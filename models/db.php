@@ -1,9 +1,9 @@
 <?php
 /**
  * Connect to DB
- * TODO: Refactor this terrible way the DB connects
  */
 function connect($hostname, $username, $password, $database){
+    // TODO: Refactor how DB connects so that `$db` doesn't neet to be called in every function.
     $db = new mysqli(
         $hostname, 
         $username, 
