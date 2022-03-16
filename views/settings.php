@@ -19,10 +19,10 @@ if(!empty(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT))){
 }
 ?>
 
-<h1 class="mb-3">Settings</h1>
+<h1 class="mb-3 pb-4 border-bottom">Settings</h1>
 
-<form action="">
-    <h2 class="mb-3">WebOps Alerts</h2>
+<form action="update_settings.php">
+    <h2 class="py-3">WebOps Alerts</h2>
     <div class="form-check form-switch mb-3">
         <input class="form-check-input" type="checkbox" role="switch" id="wcag_2_1_page_error">
         <label class="form-check-label" for="wcag_2_1_page_error">WCAG 2.1 Page Error</label>
@@ -32,7 +32,7 @@ if(!empty(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT))){
         <label class="form-check-label" for="wcag_2_1_page_alert_or_warning">WCAG 2.1 Page Alert or Warning</label>
     </div>
 
-    <h2 class="mb-3">Testing Settings</h2>
+    <h2 class="py-3">Testing Settings</h2>
     <div class="mb-3">
         <?php get_accessibility_testing_service($db, USER_ID);?>
         <label class="form-label" for="accessibility_testing_service">Accessibility Testing Service</label>
@@ -74,7 +74,7 @@ if(!empty(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT))){
         </select>
     </div>
 
-    <button class="btn btn-primary">Save Settings</button>
+    <button class="my-3 btn btn-primary">Save Settings</button>
 </form>
 
 
