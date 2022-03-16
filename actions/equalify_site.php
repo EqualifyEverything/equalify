@@ -22,10 +22,23 @@ $override_https = array(
     )
 );
 $wp_api_url = $site_url.'/?rest_route=/wp/v2/pages';
-$wp_api_contents = file_get_contents($wp_api_url, false, stream_context_create($override_https));
-if($wp_api_contents === false)
-    throw new Exception('Contents cannot be loaded.');
 
+// Save API Contents
+$curl = curl_init($wp_api_url);
+curl_setopt($curl, CURLOPT_URL, $wp_api_url);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+$headers = array(
+   "Accept: application/json",
+);
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($curl, CURLOPT_USERAGENT, 'Equalify');
+$wp_api_contents = curl_exec($curl);
+curl_close($curl);
+if($wp_api_contents == false)
+    throw new Exception('Contents cannot be loaded.');
+    
 // Create JSON
 $wp_api_json = json_decode($wp_api_contents, true);
 if(empty($wp_api_json[0]))
@@ -84,7 +97,6 @@ if(get_accessibility_testing_service($db, 1) == 'WAVE'){
 
 // Insert Site Record
 $site_record = [
-    'status' => '🎩',
     'url' => $site_url
 ];
 insert_site($db, $site_record);
