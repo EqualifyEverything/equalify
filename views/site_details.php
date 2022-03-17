@@ -33,9 +33,10 @@ else:
                 
                 <?php 
                 // Link to page accessibility inspector
-                if(get_accessibility_testing_service($db, USER_ID) == 'Little Forrest')
+                $account_info = get_account_info($db, USER_ID);
+                if($account_info->accessibility_testing_service == 'Little Forrest')
                     $wcag_inspector_url = 'https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$record->url;
-                    if(get_accessibility_testing_service($db, USER_ID) == 'WAVE')
+                    if($account_info->accessibility_testing_service == 'WAVE')
                     $wcag_inspector_url = 'https://wave.webaim.org/report#/'.$record->url
                 ?>
 
@@ -59,34 +60,28 @@ else:
 </table>
 
 <?php
-// Begin Events
+// Begin Alerts
 if(!empty($id)):
 ?>
-<hr id="events">
-<h2>Related Events</h2>
+<hr id="alerts">
+<h2>Related Alerts</h2>
 <table class="table">
     <thead>
         <tr>
             <th scope="col">Time</th>
-            <th scope="col">Type</th>
-            <th scope="col">Policy</th>
+            <th scope="col">Alert</th>
         </tr>
     </thead>
 
     <?php
-    $records = get_events_by_site($db, $id);
-    if(count($records) > 0 ):
-        foreach($records as $record):    
+    $alerts = get_alerts_by_site($db, $id);
+    if(count($alerts) > 0 ):
+        foreach($alerts as $alert):    
     ?>
 
     <tr>
-        <td><?php echo $record->time;?></td>
-        <td><?php echo ucfirst($record->type);?></td>
-        <td>
-        <a href="?view=policy_details&id=<?php echo $record->policy_id;?>">
-          <?php echo get_policy_name($db, $record->policy_id);?>
-        </a>
-      </td>
+        <td><?php echo $alert->time;?></td>
+        <td><?php echo $alert->alert;?></td>
     </tr>
 
     <?php 
@@ -95,7 +90,7 @@ if(!empty($id)):
     ?>
 
     <tr>
-        <td colspan="3">No events found.</td>
+        <td colspan="2">No alerts found.</td>
     </tr>
 
     <?php 
@@ -103,14 +98,15 @@ if(!empty($id)):
     ?>
 
 </table>
+
 <?php
-// End Events
+// End Alerts
 endif;
 ?>
 
 <hr>
-<h2 class="mb-3">Other Resources</h2>
-<a href="actions/delete_site_data.php?id=<?php echo $id;?>" class="btn btn-outline-danger">Delete Site + Related Pages and Events</a>
+<h2 class="mb-3">Options</h2>
+<a href="actions/delete_site_data.php?id=<?php echo $id;?>" class="btn btn-outline-danger">Delete Site + Related Pages and Alerts</a>
 <div class="form-text">Deletion cannot be undone.</div>
 
 <?php

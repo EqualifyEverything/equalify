@@ -43,14 +43,11 @@ $records = [];
                                 <li>
                                     <a href="index.php?view=sites" class="nav-link <?php if(current_view() == 'sites') echo 'active" aria-current="page';?>">Sites</a>
                                 </li>
-                                <li>
-                                    <a href="index.php?view=policies" class="nav-link <?php if(current_view() == 'policies') echo 'active" aria-current="page';?>">Policies</a>
-                                </li>
                             </ul>
-                            <!-- <span class="navbar-text d-inline-block px-2"> -->
-                                <?php // TODO: echo get_account_credits($db, 1); ?> 
-                                <!-- Credits Remain  -->
-                            <!-- </span> -->
+                            <span class="navbar-text d-inline-block px-2">
+                                <?php echo get_account_info($db, USER_ID)->credits; ?> 
+                                Credits Remain 
+                            </span>
                             <a href="?view=account" class="btn btn-outline-dark <?php if(current_view() == 'account') echo 'active" aria-current="page';?>">Account</a>
                         </div>
                     </div>
@@ -68,6 +65,5 @@ $records = [];
 
         </div>
     </main>
-
 </body>
 </html>

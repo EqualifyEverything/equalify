@@ -21,27 +21,27 @@ if(strpos($_SERVER['REQUEST_URI'], 'success'))
         foreach($records as $record):    
     ?>
 
-    <tr>
-        <td>
-            <a href="?view=site_details&id=<?php echo $record->id;?>#events">
-                <?php echo count(get_alerts_by_site($db, $record->id));?>
-            </a>
-        </td>
-        <td>
-            <a href="?view=site_details&id=<?php echo $record->id;?>">
-                <?php echo $record->url; ?> 
-            </a>
-        </td>
-    </tr>
+        <tr>
+            <td>
+                <a href="?view=site_details&id=<?php echo $record->id;?>#events">
+                    <?php echo count(get_alerts_by_site($db, $record->id));?>
+                </a>
+            </td>
+            <td>
+                <a href="?view=site_details&id=<?php echo $record->id;?>">
+                    <?php echo $record->url; ?> 
+                </a>
+            </td>
+        </tr>
 
     <?php 
         endforeach;
     else:
     ?>
 
-    <tr>
-        <td colspan="4">No sites have been equalified.</td>
-    </tr>
+        <tr>
+            <td colspan="4">No sites have been equalified.</td>
+        </tr>
 
     <?php 
     endif;

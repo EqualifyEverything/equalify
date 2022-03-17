@@ -50,18 +50,21 @@ foreach ($wp_api_json as $page):
     array_push($pages, array('url' => $page['link'], 'wcag_errors' => NULL));
 endforeach;
 
+// Set Account Info
+$account_info = get_account_info($db, USER_ID);
+
 // Check if user has credits 
-if(get_account_credits($db, USER_ID) < count($pages))
+if($account_info->credits < count($pages))
     die('You do not have enough credits.');
 
 // Conditional WAVE Accessibility Test
-if(get_accessibility_testing_service($db, 1) == 'WAVE'){
+if($account_info->accessibility_testing_service == 'WAVE'){
 
     // Loop Pages
     foreach ($pages as &$page):
         
         // Get Little Forrest page errors.
-        $wave_url = 'https://wave.webaim.org/api/request?key='.get_account_wave_key($db, 1).'&url='.$page['url'];
+        $wave_url = 'https://wave.webaim.org/api/request?key='.$account_info->wave_key.'&url='.$page['url'];
         $wave_json = file_get_contents($wave_url, false, stream_context_create($override_https));
         $wave_json_decoded = json_decode($wave_json, true);        
         $wave_errors = $wave_json_decoded['categories']['error']['count'];
@@ -72,7 +75,7 @@ if(get_accessibility_testing_service($db, 1) == 'WAVE'){
     endforeach;
 
 // Conditional Little Forrest Accessibility Test
-}elseif(get_accessibility_testing_service($db, 1) == 'Little Forrest'){
+}elseif($account_info->accessibility_testing_service == 'Little Forrest'){
 
     // Loop Pages
     foreach ($pages as &$page):

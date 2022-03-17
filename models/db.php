@@ -65,75 +65,12 @@ function get_all_pages(mysqli $db, $site_id){
 }
 
 /**
- * Get All Policies
- */
-function get_all_policies(mysqli $db){
-
-    // SQL
-    $sql = 'SELECT * FROM `policies`';
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
- * Get Events by Policy
- */
-function get_events_by_policy(mysqli $db, $policy_id){
-
-    // SQL
-    $sql = 'SELECT * FROM `events` WHERE `policy_id` = '.$policy_id;
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
- * Get Events by Site
- */
-function get_events_by_site(mysqli $db, $policy_id){
-
-    // SQL
-    $sql = 'SELECT * FROM `events` WHERE `site_id` = '.$policy_id;
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
  * Get Alerts
  */
 function get_all_alerts(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `type` = "alert"';
+    $sql = 'SELECT * FROM `alerts`';
 
     // Query
     $results = $db->query($sql);
@@ -154,7 +91,7 @@ function get_all_alerts(mysqli $db){
 function get_alerts_by_site(mysqli $db, $site_id){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `type` = "alert" AND `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `alerts` WHERE `site_id` = '.$site_id;
 
     // Query
     $results = $db->query($sql);
@@ -170,74 +107,19 @@ function get_alerts_by_site(mysqli $db, $site_id){
 }
 
 /**
- * Get Policy Details
+ * Get Account Info
  */
-function get_policy_details(mysqli $db, $id){
+function get_account_info(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT * FROM `policies` WHERE `id` = '.$id;
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = '';
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data = $row;
-        }
-    }
-    return $data;
-}
-
-
-/**
- * Get Account WAVE Key
- */
-function get_account_wave_key(mysqli $db, $id){
-
-    // SQL
-    $sql = 'SELECT wave_key FROM accounts WHERE id = '.$id;
+    $sql = 'SELECT * FROM accounts WHERE id = '.$id;
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->wave_key;
+    $data = $db->query($sql)->fetch_object();
 
     // Result
     return $data;
-}
-
-/**
- * Get Account Credits
- */
-function get_account_credits(mysqli $db, $id){
-
-    // SQL
-    $sql = 'SELECT credits FROM accounts WHERE id = '.$id;
-
-    // Query
-    $data = [];
-    $data = $db->query($sql)->fetch_object()->credits;
-
-    // Result
-    return $data;
-}
-
-/**
- * Get Accessibility Testing Service
- */
-function get_accessibility_testing_service(mysqli $db, $id){
-
-    // SQL
-    $sql = 'SELECT accessibility_testing_service FROM accounts WHERE id = '.$id;
-
-    // Query
-    $data = [];
-    $data = $db->query($sql)->fetch_object()->accessibility_testing_service;
-
-    // Result
-    return $data;
-
 }
 
 /**
@@ -268,23 +150,6 @@ function get_site_url(mysqli $db, $id){
     // Query
     $data = [];
     $data = $db->query($sql)->fetch_object()->url;
-
-    // Result
-    return $data;
-    
-}
-
-/**
- * Get Policy Name
- */
-function get_policy_name(mysqli $db, $id){
-
-    // SQL
-    $sql = 'SELECT `name` FROM policies WHERE id = "'.$id.'"';
-
-    // Query
-    $data = [];
-    $data = $db->query($sql)->fetch_object()->name;
 
     // Result
     return $data;
@@ -346,67 +211,18 @@ function insert_page(mysqli $db, array $record){
 }
 
 /**
- * Insert Policy
- */
-function insert_policy(mysqli $db, array $record){
-
-    // SQL
-    $sql = "INSERT INTO `policies` ";
-    $sql.= "(`name`, `action`, `event`, `tested`, `frequency`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['name']."',";
-    $sql.= "'".$record['action']."',";
-    $sql.= "'".$record['event']."',";
-    $sql.= "'".$record['tested']."',";
-    $sql.= "'".$record['frequency']."'";
-    $sql.= ");";
-    
-    // Query
-    $result = $db->query($sql);
-
-    //Fallback
-    if(!$result)
-        throw new Exception('Cannot insert policy.');
-    $record['id']->insert_id;
-    return $record;
-}
-
-/**
- * Update Policy
- */
-function update_policy(mysqli $db, array $record, $id){
-
-    // SQL
-    $sql = "UPDATE `policies` SET ";
-    $sql.= "name = '".$record['name']."',";
-    $sql.= "action = '".$record['action']."',";
-    $sql.= "event = '".$record['event']."',";
-    $sql.= "tested = '".$record['tested']."',";
-    $sql.= "frequency ='".$record['frequency']."'";
-    $sql.= " WHERE id = ".$id.";";
-
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot insert policy.');
-    $record['id']->insert_id;
-    return $record;
-}
-
-
-/**
  * Update Account
  */
 function update_account(mysqli $db, array $record){
 
     // SQL
     $sql = "UPDATE `accounts` SET ";
-    $sql.= "wave_key = '".$record['wave_key']."',";
-    $sql.= "accessibility_testing_service = '".$record['accessibility_testing_service']."'";
-    $sql.= " WHERE id = 1;";
+    $sql.= "site_unreachable_alert = '".$record['site_unreachable_alert']."',";
+    $sql.= "wcag_2_1_page_error_alert = '".$record['wcag_2_1_page_error_alert']."',";
+    $sql.= "testing_frequency = '".$record['testing_frequency']."',";
+    $sql.= "accessibility_testing_service = '".$record['accessibility_testing_service']."',";
+    $sql.= "wave_key = '".$record['wave_key']."'";
+    $sql.= " WHERE id = ".USER_ID.";";
 
     // Query
     $result = $db->query($sql);
@@ -448,58 +264,24 @@ function delete_site_pages(mysqli $db, $id){
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot delete pages.');
 }
 
 /**
- * Delete Site Events
+ * Delete Site Alerts
  */
-function delete_site_events(mysqli $db, $id){
+function delete_site_alerts(mysqli $db, $id){
     
     // SQL
-    $sql = 'DELETE FROM `events` WHERE site_id = "'.$id.'"';
+    $sql = 'DELETE FROM `alerts` WHERE site_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot delete alerts.');
 }
-
-/**
- * Delete Policy
- */
-function delete_policy(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `policies` WHERE id = "'.$id.'"';
-    $delete_pages_sql = 'DELETE FROM `policies` WHERE id = "'.$id.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot delete policy.');
-}
-
-/**
- * Delete Policy Events
- */
-function delete_policy_events(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `events` WHERE policy_id = "'.$id.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot delete site.');
-}
-
 
 /**
  * Subtract Account Credits
