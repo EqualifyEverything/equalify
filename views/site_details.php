@@ -106,7 +106,7 @@ endif;
 
 <hr>
 <h2 class="mb-3">Options</h2>
-<a href="actions/delete_site_data.php?id=<?php echo $id;?>" class="btn btn-outline-danger">Delete Site + Related Pages and Alerts</a>
+<a href="actions/delete_site_data.php?id=<?php echo $id;?>" class="btn btn-outline-danger">Delete Site, Pages, and Alerts</a>
 <div class="form-text">Deletion cannot be undone.</div>
 
 <?php

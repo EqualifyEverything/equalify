@@ -70,7 +70,7 @@ function get_all_pages(mysqli $db, $site_id){
 function get_all_alerts(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts`';
+    $sql = 'SELECT * FROM `alerts` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
 
     // Query
     $results = $db->query($sql);
