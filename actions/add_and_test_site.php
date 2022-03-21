@@ -14,6 +14,10 @@ $site_url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($site_url == false)
     throw new Exception('URL format is invalid.');
 
+// Check if URL is unique
+if(!is_unique_site_url($db, $site_url))
+    throw new Exception('Site has already been added.');
+
 // Query WP API
 $override_https = array(
     "ssl"=>array(
@@ -51,7 +55,7 @@ foreach ($wp_api_json as $page):
 endforeach;
 
 // Set Account Info
-$account_info = get_account_info($db, USER_ID);
+$account_info = get_account($db, USER_ID);
 
 // Check if user has credits 
 if($account_info->credits < count($pages))

@@ -3,14 +3,15 @@
 <?php
 // Success Message
 if(strpos($_SERVER['REQUEST_URI'], 'success'))
-    echo '<div class="alert alert-success" role="alert">Your account was updated.</div>';
+    echo '<div class="alert alert-success" role="alert">Your account settings are updated.</div>';
 
 // Set Variables
-$account_info = get_account_info($db, USER_ID);
+$account_info = get_account($db, USER_ID);
 $credits = $account_info->credits;
 $site_unreachable_alert = $account_info->site_unreachable_alert;
 $wcag_2_1_page_error_alert = $account_info->wcag_2_1_page_error_alert;
-$testing_frequency = $account_info->testing_frequency;
+$email_site_owner = $account_info->email_site_owner;
+$scan_frequency = $account_info->scan_frequency;
 $accessibility_testing_service = $account_info->accessibility_testing_service;
 $wave_key = $account_info->wave_key;
 ?>
@@ -45,14 +46,30 @@ $wave_key = $account_info->wave_key;
         });
         </script>
     </div>
-    <h2 class="py-3">Testing Settings</h2>
+    <h2 class="py-3">WebOps Enforcement</h2>
+    <div class="form-check form-switch mb-3">
+        <input type="hidden" name="email_site_owner" id="email_site_owner" value="<?php echo $email_site_owner;?>">
+        <input class="form-check-input" type="checkbox" role="switch" id="email_site_owner_switch" <?php if($email_site_owner == 1) echo 'checked';?>>
+        <label class="form-check-label" for="email_site_owner_switch">Send <a href="#" target="_blank">Alert Email</a> to the website's owner <span class="text-secondary">- 1 credit per email sent.</span></label>
+        <script>
+        document.getElementById('email_site_owner_switch').addEventListener('change', function () {
+            if ( this.checked ) {
+                document.getElementById('email_site_owner').value = 1;
+            } else {
+                document.getElementById('email_site_owner').value = 0;
+            }
+        });
+        </script>
+    </div>
+    <h2 class="py-3">Scan Settings</h2>
     <div class="mb-3">
-        <label class="form-label" for="testing_frequency">Testing Frequency</label>
-        <select id="testing_frequency" class="form-select" name="testing_frequency" onchange="showDiv('hidden_div', this)">
-            <option value="daily" <?php if($testing_frequency == 'daily') echo 'selected';?>>Daily</option>
-            <option value="weekly" <?php if($testing_frequency == 'weekly') echo 'selected';?>>Weekly</option>
-            <option value="monthly" <?php if($testing_frequency == 'monthly') echo 'selected';?>>Monthly</option>
-            <option value="annually" <?php if($testing_frequency == 'annually') echo 'selected';?>>Annually</option>
+        <label class="form-label" for="scan_frequency">Scan Frequency <span class="text-secondary">- 5 credits per site scanned.</span></label>
+        <select id="scan_frequency" class="form-select" name="scan_frequency" onchange="showDiv('hidden_div', this)">
+            <option value="manually" <?php if($scan_frequency == 'manually') echo 'selected';?>>Manually</option>
+            <option value="daily" <?php if($scan_frequency == 'daily') echo 'selected';?>>Daily</option>
+            <option value="weekly" <?php if($scan_frequency == 'weekly') echo 'selected';?>>Weekly</option>
+            <option value="monthly" <?php if($scan_frequency == 'monthly') echo 'selected';?>>Monthly</option>
+            <option value="annually" <?php if($scan_frequency == 'annually') echo 'selected';?>>Annually</option>
         </select>
     </div>
     
@@ -75,10 +92,7 @@ $wave_key = $account_info->wave_key;
         class="mb-3" 
         
         <?php 
-        if(
-            empty(
-                $wave_key
-            ) ||
+        if( 
             $accessibility_testing_service == 'Little Forrest'
         ) echo 'style="display: none;"';
         ?>

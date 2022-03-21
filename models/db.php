@@ -25,7 +25,7 @@ function connect($hostname, $username, $password, $database){
 /**
  * Get All Sites
  */
-function get_all_sites(mysqli $db){
+function get_sites(mysqli $db){
 
     // SQL
     $sql = 'SELECT * FROM `sites`';
@@ -44,12 +44,12 @@ function get_all_sites(mysqli $db){
 }
 
 /**
- * Get All Pages
+ * Get Events
  */
-function get_all_pages(mysqli $db, $site_id){
+function get_events(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `pages` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `events` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
 
     // Query
     $results = $db->query($sql);
@@ -65,12 +65,12 @@ function get_all_pages(mysqli $db, $site_id){
 }
 
 /**
- * Get Alerts
+ * Get Events by Site
  */
-function get_all_alerts(mysqli $db){
+function get_events_by_site(mysqli $db, $site_id){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
+    $sql = 'SELECT * FROM `events` WHERE `site_id` = '.$site_id;
 
     // Query
     $results = $db->query($sql);
@@ -86,12 +86,12 @@ function get_all_alerts(mysqli $db){
 }
 
 /**
- * Get Alerts by Site
+ * Get Events by Site
  */
-function get_alerts_by_site(mysqli $db, $site_id){
+function get_event_alerts_by_site(mysqli $db, $site_id){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `events` WHERE `type` = "alert" AND `site_id` = '.$site_id;
 
     // Query
     $results = $db->query($sql);
@@ -109,7 +109,7 @@ function get_alerts_by_site(mysqli $db, $site_id){
 /**
  * Get Account Info
  */
-function get_account_info(mysqli $db, $id){
+function get_account(mysqli $db, $id){
 
     // SQL
     $sql = 'SELECT * FROM accounts WHERE id = '.$id;
@@ -120,6 +120,23 @@ function get_account_info(mysqli $db, $id){
 
     // Result
     return $data;
+}
+
+/**
+ * Get Site Records
+ */
+function get_site(mysqli $db, $id){
+
+    // SQL
+    $sql = 'SELECT * FROM sites WHERE id = "'.$id.'"';
+
+    // Query
+    $data = [];
+    $data = $db->query($sql)->fetch_object();
+
+    // Result
+    return $data;
+    
 }
 
 /**
@@ -140,16 +157,16 @@ function get_site_id(mysqli $db, $url){
 }
 
 /**
- * Get Site URL
+ * Get Site Title
  */
-function get_site_url(mysqli $db, $id){
+function get_site_title(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT `url` FROM sites WHERE id = "'.$id.'"';
+    $sql = 'SELECT title FROM sites WHERE id = "'.$id.'"';
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->url;
+    $data = $db->query($sql)->fetch_object()->title;
 
     // Result
     return $data;
@@ -157,15 +174,46 @@ function get_site_url(mysqli $db, $id){
 }
 
 /**
+ * Get Site Pages
+ */
+function get_site_pages(mysqli $db, $site_id){
+
+    // SQL
+    $sql = 'SELECT * FROM `pages` WHERE `site_id` = '.$site_id;
+
+    // Query
+    $results = $db->query($sql);
+
+    // Result
+    $data = [];
+    if($results->num_rows > 0){
+        while($row = $results->fetch_object()){
+            $data[] = $row;
+        }
+    }
+    return $data;
+}
+
+
+/**
+ * Insert Site
+ */
+function is_unique_site_url(mysqli $db, $site_url){
+
+    // Require unique URL
+    $url_sql = 'SELECT * FROM sites WHERE url = "'.$site_url.'"';
+    $url_query = $db->query($url_sql);
+    if(mysqli_num_rows($url_query) > 0){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/**
  * Insert Site
  */
 function insert_site(mysqli $db, array $record){
-
-    // Require unique URL
-    $url_sql = 'SELECT * FROM sites WHERE url = "'.$record['url'].'"';
-    $url_query = $db->query($url_sql);
-    if(mysqli_num_rows($url_query) > 0)
-        throw new Exception('Site URL is aleady added.');
 
     // SQL
     $sql = "INSERT INTO `sites` ";
@@ -219,7 +267,8 @@ function update_account(mysqli $db, array $record){
     $sql = "UPDATE `accounts` SET ";
     $sql.= "site_unreachable_alert = '".$record['site_unreachable_alert']."',";
     $sql.= "wcag_2_1_page_error_alert = '".$record['wcag_2_1_page_error_alert']."',";
-    $sql.= "testing_frequency = '".$record['testing_frequency']."',";
+    $sql.= "email_site_owner = '".$record['email_site_owner']."',";
+    $sql.= "scan_frequency = '".$record['scan_frequency']."',";
     $sql.= "accessibility_testing_service = '".$record['accessibility_testing_service']."',";
     $sql.= "wave_key = '".$record['wave_key']."'";
     $sql.= " WHERE id = ".USER_ID.";";
@@ -268,19 +317,19 @@ function delete_site_pages(mysqli $db, $id){
 }
 
 /**
- * Delete Site Alerts
+ * Delete Site Events
  */
-function delete_site_alerts(mysqli $db, $id){
+function delete_site_events(mysqli $db, $id){
     
     // SQL
-    $sql = 'DELETE FROM `alerts` WHERE site_id = "'.$id.'"';
+    $sql = 'DELETE FROM `events` WHERE site_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete alerts.');
+        throw new Exception('Cannot delete events.');
 }
 
 /**

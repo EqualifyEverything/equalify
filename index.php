@@ -31,21 +31,21 @@ $records = [];
             <header class="border-bottom mb-4">
                 <nav class="navbar py-3 navbar-expand-lg navbar-light">
                     <div class="container-fluid">
-                        <a class="navbar-brand" href="index.php?view=alerts">✅ Equalify</a>
+                        <a class="navbar-brand" href="index.php?view=events">✅ Equalify</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li>
-                                    <a href="index.php?view=alerts" class="nav-link <?php if(current_view() == 'alerts' || current_view() == '') echo 'active" aria-current="page';?>">Alerts</a>
+                                    <a href="index.php?view=events" class="nav-link <?php if(current_view() == 'events' || current_view() == '') echo 'active" aria-current="page';?>">Events</a>
                                 </li>
                                 <li>
                                     <a href="index.php?view=sites" class="nav-link <?php if(current_view() == 'sites') echo 'active" aria-current="page';?>">Sites</a>
                                 </li>
                             </ul>
                             <span class="navbar-text d-inline-block px-2">
-                                <?php echo get_account_info($db, USER_ID)->credits; ?> 
+                                <?php echo get_account($db, USER_ID)->credits; ?> 
                                 Credits Remain 
                             </span>
                             <a href="?view=account" class="btn btn-outline-dark <?php if(current_view() == 'account') echo 'active" aria-current="page';?>">Account</a>
@@ -59,7 +59,7 @@ $records = [];
             if(!empty($_GET['view'])){
                 require_once 'views/'.$_GET['view'].'.php';
             }else{
-                require_once 'views/alerts.php';
+                require_once 'views/events.php';
             }
             ?>
 

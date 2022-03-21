@@ -18,8 +18,12 @@ $wcag_2_1_page_error_alert = $_POST['wcag_2_1_page_error_alert'];
 if(!is_numeric($wcag_2_1_page_error_alert)){
     throw new Exception('"WCAG 2.1 Page Error" alert options are improperly specified.');
 }
-$testing_frequency = $_POST['testing_frequency'];
-if(empty($testing_frequency)){
+$email_site_owner = $_POST['email_site_owner'];
+if(!is_numeric($wcag_2_1_page_error_alert)){
+    throw new Exception('"Email Site Owner" enforcement options are improperly specified.');
+}
+$scan_frequency = $_POST['scan_frequency'];
+if(empty($scan_frequency)){
     throw new Exception('No testing frequency is specified.');
 }
 $accessibility_testing_service = $_POST['accessibility_testing_service'];
@@ -35,7 +39,8 @@ if(empty($wave_key)){
 $record = [
     'site_unreachable_alert' => $site_unreachable_alert,
     'wcag_2_1_page_error_alert' => $wcag_2_1_page_error_alert,
-    'testing_frequency' => $testing_frequency,
+    'email_site_owner' => $email_site_owner,
+    'scan_frequency' => $scan_frequency,
     'accessibility_testing_service' => $accessibility_testing_service,
     'wave_key' => $wave_key
 ];

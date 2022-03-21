@@ -17,10 +17,10 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if(empty($id))
     throw new Exception('ID is invalid.');
 
-// Delete Site, Pages, and Alerts
+// Delete Site, Pages, and Events
 delete_site($db, $id);
 delete_site_pages($db, $id);
-delete_site_alerts($db, $id);
+delete_site_events($db, $id);
 
 // Redirect
 header("Location: ../index.php?view=sites&status=success");

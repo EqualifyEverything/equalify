@@ -1,39 +1,45 @@
-<h1>All Sites</h1>
+<h1 class="mb-3 pb-4 border-bottom">All Sites</h1>
 
 <?php
 // Success Message
 if(strpos($_SERVER['REQUEST_URI'], 'success'))
-    echo '<div class="alert alert-success" role="alert">Sites are updated.</div>'
+    echo '<div class="event event-success" role="event">Sites are updated.</div>'
 ?>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Alerts</th>
-            <th scope="col">Site</th>
-        </tr>
-    </thead>
-    <tbody>
-
+<div class="row row-cols-3 g-4 pb-4 border-bottom">
     <?php
-    $records = get_all_sites($db);
-    if(count($records) > 0 ):
-        foreach($records as $record):    
+    $sites = get_sites($db);
+    if(count($sites) > 0 ):
+        foreach($sites as $site):    
     ?>
 
-        <tr>
-            <td>
-                <a href="?view=site_details&id=<?php echo $record->id;?>#events">
-                    <?php echo count(get_alerts_by_site($db, $record->id));?>
-                </a>
-            </td>
-            <td>
-                <a href="?view=site_details&id=<?php echo $record->id;?>">
-                    <?php echo $record->url; ?> 
-                </a>
-            </td>
-        </tr>
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
 
+                <?php
+                // Badge info
+                $alert_count = count(get_event_alerts_by_site($db, $site->id));
+                if($alert_count == 0){
+                    $badge_status = 'bg-success';
+                    $badge_content = '✅ Equalified';
+                }else{
+                    $badge_status = 'bg-danger';
+                    $badge_content = $alert_count.' Alerts';
+                };
+                ?>
+                <span class="badge mb-2 <?php echo $badge_status;?>"> <?php echo $badge_content;?> </span>
+                <h5 class="card-title">
+                    <?php echo $site->title; ?>
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    <?php echo $site->url; ?> 
+                </h6>
+                <a type="button" class="btn btn-outline-primary btn-sm" href="?view=site_details&id=<?php echo $site->id;?>">View Details</a>
+            </div>
+        </div>
+    </div>
+    
     <?php 
         endforeach;
     else:
@@ -48,14 +54,20 @@ if(strpos($_SERVER['REQUEST_URI'], 'success'))
     ?>
 
     </tbody>
-</table>
-<hr>
+</div>
+<div class="my-3">
+    <button class="btn btn-primary">Scan All Sites</button>
+    <div class="form-text">
+        <?php echo count($sites)*5;?> credits will be charged to scan <?php echo count($sites);?> sites.
+    </div>
+</div>
+<!-- <hr>
 <h2>Add a Site</h2>
-<form action="actions/equalify_site.php" method="get" >
+<form action="actions/add_and_test_site.php" method="get" >
     <label for="url" class="form-label">Site URL</label>
     <input type="text" class="form-control" name="url" aria-describedby="url_help" placeholder="https://decubing.com" value="https://decubing.com" >
     <div class="form-text">
         Currently supports WordPress 4.2 - 5.9.2 sites with API enabled.
     </div>
-    <button type="submit" class="btn btn-primary my-3">Equalify Site</button>
-</form>
+    <button type="submit" class="btn btn-primary my-3">Add and Test Site</button>
+</form> -->
