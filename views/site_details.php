@@ -19,7 +19,7 @@ $account_info = get_account($db, USER_ID);
     <h1><?php echo $site->title;?></h1>
     <a class="h2 link-secondary" href="<?php echo $site->url;?>" target="_blank"><?php echo $site->url;?></a>
 </div>
-<section id="pages" class="mb-3 pb-4 border-bottom">
+<section id="pages" class="mb-3 pb-4">
     <h2>Pages</h2>
     <table class="table">
         <thead>
@@ -66,13 +66,49 @@ $account_info = get_account($db, USER_ID);
         </tbody>
     </table>
 </section>
-<section id="events" class="mb-3 pb-4 border-bottom">
-    <h2>Related Events</h2>
+<section id="alerts" class="mb-3 pb-4">
+    <h2>Site Alerts</h2>
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Type</th>
                 <th scope="col">Time</th>
+                <th scope="col">Details</th>
+            </tr>
+        </thead>
+
+        <?php
+        $alerts = get_alerts_by_site($db, $id);
+        if(count($alerts) > 0 ):
+            foreach($alerts as $alert):    
+        ?>
+
+        <tr>
+            <td><?php echo $alert->time;?></td>
+            <td><?php echo $alert->details;?></td>
+        </tr>
+
+        <?php 
+            endforeach;
+        else:
+        ?>
+
+        <tr>
+            <td colspan="2">No alerts found.</td>
+        </tr>
+
+        <?php 
+        endif;
+        ?>
+
+    </table>
+</section>
+<section id="events" class="mb-3 pb-4">
+    <h2>Equalify Events</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">time</th>
+                <th scope="col">Type</th>
                 <th scope="col">Status</th>
             </tr>
         </thead>
@@ -84,8 +120,8 @@ $account_info = get_account($db, USER_ID);
         ?>
 
         <tr>
-            <td><?php echo $event->type;?></td>
             <td><?php echo $event->time;?></td>
+            <td><?php echo ucwords(str_replace('_', ' ', $event->type));?></td>
             <td><?php echo ucwords($event->status);?></td>
         </tr>
 
@@ -95,7 +131,7 @@ $account_info = get_account($db, USER_ID);
         ?>
 
         <tr>
-            <td colspan="2">No events found.</td>
+            <td colspan="3">No events found.</td>
         </tr>
 
         <?php 
@@ -104,10 +140,10 @@ $account_info = get_account($db, USER_ID);
 
     </table>
 </section>
-<section id="site_options" class="mb-3 pb-4 border-bottom">
+<section id="site_options" class="mb-3 pb-4">
     <h2 class="pb-2">Site Options</h2>
     <a href="" class="btn btn-primary">Rescan Site</a>
-    <div class="d-inline">
-        <a href="actions/delete_site_data.php?id=<?php echo $site->id;?>" class="btn btn-outline-danger">Perminently Delete Site, Pages, and Events</a>
+    <div class="form-text">
+        5 credits will be charged to scan site.
     </div>
 </section>

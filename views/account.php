@@ -1,4 +1,6 @@
-<h1 class="mb-3 pb-4 border-bottom">Account Settings</h1>
+<div class="mb-3 pb-4 border-bottom">
+    <h1>Account Settings</h1>
+</div>
 
 <?php
 // Success Message

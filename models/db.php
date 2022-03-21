@@ -86,12 +86,33 @@ function get_events_by_site(mysqli $db, $site_id){
 }
 
 /**
- * Get Events by Site
+ * Get Alerts
  */
-function get_event_alerts_by_site(mysqli $db, $site_id){
+function get_alerts(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `type` = "alert" AND `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `alerts` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
+
+    // Query
+    $results = $db->query($sql);
+
+    // Result
+    $data = [];
+    if($results->num_rows > 0){
+        while($row = $results->fetch_object()){
+            $data[] = $row;
+        }
+    }
+    return $data;
+}
+
+/**
+ * Get Alerts
+ */
+function get_alerts_by_site(mysqli $db, $site_id){
+
+    // SQL
+    $sql = 'SELECT * FROM `alerts` WHERE `site_id` = '.$site_id;
 
     // Query
     $results = $db->query($sql);
