@@ -1,6 +1,3 @@
-<div class="mb-3 pb-4 border-bottom">
-    <h1>All Sites</h1>
-</div>
 
 <?php
 // Success Message
@@ -8,7 +5,8 @@ if(strpos($_SERVER['REQUEST_URI'], 'success'))
     echo '<div class="event event-success" role="event">Sites are updated.</div>'
 ?>
 
-<section class="mb-3 pb-4">
+<section>
+    <h1 class="mb-3 pb-4 border-bottom">All Sites</h1>
     <div class="row row-cols-3 g-4 pb-4">
         <?php
         $sites = get_sites($db);
@@ -58,8 +56,6 @@ if(strpos($_SERVER['REQUEST_URI'], 'success'))
 
         </tbody>
     </div>
-</section>
-<section class="my-3 pb-4">
     <button class="btn btn-primary">Rescan All Sites</button>
     <div class="form-text">
         <?php echo count($sites)*5;?> credits will be charged to scan <?php echo count($sites);?> sites.
