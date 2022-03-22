@@ -5,7 +5,7 @@
             <tr>
                 <th scope="col">Type</th>
                 <th scope="col">Time</th>
-                <th scope="col">Site</th>
+                <th scope="col">Property</th>
                 <th scope="col">Status</th>
             </tr>
         </thead>
@@ -20,8 +20,8 @@
             <td><?php echo ucwords(str_replace('_', ' ', $event->type));?></td>
             <td><?php echo $event->time;?></td>
             <td>
-                <a href="?view=site_details&id=<?php echo $event->site_id;?>">
-                    <?php echo get_site_title($db, $event->site_id);?>
+                <a href="?view=property_details&id=<?php echo $event->property_id;?>">
+                    <?php echo get_property_title($db, $event->property_id);?>
                 </a>
             </td>
             <td><?php echo ucwords($event->status);?></td>

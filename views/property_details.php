@@ -7,8 +7,8 @@ if($id == false)
     throw new Exception('Site ID format is invalid.');
 
 // Check if Site exists
-$site = get_site($db, $id);
-if(empty($site) == 1)
+$property = get_property($db, $id);
+if(empty($property) == 1)
     throw new Exception('Site does not exist.');
 
 // Set Account Info
@@ -16,8 +16,8 @@ $account_info = get_account($db, USER_ID);
 ?>
 
 <div class="mb-3 pb-4 border-bottom">
-    <h1><?php echo $site->title;?></h1>
-    <a class="h2 link-secondary" href="<?php echo $site->url;?>" target="_blank"><?php echo $site->url;?></a>
+    <h1><?php echo $property->title;?></h1>
+    <a class="h2 link-secondary" href="<?php echo $property->url;?>" target="_blank"><?php echo $property->url;?></a>
 </div>
 <section id="pages" class="mb-3 pb-4">
     <h2>Pages</h2>
@@ -31,7 +31,7 @@ $account_info = get_account($db, USER_ID);
         <tbody>
 
         <?php
-        $pages = get_site_pages($db, $id);
+        $pages = get_property_pages($db, $id);
         if(count($pages) > 0 ):
             foreach($pages as $page):    
         ?>
@@ -77,7 +77,7 @@ $account_info = get_account($db, USER_ID);
         </thead>
 
         <?php
-        $alerts = get_alerts_by_site($db, $id);
+        $alerts = get_alerts_by_property($db, $id);
         if(count($alerts) > 0 ):
             foreach($alerts as $alert):    
         ?>
@@ -114,7 +114,7 @@ $account_info = get_account($db, USER_ID);
         </thead>
 
         <?php
-        $events = get_events_by_site($db, $id);
+        $events = get_events_by_property($db, $id);
         if(count($events) > 0 ):
             foreach($events as $event):    
         ?>
@@ -140,10 +140,10 @@ $account_info = get_account($db, USER_ID);
 
     </table>
 </section>
-<section id="site_options" class="mb-3 pb-4">
+<section id="property_options" class="mb-3 pb-4">
     <h2 class="pb-2">Site Options</h2>
     <a href="" class="btn btn-primary">Rescan Site</a>
     <div class="form-text">
-        5 credits will be charged to scan site.
+        5 credits will be charged to scan property.
     </div>
 </section>

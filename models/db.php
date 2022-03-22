@@ -1,5 +1,5 @@
 <?php
-// TODO: Make site Object Oriented instead of Procedural
+// TODO: Make property Object Oriented instead of Procedural
 
 /**
  * Connect to DB
@@ -23,12 +23,12 @@ function connect($hostname, $username, $password, $database){
 }
 
 /**
- * Get All Sites
+ * Get All Properties
  */
-function get_sites(mysqli $db){
+function get_properties(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `sites`';
+    $sql = 'SELECT * FROM `properties`';
 
     // Query
     $results = $db->query($sql);
@@ -65,12 +65,12 @@ function get_events(mysqli $db){
 }
 
 /**
- * Get Events by Site
+ * Get Events by property
  */
-function get_events_by_site(mysqli $db, $site_id){
+function get_events_by_property(mysqli $db, $property_id){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `events` WHERE `property_id` = '.$property_id;
 
     // Query
     $results = $db->query($sql);
@@ -109,10 +109,10 @@ function get_alerts(mysqli $db){
 /**
  * Get Alerts
  */
-function get_alerts_by_site(mysqli $db, $site_id){
+function get_alerts_by_property(mysqli $db, $property_id){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `alerts` WHERE `property_id` = '.$property_id;
 
     // Query
     $results = $db->query($sql);
@@ -144,12 +144,12 @@ function get_account(mysqli $db, $id){
 }
 
 /**
- * Get Site Records
+ * Get property Records
  */
-function get_site(mysqli $db, $id){
+function get_property(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT * FROM sites WHERE id = "'.$id.'"';
+    $sql = 'SELECT * FROM properties WHERE id = "'.$id.'"';
 
     // Query
     $data = [];
@@ -161,12 +161,12 @@ function get_site(mysqli $db, $id){
 }
 
 /**
- * Get Site ID
+ * Get property ID
  */
-function get_site_id(mysqli $db, $url){
+function get_property_id(mysqli $db, $url){
 
     // SQL
-    $sql = 'SELECT id FROM sites WHERE url = "'.$url.'"';
+    $sql = 'SELECT id FROM properties WHERE url = "'.$url.'"';
 
     // Query
     $data = [];
@@ -178,12 +178,12 @@ function get_site_id(mysqli $db, $url){
 }
 
 /**
- * Get Site Title
+ * Get property Title
  */
-function get_site_title(mysqli $db, $id){
+function get_property_title(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT title FROM sites WHERE id = "'.$id.'"';
+    $sql = 'SELECT title FROM properties WHERE id = "'.$id.'"';
 
     // Query
     $data = [];
@@ -195,12 +195,12 @@ function get_site_title(mysqli $db, $id){
 }
 
 /**
- * Get Site Pages
+ * Get property Pages
  */
-function get_site_pages(mysqli $db, $site_id){
+function get_property_pages(mysqli $db, $property_id){
 
     // SQL
-    $sql = 'SELECT * FROM `pages` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `pages` WHERE `property_id` = '.$property_id;
 
     // Query
     $results = $db->query($sql);
@@ -217,12 +217,12 @@ function get_site_pages(mysqli $db, $site_id){
 
 
 /**
- * Insert Site
+ * Insert property
  */
-function is_unique_site_url(mysqli $db, $site_url){
+function is_unique_property_url(mysqli $db, $property_url){
 
     // Require unique URL
-    $url_sql = 'SELECT * FROM sites WHERE url = "'.$site_url.'"';
+    $url_sql = 'SELECT * FROM properties WHERE url = "'.$property_url.'"';
     $url_query = $db->query($url_sql);
     if(mysqli_num_rows($url_query) > 0){
         return false;
@@ -232,12 +232,12 @@ function is_unique_site_url(mysqli $db, $site_url){
 }
 
 /**
- * Insert Site
+ * Insert property
  */
-function insert_site(mysqli $db, array $record){
+function insert_property(mysqli $db, array $record){
 
     // SQL
-    $sql = "INSERT INTO `sites` ";
+    $sql = "INSERT INTO `properties` ";
     $sql.= "(`url`)";
     $sql.= " VALUES ";
     $sql.= "(";
@@ -249,7 +249,7 @@ function insert_site(mysqli $db, array $record){
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert site.');
+        throw new Exception('Cannot insert property.');
     $record['id']->insert_id;
     return $record;
 }
@@ -261,10 +261,10 @@ function insert_page(mysqli $db, array $record){
 
     // SQL
     $sql = "INSERT INTO `pages` ";
-    $sql.= "(`site_id`, `url`, `wcag_errors`)";
+    $sql.= "(`property_id`, `url`, `wcag_errors`)";
     $sql.= " VALUES ";
     $sql.= "(";
-    $sql.= "'".$record['site_id']."',";
+    $sql.= "'".$record['property_id']."',";
     $sql.= "'".$record['url']."',";
     $sql.= "'".$record['wcag_errors']."'";
     $sql.= ");";
@@ -286,7 +286,7 @@ function update_account(mysqli $db, array $record){
 
     // SQL
     $sql = "UPDATE `accounts` SET ";
-    $sql.= "site_unreachable_alert = '".$record['site_unreachable_alert']."',";
+    $sql.= "property_unreachable_alert = '".$record['property_unreachable_alert']."',";
     $sql.= "wcag_2_1_page_error_alert = '".$record['wcag_2_1_page_error_alert']."',";
     $sql.= "email_site_owner = '".$record['email_site_owner']."',";
     $sql.= "scan_frequency = '".$record['scan_frequency']."',";
@@ -305,29 +305,29 @@ function update_account(mysqli $db, array $record){
 }
 
 /**
- * Delete Site
+ * Delete property
  */
-function delete_site(mysqli $db, $id){
+function delete_property(mysqli $db, $id){
     
     // SQL
-    $sql = 'DELETE FROM `sites` WHERE id = "'.$id.'"';
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
+    $sql = 'DELETE FROM `properties` WHERE id = "'.$id.'"';
+    $delete_pages_sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot delete property.');
 }
 
 /**
- * Delete Site Pages
+ * Delete property Pages
  */
-function delete_site_pages(mysqli $db, $id){
+function delete_property_pages(mysqli $db, $id){
     
     // SQL
-    $sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
+    $sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
@@ -338,12 +338,12 @@ function delete_site_pages(mysqli $db, $id){
 }
 
 /**
- * Delete Site Events
+ * Delete property Events
  */
-function delete_site_events(mysqli $db, $id){
+function delete_property_events(mysqli $db, $id){
     
     // SQL
-    $sql = 'DELETE FROM `events` WHERE site_id = "'.$id.'"';
+    $sql = 'DELETE FROM `events` WHERE property_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
@@ -360,12 +360,12 @@ function subtract_account_credits(mysqli $db, $id, $credits){
     
     // SQL
     $sql = 'UPDATE `accounts` SET credits = credits - '.$credits.' WHERE id = '.$id;
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
+    $delete_pages_sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot delete property.');
 }

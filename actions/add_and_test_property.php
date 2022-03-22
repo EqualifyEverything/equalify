@@ -10,12 +10,12 @@ $db = connect(
 );
 
 // Get URL Variables and fallbacks
-$site_url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
-if($site_url == false)
+$property_url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
+if($property_url == false)
     throw new Exception('URL format is invalid.');
 
 // Check if URL is unique
-if(!is_unique_site_url($db, $site_url))
+if(!is_unique_property_url($db, $property_url))
     throw new Exception('Site has already been added.');
 
 // Query WP API
@@ -25,7 +25,7 @@ $override_https = array(
         "verify_peer_name"=> false,
     )
 );
-$wp_api_url = $site_url.'/?rest_route=/wp/v2/pages';
+$wp_api_url = $property_url.'/?rest_route=/wp/v2/pages';
 
 // Save API Contents
 $curl = curl_init($wp_api_url);
@@ -103,17 +103,17 @@ if($account_info->accessibility_testing_service == 'WAVE'){
 }
 
 // Insert Site Record
-$site_record = [
-    'url' => $site_url
+$property_record = [
+    'url' => $property_url
 ];
-insert_site($db, $site_record);
+insert_property($db, $property_record);
 
 // Insert Pages Records
 foreach ($pages as $page):
     $pages_record = [
         'wcag_errors' => $page['wcag_errors'],
         'url' => $page['url'],
-        'site_id' => get_site_id($db, $site_url)
+        'property_id' => get_property_id($db, $property_url)
     ];
     insert_page($db, $pages_record);
 endforeach;
@@ -122,4 +122,4 @@ endforeach;
 subtract_account_credits($db, USER_ID, count($pages) );
 
 // Redirect
-header("Location: ../index.php?view=sites&status=success");
+header("Location: ../index.php?view=properties&status=success");

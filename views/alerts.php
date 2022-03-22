@@ -20,8 +20,8 @@
             <td><?php echo $alert->time;?></td>
             <td><?php echo $alert->details;?></td>
             <td>
-                <a href="?view=site_details&id=<?php echo $alert->site_id;?>">
-                    <?php echo get_site_title($db, $alert->site_id);?>
+                <a href="?view=property_details&id=<?php echo $alert->property_id;?>">
+                    <?php echo get_property_title($db, $alert->property_id);?>
                 </a>
             </td>
         </tr>

@@ -10,7 +10,7 @@ if(strpos($_SERVER['REQUEST_URI'], 'success'))
 // Set Variables
 $account_info = get_account($db, USER_ID);
 $credits = $account_info->credits;
-$site_unreachable_alert = $account_info->site_unreachable_alert;
+$property_unreachable_alert = $account_info->property_unreachable_alert;
 $wcag_2_1_page_error_alert = $account_info->wcag_2_1_page_error_alert;
 $email_site_owner = $account_info->email_site_owner;
 $scan_frequency = $account_info->scan_frequency;
@@ -21,15 +21,15 @@ $wave_key = $account_info->wave_key;
 <form action="actions/update_account.php" method="post">
     <h2 class="py-3">WebOps Alerts</h2>
     <div class="form-check form-switch mb-3">
-        <input type="hidden" name="site_unreachable_alert" id="site_unreachable_alert" value="<?php echo $site_unreachable_alert;?>">
-        <input class="form-check-input" type="checkbox" role="switch" id="site_unreachable_alert_switch" <?php if($site_unreachable_alert == 1) echo 'checked';?>>
-        <label class="form-check-label" for="site_unreachable_alert_switch">Site Unreachable</label>
+        <input type="hidden" name="property_unreachable_alert" id="property_unreachable_alert" value="<?php echo $property_unreachable_alert;?>">
+        <input class="form-check-input" type="checkbox" role="switch" id="property_unreachable_alert_switch" <?php if($property_unreachable_alert == 1) echo 'checked';?>>
+        <label class="form-check-label" for="property_unreachable_alert_switch">Property Unreachable</label>
         <script>
-        document.getElementById('site_unreachable_alert_switch').addEventListener('change', function () {
+        document.getElementById('property_unreachable_alert_switch').addEventListener('change', function () {
             if ( this.checked ) {
-                document.getElementById('site_unreachable_alert').value = 1;
+                document.getElementById('property_unreachable_alert').value = 1;
             } else {
-                document.getElementById('site_unreachable_alert').value = 0;
+                document.getElementById('property_unreachable_alert').value = 0;
             }
         });
         </script>
@@ -51,8 +51,8 @@ $wave_key = $account_info->wave_key;
     <h2 class="py-3">WebOps Enforcement</h2>
     <div class="form-check form-switch mb-3">
         <input type="hidden" name="email_site_owner" id="email_site_owner" value="<?php echo $email_site_owner;?>">
-        <input class="form-check-input" type="checkbox" role="switch" id="email_site_owner_switch" <?php if($email_site_owner == 1) echo 'checked';?>>
-        <label class="form-check-label" for="email_site_owner_switch">Send <a href="#" target="_blank">Alert Email</a> to the website's owner <span class="text-secondary">- 1 credit per email sent.</span></label>
+        <input class="form-check-input" type="checkbox" role="switch" id="email_site_owner_switch" <?php if($email_site_owner == 1) echo 'checked';?> disabled>
+        <label class="form-check-label" for="email_site_owner_switch">Send alert email to the webproperty's owner <span class="text-secondary">- Coming soon!</span></label>
         <script>
         document.getElementById('email_site_owner_switch').addEventListener('change', function () {
             if ( this.checked ) {
@@ -65,7 +65,7 @@ $wave_key = $account_info->wave_key;
     </div>
     <h2 class="py-3">Scan Settings</h2>
     <div class="mb-3">
-        <label class="form-label" for="scan_frequency">Scan Frequency <span class="text-secondary">- 5 credits per site scanned.</span></label>
+        <label class="form-label" for="scan_frequency">Scan Frequency <span class="text-secondary">- 5 credits per property scanned.</span></label>
         <select id="scan_frequency" class="form-select" name="scan_frequency" onchange="showDiv('hidden_div', this)">
             <option value="manually" <?php if($scan_frequency == 'manually') echo 'selected';?>>Manually</option>
             <option value="daily" <?php if($scan_frequency == 'daily') echo 'selected';?>>Daily</option>

@@ -18,10 +18,10 @@ if(empty($id))
     throw new Exception('ID is invalid.');
 
 // Delete Site, Pages, and Events
-delete_site($db, $id);
-delete_site_pages($db, $id);
-delete_site_events($db, $id);
+delete_property($db, $id);
+delete_property_pages($db, $id);
+delete_property_events($db, $id);
 
 // Redirect
-header("Location: ../index.php?view=sites&status=success");
+header("Location: ../index.php?view=properties&status=success");
 die();

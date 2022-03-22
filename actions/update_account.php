@@ -10,8 +10,8 @@ $db = connect(
 );
 
 // Set Variables and fallbacks
-$site_unreachable_alert = $_POST['site_unreachable_alert'];
-if(!is_numeric($site_unreachable_alert)){
+$property_unreachable_alert = $_POST['property_unreachable_alert'];
+if(!is_numeric($property_unreachable_alert)){
     throw new Exception('"Site Unreachable" alert options are improperly specified.');
 }
 $wcag_2_1_page_error_alert = $_POST['wcag_2_1_page_error_alert'];
@@ -37,7 +37,7 @@ if(empty($wave_key)){
 
 // Create Record
 $record = [
-    'site_unreachable_alert' => $site_unreachable_alert,
+    'property_unreachable_alert' => $property_unreachable_alert,
     'wcag_2_1_page_error_alert' => $wcag_2_1_page_error_alert,
     'email_site_owner' => $email_site_owner,
     'scan_frequency' => $scan_frequency,
