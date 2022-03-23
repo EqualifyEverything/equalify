@@ -6,7 +6,7 @@
             <tr>
                 <th scope="col">Time</th>
                 <th scope="col">Details</th>
-                <th scope="col">Site</th>
+                <th scope="col">Property</th>
             </tr>
         </thead>
 
@@ -20,8 +20,14 @@
             <td><?php echo $alert->time;?></td>
             <td><?php echo $alert->details;?></td>
             <td>
-                <a href="?view=property_details&id=<?php echo $alert->property_id;?>">
-                    <?php echo get_property_title($db, $alert->property_id);?>
+
+                <?php 
+                // Set $property
+                $property = get_property($db, $alert->property_id);
+                ?>
+
+                <a href="<?php the_property_view_uri($db, $alert->property_id);?>">
+                    <?php echo $property->url;?>
                 </a>
             </td>
         </tr>

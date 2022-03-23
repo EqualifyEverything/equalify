@@ -17,11 +17,10 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if(empty($id))
     throw new Exception('ID is invalid.');
 
-// Delete Site, Pages, and Events
-delete_property($db, $id);
-delete_property_pages($db, $id);
-delete_property_events($db, $id);
+// Delete Property, Pages, and Events
+activate_property($db, $id);
+activate_property_children($db, $id);
 
 // Redirect
-header("Location: ../index.php?view=properties&status=success");
+header('Location: ../index.php?view=property_details&id='.$id.'&status=success');
 die();

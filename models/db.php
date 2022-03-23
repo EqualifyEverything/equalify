@@ -1,6 +1,5 @@
 <?php
 // TODO: Make property Object Oriented instead of Procedural
-
 /**
  * Connect to DB
  */
@@ -14,7 +13,7 @@ function connect($hostname, $username, $password, $database){
     );
     mysqli_set_charset($db, 'utf8mb4');
     if($db->connect_error){
-        die('<p>Cannot connect to database: '
+        throw new Exception('<p>Cannot connect to database: '
             . $db->connect_error . "<br>"
             . $db->connect_errorno . '</p>'
         );
@@ -24,11 +23,14 @@ function connect($hostname, $username, $password, $database){
 
 /**
  * Get All Properties
+ * @param $filter limits the query
  */
-function get_properties(mysqli $db){
+function get_properties(mysqli $db, $filter = ''){
 
     // SQL
     $sql = 'SELECT * FROM `properties`';
+    if($filter == 'parents')
+        $sql.= ' WHERE `parent` = ""';
 
     // Query
     $results = $db->query($sql);
@@ -144,7 +146,7 @@ function get_account(mysqli $db, $id){
 }
 
 /**
- * Get property Records
+ * Get Property Records
  */
 function get_property(mysqli $db, $id){
 
@@ -161,7 +163,7 @@ function get_property(mysqli $db, $id){
 }
 
 /**
- * Get property ID
+ * Get Property ID
  */
 function get_property_id(mysqli $db, $url){
 
@@ -178,16 +180,16 @@ function get_property_id(mysqli $db, $url){
 }
 
 /**
- * Get property Title
+ * Get Property URL
  */
-function get_property_title(mysqli $db, $id){
+function get_property_url(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT title FROM properties WHERE id = "'.$id.'"';
+    $sql = 'SELECT `url` FROM properties WHERE `id` = "'.$id.'"';
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->title;
+    $data = $db->query($sql)->fetch_object()->url;
 
     // Result
     return $data;
@@ -195,12 +197,12 @@ function get_property_title(mysqli $db, $id){
 }
 
 /**
- * Get property Pages
+ * Get property Children
  */
-function get_property_pages(mysqli $db, $property_id){
+function get_property_children(mysqli $db, $parent_url){
 
     // SQL
-    $sql = 'SELECT * FROM `pages` WHERE `property_id` = '.$property_id;
+    $sql = 'SELECT * FROM `properties` WHERE `parent` = "'.$parent_url.'"';
 
     // Query
     $results = $db->query($sql);
@@ -214,7 +216,6 @@ function get_property_pages(mysqli $db, $property_id){
     }
     return $data;
 }
-
 
 /**
  * Insert property
@@ -232,49 +233,36 @@ function is_unique_property_url(mysqli $db, $property_url){
 }
 
 /**
- * Insert property
+ * Insert Properties
  */
-function insert_property(mysqli $db, array $record){
+function insert_properties(mysqli $db, $properties_records){
 
-    // SQL
-    $sql = "INSERT INTO `properties` ";
-    $sql.= "(`url`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['url']."'";
-    $sql.= ");";
+    // Create SQL
+    $sql = 'INSERT INTO `properties` (`parent`, `url`, `wcag_errors`) VALUES';
+    
+    // Insert Each Record
+    $record_count = count($properties_records);
+    $record_iteration = 0;
+    foreach ($properties_records as $record){
+
+        // SQL
+        $sql.= "(";
+        $sql.= "'".$record['parent']."',";
+        $sql.= "'".$record['url']."',";
+        $sql.= "'".$record['wcag_errors']."'";
+        $sql.= ")";
+        if(++$record_iteration != $record_count)
+            $sql.= ",";
+
+    }
+    $sql.= ";";
     
     // Query
     $result = $db->query($sql);
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert property.');
-    $record['id']->insert_id;
-    return $record;
-}
-
-/**
- * Insert Page
- */
-function insert_page(mysqli $db, array $record){
-
-    // SQL
-    $sql = "INSERT INTO `pages` ";
-    $sql.= "(`property_id`, `url`, `wcag_errors`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['property_id']."',";
-    $sql.= "'".$record['url']."',";
-    $sql.= "'".$record['wcag_errors']."'";
-    $sql.= ");";
-
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot insert pages.');
+        throw new Exception('Cannot insert properties for user '.USER_ID);
     $record['id']->insert_id;
     return $record;
 }
@@ -305,52 +293,38 @@ function update_account(mysqli $db, array $record){
 }
 
 /**
- * Delete property
+ * Archive Property
  */
-function delete_property(mysqli $db, $id){
+function archive_property(mysqli $db, $property_id){
     
     // SQL
-    $sql = 'DELETE FROM `properties` WHERE id = "'.$id.'"';
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
+    $sql = 'UPDATE `properties` SET `status` = "archived" WHERE `id` = "'.$property_id.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete property.');
+        throw new Exception('Cannot archive property '.$parent_id);
 }
 
 /**
- * Delete property Pages
+ * Delete Property Children
  */
-function delete_property_pages(mysqli $db, $id){
+function archive_property_children(mysqli $db, $parent_id){
     
+    // Get URL of parent
+    $parent = get_property_url($db, $parent_id);
+
     // SQL
-    $sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
+    $sql = 'UPDATE `properties` SET `status` = "archived" WHERE parent = "'.$parent.'"';
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete pages.');
-}
-
-/**
- * Delete property Events
- */
-function delete_property_events(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `events` WHERE property_id = "'.$id.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot delete events.');
+        throw new Exception('Cannot archive children of property '.$parent_id.'.');
 }
 
 /**
@@ -368,4 +342,38 @@ function subtract_account_credits(mysqli $db, $id, $credits){
     // Result
     if(!$result)
         throw new Exception('Cannot delete property.');
+}
+
+/**
+ * The WCAG Report URL
+ */
+function the_wcag_report_URL($db, $property_url){
+    $account_info = get_account($db, USER_ID);
+    if($account_info->accessibility_testing_service == 'Little Forrest'){
+        echo 'https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property_url;
+    }elseif($account_info->accessibility_testing_service == 'WAVE'){
+        echo 'https://wave.webaim.org/report#/'.$property_url;
+    }else{
+        return null;
+    }
+    
+}
+
+/**
+ * The Property URI
+ */
+function the_property_view_uri(mysqli $db, $property_id){
+
+    // Set $property
+    $property = get_property($db, $property_id);
+
+    // Set URL
+    if($property->parent == ''){
+        echo '?view=property_details&id='.$property->id;
+    }elseif(!empty($property->parent)){
+        echo '?view=property_details&id='.get_property_id($db, $property->parent);
+    }else{
+        return false;
+    }
+    
 }

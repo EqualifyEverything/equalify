@@ -12,7 +12,7 @@ $db = connect(
 // Set Variables and fallbacks
 $property_unreachable_alert = $_POST['property_unreachable_alert'];
 if(!is_numeric($property_unreachable_alert)){
-    throw new Exception('"Site Unreachable" alert options are improperly specified.');
+    throw new Exception('"Property Unreachable" alert options are improperly specified.');
 }
 $wcag_2_1_page_error_alert = $_POST['wcag_2_1_page_error_alert'];
 if(!is_numeric($wcag_2_1_page_error_alert)){
@@ -20,7 +20,7 @@ if(!is_numeric($wcag_2_1_page_error_alert)){
 }
 $email_site_owner = $_POST['email_site_owner'];
 if(!is_numeric($wcag_2_1_page_error_alert)){
-    throw new Exception('"Email Site Owner" enforcement options are improperly specified.');
+    throw new Exception('"Email Property Owner" enforcement options are improperly specified.');
 }
 $scan_frequency = $_POST['scan_frequency'];
 if(empty($scan_frequency)){

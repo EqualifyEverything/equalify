@@ -1,26 +1,39 @@
 <?php
-// Set Site ID
+// Set Property ID with optional fallboack.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-// Check for correct info
 if($id == false)
-    throw new Exception('Site ID format is invalid.');
+    throw new Exception('Property ID format is invalid.');
 
-// Check if Site exists
+// Check if Property exists.
 $property = get_property($db, $id);
-if(empty($property) == 1)
-    throw new Exception('Site does not exist.');
 
-// Set Account Info
-$account_info = get_account($db, USER_ID);
+if(empty($property) == 1)
+    throw new Exception('Property does not exist.');
 ?>
 
 <div class="mb-3 pb-4 border-bottom">
-    <h1><?php echo $property->title;?></h1>
-    <a class="h2 link-secondary" href="<?php echo $property->url;?>" target="_blank"><?php echo $property->url;?></a>
+
+    <h1>
+    
+        <?php 
+        // Title
+        echo $property->url;
+        ?>
+
+        <span class="float-end">
+        
+        <?php
+        // Badge
+        the_status_badge($property);
+        ?>
+
+        </span>
+    </h1>
+
 </div>
-<section id="pages" class="mb-3 pb-4">
-    <h2>Pages</h2>
+<section id="relatives" class="mb-3 pb-4">
+    <h2>Properties</h2>
+
     <table class="table">
         <thead>
             <tr>
@@ -29,45 +42,35 @@ $account_info = get_account($db, USER_ID);
             </tr>
         </thead>
         <tbody>
-
-        <?php
-        $pages = get_property_pages($db, $id);
-        if(count($pages) > 0 ):
-            foreach($pages as $page):    
-        ?>
             <tr>
-                <td><?php echo $page->url; ?></td>
+                <td><?php echo $property->url;?></td>
                 <td>
-                    
-                    <?php 
-                    // Link to page accessibility inspector
-                    if($account_info->accessibility_testing_service == 'Little Forrest')
-                        $wcag_inspector_url = 'https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$page->url;
-                        if($account_info->accessibility_testing_service == 'WAVE')
-                        $wcag_inspector_url = 'https://wave.webaim.org/report#/'.$page->url
-                    ?>
-
-                    <a href="<?php echo $wcag_inspector_url;?>" target="_blank"><?php echo $page->wcag_errors; ?></a>
+                    <a href="<?php the_wcag_report_URL($db, $property->url);?>" target="_blank"><?php echo $property->wcag_errors; ?></a>
                 </td>
             </tr>
-        <?php 
-            endforeach;
-        else:
-        ?>
 
+<?php
+$children = get_property_children($db, $property->url);
+if(count($children) > 0 ):
+    foreach($children as $child):    
+?>
             <tr>
-                <td colspan="2">Site has no pages.</td>
+                <td><?php echo $child->url; ?></td>
+                <td>
+                    <a href="<?php the_wcag_report_URL($db, $child->url);?>" target="_blank"><?php echo $child->wcag_errors; ?></a>
+                </td>
             </tr>
 
-        <?php 
-        endif;
-        ?>
+<?php 
+    endforeach;
+endif;
+?>
 
         </tbody>
     </table>
 </section>
 <section id="alerts" class="mb-3 pb-4">
-    <h2>Site Alerts</h2>
+    <h2>Alerts</h2>
     <table class="table">
         <thead>
             <tr>
@@ -103,7 +106,7 @@ $account_info = get_account($db, USER_ID);
     </table>
 </section>
 <section id="events" class="mb-3 pb-4">
-    <h2>Equalify Events</h2>
+    <h2>Events</h2>
     <table class="table">
         <thead>
             <tr>
@@ -141,9 +144,22 @@ $account_info = get_account($db, USER_ID);
     </table>
 </section>
 <section id="property_options" class="mb-3 pb-4">
-    <h2 class="pb-2">Site Options</h2>
-    <a href="" class="btn btn-primary">Rescan Site</a>
-    <div class="form-text">
-        5 credits will be charged to scan property.
-    </div>
+    <h2 class="pb-2">Options</h2>
+    <a href="actions/scan_property.php" class="btn btn-primary">Rescan Property</a>
+
+    <?php
+    // Conditional Status Change Button
+    if($property->status == ' archived'){
+        $button_href = 'actions/archive_property_and_children.php?id='.$property->id;
+        $button_text = 'Archive Property & Children';
+        $button_class = 'btn-outline-secondary';
+    }else{
+        $button_href = 'actions/archive_property_and_children.php?id='.$property->id;
+        $button_text = 'Activate Property & Children';
+        $button_class = 'btn-outline-success';
+    }
+    ?>
+
+    <a href="<?php echo $button_href;?>" class="btn <?php echo $button_class;?>"><?php echo $button_text;?></a>
+
 </section>

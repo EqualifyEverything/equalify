@@ -20,8 +20,16 @@
             <td><?php echo ucwords(str_replace('_', ' ', $event->type));?></td>
             <td><?php echo $event->time;?></td>
             <td>
-                <a href="?view=property_details&id=<?php echo $event->property_id;?>">
-                    <?php echo get_property_title($db, $event->property_id);?>
+
+                <?php                 
+                // Set $property
+                $property = get_property($db, $event->property_id);
+                ?>
+
+                <a href="<?php the_property_view_uri($db, $event->property_id);?>">
+
+                    <?php echo $property->url;?>
+
                 </a>
             </td>
             <td><?php echo ucwords($event->status);?></td>

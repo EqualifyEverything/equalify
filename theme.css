@@ -1,6 +1,15 @@
 .container{
     max-width: 960px;
 }
+main{
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100vh;
+    height: -webkit-fill-available;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: scroll;
+}
 .bi{
     vertical-align: -.125em;
     pointer-events: none;
