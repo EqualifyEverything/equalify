@@ -5,31 +5,23 @@
 
         <?php
         // Begin Integrations List
-        $integrations = get_integrations($db);
-        foreach ($integrations as $integration):
+        $integrations = uploaded_integrations('integrations');
+        foreach($integrations as $integration):
         ?>
 
         <div class="col">
             <div class="card position-relative">
-                <img src="images/logo-<?php echo $integration->uri;?>.jpeg" class="card-img-top border-bottom" alt="Logo for Little Forrest">
+                <img src="integrations/<?php echo $integration['uri'];?>/logo.jpg" class="card-img-top border-bottom" alt="Logo for Little Forrest">
                 <div class="card-body">
                     <h2 class="h5 card-title">
-                        <?php echo $integration->name;?>
+                        Name
                     </h2>
                     <div class="h5 position-absolute top-0 end-0 h2 p-3">
-
-                        <?php
-                        // Status Badge
-                        the_integration_status($integration->status);
-                        ?>
-
+                        Status
                     </div>
                     <p class="card-text">
-
-                        <?php echo $integration->tagline;?>
-
+                        Tagline
                     </p>
-                    <a href="?view=integration_details&id=<?php echo $integration->id;?>" class="btn btn-primary <?php if($integration->status == 'planned') echo 'disabled';?>">View Settings</a>
                 </div>
             </div>
         </div>
@@ -44,5 +36,5 @@
     <h2>
         Need another integration?
     </h2>
-    <p>Request new integrations via <a href="https://github.com/bbertucc/equalify/issues" target="_blank">Equalify's GitHub Issues</a>. New integrations are regularly added!</p>
+    <p>Request new integrations via <a href="https://github.com/bbertucc/equalify/issues" target="_blank">Equalify's GitHub Issues</a>.</p>
 </section>

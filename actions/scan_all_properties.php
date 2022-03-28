@@ -2,7 +2,7 @@
 // Add DB Info
 require_once '../config.php';
 require_once '../models/db.php';
-require_once '../models/scanner.php';
+require_once '../models/integrations.php';
 $db = connect(
     DB_HOST, 
     DB_USERNAME,
@@ -44,9 +44,9 @@ if( count(get_scans($db, $filters)) == 0 ){
 }
 
 // Load integrations.
-$uploaded_integrations = uploaded_integrations();
+$uploaded_integrations = uploaded_integrations('../integrations');
 foreach($uploaded_integrations as $uploaded_integration){
-    require_once '../integrations/'.$uploaded_integration['uri'].'/'.$uploaded_integration['uri'].'.php';
+    require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
 }
 
 // Scan each active property.

@@ -9,9 +9,6 @@ register_integration(
 
         // Tagline (60 Chararacter Max)
         'tagline'   => 'Counts WCAG 2.1 errors and links to reports.',
-        
-        // Logo (426px by 240px gif, jpg, or png) 
-        'logo'      => 'https://edupack.dev/wp-content/uploads/2022/03/logo-little_forrest.jpeg' 
 
     ),
     array(

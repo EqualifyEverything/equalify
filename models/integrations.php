@@ -3,11 +3,10 @@
 /**
  * Uploaded Integrations
  */
-function uploaded_integrations(){
+function uploaded_integrations($path_to_integrations){
 
     // List all uploaded integrations.
-    $itegration_path = '../integrations';
-    $integration_folders = array_diff(scandir($itegration_path), array('..', '.'));;
+    $integration_folders = array_diff(scandir($path_to_integrations), array('..', '.'));;
     $uploaded_integrations = [];
     foreach ($integration_folders as $integration_folder){
 

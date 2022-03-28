@@ -6,7 +6,6 @@
 // Set Variables
 $account_info = get_account($db, USER_ID);
 $credits = $account_info->credits;
-
 ?>
 
 <form action="actions/update_account.php" method="post">

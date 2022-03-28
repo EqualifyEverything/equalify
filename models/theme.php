@@ -23,26 +23,6 @@ function the_success_message(){
 }
 
 /**
- * The Integration Status Badge
- */
-function the_integration_status($integration_status){
-    
-    // Integration Status Variables
-    if($integration_status == 'active'){
-        $badge_class = 'bg-success';
-        $badge_text = 'Active';
-    }elseif($integration_status == 'disabled'){
-        $badge_class = 'bg-secondary';
-        $badge_text = 'Disabled';
-    }else{
-        $badge_class = 'bg-dark';
-        $badge_text = 'Planned';
-    }
-    echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
-
-}
-
-/**
  * The Type Badge
  */
 function the_property_type($property_type){
