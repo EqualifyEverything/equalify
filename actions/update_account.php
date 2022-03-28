@@ -9,44 +9,85 @@ $db = connect(
     DB_NAME
 );
 
-// Set Variables and fallbacks
-$property_unreachable_alert = $_POST['property_unreachable_alert'];
-if(!is_numeric($property_unreachable_alert)){
-    throw new Exception('"Property Unreachable" alert options are improperly specified.');
-}
-$wcag_2_1_page_error_alert = $_POST['wcag_2_1_page_error_alert'];
-if(!is_numeric($wcag_2_1_page_error_alert)){
-    throw new Exception('"WCAG 2.1 Page Error" alert options are improperly specified.');
-}
-$email_site_owner = $_POST['email_site_owner'];
-if(!is_numeric($wcag_2_1_page_error_alert)){
-    throw new Exception('"Email Property Owner" enforcement options are improperly specified.');
-}
-$scan_frequency = $_POST['scan_frequency'];
-if(empty($scan_frequency)){
-    throw new Exception('No testing frequency is specified.');
-}
-$accessibility_testing_service = $_POST['accessibility_testing_service'];
-if(empty($accessibility_testing_service)){
-    throw new Exception('No accessibility testing service is specified.');
-}
-$wave_key = $_POST['wave_key'];
-if(empty($wave_key)){
-    throw new Exception('Wave Key is missing.');
+// Get Last View
+if(empty($_POST['last_view'])){
+    $last_view = 'account';
+}else{
+    $last_view = $_POST['last_view'];
 }
 
 // Create Record
-$record = [
-    'property_unreachable_alert' => $property_unreachable_alert,
-    'wcag_2_1_page_error_alert' => $wcag_2_1_page_error_alert,
-    'email_site_owner' => $email_site_owner,
-    'scan_frequency' => $scan_frequency,
-    'accessibility_testing_service' => $accessibility_testing_service,
-    'wave_key' => $wave_key
-];
+$account_records = [];
 
-update_account($db, $record);
+// Equalify - Property Unreachable Alert
+if(!empty($_POST['property_unreachable_alert'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'property_unreachable_alert',
+            'value' => $_POST['property_unreachable_alert']
+        )
+    );
+};
+
+// Equalify - Scan Frequency
+if(!empty($_POST['scan_frequency'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'scan_frequency',
+            'value' => $_POST['scan_frequency']
+        )
+    );
+};
+
+// Equalify - Scan Frequency
+if(!empty($_POST['scan_frequency'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'scan_frequency',
+            'value' => $_POST['scan_frequency']
+        )
+    );
+};
+
+// Little Forrest - WCAG 2.1 Page Error Alert
+if(!empty($_POST['little_forrest_wcag_2_1_page_error_alert'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'little_forrest_wcag_2_1_page_error_alert',
+            'value' => $_POST['little_forrest_wcag_2_1_page_error_alert']
+        )
+    );
+};
+
+// Wave - WCAG 2.1 Page Error Alert
+if(!empty($_POST['wave_wcag_2_1_page_error_alert'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'wave_wcag_2_1_page_error_alert',
+            'value' => $_POST['wave_wcag_2_1_page_error_alert']
+        )
+    );
+};
+
+// Wave - Key
+if(!empty($_POST['wave_key'])){
+    array_push(
+        $account_records,
+        array(
+            'key'   => 'wave_key',
+            'value' => $_POST['wave_key']
+        )
+    );
+};
+
+// Update Accoount
+update_account($db, $account_records);
 
 // Redirect
-header("Location: ../index.php?view=account&status=success");
+header('Location: ../index.php?view='.$last_view.'&status=success');
 die();

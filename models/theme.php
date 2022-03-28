@@ -12,27 +12,44 @@ function the_active_view($view){
 }
 
 /**
- * The Status Badge
+ * The Success Message
  */
-function the_status_badge($property){
+function the_success_message(){
 
-    // Badge info
-    if($property->status == 'archived'){
-        $badge_status = 'bg-secondary';
-        $badge_content = 'Archived';
+    // Success Message
+    if(strpos($_SERVER['REQUEST_URI'], 'success'))
+        echo '<div class="alert alert-success" role="alert">Update was successful!</div>';
+
+}
+
+/**
+ * The Integration Status Badge
+ */
+function the_integration_status($integration_status){
+    
+    // Integration Status Variables
+    if($integration_status == 'active'){
+        $badge_class = 'bg-success';
+        $badge_text = 'Active';
+    }elseif($integration_status == 'disabled'){
+        $badge_class = 'bg-secondary';
+        $badge_text = 'Disabled';
     }else{
-
-        // Alerts
-        $alert_count = count(get_alerts_by_property($db, $property->id));
-        if($alert_count == 0){
-            $badge_status = 'bg-success';
-            $badge_content = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16"><path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/><path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/></svg> Equalified';
-        }else{
-            $badge_status = 'bg-danger';
-            $badge_content = $alert_count.' Alerts';
-        };
-
+        $badge_class = 'bg-dark';
+        $badge_text = 'Planned';
     }
-    echo '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
+    echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
+
+}
+
+/**
+ * The Type Badge
+ */
+function the_property_type($property_type){
+    
+    // Type Status
+    // doesn't include 'static' to simplify the ux
+    if($property_type == 'wordpress')
+        echo '<span class="badge bg-light text-dark">WordPress<span class="visually-hidden"> Property Type</span></span>';
 
 }

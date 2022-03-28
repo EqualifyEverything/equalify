@@ -23,14 +23,101 @@ function connect($hostname, $username, $password, $database){
 
 /**
  * Get All Properties
- * @param $filter limits the query
+ * @param filters [$name => $value]
  */
-function get_properties(mysqli $db, $filter = ''){
+function get_properties(mysqli $db, $filters = []){
 
     // SQL
     $sql = 'SELECT * FROM `properties`';
-    if($filter == 'parents')
-        $sql.= ' WHERE `parent` = ""';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
+
+    // Query
+    $results = $db->query($sql);
+
+    // Result
+    $data = [];
+    if($results->num_rows > 0){
+        while($row = $results->fetch_object()){
+            $data[] = $row;
+        }
+    }
+
+    return $data;
+}
+
+/**
+ * Get Property Ids
+ * @param filters [$name => $value]
+ */
+function get_property_ids(mysqli $db, $filters = []){
+
+    // SQL
+    $sql = 'SELECT `id` FROM `properties`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
+
+    // Query
+    $results = $db->query($sql);
+
+    // Result
+    if($results->num_rows > 0){
+        while($row = $results->fetch_object()->id){
+            $data[] = $row;
+        }
+    }
+    return $data;
+}
+
+/**
+ * Get Scans
+ *  @param filters [$status => $value]
+ */
+function get_scans(mysqli $db, $filters = []){
+
+    // SQL
+    $sql = 'SELECT * FROM `scans`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= ' WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s");';
 
     // Query
     $results = $db->query($sql);
@@ -46,33 +133,12 @@ function get_properties(mysqli $db, $filter = ''){
 }
 
 /**
- * Get Events
+ * Get Scans by property
  */
-function get_events(mysqli $db){
+function get_scans_by_property(mysqli $db, $property_id){
 
     // SQL
-    $sql = 'SELECT * FROM `events` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
- * Get Events by property
- */
-function get_events_by_property(mysqli $db, $property_id){
-
-    // SQL
-    $sql = 'SELECT * FROM `events` WHERE `property_id` = '.$property_id;
+    $sql = 'SELECT * FROM `scans` WHERE `property_id` = '.$property_id;
 
     // Query
     $results = $db->query($sql);
@@ -197,7 +263,7 @@ function get_property_url(mysqli $db, $id){
 }
 
 /**
- * Get property Children
+ * Get Property Children
  */
 function get_property_children(mysqli $db, $parent_url){
 
@@ -218,9 +284,25 @@ function get_property_children(mysqli $db, $parent_url){
 }
 
 /**
- * Insert property
+ * Is Unique Property URL
  */
 function is_unique_property_url(mysqli $db, $property_url){
+
+    // Require unique URL
+    $url_sql = 'SELECT * FROM properties WHERE url = "'.$property_url.'"';
+    $url_query = $db->query($url_sql);
+    if(mysqli_num_rows($url_query) > 0){
+        return false;
+    }else{
+        return true;
+    }
+
+}
+
+/**
+ * Is Active Intragration
+ */
+function is_active_intration(mysqli $db, $integration_uri){
 
     // Require unique URL
     $url_sql = 'SELECT * FROM properties WHERE url = "'.$property_url.'"';
@@ -233,12 +315,59 @@ function is_unique_property_url(mysqli $db, $property_url){
 }
 
 /**
- * Insert Properties
+ * Add Property
  */
-function insert_properties(mysqli $db, $properties_records){
+function add_property(mysqli $db, $url, $type, $status, $parent){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`parent`, `url`, `wcag_errors`) VALUES';
+    $sql = 'INSERT INTO `properties` (`url`, `type`, `status`, `parent`) VALUES';
+    $sql.= '("'.$url.'",';
+    $sql.= '"'.$type.'",';
+    $sql.= '"'.$status.'",';
+    $sql.= '"'.$parent.'")';
+    
+    // Query
+    $result = $db->query($sql);
+
+    //Fallback
+    if(!$result)
+        throw new Exception('Cannot insert property with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$parent);
+    
+    // Complete Query
+    return $result;
+}
+
+/**
+ * Add Scan
+ */
+function add_scan(mysqli $db, $status, array $properties){
+
+    // Serialize properties.
+    $properties = serialize($properties);
+
+    // Create SQL
+    $sql = "INSERT INTO `scans` (`status`, `properties`) VALUES";
+    $sql.= "('".$status."',";
+    $sql.= "'".$properties."')";
+    
+    // Query
+    $result = $db->query($sql);
+
+    //Fallback
+    if(!$result)
+        throw new Exception('Cannot insert scan with status "'.$status.'" and records "'.$records.'"');
+    
+    // Complete Query
+    return $result;
+}
+
+/**
+ * Add Properties 
+ */
+function add_properties(mysqli $db, $properties_records){
+
+    // Create SQL
+    $sql = 'INSERT INTO `properties` (`parent`, `url`, `status`) VALUES';
     
     // Insert Each Record
     $record_count = count($properties_records);
@@ -249,7 +378,7 @@ function insert_properties(mysqli $db, $properties_records){
         $sql.= "(";
         $sql.= "'".$record['parent']."',";
         $sql.= "'".$record['url']."',";
-        $sql.= "'".$record['wcag_errors']."'";
+        $sql.= "'".$record['status']."'";
         $sql.= ")";
         if(++$record_iteration != $record_count)
             $sql.= ",";
@@ -262,32 +391,53 @@ function insert_properties(mysqli $db, $properties_records){
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert properties for user '.USER_ID);
+        throw new Exception('Cannot insert property records "'.$properties_records.'"');
     $record['id']->insert_id;
     return $record;
 }
 
 /**
- * Update Account
+ * Update Account 
  */
-function update_account(mysqli $db, array $record){
+function update_account(mysqli $db, array $account_records){
 
     // SQL
-    $sql = "UPDATE `accounts` SET ";
-    $sql.= "property_unreachable_alert = '".$record['property_unreachable_alert']."',";
-    $sql.= "wcag_2_1_page_error_alert = '".$record['wcag_2_1_page_error_alert']."',";
-    $sql.= "email_site_owner = '".$record['email_site_owner']."',";
-    $sql.= "scan_frequency = '".$record['scan_frequency']."',";
-    $sql.= "accessibility_testing_service = '".$record['accessibility_testing_service']."',";
-    $sql.= "wave_key = '".$record['wave_key']."'";
-    $sql.= " WHERE id = ".USER_ID.";";
+    $sql = 'UPDATE `accounts` SET ';
+
+    // Loop Based on the amount of records updated
+    $record_count = count($account_records);
+    $record_iteration = 0;
+    foreach ($account_records as $record){
+        $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
+        if(++$record_iteration != $record_count)
+            $sql.= ",";
+    }
+    $sql.= ' WHERE `id` = "'.USER_ID.'";';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot insert account.');
+        throw new Exception('Cannot update account for user '.USER_ID);
+    $record['id']->insert_id;
+    return $record;
+}
+
+/**
+ * Update Status 
+ */
+function update_scan_status(mysqli $db, $old_status, $new_status){
+
+    // SQL
+    $sql = 'UPDATE `scans` SET `status` = "'.$new_status.'" WHERE `status` = "'.$old_status.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
     $record['id']->insert_id;
     return $record;
 }
@@ -309,7 +459,7 @@ function archive_property(mysqli $db, $property_id){
 }
 
 /**
- * Delete Property Children
+ * Archive Property Children
  */
 function archive_property_children(mysqli $db, $parent_id){
     
@@ -324,7 +474,56 @@ function archive_property_children(mysqli $db, $parent_id){
 
     // Result
     if(!$result)
-        throw new Exception('Cannot archive children of property '.$parent_id.'.');
+        throw new Exception('Cannot archive children of property "'.$parent_id.'"');
+}
+
+/**
+ * Activate Property
+ */
+function activate_property(mysqli $db, $property_id){
+
+    // See if property has been scanned
+    if(count(get_scans_by_property($db, $property_id)) > 0){
+        $status = 'active';
+    }else{
+        $status = 'unscanned';
+    }
+    
+    // SQL
+    $sql = 'UPDATE `properties` SET `status` = "'.$status.'" WHERE `id` = "'.$property_id.'"';
+
+    // Execute Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot activate property "'.$parent_id.'"');
+}
+
+/**
+ * Activate Property Children
+ */
+function activate_property_children(mysqli $db, $parent_id){
+    
+    // Get URL of parent
+    $parent = get_property_url($db, $parent_id);
+
+    // See if property has been scanned
+    if(count(get_scans_by_property($db, $parent_id)) > 0){
+        $status = 'active';
+    }else{
+        $status = 'unscanned';
+    }
+
+    // SQL
+    $sql = 'UPDATE `properties` SET `status` = "'.$status.'" WHERE parent = "'.$parent.'"';
+
+    // Execute Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot activate children of property "'.$parent_id.'"');
 }
 
 /**
@@ -345,21 +544,6 @@ function subtract_account_credits(mysqli $db, $id, $credits){
 }
 
 /**
- * The WCAG Report URL
- */
-function the_wcag_report_URL($db, $property_url){
-    $account_info = get_account($db, USER_ID);
-    if($account_info->accessibility_testing_service == 'Little Forrest'){
-        echo 'https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property_url;
-    }elseif($account_info->accessibility_testing_service == 'WAVE'){
-        echo 'https://wave.webaim.org/report#/'.$property_url;
-    }else{
-        return null;
-    }
-    
-}
-
-/**
  * The Property URI
  */
 function the_property_view_uri(mysqli $db, $property_id){
@@ -376,4 +560,37 @@ function the_property_view_uri(mysqli $db, $property_id){
         return false;
     }
     
+}
+
+/**
+ * The Property Status Badge
+ */
+function the_property_status($db, $property){
+
+    // Badge info
+    if($property->status == 'archived'){
+        $badge_status = 'bg-dark';
+        $badge_content = 'Archived';
+    }elseif($property->status == 'unscanned'){
+        $badge_status = 'bg-warning text-dark';
+        $badge_content = 'Unscanned';
+    }else{
+
+        // Alerts
+        $alert_count = count(get_alerts_by_property($db, $property->id));
+        if($alert_count == 0){
+            $badge_status = 'bg-success';
+            $badge_content = 'Equalified';
+        }else{
+            $badge_status = 'bg-danger';
+            if($alert_count == 1){
+                $badge_content = $alert_count.' Alert';
+            }else{
+                $badge_content = $alert_count.' Alerts';
+            }
+        };
+
+    }
+    echo '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
+
 }

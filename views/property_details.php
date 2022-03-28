@@ -2,13 +2,13 @@
 // Set Property ID with optional fallboack.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if($id == false)
-    throw new Exception('Property ID format is invalid.');
+    throw new Exception('Format of property ID "'.$id.'" is invalid');
 
 // Check if Property exists.
 $property = get_property($db, $id);
 
 if(empty($property) == 1)
-    throw new Exception('Property does not exist.');
+    throw new Exception('There is no record of property "'.$id.'"');
 ?>
 
 <div class="mb-3 pb-4 border-bottom">
@@ -24,16 +24,16 @@ if(empty($property) == 1)
         
         <?php
         // Badge
-        the_status_badge($property);
+        the_property_status($db, $property);
         ?>
 
         </span>
     </h1>
 
 </div>
+
 <section id="relatives" class="mb-3 pb-4">
     <h2>Properties</h2>
-
     <table class="table">
         <thead>
             <tr>
@@ -51,7 +51,8 @@ if(empty($property) == 1)
 
 <?php
 $children = get_property_children($db, $property->url);
-if(count($children) > 0 ):
+$child_count = count($children);
+if($child_count > 0 ):
     foreach($children as $child):    
 ?>
             <tr>
@@ -68,6 +69,27 @@ endif;
 
         </tbody>
     </table>
+
+    <?php
+    // Scan Button
+    if($property->status == 'active' || $property->status == 'unscanned'){
+        echo '<a href="actions/scan.php?id=" class="btn btn-primary">';
+        if($property->status == 'active'){
+            echo 'Re-scan ';
+        }else{
+            echo 'Scan ';
+        }
+        $property_count = $child_count+1;
+        if($property_count > 1){
+            echo 'Properties';
+        }else{
+            echo 'Property';
+        }
+        echo '</a>';
+
+    }
+    ?>
+
 </section>
 <section id="alerts" class="mb-3 pb-4">
     <h2>Alerts</h2>
@@ -96,7 +118,7 @@ endif;
         ?>
 
         <tr>
-            <td colspan="2">No alerts found.</td>
+            <td colspan="2">No alerts yet...</td>
         </tr>
 
         <?php 
@@ -105,27 +127,25 @@ endif;
 
     </table>
 </section>
-<section id="events" class="mb-3 pb-4">
-    <h2>Events</h2>
+<section id="scans" class="mb-3 pb-4">
+    <h2>Scans</h2>
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">time</th>
-                <th scope="col">Type</th>
+                <th scope="col">Time</th>
                 <th scope="col">Status</th>
             </tr>
         </thead>
 
         <?php
-        $events = get_events_by_property($db, $id);
-        if(count($events) > 0 ):
-            foreach($events as $event):    
+        $scans = get_scans_by_property($db, $id);
+        if(count($scans) > 0 ):
+            foreach($scans as $scan):    
         ?>
 
         <tr>
-            <td><?php echo $event->time;?></td>
-            <td><?php echo ucwords(str_replace('_', ' ', $event->type));?></td>
-            <td><?php echo ucwords($event->status);?></td>
+            <td><?php echo $scan->time;?></td>
+            <td><?php echo ucwords($scan->status);?></td>
         </tr>
 
         <?php 
@@ -134,7 +154,7 @@ endif;
         ?>
 
         <tr>
-            <td colspan="3">No events found.</td>
+            <td colspan="2">No scans yet!</td>
         </tr>
 
         <?php 
@@ -145,21 +165,23 @@ endif;
 </section>
 <section id="property_options" class="mb-3 pb-4">
     <h2 class="pb-2">Options</h2>
-    <a href="actions/scan_property.php" class="btn btn-primary">Rescan Property</a>
-
     <?php
     // Conditional Status Change Button
-    if($property->status == ' archived'){
-        $button_href = 'actions/archive_property_and_children.php?id='.$property->id;
-        $button_text = 'Archive Property & Children';
-        $button_class = 'btn-outline-secondary';
-    }else{
-        $button_href = 'actions/archive_property_and_children.php?id='.$property->id;
-        $button_text = 'Activate Property & Children';
+    if($property->status == 'archived'){
+        $button_text = 'Activate';
         $button_class = 'btn-outline-success';
+    }else{
+        $button_text = 'Archive All Properties';
+        $button_class = 'btn-outline-dark';
     }
     ?>
 
-    <a href="<?php echo $button_href;?>" class="btn <?php echo $button_class;?>"><?php echo $button_text;?></a>
+    <a href="actions/toggle_property_status.php?id=<?php echo $property->id;?>&current_status=<?php echo $property->status;?>" class="btn <?php echo $button_class;?>"><?php echo $button_text;?></a>
+
+    <?php
+    // Optional Add Property
+    if($property->type == 'static')
+        echo '<a href="?view=property_adder&type=static&parent='.$property->url.'" class="btn btn-outline-dark">Add Child Property</a>';
+    ?>
 
 </section>

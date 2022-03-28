@@ -20,6 +20,7 @@ $records = [];
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta description="Equalify brings WebOps management into one dashboard with reporting and enforcement tools, integrated with your favorite services." />
     <title>Equalify | WebOps Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="theme.css" rel="stylesheet">
@@ -27,15 +28,14 @@ $records = [];
 </head>
 <body>
     <main>
-        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top" style="width: 280px;">
-            <a href="index.php?view=events" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi me-2 bi-patch-check-fill" viewBox="0 0 16 16">
+        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 280px;">
+            <a href="index.php?view=dashboard" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi me-2 bi-patch-check-fill" viewBox="0 0 16 16">
                     <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01-.622-.636zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708z"/>
                 </svg>
-                <span class="fs-4">Equalify</span>
+                <span class="fs-2">Equalify</span>
             </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
+            <ul class="nav nav-pills flex-column mb-auto mt-5">
                 <li class="nav-item">
                     <a href="index.php?view=dashboard" class="nav-link link-dark <?php the_active_view('dashboard');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-house-door" viewBox="0 0 16 16">
@@ -56,6 +56,15 @@ $records = [];
                         </span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="index.php?view=scans" class="nav-link link-dark <?php the_active_view('scans');?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-arrow-repeat" viewBox="0 0 16 16">
+                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                        </svg>
+                        Scans
+                    </a>
+                </li>
                 <li>
                     <a href="index.php?view=properties" class="nav-link link-dark <?php the_active_view('properties');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-diagram-3" viewBox="0 0 16 16">
@@ -65,12 +74,11 @@ $records = [];
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=events" class="nav-link link-dark <?php the_active_view('events');?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-arrow-repeat" viewBox="0 0 16 16">
-                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                    <a href="index.php?view=integrations" class="nav-link link-dark <?php the_active_view('integrations');?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-plugin" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 1 2.898 5.673c-.167-.121-.216-.406-.002-.62l1.8-1.8a3.5 3.5 0 0 0 4.572-.328l1.414-1.415a.5.5 0 0 0 0-.707l-.707-.707 1.559-1.563a.5.5 0 1 0-.708-.706l-1.559 1.562-1.414-1.414 1.56-1.562a.5.5 0 1 0-.707-.706l-1.56 1.56-.707-.706a.5.5 0 0 0-.707 0L5.318 5.975a3.5 3.5 0 0 0-.328 4.571l-1.8 1.8c-.58.58-.62 1.6.121 2.137A8 8 0 1 0 0 8a.5.5 0 0 0 1 0Z"/>
                         </svg>
-                        Events
+                        Integrations
                     </a>
                 </li>
             </ul>
@@ -79,6 +87,10 @@ $records = [];
         <div class="container py-3">
 
             <?php
+
+            // Success Message
+            the_success_message();
+
             // Show View
             if(!empty($_GET['view'])){
                 require_once 'views/'.$_GET['view'].'.php';
