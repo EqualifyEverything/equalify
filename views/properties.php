@@ -28,7 +28,7 @@
 
                     <?php
                     // The Status Badge
-                    the_property_status($db, $property);
+                    the_property_badge($db, $property);
                     ?>
 
                     <?php

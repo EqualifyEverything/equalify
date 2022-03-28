@@ -117,28 +117,7 @@ function get_scans(mysqli $db, $filters = []){
     
         }
     }
-    $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s");';
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
- * Get Scans by property
- */
-function get_scans_by_property(mysqli $db, $property_id){
-
-    // SQL
-    $sql = 'SELECT * FROM `scans` WHERE `property_id` = '.$property_id;
+    $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s") DESC;';
 
     // Query
     $results = $db->query($sql);
@@ -392,138 +371,7 @@ function add_properties(mysqli $db, $properties_records){
     //Fallback
     if(!$result)
         throw new Exception('Cannot insert property records "'.$properties_records.'"');
-    $record['id']->insert_id;
-    return $record;
-}
 
-/**
- * Update Account 
- */
-function update_account(mysqli $db, array $account_records){
-
-    // SQL
-    $sql = 'UPDATE `accounts` SET ';
-
-    // Loop Based on the amount of records updated
-    $record_count = count($account_records);
-    $record_iteration = 0;
-    foreach ($account_records as $record){
-        $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
-        if(++$record_iteration != $record_count)
-            $sql.= ",";
-    }
-    $sql.= ' WHERE `id` = "'.USER_ID.'";';
-
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot update account for user '.USER_ID);
-    $record['id']->insert_id;
-    return $record;
-}
-
-/**
- * Update Status 
- */
-function update_scan_status(mysqli $db, $old_status, $new_status){
-
-    // SQL
-    $sql = 'UPDATE `scans` SET `status` = "'.$new_status.'" WHERE `status` = "'.$old_status.'"';
-
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot update status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
-    $record['id']->insert_id;
-    return $record;
-}
-
-/**
- * Archive Property
- */
-function archive_property(mysqli $db, $property_id){
-    
-    // SQL
-    $sql = 'UPDATE `properties` SET `status` = "archived" WHERE `id` = "'.$property_id.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot archive property '.$parent_id);
-}
-
-/**
- * Archive Property Children
- */
-function archive_property_children(mysqli $db, $parent_id){
-    
-    // Get URL of parent
-    $parent = get_property_url($db, $parent_id);
-
-    // SQL
-    $sql = 'UPDATE `properties` SET `status` = "archived" WHERE parent = "'.$parent.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot archive children of property "'.$parent_id.'"');
-}
-
-/**
- * Activate Property
- */
-function activate_property(mysqli $db, $property_id){
-
-    // See if property has been scanned
-    if(count(get_scans_by_property($db, $property_id)) > 0){
-        $status = 'active';
-    }else{
-        $status = 'unscanned';
-    }
-    
-    // SQL
-    $sql = 'UPDATE `properties` SET `status` = "'.$status.'" WHERE `id` = "'.$property_id.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot activate property "'.$parent_id.'"');
-}
-
-/**
- * Activate Property Children
- */
-function activate_property_children(mysqli $db, $parent_id){
-    
-    // Get URL of parent
-    $parent = get_property_url($db, $parent_id);
-
-    // See if property has been scanned
-    if(count(get_scans_by_property($db, $parent_id)) > 0){
-        $status = 'active';
-    }else{
-        $status = 'unscanned';
-    }
-
-    // SQL
-    $sql = 'UPDATE `properties` SET `status` = "'.$status.'" WHERE parent = "'.$parent.'"';
-
-    // Execute Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot activate children of property "'.$parent_id.'"');
 }
 
 /**
@@ -562,16 +410,111 @@ function the_property_view_uri(mysqli $db, $property_id){
     
 }
 
+
 /**
- * The Property Status Badge
+ * Update Account 
  */
-function the_property_status($db, $property){
+function update_account(mysqli $db, array $account_records){
+
+    // SQL
+    $sql = 'UPDATE `accounts` SET ';
+
+    // Loop Based on the amount of records updated
+    $record_count = count($account_records);
+    $record_iteration = 0;
+    foreach ($account_records as $record){
+        $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
+        if(++$record_iteration != $record_count)
+            $sql.= ",";
+    }
+    $sql.= ' WHERE `id` = "'.USER_ID.'";';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update account for user '.USER_ID);
+
+}
+
+/**
+ * Update Status 
+ */
+function update_scan_status(mysqli $db, $old_status, $new_status){
+
+    // SQL
+    $sql = 'UPDATE `scans` SET `status` = "'.$new_status.'" WHERE `status` = "'.$old_status.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update scan status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
+}
+
+/**
+ * Update Property Scanned Time 
+ */
+function update_property_scanned_time(mysqli $db, $id){
+
+    // SQL
+    $sql = 'UPDATE `properties` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = "'.$id.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update scan status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
+}
+
+/**
+ * Update Property Status 
+ */
+function update_property_status(mysqli $db, $id, $new_status){
+
+    // SQL
+    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE `id` = "'.$id.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update property status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
+}
+
+/**
+ * Update Property Children Status 
+ */
+function update_property_children_status(mysqli $db, $parent_id, $new_status){
+
+    // Get URL of parent.
+    $parent = get_property_url($db, $parent_id);
+
+    // SQL
+    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE parent = "'.$parent.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot archive children of property "'.$parent_id.'"');
+}
+
+/**
+ * The Property Badge
+ */
+function the_property_badge($db, $property){
 
     // Badge info
     if($property->status == 'archived'){
         $badge_status = 'bg-dark';
         $badge_content = 'Archived';
-    }elseif($property->status == 'unscanned'){
+    }elseif($property->scanned == NULL){
         $badge_status = 'bg-warning text-dark';
         $badge_content = 'Unscanned';
     }else{

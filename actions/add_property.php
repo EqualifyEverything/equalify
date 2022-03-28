@@ -37,7 +37,7 @@ if( !str_ends_with($url, '/') )
 if(is_unique_property_url($db, $url) && $type == 'static' ){
 
     // Static Property
-    add_property($db, $url, $type, 'unscanned', $parent );
+    add_property($db, $url, $type, 'active', $parent );
 
 }elseif(is_unique_property_url($db, $url) && $type == 'wordpress'){
 

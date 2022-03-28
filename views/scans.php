@@ -11,8 +11,8 @@
         <thead>
             <tr>
                 <th scope="col">Time</th>
-                <th scope="col">Property</th>
                 <th scope="col">Status</th>
+                <th scope="col">Properties Scanned</th>
             </tr>
         </thead>
 
@@ -24,20 +24,16 @@
 
         <tr>
             <td><?php echo $scan->time;?></td>
+            <td><?php echo ucwords($scan->status);?></td>
             <td>
 
-                <?php                 
-                // Set $property
-                $property = get_property($db, $scan->property_id);
-                ?>
+            <?php             
+            // Link to properties    
+            $property_ids = unserialize($scan->properties);
+            echo count($property_ids);
+            ?>
 
-                <a href="<?php the_property_view_uri($db, $scan->property_id);?>">
-
-                    <?php echo $property->url;?>
-
-                </a>
             </td>
-            <td><?php echo ucwords($scan->status);?></td>
         </tr>
 
         <?php 
@@ -46,7 +42,7 @@
         ?>
 
         <tr>
-            <td colspan="4">No scans found.</td>
+            <td colspan="3">No scans found.</td>
         </tr>
 
         <?php 

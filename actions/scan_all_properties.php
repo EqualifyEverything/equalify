@@ -11,16 +11,26 @@ $db = connect(
 );
 
 // Set $properties_ids variable
-$property_ids = get_property_ids($db);
+$property_filters = [
+    array(
+        'name'  => 'status',
+        'value' => 'active'
+    ),
+];
+$property_ids = get_property_ids($db, $property_filters);
 
-// Make sure they have enough credits
+// Make sure there are properties to scan.
+if($property_ids == NULL)
+    throw new Exception('You have no active properties to scan');
+
+// Make sure they have enough credits.
 $credits = get_account($db, USER_ID)->credits;
 $properties_count = count($property_ids);
 if($credits < $properties_count)
     throw new Exception('Your user, "'.USER_ID.'," has '.$credits.' credits. You need '.$properties_count.' to scan');
 
 // Create scan if no other scans are running.
-// TODO: Allow multiple scans
+// TODO: Allow multiple scans.
 $filters = [
     array(
         'name'  => 'status',
@@ -33,26 +43,37 @@ if( count(get_scans($db, $filters)) == 0 ){
     throw new Exception('Only one scan can run at a time');
 }
 
-// Load in integrations
+// Load integrations.
 $uploaded_integrations = uploaded_integrations();
 foreach($uploaded_integrations as $uploaded_integration){
     require_once '../integrations/'.$uploaded_integration['uri'].'/'.$uploaded_integration['uri'].'.php';
 }
 
-// Scan each property.
-$properties = get_properties($db);
+// Scan each active property.
+$property_filters = [
+    array(
+        'name'  => 'status',
+        'value' => 'active'
+    ),
+];
+$properties = get_properties($db, $property_filters);
 foreach ($properties as $property){
 
-    // Scan each property.
+    // Run Integrations
     foreach($uploaded_integrations as $uploaded_integration){
-        $uploaded_integration['uri']($uploaded_integration['uri']);
+        $uploaded_integration['uri']($property->url);
     }
+
+    // Update scanned timestamp.
+    update_property_scanned_time($db, $property->id);
     
 }
 
-// Add Scan Record
+// Subtract account credits.
+subtract_account_credits($db, USER_ID, $properties_count);
+
+// Add scan record.
 update_scan_status($db, 'running', 'complete');
-die;
 
 // Redirect
 header("Location: ../index.php?view=scans&status=success");
