@@ -28,12 +28,12 @@
 
                     <?php
                     // The Status Badge
-                    the_property_badge($db, $property);
+                    echo get_property_badge($db, $property);
                     ?>
 
                     <?php
                     // The Type Badge
-                    the_property_type($property->type);
+                    the_property_type_badge($property->type);
                     ?>
                     
                     <h2 class="h5 card-title">

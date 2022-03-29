@@ -1,12 +1,6 @@
 <?php
 /**
- * Name: Urlbox
- * Tagline: Screenshots sites on every scan.
+ * Name: Urlbox 
+ * Description: Taks a screenshot of pages on every scan.
  * Status: Planned
  */
-
- /**
- * URL Box
- */
-function urlbox($url){
-}

@@ -83,7 +83,17 @@ $records = [];
                     </a>
                 </li>
             </ul>
-            <a href="?view=account" class="btn btn-outline-primary <?php the_active_view('account');?>>">Account Settings</a>
+            <a href="?view=account" class="btn btn-outline-secondary <?php the_active_view('account');?>>">Account Settings</a>
+            <div class="border-top mt-3 pt-3">
+                <p class="text-muted">
+                    🎉 <strong><?php echo get_account($db, USER_ID)->usage;?> properties scanned!</strong>
+                </p>
+                <p class="text-muted">
+                <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
+                <script>window.DonorBox = { widgetLinkClassName: 'custom-dbox-popup' }</script>
+                    If scans are useful, you can <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to Blake</a> to keep the service free and maintained.
+                </p>
+            </div>
         </div>
         <div class="container py-3">
 

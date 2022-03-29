@@ -23,13 +23,55 @@ function the_success_message(){
 }
 
 /**
- * The Type Badge
+ * The Property Type Badge
  */
-function the_property_type($property_type){
+function the_property_type_badge($property_type){
     
     // Type Status
     // doesn't include 'static' to simplify the ux
     if($property_type == 'wordpress')
         echo '<span class="badge bg-light text-dark">WordPress<span class="visually-hidden"> Property Type</span></span>';
 
+}
+
+/**
+ * The Integration Status Badge
+ */
+function the_integration_status_badge($integration_status){
+
+    // Set badge
+    // doesn't include 'planned' 'cuz the button says that.
+    if($integration_status == 'Disabled'){
+        $badge_class = 'bg-secondary';
+        $badge_text = 'Disabled';
+        echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
+    }elseif($integration_status == 'Active'){
+        $badge_class = 'bg-success';
+        $badge_text = 'Active';
+        echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
+    }else{
+        return false;
+    }
+
+}
+
+/**
+ * The Integration Activation Button
+ */
+function the_integration_activation_button($integration_uri, $integration_status){
+
+    // Set button.
+    if($integration_status == 'Planned'){
+        $button_class = 'btn btn-outline-secondary disabled';
+        $button_text = 'Coming Soon';
+    }elseif($integration_status == 'Disabled'){
+        $button_class = 'btn-primary';
+        $button_text = 'Activate';
+    }elseif($integration_status == 'Active'){
+        $button_class = 'btn btn-outline-danger';
+        $button_text = 'Disable';
+    }
+    echo '<a href="actions/toggle_plugin_status.php?integration='.$integration_uri.'&old_status='.$integration_status.'" class="btn '.$button_class.'">'.$button_text.'</a>';
+
+                        
 }

@@ -26,7 +26,7 @@
                 $property = get_property($db, $alert->property_id);
                 ?>
 
-                <a href="<?php the_property_view_uri($db, $alert->property_id);?>">
+                <a href="<?php echo get_property_view_uri($db, $alert->property_id);?>">
                     <?php echo $property->url;?>
                 </a>
             </td>

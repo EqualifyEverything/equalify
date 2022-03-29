@@ -24,7 +24,7 @@ if(empty($property) == 1)
         
         <?php
         // Badge
-        the_property_badge($db, $property);
+        echo get_property_badge($db, $property);
         ?>
 
         </span>

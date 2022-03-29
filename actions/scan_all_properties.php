@@ -1,4 +1,5 @@
 <?php
+
 // Add DB Info
 require_once '../config.php';
 require_once '../models/db.php';
@@ -18,16 +19,17 @@ $property_filters = [
     ),
 ];
 $property_ids = get_property_ids($db, $property_filters);
+print_r($property_ids);
 
 // Make sure there are properties to scan.
 if($property_ids == NULL)
     throw new Exception('You have no active properties to scan');
 
-// Make sure they have enough credits.
-$credits = get_account($db, USER_ID)->credits;
+// Make sure they have enough usage.
+$usage = get_account($db, USER_ID)->usage;
 $properties_count = count($property_ids);
-if($credits < $properties_count)
-    throw new Exception('Your user, "'.USER_ID.'," has '.$credits.' credits. You need '.$properties_count.' to scan');
+if($usage < $properties_count)
+    throw new Exception('Your user, "'.USER_ID.'," has '.$usage.' usage. You need '.$properties_count.' to scan');
 
 // Create scan if no other scans are running.
 // TODO: Allow multiple scans.
@@ -38,7 +40,7 @@ $filters = [
     ),
 ];
 if( count(get_scans($db, $filters)) == 0 ){
-    add_scan($db, 'running', $property_ids);
+    add_scan($db, 'running-test', $property_ids);
 }else{
     throw new Exception('Only one scan can run at a time');
 }
@@ -59,9 +61,14 @@ $property_filters = [
 $properties = get_properties($db, $property_filters);
 foreach ($properties as $property){
 
-    // Run Integrations
+    // Some integrations use account info.
+    $account = get_account($db, USER_ID);
+
+    // Run integration scans.
     foreach($uploaded_integrations as $uploaded_integration){
-        $uploaded_integration['uri']($property->url);
+        $integration_scan_function_name = $uploaded_integration['uri'].'_scans';
+        if(function_exists($integration_scan_function_name))
+            $integration_scan_function_name($property, $account);
     }
 
     // Update scanned timestamp.
@@ -69,8 +76,8 @@ foreach ($properties as $property){
     
 }
 
-// Subtract account credits.
-subtract_account_credits($db, USER_ID, $properties_count);
+// Subtract account usage.
+add_account_usage($db, USER_ID, $properties_count);
 
 // Add scan record.
 update_scan_status($db, 'running', 'complete');

@@ -7,7 +7,7 @@ register_integration(
         // Integration Name (20 char. max) 
         'name'      => 'Little Forrest',
 
-        // Tagline (60 Chararacter Max)
+        // Description (60 Chararacter Max)
         'tagline'   => 'Counts WCAG 2.1 errors and links to reports.',
 
     ),

@@ -88,8 +88,8 @@ function get_property_ids(mysqli $db, $filters = []){
 
     // Result
     if($results->num_rows > 0){
-        while($row = $results->fetch_object()->id){
-            $data[] = $row;
+        while($row = $results->fetch_object()){
+            $data[] = $row->id;
         }
     }
     return $data;
@@ -377,35 +377,34 @@ function add_properties(mysqli $db, $properties_records){
 }
 
 /**
- * Subtract Account Credits
+ * Add Account Usage
  */
-function subtract_account_credits(mysqli $db, $id, $credits){
+function add_account_usage(mysqli $db, $id, $usage){
     
     // SQL
-    $sql = 'UPDATE `accounts` SET credits = credits - '.$credits.' WHERE id = '.$id;
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE property_id = "'.$id.'"';
-
+    $sql = 'UPDATE `accounts` SET `usage` = `usage` + '.$usage.' WHERE `id` = '.$id;
+    print_r($sql);
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete property.');
+        throw new Exception('Cannot add "'.$usage.'" for user "'.$id.'"');
 }
 
 /**
- * The Property URI
+ * Get Property URI
  */
-function the_property_view_uri(mysqli $db, $property_id){
+function get_property_view_uri(mysqli $db, $property_id){
 
     // Set $property
     $property = get_property($db, $property_id);
 
     // Set URL
     if($property->parent == ''){
-        echo '?view=property_details&id='.$property->id;
+        return '?view=property_details&id='.$property->id;
     }elseif(!empty($property->parent)){
-        echo '?view=property_details&id='.get_property_id($db, $property->parent);
+        return '?view=property_details&id='.get_property_id($db, $property->parent);
     }else{
         return false;
     }
@@ -510,7 +509,7 @@ function update_property_children_status(mysqli $db, $parent_id, $new_status){
 /**
  * The Property Badge
  */
-function the_property_badge($db, $property){
+function get_property_badge($db, $property){
 
     // Badge info
     if($property->status == 'archived'){
@@ -536,6 +535,6 @@ function the_property_badge($db, $property){
         };
 
     }
-    echo '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
+    return '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
 
 }

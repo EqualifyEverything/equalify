@@ -30,4 +30,3 @@ if($old_status == 'archived'){
 
 // Redirect
 header('Location: ../index.php?view=property_details&id='.$id.'&status=success');
-die();
