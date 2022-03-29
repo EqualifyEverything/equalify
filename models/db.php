@@ -346,7 +346,7 @@ function add_scan(mysqli $db, $status, array $properties){
 function add_properties(mysqli $db, $properties_records){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`parent`, `url`, `status`) VALUES';
+    $sql = 'INSERT INTO `properties` (`parent`, `url`, `status`, `type`) VALUES';
     
     // Insert Each Record
     $record_count = count($properties_records);
@@ -357,7 +357,9 @@ function add_properties(mysqli $db, $properties_records){
         $sql.= "(";
         $sql.= "'".$record['parent']."',";
         $sql.= "'".$record['url']."',";
-        $sql.= "'".$record['status']."'";
+        $sql.= "'".$record['status']."',";
+        $sql.= "'".$record['type']."'";
+
         $sql.= ")";
         if(++$record_iteration != $record_count)
             $sql.= ",";

@@ -49,7 +49,8 @@ function get_wordpress_properties($site_url){
             array(
                 'url'       => $property['url'], 
                 'parent'    => $property_parent,
-                'status'    => 'active'
+                'status'    => 'active',
+                'type'      => 'wordpress'
             )
         );
 
