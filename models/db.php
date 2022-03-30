@@ -188,6 +188,7 @@ function get_account(mysqli $db, $id){
 
     // Result
     return $data;
+
 }
 
 /**
@@ -276,21 +277,6 @@ function is_unique_property_url(mysqli $db, $property_url){
         return true;
     }
 
-}
-
-/**
- * Is Active Intragration
- */
-function is_active_intration(mysqli $db, $integration_uri){
-
-    // Require unique URL
-    $url_sql = 'SELECT * FROM properties WHERE url = "'.$property_url.'"';
-    $url_query = $db->query($url_sql);
-    if(mysqli_num_rows($url_query) > 0){
-        return false;
-    }else{
-        return true;
-    }
 }
 
 /**
@@ -383,7 +369,7 @@ function add_account_usage(mysqli $db, $id, $usage){
     
     // SQL
     $sql = 'UPDATE `accounts` SET `usage` = `usage` + '.$usage.' WHERE `id` = '.$id;
-    print_r($sql);
+
     // Execute Query
     $result = $db->query($sql);
 
@@ -507,6 +493,23 @@ function update_property_children_status(mysqli $db, $parent_id, $new_status){
 }
 
 /**
+ * Update Property Data 
+ */
+function update_property_data(mysqli $db, $id, $column, $value){
+
+    // SQL
+    $sql = 'UPDATE `properties` SET `'.$column.'` = "'.$value.'" WHERE `id` = "'.$id.'"';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for property "'.$id.'"');
+
+}
+
+/**
  * The Property Badge
  */
 function get_property_badge($db, $property){
@@ -537,4 +540,96 @@ function get_property_badge($db, $property){
     }
     return '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
 
+}
+
+/**
+ * Add DB Column
+ */
+function add_db_column($db, $table, $column_name, $column_type){
+
+    // SQL.
+    $sql = 'ALTER TABLE `'.$table.'` ';
+    $sql.= 'ADD COLUMN '.$column_name.' '.$column_type.';';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot add "'.$column_name.'" to "'.$table.'" with type "'.$column_type.'"');
+
+}
+
+/**
+ * DB Column Exists
+ */
+function db_column_exists($db, $table, $column_name){
+
+    // SQL.
+    $sql = 'SELECT '.$column_name.' FROM `'.$table.'` ';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result){
+        return false;   
+    }else{
+        return true;
+    }
+
+}
+
+/**
+ * Delete Alerts
+ * @param filters [$name => $value]
+ */
+function delete_alerts(mysqli $db, $filters = []){
+
+    // SQL
+    $sql = 'DELETE FROM `alerts`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+}
+
+/**
+ * Add Alert
+ */
+function add_alert(mysqli $db, $property_id, $integration_uri, $details){
+
+    // Create SQL
+    $sql = "INSERT INTO `alerts` (`property_id`, `integration_uri`, `details`) VALUES";
+    $sql.= "('".$property_id."',";
+    $sql.= "'".$integration_uri."',";
+    $sql.= "'".$details."')";
+    
+    // Query
+    $result = $db->query($sql);
+
+    //Fallback
+    if(!$result)
+        throw new Exception('Cannot insert alert for property "'.$property_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
+    
+    // Complete Query
+    return $result;
 }

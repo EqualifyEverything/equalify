@@ -5,14 +5,90 @@
  * Status: Active
  */
 
- /**
- * Little Forrest Scans
+/**
+ * Little Forrest Fields
  */
-function little_forrest_scans($url){
+function little_forrest_fields(){
+
+    $little_forrest_fields = array(
+        
+        // These fields are added to the database.
+        'db' => [
+
+                // Properties fields.
+                'properties' => [
+                    array(
+                        'name' => 'little_forrest_wcag_2_1_errors',
+                        'type'  => 'VARCHAR(20)'
+                    )
+                ]
+            
+        ]
+
+    );
+
+    // Return fields
+    return $little_forrest_fields;
+
 }
 
- /**
- * Little Forrest Settings
+/**
+ * little_forrest Scans
  */
-function little_forrest_settings($url){
+function little_forrest_scans($property, $account){
+
+    // Add DB info and required functions.
+    require_once '../config.php';
+    require_once '../models/db.php';
+    $db = connect(
+        DB_HOST, 
+        DB_USERNAME,
+        DB_PASSWORD,
+        DB_NAME
+    );
+
+    // Get Little Forrest data.
+    $override_https = array(
+        "ssl"=>array(
+            "verify_peer"=> false,
+            "verify_peer_name"=> false,
+        )
+    );
+    $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$property->url.'&level=WCAG2AA';
+    $little_forrest_json = file_get_contents($little_forrest_url, false, stream_context_create($override_https));
+
+    // Fallback if LF scan doesn't work
+    if(strpos($little_forrest_json, 'NoSuchFileException'))
+        throw new Exception('Little Forrest error related to page "'.$little_forrest_url.'"');
+
+    // Decode JSON and count WCAG errors.
+    $little_forrest_json_decoded = json_decode($little_forrest_json, true);
+    $little_forrest_errors = count($little_forrest_json_decoded['Errors']);
+    if($little_forrest_errors == NULL)
+        $little_forrest_errors = 0;
+        
+    // Remove previously saved alerts.
+    $alerts_filter = [
+        array(
+            'name'   =>  'property_id',
+            'value'  =>  $property->id
+        ),
+        array(
+            'name'   =>  'property_id',
+            'value'  =>  $property->id
+        ),
+        array(
+            'name'   =>  'integration_uri',
+            'value'  =>  'little_forrest'
+        )
+    ];
+    delete_alerts($db, $alerts_filter);
+
+    // Set optional alerts.
+    if($little_forrest_errors > 1)
+        add_alert($db, $property->id, 'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property->url.'&lang=auto" target="_blank">Little Forrest report</a>.');
+
+    // Update property data.
+    update_property_data($db, $property->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);
+        
 }

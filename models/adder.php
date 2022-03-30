@@ -5,7 +5,7 @@
 function get_wordpress_properties($site_url){
 
     // Reformat URL for JSON request.
-    $json_url = $site_url.'/wp-json/wp/v2/pages';
+    $json_url = $site_url.'/wp-json/wp/v2/pages?per_page=100';
 
     // Get URL contents.
     $curl = curl_init($json_url);

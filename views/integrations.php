@@ -45,6 +45,13 @@
                     the_integration_activation_button($integration['uri'], $meta['status']);
                     ?>
 
+                    <?php
+                    // Show settings button if integration has settings
+                    $integration_fields = get_integration_fields( $integration['uri'] );
+                    if(!empty($integration_fields['settings']))
+                        the_integration_settings_button($integration['uri'], $meta['status']);
+                    ?>
+
                 </div>
             </div>
         </div>

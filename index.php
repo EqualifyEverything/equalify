@@ -2,7 +2,7 @@
 // Add Dependencies
 require_once 'config.php';
 require_once 'models/db.php';
-require_once 'models/theme.php';
+require_once 'models/views.php';
 require_once 'models/integrations.php';
 
 // Setup DB Connection

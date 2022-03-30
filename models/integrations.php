@@ -74,3 +74,38 @@ function get_integration_meta( $file ) {
 
 	return $headers;
 }
+
+/**
+ * Get Integration Fields
+ */
+function get_integration_fields( $uri ){
+
+	// Get integration file.
+	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
+    require_once $integration_path;
+    $integration_db_fields = $uri.'_fields';
+    if( function_exists( $integration_db_fields ) ){
+		return $integration_db_fields();
+	}else{
+		false;
+	}
+
+}
+
+/**
+ * Is Active Integration
+ */
+function is_active_integration($uri){
+
+	// Get integration meta.
+	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
+    $integration_meta = get_integration_meta($integration_path);
+
+	// Return true if it is active.
+	if($integration_meta['status'] == 'Active'){
+		return true;
+	}else{
+		return false;
+	}
+
+}
