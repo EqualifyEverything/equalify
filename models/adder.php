@@ -5,7 +5,7 @@
 function get_wordpress_properties($site_url){
 
     // Reformat URL for JSON request.
-    $json_url = $site_url.'/wp-json/wp/v2/pages?per_page=100';
+    $json_url = $site_url.'wp-json/wp/v2/pages?per_page=100';
 
     // Get URL contents.
     $curl = curl_init($json_url);
@@ -28,7 +28,7 @@ function get_wordpress_properties($site_url){
     // Push JSON to properties array.
     $properties = [];
     foreach ($wp_api_json as $property):
-        array_push($properties, array('url' => $property['link'], 'wcag_errors' => NULL));
+        array_push($properties, array('url' => $property['link']));
     endforeach;
 
     // Insert properties.
@@ -37,18 +37,20 @@ function get_wordpress_properties($site_url){
 
         // Set parent.
         if($property['url'] == $site_url || $property['url'] == $site_url.'/'){
-            $property_parent = '';  
+            $is_parent = 1;  
         }else{
-            $property_parent = $site_url;                    
+            $is_parent = NULL;                    
         }
+        $property_group = $site_url;                    
 
         // Push each property to properties' records.
-        // TODO: Make parent an id instead of URL
+        // TODO: Make group an id instead of URL
         array_push(
             $properties_records, 
             array(
                 'url'       => $property['url'], 
-                'parent'    => $property_parent,
+                'group'     => $property_group,
+                'is_parent' => $is_parent,
                 'status'    => 'active',
                 'type'      => 'wordpress'
             )

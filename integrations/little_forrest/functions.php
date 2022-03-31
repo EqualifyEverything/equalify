@@ -86,7 +86,7 @@ function little_forrest_scans($property, $account){
 
     // Set optional alerts.
     if($little_forrest_errors > 1)
-        add_alert($db, $property->id, 'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property->url.'&lang=auto" target="_blank">Little Forrest report</a>.');
+        add_alert($db, $property->id, $property->group,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property->url.'&lang=auto" target="_blank">Little Forrest report</a>.');
 
     // Update property data.
     update_property_data($db, $property->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);

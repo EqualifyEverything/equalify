@@ -20,12 +20,10 @@ if(empty($old_status))
 
 // Toggle Property Status
 if($old_status == 'active'){
-    update_property_status($db, $id, 'archived');
-    update_property_children_status($db, $id, 'archived');
+    update_property_group_status($db, $id, 'archived');
 }
 if($old_status == 'archived'){
-    update_property_status($db, $id, 'active');
-    update_property_children_status($db, $id, 'active');
+    update_property_group_status($db, $id, 'active');
 }
 
 // Redirect

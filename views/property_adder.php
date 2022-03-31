@@ -1,8 +1,8 @@
 <?php
 // Set URL Requests
-$requested_parent = '';
-if(!empty($_GET['parent']))
-    $requested_parent = $_GET['parent'];
+$requested_group = '';
+if(!empty($_GET['group']))
+    $requested_group = $_GET['group'];
 $requested_type = '';
 if(!empty($_GET['type']))
     $requested_type = $_GET['type'];
@@ -27,28 +27,28 @@ if(!empty($_GET['type']))
                     <option value="drupal_7" disabled>Drupal 7 Site (Coming Soon)</option>
                 </select>
             </div>
-            <div id="parent_field" class="col-4" style="display:none">
-                <label for="parent" class="form-label">Parent</label>
-                <select id="parent" name="parent" class="form-select">
+            <div id="group_field" class="col-4" style="display:none">
+                <label for="group" class="form-label">Group</label>
+                <select id="group" name="group" class="form-select">
                     <option value="">None</option>
 
                     <?php
-                    // Show Non-WordPress Property Parents because
+                    // Show Non-WordPress Property Groups because
                     // WordPress properties are automatically loaded
                     $filters = [
                         array(
-                            'name'  => 'parent',
-                            'value' => ''
+                            'name'  => 'is_parent',
+                            'value' => '1'
                         ),
                         array(
                             'name'  => 'type',
                             'value' => 'static'
                         )
                     ];
-                    $parents = get_properties($db, $filters);
-                    if( count($parents) > 0 ){
-                        foreach ($parents as $parent){
-                            echo '<option value="'.$parent->url.'">'.$parent->url.'</option>';
+                    $groups = get_properties($db, $filters);
+                    if( count($groups) > 0 ){
+                        foreach ($groups as $group){
+                            echo '<option value="'.$group->url.'">'.$group->url.'</option>';
                         }
                     }
                     ?>                
@@ -77,24 +77,24 @@ if(!empty($_GET['type']))
     }
 
     <?php
-    // Load parents from URL request.
-    if(!empty($requested_parent)) 
-        echo "select('parent', '".$requested_parent."');";
+    // Load groups from URL request.
+    if(!empty($requested_group)) 
+        echo "select('group', '".$requested_group."');";
 
     // Load type from URL request.
     if(!empty($requested_type)) 
         echo "select('type', '".$requested_type."');";
     ?>
 
-    // Restrict "parents" to static pages.
+    // Restrict "groups" to static pages.
     if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Static Page' ){
-        document.getElementById('parent_field').style.display = 'block';
+        document.getElementById('group_field').style.display = 'block';
     };
     document.getElementById('type').addEventListener('change', function () {
         if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Static Page' ){
-            document.getElementById('parent_field').style.display = 'block';
+            document.getElementById('group_field').style.display = 'block';
         } else {
-            document.getElementById('parent_field').style.display = 'none';
+            document.getElementById('group_field').style.display = 'none';
         }
     });
 

@@ -43,26 +43,27 @@ if(empty($property) == 1)
             </tr>
         </thead>
         <tbody>
+
+            <?php
+            $group = get_property_group($db, $property->url);
+            $group_count = count($group);
+            if($group_count > 0 ):
+                foreach($group as $property):    
+            ?>
+
             <tr>
-                <td><?php echo $property->url;?></td>
-                <td><?php echo $property->scanned;?></td>
+                <td>
+                    <a href="<?php echo $property->url;?>" target="_blank"><?php echo $property->url;?></a>
+                </td>
+                <td>
+                    <?php echo $property->scanned; ?>
+                </td>
             </tr>
 
-<?php
-$children = get_property_children($db, $property->url);
-$child_count = count($children);
-if($child_count > 0 ):
-    foreach($children as $child):    
-?>
-            <tr>
-                <td><?php echo $child->url; ?></td>
-                <td><?php echo $child->scanned; ?></td>
-            </tr>
-
-<?php 
-    endforeach;
-endif;
-?>
+            <?php 
+                endforeach;
+            endif;
+            ?>
 
         </tbody>
     </table>
@@ -73,18 +74,20 @@ endif;
         <thead>
             <tr>
                 <th scope="col">Time</th>
+                <th scope="col">Property</th>
                 <th scope="col">Details</th>
             </tr>
         </thead>
 
         <?php
-        $alerts = get_alerts_by_property($db, $id);
+        $alerts = get_alerts_by_property_group($db, $property->group);
         if(count($alerts) > 0 ):
             foreach($alerts as $alert):    
         ?>
 
         <tr>
             <td><?php echo $alert->time;?></td>
+            <td><?php echo get_property_url($db, $alert->property_id);?></td>
             <td><?php echo $alert->details;?></td>
         </tr>
 
@@ -124,7 +127,7 @@ endif;
     <?php
     // Optional Add Property
     if($property->type == 'static')
-        echo '<a href="?view=property_adder&type=static&parent='.$property->url.'" class="btn btn-outline-dark">Add Child Property</a>';
+        echo '<a href="?view=property_adder&type=static&group='.$property->url.'" class="btn btn-outline-dark">Add Property to Group</a>';
     ?>
 
 </section>

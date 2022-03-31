@@ -10,11 +10,11 @@
     <div class="row row-cols-3 g-4 pb-4">
         
         <?php
-        // Show Property Parents
+        // Show Property Groups
         $filters = [
             array(
-                'name'  => 'parent',
-                'value' => ''
+                'name'  => 'is_parent',
+                'value' => '1'
             ),
         ];
         $properties = get_properties($db, $filters);

@@ -10,38 +10,39 @@ $db = connect(
     DB_NAME
 );
 
-// Get variables and set fallbacks.
+// Get URL variabls and set fallbacks.
 $url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($url == false)
     throw new Exception('URL"'.$_GET['url'].'" format is invalid');
-$type = $_GET['type'];
-if( $type == false)
-    throw new Exception('Property type is not specified for the URL "'.$url.'"');
-$parent = $_GET['parent'];
-if(empty($parent)){
-    $parent = '';
-}else{
-    if(filter_input(INPUT_GET, 'parent', FILTER_VALIDATE_URL) == false)
-        throw new Exception('Parent URL"'.$_GET['parent'].'" format is invalid');
-}
-if($type == 'wordpress' && $parent != '')
-    throw new Exception('WordPress preproperties like "'.$url.'" cannot have parents');
 
 // Add backslash if no backslash exists 
 // because WP API automatically gives backslashes to properties
-// and we need the same url to set parent
+// and we need the same url to set group
 if( !str_ends_with($url, '/') )
     $url = $url.'/';
 
-// Add Unique Property
+// Get other variables after we set the URL variable correctly
+$type = $_GET['type'];
+if( $type == false)
+    throw new Exception('Property type is not specified for the URL "'.$url.'"');
+$group = $_GET['group'];
+if(empty($group)){
+    $group = $url;
+    $is_parent = 1;
+}else{
+    $is_parent = '';
+    if(filter_input(INPUT_GET, 'group', FILTER_VALIDATE_URL) == false)
+        throw new Exception('Group URL"'.$_GET['group'].'" format is invalid');
+}
+if($type == 'wordpress' && $group != $url)
+    throw new Exception('WordPress preproperties like "'.$url.'" cannot have groups');
+
+// Only add unique properties that are static.
 if(is_unique_property_url($db, $url) && $type == 'static' ){
+    add_property($db, $url, $type, 'active', $group, $is_parent );
 
-    // Static Property
-    add_property($db, $url, $type, 'active', $parent );
-
+// WordPress properties are treated differently..
 }elseif(is_unique_property_url($db, $url) && $type == 'wordpress'){
-
-    // WordPress Properties
     $properties = get_wordpress_properties($url);
     add_properties($db, $properties);
 

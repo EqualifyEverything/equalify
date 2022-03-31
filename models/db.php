@@ -154,12 +154,12 @@ function get_alerts(mysqli $db){
 }
 
 /**
- * Get Alerts
+ * Get Alerts By Property Group
  */
-function get_alerts_by_property(mysqli $db, $property_id){
+function get_alerts_by_property_group(mysqli $db, $group){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts` WHERE `property_id` = '.$property_id;
+    $sql = 'SELECT * FROM `alerts` WHERE `property_group` = "'.$group.'"';
 
     // Query
     $results = $db->query($sql);
@@ -243,12 +243,12 @@ function get_property_url(mysqli $db, $id){
 }
 
 /**
- * Get Property Children
+ * Get Property Group
  */
-function get_property_children(mysqli $db, $parent_url){
+function get_property_group(mysqli $db, $group){
 
     // SQL
-    $sql = 'SELECT * FROM `properties` WHERE `parent` = "'.$parent_url.'"';
+    $sql = 'SELECT * FROM `properties` WHERE `group` = "'.$group.'"';
 
     // Query
     $results = $db->query($sql);
@@ -282,21 +282,26 @@ function is_unique_property_url(mysqli $db, $property_url){
 /**
  * Add Property
  */
-function add_property(mysqli $db, $url, $type, $status, $parent){
+function add_property(mysqli $db, $url, $type, $status, $group, $is_parent){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`url`, `type`, `status`, `parent`) VALUES';
+    $sql = 'INSERT INTO `properties` (`url`, `type`, `status`, `is_parent`, `group`) VALUES';
     $sql.= '("'.$url.'",';
     $sql.= '"'.$type.'",';
     $sql.= '"'.$status.'",';
-    $sql.= '"'.$parent.'")';
+    if(empty($is_parent)){
+        $sql.= 'NULL,';
+    }else{
+        $sql.= '"'.$is_parent.'",';
+    }
+    $sql.= '"'.$group.'")';
     
     // Query
     $result = $db->query($sql);
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert property with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$parent);
+        throw new Exception('Cannot insert property with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$group.',"'.$is_parent.'"');
     
     // Complete Query
     return $result;
@@ -332,7 +337,7 @@ function add_scan(mysqli $db, $status, array $properties){
 function add_properties(mysqli $db, $properties_records){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`parent`, `url`, `status`, `type`) VALUES';
+    $sql = 'INSERT INTO `properties` (`group`, `url`, `status`, `is_parent`, `type`) VALUES';
     
     // Insert Each Record
     $record_count = count($properties_records);
@@ -341,9 +346,14 @@ function add_properties(mysqli $db, $properties_records){
 
         // SQL
         $sql.= "(";
-        $sql.= "'".$record['parent']."',";
+        $sql.= "'".$record['group']."',";
         $sql.= "'".$record['url']."',";
         $sql.= "'".$record['status']."',";
+        if(empty($record['is_parent'])){
+            $sql.= 'NULL,';
+        }else{
+            $sql.= '"'.$record['is_parent'].'",';
+        }
         $sql.= "'".$record['type']."'";
 
         $sql.= ")";
@@ -387,10 +397,10 @@ function get_property_view_uri(mysqli $db, $property_id){
     $property = get_property($db, $property_id);
 
     // Set URL
-    if($property->parent == ''){
+    if($property->group == ''){
         return '?view=property_details&id='.$property->id;
-    }elseif(!empty($property->parent)){
-        return '?view=property_details&id='.get_property_id($db, $property->parent);
+    }elseif(!empty($property->group)){
+        return '?view=property_details&id='.get_property_id($db, $property->group);
     }else{
         return false;
     }
@@ -458,38 +468,22 @@ function update_property_scanned_time(mysqli $db, $id){
 }
 
 /**
- * Update Property Status 
+ * Update Property Group Status 
  */
-function update_property_status(mysqli $db, $id, $new_status){
+function update_property_group_status(mysqli $db, $group, $new_status){
+
+    // Get URL of group.
+    $group = get_property_url($db, $group);
 
     // SQL
-    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE `id` = "'.$id.'"';
+    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE `group` = "'.$group.'"';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot update property status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
-}
-
-/**
- * Update Property Children Status 
- */
-function update_property_children_status(mysqli $db, $parent_id, $new_status){
-
-    // Get URL of parent.
-    $parent = get_property_url($db, $parent_id);
-
-    // SQL
-    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE parent = "'.$parent.'"';
-
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot archive children of property "'.$parent_id.'"');
+        throw new Exception('Cannot archive property group "'.$group.'"');
 }
 
 /**
@@ -524,7 +518,7 @@ function get_property_badge($db, $property){
     }else{
 
         // Alerts
-        $alert_count = count(get_alerts_by_property($db, $property->id));
+        $alert_count = count(get_alerts_by_property_group($db, $property->group));
         if($alert_count == 0){
             $badge_status = 'bg-success';
             $badge_content = 'Equalified';
@@ -615,11 +609,12 @@ function delete_alerts(mysqli $db, $filters = []){
 /**
  * Add Alert
  */
-function add_alert(mysqli $db, $property_id, $integration_uri, $details){
+function add_alert(mysqli $db, $property_id, $property_group, $integration_uri, $details){
 
     // Create SQL
-    $sql = "INSERT INTO `alerts` (`property_id`, `integration_uri`, `details`) VALUES";
+    $sql = "INSERT INTO `alerts` (`property_id`, `property_group`, `integration_uri`, `details`) VALUES";
     $sql.= "('".$property_id."',";
+    $sql.= "'".$property_group."',";
     $sql.= "'".$integration_uri."',";
     $sql.= "'".$details."')";
     
