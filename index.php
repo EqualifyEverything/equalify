@@ -2,7 +2,7 @@
 // Add Dependencies
 require_once 'config.php';
 require_once 'models/db.php';
-require_once 'models/views.php';
+require_once 'models/view_components.php';
 require_once 'models/integrations.php';
 
 // Setup DB Connection
@@ -61,7 +61,11 @@ $records = [];
                         </svg>
                         Alerts 
                         <span class="badge bg-danger float-end">
-                            <?php echo count(get_alerts($db));?>
+                            <span id="alert_count">
+
+                                <?php echo count(get_alerts($db));?>
+                            
+                            </span>
                         </span>
                     </a>
                 </li>
@@ -91,7 +95,7 @@ $records = [];
                 <p class="text-muted">
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
                 <script>window.DonorBox = { widgetLinkClassName: 'custom-dbox-popup' }</script>
-                    If scans are useful, you can <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to Blake</a> to keep the service free and maintained.
+                    If the scans are useful to you, <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to the project</a> to keep the service free and maintained.
                 </p>
             </div>
         </div>

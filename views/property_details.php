@@ -45,7 +45,13 @@ if(empty($property) == 1)
         <tbody>
 
             <?php
-            $group = get_property_group($db, $property->url);
+            $property_filters = [
+                array(
+                    'name'  => 'group',
+                    'value' => $property->group
+                ),
+            ];
+            $group = get_properties($db, $property_filters);
             $group_count = count($group);
             if($group_count > 0 ):
                 foreach($group as $property):    
@@ -127,7 +133,7 @@ if(empty($property) == 1)
     <?php
     // Optional Add Property
     if($property->type == 'static')
-        echo '<a href="?view=property_adder&type=static&group='.$property->url.'" class="btn btn-outline-dark">Add Property to Group</a>';
+        echo '<a href="?view=property_adder&type=static&group='.$property->group.'" class="btn btn-outline-dark">Add Property to Group</a>';
     ?>
 
 </section>

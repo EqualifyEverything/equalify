@@ -10,7 +10,7 @@ $db = connect(
     DB_NAME
 );
 
-// Get URL variabls and fallbacks
+// Get URL variables and fallbacks.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if(empty($id))
     throw new Exception('ID "'.$id.'" is invalid format.');
@@ -18,12 +18,13 @@ $old_status = $_GET['old_status'];
 if(empty($old_status))
     throw new Exception('Status is not specfied for property "'.$id.'"');
 
-// Toggle Property Status
+// Toggle property status.
+$group = get_property($db, $id)->group;
 if($old_status == 'active'){
-    update_property_group_status($db, $id, 'archived');
+    update_property_group_status($db, $group, 'archived');
 }
 if($old_status == 'archived'){
-    update_property_group_status($db, $id, 'active');
+    update_property_group_status($db, $group, 'active');
 }
 
 // Redirect

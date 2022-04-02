@@ -24,10 +24,10 @@ if(!empty($_GET['type']))
                 <select id="type" name="type" class="form-select">
                     <option value="static">Static Page</option>
                     <option value="wordpress">WordPress Site</option>
-                    <option value="drupal_7" disabled>Drupal 7 Site (Coming Soon)</option>
+                    <option value="drupal">Drupal Site</option>
                 </select>
             </div>
-            <div id="group_field" class="col-4" style="display:none">
+            <div id="group_field" class="col-4">
                 <label for="group" class="form-label">Group</label>
                 <select id="group" name="group" class="form-select">
                     <option value="">None</option>
@@ -86,22 +86,9 @@ if(!empty($_GET['type']))
         echo "select('type', '".$requested_type."');";
     ?>
 
-    // Restrict "groups" to static pages.
-    if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Static Page' ){
-        document.getElementById('group_field').style.display = 'block';
-    };
-    document.getElementById('type').addEventListener('change', function () {
-        if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Static Page' ){
-            document.getElementById('group_field').style.display = 'block';
-        } else {
-            document.getElementById('group_field').style.display = 'none';
-        }
-    });
-
     // Add helper text to URL field.
-    $helperText = 'WordPress site pages are automatically added (up to 100 pages).'
     if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'WordPress Site' ){
-        document.getElementById('url_helper').textContent = $helperText;
+        document.getElementById('url_helper').textContent = 'Adds up to 100 WordPress pages.';
     };
     document.getElementById('type').addEventListener('change', function () {
         if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'WordPress Site' ){

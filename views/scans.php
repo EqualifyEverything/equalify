@@ -4,9 +4,68 @@
             <h1>All Scans</h1>
         </div>
         <div>
-            <a href="actions/scan_all_properties.php" class="btn btn-primary">Scan All Properties</a>
+            <button id="add_scan" class="btn btn-primary">Scan All Properties</button>
+            <script>
+
+                // Ansycronistically start scan.
+                async function addScan() {
+                    const response = await fetch('actions/scan_all_properties.php?action=add_scan', {
+                        method: 'GET', 
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'text/html'
+                        }
+                    });
+                    console.log('hpp');
+                    return response.text();
+                }
+
+                async function doScan() {
+                    const response = await fetch('actions/scan_all_properties.php?action=do_scan', {
+                        method: 'GET', 
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'text/html'
+                        }
+                    });
+                    return response.text();
+                }
+
+                async function getAlerts() {
+                    const response = await fetch('actions/scan_all_properties.php?action=get_alerts', {
+                        method: 'GET', 
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'text/html'
+                        }
+                    });
+                    return response.text();
+                }
+
+                async function refreshTable(data) {
+                    document.getElementById('the_scans_rows').innerHTML = data;
+                }
+
+                async function refreshAlerts(data) {
+                    document.getElementById('alert_count').innerHTML = data;
+                }
+
+                const handleScan = () => {
+                    addScan()
+                    .then(refreshTable)
+                    .then(doScan)
+                    .then(refreshTable)
+                    .then(getAlerts)
+                    .then(refreshAlerts);
+                }
+                
+                // Event listener.
+                document.getElementById('add_scan').addEventListener('click', handleScan)
+
+            </script>
         </div>
     </div>
+    
     <table class="table">
         <thead>
             <tr>
@@ -15,40 +74,16 @@
                 <th scope="col">Properties Scanned</th>
             </tr>
         </thead>
+        <tbody id="the_scans_rows">
 
-        <?php
-        // Begin Scans
-        $scans = get_scans($db);
-        if(count($scans) > 0 ): foreach($scans as $scan):    
-        ?>
+            <?php
 
-        <tr>
-            <td><?php echo $scan->time;?></td>
-            <td><?php echo ucwords($scan->status);?></td>
-            <td>
+            // Show scans
+            $scans = get_scans($db);
+            the_scan_rows($scans);
 
-            <?php             
-            // Link to properties    
-            $property_ids = unserialize($scan->properties);
-            echo count($property_ids);
             ?>
 
-            </td>
-        </tr>
-
-        <?php 
-        // Fallback
-        endforeach; else:
-        ?>
-
-        <tr>
-            <td colspan="3">No scans found.</td>
-        </tr>
-
-        <?php 
-        // End Scans
-        endif;
-        ?>
-
-    </table>    
+        </tbody>
+    </table>
 </section>

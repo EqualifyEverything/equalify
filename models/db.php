@@ -93,6 +93,7 @@ function get_property_ids(mysqli $db, $filters = []){
         }
     }
     return $data;
+
 }
 
 /**
@@ -243,25 +244,23 @@ function get_property_url(mysqli $db, $id){
 }
 
 /**
- * Get Property Group
+ * Get Group Parent Status
+ * Parent sets the group status.
  */
-function get_property_group(mysqli $db, $group){
+function get_group_parent_status(mysqli $db, $group){
 
     // SQL
-    $sql = 'SELECT * FROM `properties` WHERE `group` = "'.$group.'"';
+    $sql = 'SELECT `status` FROM `properties` WHERE `group` = "'.$group.'" AND `is_parent` = 1';
 
     // Query
-    $results = $db->query($sql);
+    $data = [];
+    $data = $db->query($sql)->fetch_object()->status;
 
     // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
     return $data;
+    
 }
+
 
 /**
  * Is Unique Property URL
@@ -329,6 +328,7 @@ function add_scan(mysqli $db, $status, array $properties){
     
     // Complete Query
     return $result;
+    
 }
 
 /**
@@ -407,7 +407,6 @@ function get_property_view_uri(mysqli $db, $property_id){
     
 }
 
-
 /**
  * Update Account 
  */
@@ -472,9 +471,6 @@ function update_property_scanned_time(mysqli $db, $id){
  */
 function update_property_group_status(mysqli $db, $group, $new_status){
 
-    // Get URL of group.
-    $group = get_property_url($db, $group);
-
     // SQL
     $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE `group` = "'.$group.'"';
 
@@ -483,7 +479,7 @@ function update_property_group_status(mysqli $db, $group, $new_status){
 
     // Result
     if(!$result)
-        throw new Exception('Cannot archive property group "'.$group.'"');
+        throw new Exception('Cannot update "'.$group.'" group status to "'.$new_status.'"');
 }
 
 /**
