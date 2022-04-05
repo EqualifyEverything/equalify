@@ -23,7 +23,7 @@ function connect($hostname, $username, $password, $database){
 
 /**
  * Get All Properties
- * @param filters [$name => $value]
+ * @param filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_properties(mysqli $db, $filters = []){
 
@@ -61,7 +61,7 @@ function get_properties(mysqli $db, $filters = []){
 
 /**
  * Get Property Ids
- * @param filters [$name => $value]
+ * @param filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_property_ids(mysqli $db, $filters = []){
 
@@ -98,7 +98,7 @@ function get_property_ids(mysqli $db, $filters = []){
 
 /**
  * Get Scans
- *  @param filters [$status => $value]
+ * @param filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_scans(mysqli $db, $filters = []){
 
@@ -572,7 +572,7 @@ function db_column_exists($db, $table, $column_name){
 
 /**
  * Delete Alerts
- * @param filters [$name => $value]
+ * @param filters [ array ('name' => $name, 'value' => $value) ]
  */
 function delete_alerts(mysqli $db, $filters = []){
 

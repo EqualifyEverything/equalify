@@ -25,6 +25,16 @@ if($old_status == 'active'){
 }
 if($old_status == 'archived'){
     update_property_group_status($db, $group, 'active');
+
+    // Alerts are deleted when a property is archived.
+    $filters = [
+        array(
+            'name'  => 'property_group',
+            'value' => $group
+        )
+    ];
+    delete_alerts($db, $filters);
+
 }
 
 // Redirect

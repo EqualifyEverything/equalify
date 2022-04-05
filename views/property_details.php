@@ -121,8 +121,8 @@ if(empty($property) == 1)
         $button_text = 'Activate';
         $button_class = 'btn-outline-success';
     }else{
-        $button_text = 'Archive';
-        $button_class = 'btn-outline-dark';
+        $button_text = 'Archive and Delete Alerts';
+        $button_class = 'btn-outline-danger';
     }
     ?>
 
