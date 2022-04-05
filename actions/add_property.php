@@ -13,7 +13,7 @@ $db = connect(
 // Valid URLs are required for each property.
 $url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($url == false)
-    throw new Exception('URL"'.$_GET['url'].'" format is invalid');
+    die('URL"'.$_GET['url'].'" format is invalid or missing.');
 
 // Add backslash if no backslash exists 
 // because WP API automatically gives backslashes to properties
@@ -24,7 +24,7 @@ if( !str_ends_with($url, '/') )
 // Property types must be specified because different types require different scans.
 $type = $_GET['type'];
 if( $type == false)
-    throw new Exception('Property type is not specified for the URL "'.$url.'"');
+    die('Property type is not specified for the URL "'.$url.'".');
 
 // When group isn't included, property creates its own group..
 if(empty($_GET['group'])){
@@ -43,7 +43,7 @@ if(empty($_GET['group'])){
 
 // Properties must have unique URLS.
 if(!is_unique_property_url($db, $url))
-    throw new Exception('Property "'.$url.'" already exists');
+    die('Property "'.$url.'" already exists.');
 
 // Static pages are added individually.
 if($type == 'static' ){

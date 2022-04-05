@@ -30,21 +30,13 @@ $records = [];
 <body>
     <main>
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 280px;">
-            <a href="index.php?view=dashboard" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <a href="index.php?view=properties" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi me-2 bi-patch-check-fill" viewBox="0 0 16 16">
                     <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01-.622-.636zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708z"/>
                 </svg>
                 <span class="fs-2">Equalify</span>
             </a>
             <ul class="nav nav-pills flex-column mb-auto mt-5">
-                <li class="nav-item">
-                    <a href="index.php?view=dashboard" class="nav-link link-dark <?php the_active_view('dashboard');?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-house-door" viewBox="0 0 16 16">
-                            <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
-                        </svg>
-                        Dashboard
-                    </a>
-                </li>
                 <li>
                     <a href="index.php?view=properties" class="nav-link link-dark <?php the_active_view('properties');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-diagram-3" viewBox="0 0 16 16">
@@ -110,7 +102,7 @@ $records = [];
             if(!empty($_GET['view'])){
                 require_once 'views/'.$_GET['view'].'.php';
             }else{
-                require_once 'views/dashboard.php';
+                require_once 'views/properties.php';
             }
             ?>
 

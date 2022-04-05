@@ -5,8 +5,9 @@
         <thead>
             <tr>
                 <th scope="col">Time</th>
+                <th scope="col">Source</th>
                 <th scope="col">Details</th>
-                <th scope="col">Property</th>
+                <th scope="col">Actions</th>
             </tr>
         </thead>
 
@@ -18,16 +19,20 @@
 
         <tr>
             <td><?php echo $alert->time;?></td>
+            <td><?php echo ucwords($alert->source);?></td>
             <td><?php echo $alert->details;?></td>
-            <td>
-
+            <td style="min-width: 200px;">
                 <?php 
-                // Set $property
-                $property = get_property($db, $alert->property_id);
+                // Integration alerts link to the integration.
+                if( $alert->source == 'property' ){
+                    $property = get_property($db, $alert->property_id);
+                    echo '<a class="btn btn-primary btn-sm  href="'.get_property_view_uri($db, $alert->property_id).'">View Property</a>';
+
+                }
                 ?>
 
-                <a href="<?php echo get_property_view_uri($db, $alert->property_id);?>">
-                    <?php echo $property->url;?>
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>" class="btn btn-outline-secondary btn-sm">
+                    Dismiss
                 </a>
             </td>
         </tr>
@@ -38,7 +43,7 @@
         ?>
 
         <tr>
-            <td colspan="3">No alerts found.</td>
+            <td colspan="4">No alerts found.</td>
         </tr>
 
         <?php 

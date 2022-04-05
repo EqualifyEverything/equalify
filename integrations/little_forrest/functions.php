@@ -57,7 +57,7 @@ function little_forrest_scans($property, $account){
     $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$property->url.'&level=WCAG2AA';
     $little_forrest_json = file_get_contents($little_forrest_url, false, stream_context_create($override_https));
 
-    // Fallback if LF scan doesn't work
+    // Fallback if LF scan doesn't work.
     if(strpos($little_forrest_json, 'NoSuchFileException'))
         throw new Exception('Little Forrest error related to page "'.$little_forrest_url.'"');
 
@@ -86,7 +86,7 @@ function little_forrest_scans($property, $account){
 
     // Set optional alerts.
     if($little_forrest_errors > 1)
-        add_alert($db, $property->id, $property->group,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property->url.'&lang=auto" target="_blank">Little Forrest report</a>.');
+        add_property_alert($db, $property->id, $property->group,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$property->url.'&lang=auto" target="_blank">Little Forrest report</a>.');
 
     // Update property data.
     update_property_data($db, $property->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);

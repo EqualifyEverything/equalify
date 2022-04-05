@@ -104,7 +104,7 @@ function wave_scans($property, $account){
 
     // Set optional alerts.
     if($wave_errors > 1)
-        add_alert($db, $property->id, $property->group, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$property->url.'" target="_blank">WAVE report</a>');
+        add_property_alert($db, $property->id, $property->group, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$property->url.'" target="_blank">WAVE report</a>');
 
     // Update property data.
     update_property_data($db, $property->id, 'wave_wcag_2_1_errors', $wave_errors);

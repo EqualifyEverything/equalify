@@ -22,9 +22,6 @@ if(empty($old_status))
 $group = get_property($db, $id)->group;
 if($old_status == 'active'){
     update_property_group_status($db, $group, 'archived');
-}
-if($old_status == 'archived'){
-    update_property_group_status($db, $group, 'active');
 
     // Alerts are deleted when a property is archived.
     $filters = [
@@ -34,7 +31,10 @@ if($old_status == 'archived'){
         )
     ];
     delete_alerts($db, $filters);
-
+    
+}
+if($old_status == 'archived'){
+    update_property_group_status($db, $group, 'active');
 }
 
 // Redirect

@@ -34,9 +34,9 @@ function wordpress_properties_adder($site_url){
 }
 
 /**
- * Drupal Properties Adder
+ * XML Site Adder
  */
-function drupal_properties_adder($site_url){
+function xml_site_adder($site_url){
 
     // Reformat URL for XML request.
     $xml_url = $site_url.'sitemap.xml';

@@ -23,7 +23,7 @@ function connect($hostname, $username, $password, $database){
 
 /**
  * Get All Properties
- * @param filters [ array ('name' => $name, 'value' => $value) ]
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_properties(mysqli $db, $filters = []){
 
@@ -61,7 +61,7 @@ function get_properties(mysqli $db, $filters = []){
 
 /**
  * Get Property Ids
- * @param filters [ array ('name' => $name, 'value' => $value) ]
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_property_ids(mysqli $db, $filters = []){
 
@@ -98,7 +98,7 @@ function get_property_ids(mysqli $db, $filters = []){
 
 /**
  * Get Scans
- * @param filters [ array ('name' => $name, 'value' => $value) ]
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
 function get_scans(mysqli $db, $filters = []){
 
@@ -572,7 +572,7 @@ function db_column_exists($db, $table, $column_name){
 
 /**
  * Delete Alerts
- * @param filters [ array ('name' => $name, 'value' => $value) ]
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
 function delete_alerts(mysqli $db, $filters = []){
 
@@ -603,13 +603,14 @@ function delete_alerts(mysqli $db, $filters = []){
 }
 
 /**
- * Add Alert
+ * Add Property Alert
  */
-function add_alert(mysqli $db, $property_id, $property_group, $integration_uri, $details){
-
+function add_property_alert(mysqli $db, $property_id, $property_group, $integration_uri, $details){
+    
     // Create SQL
-    $sql = "INSERT INTO `alerts` (`property_id`, `property_group`, `integration_uri`, `details`) VALUES";
-    $sql.= "('".$property_id."',";
+    $sql = "INSERT INTO `alerts` (`source`, `property_id`, `property_group`, `integration_uri`, `details`) VALUES";
+    $sql.= "('property',";
+    $sql.= "'".$property_id."',";
     $sql.= "'".$property_group."',";
     $sql.= "'".$integration_uri."',";
     $sql.= "'".$details."')";
@@ -617,10 +618,33 @@ function add_alert(mysqli $db, $property_id, $property_group, $integration_uri, 
     // Query
     $result = $db->query($sql);
 
-    //Fallback
+    // Fallback
     if(!$result)
-        throw new Exception('Cannot insert alert for property "'.$property_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
+        throw new Exception('Cannot insert integration alert for property "'.$property_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
     
     // Complete Query
     return $result;
+    
+}
+
+/**
+ * Add Integration Alert
+ */
+function add_integration_alert(mysqli $db, $details){
+
+    // Create SQL
+    $sql = "INSERT INTO `alerts` (`source`, `details`) VALUES";
+    $sql.= "('integration',";
+    $sql.= "'".$details."')";
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Cannot insert alert "'.$details.'"');
+    
+    // Complete Query
+    return $result;
+    
 }

@@ -24,7 +24,7 @@ if(!empty($_GET['type']))
                 <select id="type" name="type" class="form-select">
                     <option value="static">Static Page</option>
                     <option value="wordpress">WordPress Site</option>
-                    <option value="drupal">Drupal Site</option>
+                    <option value="xml">Site (via XML Sitemap)</option>
                 </select>
             </div>
             <div id="group_field" class="col-4">

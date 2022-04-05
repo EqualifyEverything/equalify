@@ -53,14 +53,26 @@ if( $_GET['action'] == 'do_scan' ){
 
                 // Fire the '_scans' function. 
                 $integration_scan_function_name = $uploaded_integration['uri'].'_scans';
-                if(function_exists($integration_scan_function_name))
-                    $integration_scan_function_name($property, $account);
+                if(function_exists($integration_scan_function_name)){
+
+                    // We need to kill the scan if an integration has an error.
+                    try {
+                        $integration_scan_function_name($property, $account);
+
+                        // Only successful scans get their timestamp updated.
+                        update_property_scanned_time($db, $property->id);
+
+                    } catch (Exception $x) {
+
+                        // Update scan status, add integration alert and die.
+                        add_integration_alert($db, $x->getMessage());
+
+                    }
+
+                }
 
             }
         }
-
-        // Update scanned timestamp.
-        update_property_scanned_time($db, $property->id);
         
     }
 
@@ -68,7 +80,7 @@ if( $_GET['action'] == 'do_scan' ){
     $properties_count = count($active_property_ids);
     add_account_usage($db, USER_ID, $properties_count);
 
-    // Add scan record.
+    // Update scan record.
     update_scan_status($db, 'running', 'complete');
 
     // Return all scans as JSON.
