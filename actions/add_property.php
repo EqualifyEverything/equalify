@@ -15,12 +15,6 @@ $url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($url == false)
     die('URL"'.$_GET['url'].'" format is invalid or missing.');
 
-// Add backslash if no backslash exists 
-// because WP API automatically gives backslashes to properties
-// and we need the same url to set group.
-if( !str_ends_with($url, '/') )
-    $url = $url.'/';
-
 // Property types must be specified because different types require different scans.
 $type = $_GET['type'];
 if( $type == false)
@@ -28,6 +22,14 @@ if( $type == false)
 
 // When group isn't included, property creates its own group..
 if(empty($_GET['group'])){
+
+    // Sites that are XML use the host as a defult group
+    if($type == 'xml'){
+        $cleaned_url = parse_url($url)['host'];
+    }else{
+        $cleaned_url = $url;
+    }
+
     $group = $url;
     $is_parent = 1;
 
@@ -49,17 +51,17 @@ if(!is_unique_property_url($db, $url))
 if($type == 'static' ){
     add_property($db, $url, $type, 'active', $group, $is_parent );
 
-// WordPress and Drupal deal with adding properties and setting
+// WordPress and XML deal with adding properties and setting
 // groups + status similarly, so they are in one condition.
-}elseif($type == 'wordpress' || $type == 'drupal' ){
+}elseif($type == 'wordpress' || $type == 'xml' ){
 
     // WordPress uses an API to turn pages into properties.
     if($type == 'wordpress' )
         $properties = wordpress_properties_adder($url);
 
-    // Drupal uses its XML sitemap to turn pages into properties.
-    if($type == 'drupal' )
-        $properties = drupal_properties_adder($url);
+    // Sitemaps with XML can turn pages into properties.
+    if($type == 'xml' )
+        $properties = xml_site_adder($url);
 
     // We're setting the status and adding properties so we don't
     // have to call the $db outside "models/adder.php".
@@ -92,7 +94,7 @@ if($type == 'static' ){
 // Since we're passing type through a URL, we a fallback in
 // case someone passes an unsupported type. 
 }else{
-    throw new Exception('Property "'.$url.'" already exists');
+    die('"'.$type.'" properties are unsupported.');
 }
 
 // When the work is done, we can triumphantly return home.

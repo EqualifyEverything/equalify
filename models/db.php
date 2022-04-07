@@ -215,7 +215,7 @@ function get_property(mysqli $db, $id){
 function get_property_id(mysqli $db, $url){
 
     // SQL
-    $sql = 'SELECT id FROM properties WHERE url = "'.$url.'"';
+    $sql = 'SELECT `id` FROM `properties` WHERE `url` = "'.$url.'"';
 
     // Query
     $data = [];
@@ -393,16 +393,14 @@ function add_account_usage(mysqli $db, $id, $usage){
  */
 function get_property_view_uri(mysqli $db, $property_id){
 
-    // Set $property
+    // We just need to see if the property is a parent. If 
+    // it is, that property's ID is good so we don't need
+    // to run another query to get the id of the parent.
     $property = get_property($db, $property_id);
-
-    // Set URL
-    if($property->group == ''){
+    if($property->is_parent == 1){
         return '?view=property_details&id='.$property->id;
-    }elseif(!empty($property->group)){
-        return '?view=property_details&id='.get_property_id($db, $property->group);
     }else{
-        return false;
+        return '?view=property_details&id='.get_property_id($db, $property->group);
     }
     
 }

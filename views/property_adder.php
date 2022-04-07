@@ -16,19 +16,19 @@ if(!empty($_GET['type']))
         <div class="row">
             <div class="col">
                 <label for="url" class="form-label">Property URL</label>
-                <input id="url"  name="url" type="text" class="form-control" placeholder="https://equalify.app" aria-describedby="url_helper">
+                <input id="url"  name="url" type="text" class="form-control" placeholder="https://equalify.app" aria-describedby="url_helper" required>
                 <div id="url_helper" class="form-text"></div>
             </div>
             <div class="col-3">
-                <label for="type" class="form-label">Type</label>
+                <label for="type" class="form-label">Scan Type</label>
                 <select id="type" name="type" class="form-select">
                     <option value="static">Static Page</option>
                     <option value="wordpress">WordPress Site</option>
-                    <option value="xml" disabled>Site (via XML Sitemap)</option>
+                    <option value="xml">Site via XML Sitemap</option>
                 </select>
             </div>
             <div id="group_field" class="col-4">
-                <label for="group" class="form-label">Group</label>
+                <label for="group" class="form-label">Existing Group</label>
                 <select id="group" name="group" class="form-select">
                     <option value="">None</option>
 
@@ -87,14 +87,26 @@ if(!empty($_GET['type']))
     ?>
 
     // Add helper text to URL field.
+    function updateHelper(helperText, helperPlaceholder) {
+        document.getElementById('url_helper').innerHTML = helperText;
+        document.getElementById('url').placeholder = helperPlaceholder;
+    }
+    var wordpressHelperText = 'Adds up to 100 WordPress pages.',
+        xmlHelperText = 'URL must be a standard <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
     if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'WordPress Site' ){
-        document.getElementById('url_helper').textContent = 'Adds up to 100 WordPress pages.';
-    };
+        updateHelper(wordpressHelperText, 'https://equalify.app/')
+    }else if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Site via XML Sitemap' ){
+        updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
+    }else{
+        updateHelper('', 'https://equalify.app/')
+    }
     document.getElementById('type').addEventListener('change', function () {
         if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'WordPress Site' ){
-            document.getElementById('url_helper').textContent = $helperText;
+            updateHelper(wordpressHelperText, 'https://equalify.app/')
+        } else if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Site via XML Sitemap' ) {
+            updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
         } else {
-            document.getElementById('url_helper').textContent = '';
+            updateHelper('', 'https://equalify.app/')
         }
     });
 

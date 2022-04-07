@@ -82,6 +82,7 @@ if(empty($property) == 1)
                 <th scope="col">Time</th>
                 <th scope="col">Property</th>
                 <th scope="col">Details</th>
+                <th scope="col">Actions</th>
             </tr>
         </thead>
 
@@ -95,6 +96,11 @@ if(empty($property) == 1)
             <td><?php echo $alert->time;?></td>
             <td><?php echo get_property_url($db, $alert->property_id);?></td>
             <td><?php echo $alert->details;?></td>
+            <td>
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&property_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
+                    Dismiss
+                </a>
+            </td>
         </tr>
 
         <?php 
@@ -103,7 +109,7 @@ if(empty($property) == 1)
         ?>
 
         <tr>
-            <td colspan="2">No alerts yet...</td>
+            <td colspan="2">No alerts found.</td>
         </tr>
 
         <?php 
