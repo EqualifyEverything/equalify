@@ -25,7 +25,7 @@
                 <?php 
                 // Integration alerts link to the integration.
                 if( $alert->source == 'property' ){
-                    echo '<a class="btn btn-primary btn-sm"  href="'.get_property_view_uri($db, $alert->property_id).'">View Property</a>';
+                    echo '<a class="btn btn-primary btn-sm"  href="'.get_property_details_uri($db, $alert->property_id).'">View Property</a>';
                 }
                 ?>
 

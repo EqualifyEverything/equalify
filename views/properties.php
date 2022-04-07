@@ -37,7 +37,7 @@
                     ?>
                     
                     <h2 class="h5 card-title">
-                        <?php echo $property->url; ?> 
+                        <?php echo $property->group; ?> 
                     </h2>
                     <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=property_details&id=<?php echo $property->id;?>">View Details</a>
                 </div>

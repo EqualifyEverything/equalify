@@ -267,10 +267,18 @@ function get_group_parent_status(mysqli $db, $group){
  */
 function is_unique_property_url(mysqli $db, $property_url){
 
+    // We don't consider a property with a '/' a unique url
+    // so we will also search for them.
+    if( !str_ends_with($property_url, '/') )
+        $property_url_backslashed = $property_url.'/';
+
     // Require unique URL
-    $url_sql = 'SELECT * FROM properties WHERE url = "'.$property_url.'"';
-    $url_query = $db->query($url_sql);
-    if(mysqli_num_rows($url_query) > 0){
+    $sql = 'SELECT * FROM `properties` WHERE `url` = "'.$property_url.'"';
+    if(isset($property_url_backslashed))
+        $sql.= ' OR `url` = "'.$property_url_backslashed.'"';
+
+    $query = $db->query($sql);
+    if(mysqli_num_rows($query) > 0){
         return false;
     }else{
         return true;
@@ -389,9 +397,9 @@ function add_account_usage(mysqli $db, $id, $usage){
 }
 
 /**
- * Get Property URI
+ * Get Details URI
  */
-function get_property_view_uri(mysqli $db, $property_id){
+function get_property_details_uri(mysqli $db, $property_id){
 
     // We just need to see if the property is a parent. If 
     // it is, that property's ID is good so we don't need

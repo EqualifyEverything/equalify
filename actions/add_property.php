@@ -15,29 +15,25 @@ $url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($url == false)
     die('URL"'.$_GET['url'].'" format is invalid or missing.');
 
-// Property types must be specified because different types require different scans.
+// Property types must be specified 'cuz different types require different scans.
 $type = $_GET['type'];
 if( $type == false)
     die('Property type is not specified for the URL "'.$url.'".');
 
-// When group isn't included, property creates its own group..
+// When group isn't specified, a new group is created.
 if(empty($_GET['group'])){
 
-    // Sites that are XML use the host as a defult group
-    if($type == 'xml'){
-        $cleaned_url = parse_url($url)['host'];
-    }else{
-        $cleaned_url = $url;
-    }
-
+    // We're setting these variables here, but they will
+    // change if we generate more properties from the url.
     $group = $url;
     $is_parent = 1;
 
     // New groups have the active status by default.
     $status = 'active';
 
-// ..otherwise, property inherits the select group attributes.
+// Some proprerties are added to existing groups.
 }else{
+    $existing_group = true;
     $is_parent = '';
     $group = filter_input(INPUT_GET, 'group', FILTER_VALIDATE_URL);
     $status = get_group_parent_status($db, $group);
@@ -55,23 +51,37 @@ if($type == 'static' ){
 // groups + status similarly, so they are in one condition.
 }elseif($type == 'wordpress' || $type == 'xml' ){
 
-    // WordPress uses an API to turn pages into properties.
-    if($type == 'wordpress' )
+    // WordPress API is queried to turn pages into properties.
+    if($type == 'wordpress' ){
+
+        // Lots of users don't include backslashes,
+        // which WordPress required to access the API
+        if( !str_ends_with($url, '/') )
+            $url = $url.'/';
+
+        // WordPress adder can create lots of properties
         $properties = wordpress_properties_adder($url);
 
-    // Sitemaps with XML can turn pages into properties.
+    }
+
+    // .XML adder can create lots of properties.
     if($type == 'xml' )
         $properties = xml_site_adder($url);
 
-    // We're setting the status and adding properties so we don't
-    // have to call the $db outside "models/adder.php".
+    // We're setting the status and adding properties here so we
+    // do not have to call the $db inside "models/adders.php",
+    // keeping each model focused on distinct functions.
     $properties_records = [];
     foreach ($properties as &$property):
 
-        // New groups with many properties need to set one parent,
-        // which is the main URL that initiated the adder.
+        // Though these variables were set, we must reset them for
+        // one property, since we have now generated many properties.
         if($group == $property['url']){
             $is_parent = 1;
+
+            // This will be used later..
+            $has_parent = true;
+
         }else{
             $is_parent = '';
         }
@@ -89,13 +99,35 @@ if($type == 'static' ){
         );
 
     endforeach; 
+
+    // Some newly created record arrays do not have existing groups
+    // and do not contain a parent because API/XML records contain 
+    // different URLs that the URL where the API/XML exists. In that 
+    // case, the first record, which is often the homepage, becomes 
+    // parent and the URL the person entered becomes the group
+    if(!isset($has_parent) && !isset($existing_group)){
+        $first_record = $properties_records[0];
+        $first_record['is_parent'] = 1;
+        $group = $url;
+        foreach ($properties_records as &$property){
+            $property['group'] = $group;
+        }
+    }
+
+    // Finalllly, we can add properties to the DB.
     add_properties($db, $properties_records);
 
-// Since we're passing type through a URL, we a fallback in
-// case someone passes an unsupported type. 
+// Since we're passing type through a URL, we have a fallback
+// in case someone passes an unsupported 'type'. 
 }else{
     die('"'.$type.'" properties are unsupported.');
 }
 
-// When the work is done, we can triumphantly return home.
-header("Location: ../index.php?view=properties&status=success");
+// For better UX, we're redirecting to the details page with
+// all the shiney new properties.
+if(isset($property_records)){
+    $redirect_uid =  get_property_details_uri($db, get_property_id($db, $property_records[0]->group));
+}else{
+    $redirect_uid = get_property_id($db, $url);
+}
+header('Location: ../index.php?view=property_details&id='.$redirect_uid.'&status=success');

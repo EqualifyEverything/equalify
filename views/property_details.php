@@ -17,7 +17,7 @@ if(empty($property) == 1)
     
         <?php 
         // Title
-        echo $property->url;
+        echo $property->group;
         ?>
 
         <span class="float-end">

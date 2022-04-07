@@ -4,11 +4,6 @@
  */
 function wordpress_properties_adder($site_url){
 
-    // Lots of users don't include backslashes,
-    // which will break the url.
-    if( !str_ends_with($url, '/') )
-        $site_url = $site_url.'/';
-
     // Reformat URL for JSON request.
     $json_url = $site_url.'wp-json/wp/v2/pages?per_page=100';
 
