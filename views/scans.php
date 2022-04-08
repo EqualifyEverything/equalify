@@ -4,12 +4,12 @@
             <h1>All Scans</h1>
         </div>
         <div>
-            <button id="add_scan" class="btn btn-primary">Scan All Properties</button>
+            <button id="add_scan" class="btn btn-primary">Scan All Pages</button>
             <script>
 
                 // Ansycronistically start scan.
                 async function addScan() {
-                    const response = await fetch('actions/scan_all_properties.php?action=add_scan', {
+                    const response = await fetch('actions/scan_all_pages.php?action=add_scan', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
@@ -21,7 +21,7 @@
                 }
 
                 async function doScan() {
-                    const response = await fetch('actions/scan_all_properties.php?action=do_scan', {
+                    const response = await fetch('actions/scan_all_pages.php?action=do_scan', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
@@ -32,7 +32,7 @@
                 }
 
                 async function getAlerts() {
-                    const response = await fetch('actions/scan_all_properties.php?action=get_alerts', {
+                    const response = await fetch('actions/scan_all_pages.php?action=get_alerts', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
@@ -71,7 +71,7 @@
             <tr>
                 <th scope="col">Time</th>
                 <th scope="col">Status</th>
-                <th scope="col">Properties Scanned</th>
+                <th scope="col">Pages Scanned</th>
             </tr>
         </thead>
         <tbody id="the_scans_rows">

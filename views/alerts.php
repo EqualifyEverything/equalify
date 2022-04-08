@@ -24,8 +24,8 @@
             <td style="min-width: 200px;">
                 <?php 
                 // Integration alerts link to the integration.
-                if( $alert->source == 'property' ){
-                    echo '<a class="btn btn-primary btn-sm"  href="'.get_property_details_uri($db, $alert->property_id).'">View Property</a>';
+                if( $alert->source == 'page' ){
+                    echo '<a class="btn btn-primary btn-sm"  href="'.get_site_details_uri($db, $alert->page_id).'">Site Details</a>';
                 }
                 ?>
 

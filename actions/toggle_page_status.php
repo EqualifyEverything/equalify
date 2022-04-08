@@ -16,26 +16,26 @@ if(empty($id))
     throw new Exception('ID "'.$id.'" is invalid format.');
 $old_status = $_GET['old_status'];
 if(empty($old_status))
-    throw new Exception('Status is not specfied for property "'.$id.'"');
+    throw new Exception('Status is not specfied for page "'.$id.'"');
 
-// Toggle property status.
-$group = get_property($db, $id)->group;
+// Toggle page status.
+$site = get_page($db, $id)->site;
 if($old_status == 'active'){
-    update_property_group_status($db, $group, 'archived');
+    update_site_status($db, $site, 'archived');
 
-    // Alerts are deleted when a property is archived.
+    // Alerts are deleted when a page is archived.
     $filters = [
         array(
-            'name'  => 'property_group',
-            'value' => $group
+            'name'  => 'site',
+            'value' => $site
         )
     ];
     delete_alerts($db, $filters);
     
 }
 if($old_status == 'archived'){
-    update_property_group_status($db, $group, 'active');
+    update_site_status($db, $site, 'active');
 }
 
 // Redirect
-header('Location: ../index.php?view=property_details&id='.$id.'&status=success');
+header('Location: ../index.php?view=site_details&id='.$id.'&status=success');

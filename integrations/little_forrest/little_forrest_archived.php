@@ -20,15 +20,15 @@ register_integration(
 );
 
 /**
- * Scan properties with LF and return errors
+ * Scan pages with LF and return errors
  */
-function wcag_2_1_page_error($properties){
+function wcag_2_1_page_error($pages){
 
-    // Loop $properties
-    foreach ($properties as &$property):
+    // Loop $pages
+    foreach ($pages as &$page):
     
         // Get Little Forrest data.
-        $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$property['url'].'&level=WCAG2AA';
+        $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$page['url'].'&level=WCAG2AA';
         $little_forrest_json = file_get_contents($little_forrest_url, false, stream_context_create($override_https));
 
         // Fallback if LF scan doesn't work
@@ -42,7 +42,7 @@ function wcag_2_1_page_error($properties){
             $little_forrest_errors = 0;
 
         // Update post meta.
-        $property['wcag_errors'] = $little_forrest_errors;
+        $page['wcag_errors'] = $little_forrest_errors;
     
     endforeach;
 
@@ -51,7 +51,7 @@ function wcag_2_1_page_error($properties){
 /**
  * Create Settings View
  */
-function settings($properties){
+function settings($pages){
 ?>
 
     <div class="form-check form-switch mb-3">

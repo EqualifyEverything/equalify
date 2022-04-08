@@ -23,17 +23,17 @@ function the_success_message(){
 }
 
 /**
- * The Property Type Badge
+ * The Page Type Badge
  */
-function the_property_type_badge($property_type){
+function the_page_type_badge($page_type){
     
     // Every letter is uppercase so we have to create
     // conditions for "WordPress" or "XML" or any other
     // name that requires unique casing.
-    $property_type = str_replace('_', ' ', strtoupper($property_type));
+    $page_type = str_replace('_', ' ', strtoupper($page_type));
     echo '<span class="badge bg-light text-dark">'
-        .$property_type.
-        '<span class="visually-hidden"> Property Type</span></span>';
+        .$page_type.
+        '<span class="visually-hidden"> Page Type</span></span>';
 
 }
 
@@ -110,9 +110,9 @@ function the_scan_rows($scans){
             <td>
 
             <?php             
-            // Link to properties    
-            $property_ids = unserialize($scan->properties);
-            echo count($property_ids);
+            // Link to pages    
+            $page_ids = unserialize($scan->pages);
+            echo count($page_ids);
             ?>
 
             </td>

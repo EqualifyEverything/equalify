@@ -1,14 +1,14 @@
 <?php
-// Set Property ID with optional fallboack.
+// Set Page ID with optional fallboack.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if($id == false)
-    throw new Exception('Format of property ID "'.$id.'" is invalid');
+    throw new Exception('Format of page ID "'.$id.'" is invalid');
 
-// Check if Property exists.
-$property = get_property($db, $id);
+// Check if Page exists.
+$page = get_page($db, $id);
 
-if(empty($property) == 1)
-    throw new Exception('There is no record of property "'.$id.'"');
+if(empty($page) == 1)
+    throw new Exception('There is no record of page "'.$id.'"');
 ?>
 
 <div class="mb-3 pb-4 border-bottom">
@@ -17,14 +17,14 @@ if(empty($property) == 1)
     
         <?php 
         // Title
-        echo $property->group;
+        echo $page->site;
         ?>
 
         <span class="float-end">
         
         <?php
         // Badge
-        echo get_property_badge($db, $property);
+        echo get_page_badge($db, $page);
         ?>
 
         </span>
@@ -33,39 +33,36 @@ if(empty($property) == 1)
 </div>
 
 <section id="relatives" class="mb-3 pb-4">
-    <h2>Properties</h2>
+    <h2>Pages</h2>
     <table class="table">
         <thead>
             <tr>
                 <th scope="col">URL</th>
-                <th scope="col">Type</th>
                 <th scope="col">Scanned</th>
             </tr>
         </thead>
         <tbody>
 
             <?php
-            $property_filters = [
+            $page_filters = [
                 array(
-                    'name'  => 'group',
-                    'value' => $property->group
+                    'name'  => 'site',
+                    'value' => $page->site
                 ),
             ];
-            $group = get_properties($db, $property_filters);
-            $group_count = count($group);
-            if($group_count > 0 ):
-                foreach($group as $property):    
+            $site = get_pages($db, $page_filters);
+            $site_count = count($site);
+            if($site_count > 0 ):
+                foreach($site as $page):    
             ?>
 
             <tr>
                 <td>
-                    <a href="<?php echo $property->url;?>" target="_blank"><?php echo $property->url;?></a>
+                    <a href="<?php echo $page->url;?>" target="_blank"><?php echo $page->url;?></a>
                 </td>
+
                 <td>
-                    <?php echo $property->type; ?>
-                </td>
-                <td>
-                    <?php echo $property->scanned; ?>
+                    <?php echo $page->scanned; ?>
                 </td>
             </tr>
 
@@ -83,24 +80,24 @@ if(empty($property) == 1)
         <thead>
             <tr>
                 <th scope="col">Time</th>
-                <th scope="col">Property</th>
+                <th scope="col">Page</th>
                 <th scope="col">Details</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
 
         <?php
-        $alerts = get_alerts_by_property_group($db, $property->group);
+        $alerts = get_alerts_by_site($db, $page->site);
         if(count($alerts) > 0 ):
             foreach($alerts as $alert):    
         ?>
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo get_property_url($db, $alert->property_id);?></td>
+            <td><?php echo get_page_url($db, $alert->page_id);?></td>
             <td><?php echo $alert->details;?></td>
             <td>
-                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&property_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
                     Dismiss
                 </a>
             </td>
@@ -121,12 +118,12 @@ if(empty($property) == 1)
 
     </table>
 </section>
-<section id="property_options" class="mb-3 pb-4">
+<section id="page_options" class="mb-3 pb-4">
     <h2 class="pb-2">Options</h2>
 
     <?php
     // Set button to status conditions.
-    if($property->status == 'archived'){
+    if($page->status == 'archived'){
         $button_text = 'Activate Site';
         $button_class = 'btn-outline-success';
     }else{
@@ -135,7 +132,7 @@ if(empty($property) == 1)
     }
     ?>
 
-    <a href="actions/toggle_property_status.php?id=<?php echo $property->id;?>&old_status=<?php echo $property->status;?>" class="btn <?php echo $button_class;?>">
+    <a href="actions/toggle_page_status.php?id=<?php echo $page->id;?>&old_status=<?php echo $page->status;?>" class="btn <?php echo $button_class;?>">
         <?php echo $button_text;?>
     </a>
 

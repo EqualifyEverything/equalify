@@ -14,23 +14,23 @@ $db = connect(
 
 // Setup queries to minize db calls.
 $account = get_account($db, USER_ID);
-$property_filters = [
+$page_filters = [
     array(
         'name'  => 'status',
         'value' => 'active'
     ),
 ];
-$active_property_ids = get_property_ids($db, $property_filters);
-$active_properties = get_properties($db, $property_filters);
+$active_page_ids = get_page_ids($db, $page_filters);
+$active_pages = get_pages($db, $page_filters);
 $uploaded_integrations = uploaded_integrations('../integrations');
 
-// Make sure there are properties to scan.
-if($active_property_ids == NULL)
-    throw new Exception('You have no active properties to scan');
+// Make sure there are pages to scan.
+if($active_page_ids == NULL)
+    throw new Exception('You have no active pages to scan');
 
 // Adding a scan to display a running task before scans complete.
 if( $_GET['action'] == 'add_scan' ){
-    add_scan($db, 'running', $active_property_ids);
+    add_scan($db, 'running', $active_page_ids);
     $scans = get_scans($db);
     the_scan_rows($scans);
 }
@@ -44,8 +44,8 @@ if( $_GET['action'] == 'do_scan' ){
             require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
     }
 
-    // Scan each active property.
-    foreach ($active_properties as $property){
+    // Scan each active page.
+    foreach ($active_pages as $page){
 
         // Run active integration scans.
         foreach($uploaded_integrations as $uploaded_integration){
@@ -57,10 +57,10 @@ if( $_GET['action'] == 'do_scan' ){
 
                     // We need to kill the scan if an integration has an error.
                     try {
-                        $integration_scan_function_name($property, $account);
+                        $integration_scan_function_name($page, $account);
 
                         // Only successful scans get their timestamp updated.
-                        update_property_scanned_time($db, $property->id);
+                        update_page_scanned_time($db, $page->id);
 
                     } catch (Exception $x) {
 
@@ -77,8 +77,8 @@ if( $_GET['action'] == 'do_scan' ){
     }
 
     // Add account usage.
-    $properties_count = count($active_property_ids);
-    add_account_usage($db, USER_ID, $properties_count);
+    $pages_count = count($active_page_ids);
+    add_account_usage($db, USER_ID, $pages_count);
 
     // Update scan record.
     update_scan_status($db, 'running', 'complete');

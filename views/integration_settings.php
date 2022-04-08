@@ -82,17 +82,17 @@ if(!empty($settings['account'])):
 // End account settings.
 endif;
 
-// Begin property settings.
-if(!empty($settings['property'])):
+// Begin page settings.
+if(!empty($settings['page'])):
 ?>
 
 
-<section id="property_settings" class="mb-3 pb-3 border-bottom">
+<section id="page_settings" class="mb-3 pb-3 border-bottom">
     <h2>
-        Property Settings
+        Page Settings
     </h2>
 
-    <form action="actions/update_property.php" method="post" class="my-3">
+    <form action="actions/update_page.php" method="post" class="my-3">
     
         <?php
         // Settings
@@ -104,6 +104,6 @@ if(!empty($settings['property'])):
 </section>
 
 <?php
-// End property settings.
+// End page settings.
 endif;
 ?>

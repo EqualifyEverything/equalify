@@ -19,13 +19,13 @@ if(empty($_POST['last_view'])){
 // Create Record
 $account_records = [];
 
-// Equalify - Property Unreachable Alert
-if(!empty($_POST['property_unreachable_alert'])){
+// Equalify - Page Unreachable Alert
+if(!empty($_POST['page_unreachable_alert'])){
     array_push(
         $account_records,
         array(
-            'key'   => 'property_unreachable_alert',
-            'value' => $_POST['property_unreachable_alert']
+            'key'   => 'page_unreachable_alert',
+            'value' => $_POST['page_unreachable_alert']
         )
     );
 };

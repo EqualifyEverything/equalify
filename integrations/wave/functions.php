@@ -23,8 +23,8 @@ function wave_fields(){
                     )
                 ],
 
-                // Properties fields.
-                'properties' => [
+                // Pages fields.
+                'pages' => [
                     array(
                         'name' => 'wave_wcag_2_1_errors',
                         'type'  => 'VARCHAR(20)'
@@ -57,7 +57,7 @@ function wave_fields(){
 /**
  * WAVE Scans
  */
-function wave_scans($property, $account){
+function wave_scans($page, $account){
 
     // Add DB info and required functions.
     require_once '../config.php';
@@ -76,7 +76,7 @@ function wave_scans($property, $account){
             "verify_peer_name"=> false,
         )
     );
-    $wave_url = 'https://wave.webaim.org/api/request?key='.$account->wave_key.'&url='.$property->url;
+    $wave_url = 'https://wave.webaim.org/api/request?key='.$account->wave_key.'&url='.$page->url;
     $wave_json = file_get_contents($wave_url, false, stream_context_create($override_https));
     $wave_json_decoded = json_decode($wave_json, true);      
 
@@ -89,8 +89,8 @@ function wave_scans($property, $account){
     // scans.
     $alerts_filter = [
         array(
-            'name'   =>  'property_id',
-            'value'  =>  $property->id
+            'name'   =>  'page_id',
+            'value'  =>  $page->id
         ),
         array(
             'name'   =>  'integration_uri',
@@ -104,9 +104,9 @@ function wave_scans($property, $account){
 
     // Set optional alerts.
     if($wave_errors > 1)
-        add_property_alert($db, $property->id, $property->group, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$property->url.'" target="_blank">WAVE report</a>');
+        add_page_alert($db, $page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>');
 
-    // Update property data.
-    update_property_data($db, $property->id, 'wave_wcag_2_1_errors', $wave_errors);
+    // Update page data.
+    update_page_data($db, $page->id, 'wave_wcag_2_1_errors', $wave_errors);
         
 }

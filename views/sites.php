@@ -4,22 +4,22 @@
             <h1>All Sites</h1>
         </div>
         <div>
-            <a href="?view=site_adder" class="btn btn-primary">Add Site</a>
+            <a href="?view=new_site" class="btn btn-primary">Add Site</a>
         </div>
     </div>
     <div class="row row-cols-3 g-4 pb-4">
         
         <?php
-        // Show Property Groups
+        // Show Page Sites
         $filters = [
             array(
                 'name'  => 'is_parent',
                 'value' => '1'
             ),
         ];
-        $properties = get_properties($db, $filters);
-        if(count($properties) > 0 ):
-            foreach($properties as $property):    
+        $pages = get_pages($db, $filters);
+        if(count($pages) > 0 ):
+            foreach($pages as $page):    
         ?>
 
         <div class="col">
@@ -28,18 +28,18 @@
 
                     <?php
                     // The Status Badge
-                    echo get_property_badge($db, $property);
+                    echo get_page_badge($db, $page);
                     ?>
 
                     <?php
                     // The Type Badge
-                    the_property_type_badge($property->type);
+                    the_page_type_badge($page->type);
                     ?>
                     
                     <h2 class="h5 card-title">
-                        <?php echo $property->group; ?> 
+                        <?php echo $page->site; ?> 
                     </h2>
-                    <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=property_details&id=<?php echo $property->id;?>">View Details</a>
+                    <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=site_details&id=<?php echo $page->id;?>">View Details</a>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
         else:
         ?>
 
-            <p>No properties exist.</p>
+            <p>No pages exist.</p>
 
         <?php 
         endif;

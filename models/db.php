@@ -1,5 +1,5 @@
 <?php
-// TODO: Make property Object Oriented instead of Procedural
+// TODO: Make page Object Oriented instead of Procedural
 /**
  * Connect to DB
  */
@@ -22,13 +22,13 @@ function connect($hostname, $username, $password, $database){
 }
 
 /**
- * Get All Properties
+ * Get All Pages
  * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
-function get_properties(mysqli $db, $filters = []){
+function get_pages(mysqli $db, $filters = []){
 
     // SQL
-    $sql = 'SELECT * FROM `properties`';
+    $sql = 'SELECT * FROM `pages`';
 
     // Add optional filters
     $filter_count = count($filters);
@@ -60,13 +60,13 @@ function get_properties(mysqli $db, $filters = []){
 }
 
 /**
- * Get Property Ids
+ * Get Page Ids
  * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
-function get_property_ids(mysqli $db, $filters = []){
+function get_page_ids(mysqli $db, $filters = []){
 
     // SQL
-    $sql = 'SELECT `id` FROM `properties`';
+    $sql = 'SELECT `id` FROM `pages`';
 
     // Add optional filters
     $filter_count = count($filters);
@@ -155,12 +155,12 @@ function get_alerts(mysqli $db){
 }
 
 /**
- * Get Alerts By Property Group
+ * Get Alerts By Page Site
  */
-function get_alerts_by_property_group(mysqli $db, $group){
+function get_alerts_by_site(mysqli $db, $site){
 
     // SQL
-    $sql = 'SELECT * FROM `alerts` WHERE `property_group` = "'.$group.'"';
+    $sql = 'SELECT * FROM `alerts` WHERE `site` = "'.$site.'"';
 
     // Query
     $results = $db->query($sql);
@@ -193,12 +193,12 @@ function get_account(mysqli $db, $id){
 }
 
 /**
- * Get Property Records
+ * Get Page Records
  */
-function get_property(mysqli $db, $id){
+function get_page(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT * FROM properties WHERE id = "'.$id.'"';
+    $sql = 'SELECT * FROM pages WHERE id = "'.$id.'"';
 
     // Query
     $data = [];
@@ -210,12 +210,12 @@ function get_property(mysqli $db, $id){
 }
 
 /**
- * Get Property ID
+ * Get Page ID
  */
-function get_property_id(mysqli $db, $url){
+function get_page_id(mysqli $db, $url){
 
     // SQL
-    $sql = 'SELECT `id` FROM `properties` WHERE `url` = "'.$url.'"';
+    $sql = 'SELECT `id` FROM `pages` WHERE `url` = "'.$url.'"';
 
     // Query
     $data = [];
@@ -227,12 +227,12 @@ function get_property_id(mysqli $db, $url){
 }
 
 /**
- * Get Property URL
+ * Get Page URL
  */
-function get_property_url(mysqli $db, $id){
+function get_page_url(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT `url` FROM properties WHERE `id` = "'.$id.'"';
+    $sql = 'SELECT `url` FROM pages WHERE `id` = "'.$id.'"';
 
     // Query
     $data = [];
@@ -244,13 +244,13 @@ function get_property_url(mysqli $db, $id){
 }
 
 /**
- * Get Group Parent Status
- * Parent sets the group status.
+ * Get Site Parent Status
+ * Parent sets the site status.
  */
-function get_group_parent_status(mysqli $db, $group){
+function get_site_parent_status(mysqli $db, $site){
 
     // SQL
-    $sql = 'SELECT `status` FROM `properties` WHERE `group` = "'.$group.'" AND `is_parent` = 1';
+    $sql = 'SELECT `status` FROM `pages` WHERE `site` = "'.$site.'" AND `is_parent` = 1';
 
     // Query
     $data = [];
@@ -263,19 +263,19 @@ function get_group_parent_status(mysqli $db, $group){
 
 
 /**
- * Is Unique Property URL
+ * Is Unique Page URL
  */
-function is_unique_property_url(mysqli $db, $property_url){
+function is_unique_page_url(mysqli $db, $page_url){
 
-    // We don't consider a property with a '/' a unique url
+    // We don't consider a page with a '/' a unique url
     // so we will also search for them.
-    if( !str_ends_with($property_url, '/') )
-        $property_url_backslashed = $property_url.'/';
+    if( !str_ends_with($page_url, '/') )
+        $page_url_backslashed = $page_url.'/';
 
     // Require unique URL
-    $sql = 'SELECT * FROM `properties` WHERE `url` = "'.$property_url.'"';
-    if(isset($property_url_backslashed))
-        $sql.= ' OR `url` = "'.$property_url_backslashed.'"';
+    $sql = 'SELECT * FROM `pages` WHERE `url` = "'.$page_url.'"';
+    if(isset($page_url_backslashed))
+        $sql.= ' OR `url` = "'.$page_url_backslashed.'"';
 
     $query = $db->query($sql);
     if(mysqli_num_rows($query) > 0){
@@ -287,12 +287,12 @@ function is_unique_property_url(mysqli $db, $property_url){
 }
 
 /**
- * Add Property
+ * Add Page
  */
-function add_property(mysqli $db, $url, $type, $status, $group, $is_parent){
+function add_page(mysqli $db, $url, $type, $status, $site, $is_parent){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`url`, `type`, `status`, `is_parent`, `group`) VALUES';
+    $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `is_parent`, `site`) VALUES';
     $sql.= '("'.$url.'",';
     $sql.= '"'.$type.'",';
     $sql.= '"'.$status.'",';
@@ -301,14 +301,14 @@ function add_property(mysqli $db, $url, $type, $status, $group, $is_parent){
     }else{
         $sql.= '"'.$is_parent.'",';
     }
-    $sql.= '"'.$group.'")';
+    $sql.= '"'.$site.'")';
     
     // Query
     $result = $db->query($sql);
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert property with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$group.',"'.$is_parent.'"');
+        throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$site.',"'.$is_parent.'"');
     
     // Complete Query
     return $result;
@@ -317,15 +317,15 @@ function add_property(mysqli $db, $url, $type, $status, $group, $is_parent){
 /**
  * Add Scan
  */
-function add_scan(mysqli $db, $status, array $properties){
+function add_scan(mysqli $db, $status, array $pages){
 
-    // Serialize properties.
-    $properties = serialize($properties);
+    // Serialize pages.
+    $pages = serialize($pages);
 
     // Create SQL
-    $sql = "INSERT INTO `scans` (`status`, `properties`) VALUES";
+    $sql = "INSERT INTO `scans` (`status`, `pages`) VALUES";
     $sql.= "('".$status."',";
-    $sql.= "'".$properties."')";
+    $sql.= "'".$pages."')";
     
     // Query
     $result = $db->query($sql);
@@ -340,21 +340,21 @@ function add_scan(mysqli $db, $status, array $properties){
 }
 
 /**
- * Add Properties 
+ * Add Pages 
  */
-function add_properties(mysqli $db, $properties_records){
+function add_pages(mysqli $db, $pages_records){
 
     // Create SQL
-    $sql = 'INSERT INTO `properties` (`group`, `url`, `status`, `is_parent`, `type`) VALUES';
+    $sql = 'INSERT INTO `pages` (`site`, `url`, `status`, `is_parent`, `type`) VALUES';
     
     // Insert Each Record
-    $record_count = count($properties_records);
+    $record_count = count($pages_records);
     $record_iteration = 0;
-    foreach ($properties_records as $record){
+    foreach ($pages_records as $record){
 
         // SQL
         $sql.= "(";
-        $sql.= "'".$record['group']."',";
+        $sql.= "'".$record['site']."',";
         $sql.= "'".$record['url']."',";
         $sql.= "'".$record['status']."',";
         if(empty($record['is_parent'])){
@@ -376,7 +376,7 @@ function add_properties(mysqli $db, $properties_records){
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert property records "'.$properties_records.'"');
+        throw new Exception('Cannot insert page records "'.$pages_records.'"');
 
 }
 
@@ -399,16 +399,16 @@ function add_account_usage(mysqli $db, $id, $usage){
 /**
  * Get Details URI
  */
-function get_property_details_uri(mysqli $db, $property_id){
+function get_site_details_uri(mysqli $db, $page_id){
 
-    // We just need to see if the property is a parent. If 
-    // it is, that property's ID is good so we don't need
+    // We just need to see if the page is a parent. If 
+    // it is, that page's ID is good so we don't need
     // to run another query to get the id of the parent.
-    $property = get_property($db, $property_id);
-    if($property->is_parent == 1){
-        return '?view=property_details&id='.$property->id;
+    $page = get_page($db, $page_id);
+    if($page->is_parent == 1){
+        return '?view=site_details&id='.$page->id;
     }else{
-        return '?view=property_details&id='.get_property_id($db, $property->group);
+        return '?view=site_details&id='.get_page_id($db, $page->site);
     }
     
 }
@@ -457,12 +457,12 @@ function update_scan_status(mysqli $db, $old_status, $new_status){
 }
 
 /**
- * Update Property Scanned Time 
+ * Update Page Scanned Time 
  */
-function update_property_scanned_time(mysqli $db, $id){
+function update_page_scanned_time(mysqli $db, $id){
 
     // SQL
-    $sql = 'UPDATE `properties` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = "'.$id.'"';
+    $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = "'.$id.'"';
 
     // Query
     $result = $db->query($sql);
@@ -473,54 +473,54 @@ function update_property_scanned_time(mysqli $db, $id){
 }
 
 /**
- * Update Property Group Status 
+ * Update Page Site Status 
  */
-function update_property_group_status(mysqli $db, $group, $new_status){
+function update_site_status(mysqli $db, $site, $new_status){
 
     // SQL
-    $sql = 'UPDATE `properties` SET `status` = "'.$new_status.'" WHERE `group` = "'.$group.'"';
+    $sql = 'UPDATE `pages` SET `status` = "'.$new_status.'" WHERE `site` = "'.$site.'"';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot update "'.$group.'" group status to "'.$new_status.'"');
+        throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
 }
 
 /**
- * Update Property Data 
+ * Update Page Data 
  */
-function update_property_data(mysqli $db, $id, $column, $value){
+function update_page_data(mysqli $db, $id, $column, $value){
 
     // SQL
-    $sql = 'UPDATE `properties` SET `'.$column.'` = "'.$value.'" WHERE `id` = "'.$id.'"';
+    $sql = 'UPDATE `pages` SET `'.$column.'` = "'.$value.'" WHERE `id` = "'.$id.'"';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for property "'.$id.'"');
+        throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$id.'"');
 
 }
 
 /**
- * The Property Badge
+ * The Page Badge
  */
-function get_property_badge($db, $property){
+function get_page_badge($db, $page){
 
     // Badge info
-    if($property->status == 'archived'){
+    if($page->status == 'archived'){
         $badge_status = 'bg-dark';
         $badge_content = 'Archived';
-    }elseif($property->scanned == NULL){
+    }elseif($page->scanned == NULL){
         $badge_status = 'bg-warning text-dark';
         $badge_content = 'Unscanned';
     }else{
 
         // Alerts
-        $alert_count = count(get_alerts_by_property_group($db, $property->group));
+        $alert_count = count(get_alerts_by_site($db, $page->site));
         if($alert_count == 0){
             $badge_status = 'bg-success';
             $badge_content = 'Equalified';
@@ -609,15 +609,15 @@ function delete_alerts(mysqli $db, $filters = []){
 }
 
 /**
- * Add Property Alert
+ * Add Page Alert
  */
-function add_property_alert(mysqli $db, $property_id, $property_group, $integration_uri, $details){
+function add_page_alert(mysqli $db, $page_id, $site, $integration_uri, $details){
     
     // Create SQL
-    $sql = "INSERT INTO `alerts` (`source`, `property_id`, `property_group`, `integration_uri`, `details`) VALUES";
-    $sql.= "('property',";
-    $sql.= "'".$property_id."',";
-    $sql.= "'".$property_group."',";
+    $sql = "INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `details`) VALUES";
+    $sql.= "('page',";
+    $sql.= "'".$page_id."',";
+    $sql.= "'".$site."',";
     $sql.= "'".$integration_uri."',";
     $sql.= "'".$details."')";
     
@@ -626,7 +626,7 @@ function add_property_alert(mysqli $db, $property_id, $property_group, $integrat
 
     // Fallback
     if(!$result)
-        throw new Exception('Cannot insert integration alert for property "'.$property_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
+        throw new Exception('Cannot insert integration alert for page "'.$page_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
     
     // Complete Query
     return $result;

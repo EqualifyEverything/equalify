@@ -1,15 +1,8 @@
-<?php
-// Set URL Requests
-$requested_type = '';
-if(!empty($_GET['type']))
-    $requested_type = $_GET['type'];
-?>
-
 <section>
     <div class="mb-3 pb-4 border-bottom">
-        <h1>Add Site</h1>
+        <h1>New Site</h1>
     </div>
-    <form action="actions/add_property.php" method="get" >
+    <form action="actions/add_site.php" method="get" >
         <div class="row">
             <div class="col">
                 <label for="url" class="form-label">Site URL</label>
@@ -17,7 +10,7 @@ if(!empty($_GET['type']))
                 <div id="url_helper" class="form-text"></div>
             </div>
             <div class="col-3">
-                <label for="type" class="form-label">Scan Type</label>
+                <label for="type" class="form-label">Site Type</label>
                 <select id="type" name="type" class="form-select">
                     <option value="wordpress">WordPress Site</option>
                     <option value="xml">Site via XML Sitemap</option>
@@ -26,30 +19,12 @@ if(!empty($_GET['type']))
             </div>
         </div>
         <div class="my-3">
-            <button type="submit" class="btn btn-primary">Add Property</button>
+            <button type="submit" class="btn btn-primary">Add Site</button>
         </div>
     </form> 
 </section>
 
 <script>
-
-    // Change a select element's option.
-    function select(selectId, optionValToSelect){
-        var selectElement = document.getElementById(selectId);
-        var selectOptions = selectElement.options;
-        for (var opt, j = 0; opt = selectOptions[j]; j++) {
-            if (opt.value == optionValToSelect) {
-                selectElement.selectedIndex = j;
-                break;
-            }
-        }
-    }
-
-    <?php
-    // Load type from URL request.
-    if(!empty($requested_type)) 
-        echo "select('type', '".$requested_type."');";
-    ?>
 
     // Add helper text to URL field.
     function updateHelper(helperText, helperPlaceholder) {

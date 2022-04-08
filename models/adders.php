@@ -1,8 +1,8 @@
 <?php
 /**
- * WordPress Properties Adder
+ * WordPress Pages Adder
  */
-function wordpress_properties_adder($site_url){
+function wordpress_site_adder($site_url){
 
     // Reformat URL for JSON request.
     $json_url = $site_url.'wp-json/wp/v2/pages?per_page=100';
@@ -17,20 +17,20 @@ function wordpress_properties_adder($site_url){
     curl_setopt($curl, CURLOPT_USERAGENT, 'Equalify');
     $url_contents = curl_exec($curl);
     if($url_contents == false)
-        die('Contents of "'.$site_url.'" cannot be loaded.');
+    throw new Exception('Contents of "'.$site_url.'" cannot be loaded.');
     curl_close($curl);
 
     // Create JSON.
     $wp_api_json = json_decode($url_contents, true);
     if(empty($wp_api_json[0]))
-        die('The URL "'.$site_url.'" does not contain valid WordPress API V2 JSON.');
+        throw new Exception('The URL "'.$site_url.'" does not contain valid WordPress API V2 JSON.');
 
-    // Push JSON to properties array.
-    $properties = [];
-    foreach ($wp_api_json as $property):
-        array_push($properties, array('url' => $property['link']));
+    // Push JSON to pages array.
+    $pages = [];
+    foreach ($wp_api_json as $page):
+        array_push($pages, array('url' => $page['link']));
     endforeach;
-    return $properties;
+    return $pages;
 }
 
 /**
@@ -64,11 +64,11 @@ function xml_site_adder($site_url){
     $json = json_encode($xml);
     $json_entries = json_decode($json,TRUE);
 
-    // Push JSON to properties array.
-    $properties = [];
-    foreach ($json_entries['url'] as $property):
-        array_push($properties, array('url' => $property['loc']));
+    // Push JSON to pages array.
+    $pages = [];
+    foreach ($json_entries['url'] as $page):
+        array_push($pages, array('url' => $page['loc']));
     endforeach;
-    return $properties;
+    return $pages;
 
 }

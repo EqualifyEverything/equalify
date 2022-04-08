@@ -52,11 +52,11 @@ if($old_status == 'Active'){
             }
         }
 
-        // Setup "properties" fields.
-        if( !empty($integration_db_fields['properties']) ){
-            foreach($integration_db_fields['properties'] as $integration_properties_field){
-                if(!db_column_exists($db, 'properties', $integration_properties_field['name']))
-                    add_db_column($db, 'properties', $integration_properties_field['name'], $integration_properties_field['type']);
+        // Setup "pages" fields.
+        if( !empty($integration_db_fields['pages']) ){
+            foreach($integration_db_fields['pages'] as $integration_pages_field){
+                if(!db_column_exists($db, 'pages', $integration_pages_field['name']))
+                    add_db_column($db, 'pages', $integration_pages_field['name'], $integration_pages_field['type']);
             }
         }
 

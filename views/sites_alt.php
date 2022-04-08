@@ -4,7 +4,7 @@
             <h1>All Sites</h1>
         </div>
         <div>
-            <a href="?view=site_adder" class="btn btn-primary">Add Site</a>
+            <a href="?view=site_creator" class="btn btn-primary">Add Site</a>
         </div>
     </div>
     <div class="row row-cols-3 g-4 pb-4">
@@ -21,23 +21,23 @@
             <tbody>
 
                 <?php
-                $properties = get_properties($db);
-                if(count($properties) > 0 ):
-                    foreach($properties as $property):    
+                $pages = get_pages($db);
+                if(count($pages) > 0 ):
+                    foreach($pages as $page):    
                 ?>
 
-                <tr <?php if($property->is_parent == 1) echo 'class="parent"'?>>
+                <tr <?php if($page->is_parent == 1) echo 'class="parent"'?>>
                     <td>
-                        <?php echo $property->group; ?> 
+                        <?php echo $page->site; ?> 
                     </td>
                     <td>
-                        <?php echo $property->status; ?> 
+                        <?php echo $page->status; ?> 
                     </td>
                     <td>
-                        <?php echo $property->scanned; ?> 
+                        <?php echo $page->scanned; ?> 
                     </td>
                     <td>
-                        <?php echo $property->type; ?> 
+                        <?php echo $page->type; ?> 
                     </td>
                     <td>
                     </td>
@@ -50,7 +50,7 @@
 
                 <tr>
                     <td span="4">
-                        No properties exist.
+                        No pages exist.
                     </td>
                 </tr>
 
