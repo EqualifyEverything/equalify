@@ -408,7 +408,7 @@ function get_site_details_uri(mysqli $db, $page_id){
     if($page->is_parent == 1){
         return '?view=site_details&id='.$page->id;
     }else{
-        return '?view=site_details&id='.get_page_id($db, $page->site);
+        return '?view=site_details&id='.get_page_id($db, $page->url);
     }
     
 }

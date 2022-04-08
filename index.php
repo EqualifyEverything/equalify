@@ -82,7 +82,7 @@ $records = [];
             <a href="?view=account" class="btn btn-outline-secondary <?php the_active_view('account');?>>">Account Settings</a>
             <div class="border-top mt-3 pt-3">
                 <p class="text-muted">
-                    🎉 <strong><?php echo get_account($db, USER_ID)->usage;?> pages scanned!</strong>
+                    🎉 <strong><?php echo get_account($db, USER_ID)->usage;?> pages scanned.</strong>
                 </p>
                 <p class="text-muted">
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
