@@ -20,32 +20,13 @@ $type = $_GET['type'];
 if( $type == false)
     die('Property type is not specified for the URL "'.$url.'".');
 
-// When group isn't specified, a new group is created.
-if(empty($_GET['group'])){
-
-    // We're setting these variables here, but they will
-    // change if we generate more properties from the url.
-    $group = $url;
-    $is_parent = 1;
-
-    // New groups have the active status by default.
-    $status = 'active';
-
-// Some proprerties are added to existing groups.
-}else{
-    $existing_group = true;
-    $is_parent = '';
-    $group = filter_input(INPUT_GET, 'group', FILTER_VALIDATE_URL);
-    $status = get_group_parent_status($db, $group);
-}
-
 // Properties must have unique URLS.
 if(!is_unique_property_url($db, $url))
     die('Property "'.$url.'" already exists.');
 
 // Static pages are added individually.
-if($type == 'static' ){
-    add_property($db, $url, $type, 'active', $group, $is_parent );
+if($type == 'single_page' ){
+    add_property($db, $url, $type, 'active', $group = $url, $is_parent = 1 );
 
 // WordPress and XML deal with adding properties and setting
 // groups + status similarly, so they are in one condition.
@@ -91,7 +72,7 @@ if($type == 'static' ){
             $properties_records, 
             array(
                 'url'       => $property['url'], 
-                'group'     => $group,
+                'group'     => $url,
                 'is_parent' => $is_parent,
                 'status'    => $status,
                 'type'      => $type
@@ -102,7 +83,7 @@ if($type == 'static' ){
 
     // Some newly created record arrays do not have existing groups
     // and do not contain a parent because API/XML records contain 
-    // different URLs that the URL where the API/XML exists. In that 
+    // different URLs than the URL where the API/XML exists. In that 
     // case, the first record, which is often the homepage, becomes 
     // parent and the URL the person entered becomes the group
     if(!isset($has_parent) && !isset($existing_group)){

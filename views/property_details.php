@@ -38,8 +38,8 @@ if(empty($property) == 1)
         <thead>
             <tr>
                 <th scope="col">URL</th>
+                <th scope="col">Type</th>
                 <th scope="col">Scanned</th>
-
             </tr>
         </thead>
         <tbody>
@@ -60,6 +60,9 @@ if(empty($property) == 1)
             <tr>
                 <td>
                     <a href="<?php echo $property->url;?>" target="_blank"><?php echo $property->url;?></a>
+                </td>
+                <td>
+                    <?php echo $property->type; ?>
                 </td>
                 <td>
                     <?php echo $property->scanned; ?>
@@ -109,7 +112,7 @@ if(empty($property) == 1)
         ?>
 
         <tr>
-            <td colspan="2">No alerts found.</td>
+            <td colspan="4">No alerts found.</td>
         </tr>
 
         <?php 
@@ -124,10 +127,10 @@ if(empty($property) == 1)
     <?php
     // Set button to status conditions.
     if($property->status == 'archived'){
-        $button_text = 'Activate';
+        $button_text = 'Activate Site';
         $button_class = 'btn-outline-success';
     }else{
-        $button_text = 'Archive and Delete Alerts';
+        $button_text = 'Archive Site and Delete Alerts';
         $button_class = 'btn-outline-danger';
     }
     ?>
@@ -135,11 +138,5 @@ if(empty($property) == 1)
     <a href="actions/toggle_property_status.php?id=<?php echo $property->id;?>&old_status=<?php echo $property->status;?>" class="btn <?php echo $button_class;?>">
         <?php echo $button_text;?>
     </a>
-
-    <?php
-    // Optional Add Property
-    if($property->type == 'static')
-        echo '<a href="?view=property_adder&type=static&group='.$property->group.'" class="btn btn-outline-dark">Add Property to Group</a>';
-    ?>
 
 </section>

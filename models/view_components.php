@@ -27,10 +27,13 @@ function the_success_message(){
  */
 function the_property_type_badge($property_type){
     
-    // Type Status
-    // doesn't include 'static' to simplify the ux
-    if($property_type == 'wordpress')
-        echo '<span class="badge bg-light text-dark">WordPress<span class="visually-hidden"> Property Type</span></span>';
+    // Every letter is uppercase so we have to create
+    // conditions for "WordPress" or "XML" or any other
+    // name that requires unique casing.
+    $property_type = str_replace('_', ' ', strtoupper($property_type));
+    echo '<span class="badge bg-light text-dark">'
+        .$property_type.
+        '<span class="visually-hidden"> Property Type</span></span>';
 
 }
 

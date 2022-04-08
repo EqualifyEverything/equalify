@@ -18,3 +18,21 @@ main{
 .me-2{
     margin-right: .5rem !important;
 }
+.sites tbody tr, .sites tbody td{
+    border: 0;
+    padding-top: 0;
+}
+.sites tbody tr{
+    opacity: .5;
+    font-size: .8em;
+}
+.sites tbody tr.parent{
+    font-weight: bold;
+    border-top: 1px solid;
+    opacity: 1;
+    font-size: 1em;
+}
+.sites tbody tr.parent td{
+    padding-top: .5rem;
+
+}

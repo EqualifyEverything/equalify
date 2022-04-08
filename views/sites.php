@@ -1,10 +1,10 @@
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h1>All Properties</h1>
+            <h1>All Sites</h1>
         </div>
         <div>
-            <a href="?view=property_adder" class="btn btn-primary">Add Property</a>
+            <a href="?view=site_adder" class="btn btn-primary">Add Site</a>
         </div>
     </div>
     <div class="row row-cols-3 g-4 pb-4">
