@@ -44,8 +44,12 @@ if( $_GET['action'] == 'do_scan' ){
             require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
     }
 
+    // We're counting every page that is successfully scanned.
+    $pages_count = 0;
+
     // Scan each active page.
     foreach ($active_pages as $page){
+        $pages_count++;
 
         // Run active integration scans.
         foreach($uploaded_integrations as $uploaded_integration){
@@ -64,8 +68,12 @@ if( $_GET['action'] == 'do_scan' ){
 
                     } catch (Exception $x) {
 
-                        // Update scan status, add integration alert and die.
+                        // We will kill the scan and alert folks of any errors, but
+                        // we will also record the successful scans that occured.
+                        add_account_usage($db, USER_ID, $pages_count);
                         add_integration_alert($db, $x->getMessage());
+                        update_scan_status($db, 'running', 'incomplete');
+                        die;
 
                     }
 
@@ -76,20 +84,20 @@ if( $_GET['action'] == 'do_scan' ){
         
     }
 
-    // Add account usage.
+    // Account usage the status is only updated if the scan succeed.
     $pages_count = count($active_page_ids);
     add_account_usage($db, USER_ID, $pages_count);
-
-    // Update scan record.
     update_scan_status($db, 'running', 'complete');
 
-    // Return all scans as JSON.
+    // Scan info is passed to JSON on the view, so that we can do 
+    // async scans.
     $scans = get_scans($db);
     the_scan_rows($scans);
     
 }
 
-// This changes the little red number.
+// This changes the little red number asyncronistically with JS
+// embedded in the view file.
 if( $_GET['action'] == 'get_alerts' ){
     echo count(get_alerts($db));
 }

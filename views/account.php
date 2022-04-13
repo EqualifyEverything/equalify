@@ -11,3 +11,7 @@ $usage = $account_info->usage;
 <form action="actions/update_account.php" method="post">
     <button class="btn btn-primary my-3" type="submit">Save Settings</button>
 </form>
+
+<hr>
+
+<a class="btn btn-secondary my-3" href="?logout">Logout</a>

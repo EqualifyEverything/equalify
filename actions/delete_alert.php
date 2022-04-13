@@ -1,7 +1,7 @@
 <?php
 // Info on DB must be declared to use db.php models.
 require_once '../config.php';
-require_once '../models/creators.php';
+require_once '../models/adders.php';
 require_once '../models/db.php';
 $db = connect(
     DB_HOST, 

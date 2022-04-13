@@ -49,7 +49,7 @@
         else:
         ?>
 
-            <p>No pages exist.</p>
+            <p>No sites exist.</p>
 
         <?php 
         endif;

@@ -654,3 +654,43 @@ function add_integration_alert(mysqli $db, $details){
     return $result;
     
 }
+
+/**
+ * Get Account Email
+ */
+function account_email_exists(mysqli $db, $email){
+
+    // Create SQL
+    $sql = 'SELECT `email` FROM `accounts` WHERE `email` = "'.$email.'"';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if($result->num_rows == 0){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/**
+ * Get Account Password
+ */
+function get_account_password(mysqli $db, $email){
+
+    // SQL
+    $sql = 'SELECT `password` FROM `accounts` WHERE `email` = "'.$email.'"';
+
+    // Query
+    $data = [];
+    $data = $db->query($sql)->fetch_object()->password;
+
+    // Result
+    if(!$data){
+        return false;
+    }else{
+        return true;
+    }
+
+}
