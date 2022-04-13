@@ -21,7 +21,4 @@ Three key "biases" keep our work good:
 1. Download the contents of the repo.
 2. Update `config.php` info.
 3. Upload/run on your server.
-4. Contribute.
-- Report errors. 
-- Submit pull requests. 
-- Share the love.
+4. Contribute: Report issues, submit pull requests, share the love!
