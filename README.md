@@ -9,7 +9,7 @@ Server health affects your CMS, which affects accessibility that affects your an
 
 Bringing data from all WebOps services means **richer reporting** and **smarter enforcement** of your website policies.
 
-## What's Equalify's altruistic purpose?
+## What is Equalify's altruistic purpose?
 Making the world better is a driving force behind Equalify.
 
 Three key "biases" that keeps work good:
