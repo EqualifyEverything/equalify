@@ -2,6 +2,7 @@
 // Add Dependencies
 require_once 'config.php';
 require_once 'models/db.php';
+require_once 'actions/install.php';
 require_once 'models/view_components.php';
 require_once 'models/integrations.php';
 
@@ -79,6 +80,13 @@ $records = [];
                     </a>
                 </li>
             </ul>
+
+            <?php
+            // As soon as you use Equalify, you know the toll
+            // you will be asked to support the service.
+            if(!empty(get_meta($db)->usage)):
+            ?>
+
             <div class="border-top mt-3 pt-3">
                 <p class="text-muted">
                     🎉 <strong><?php echo get_meta($db)->usage;?> pages scanned.</strong>
@@ -89,6 +97,11 @@ $records = [];
                     If the scans are useful to you, <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to the project</a> to keep the service free and maintained.
                 </p>
             </div>
+            
+            <?php
+            endif;
+            ?>
+
         </div>
         <div class="container py-3">
 

@@ -1,5 +1,4 @@
 <?php
-// TODO: Make page Object Oriented instead of Procedural
 /**
  * Connect to DB
  */
@@ -11,12 +10,8 @@ function connect($hostname, $username, $password, $database){
         $password,
         $database
     );
-    mysqli_set_charset($db, 'utf8mb4');
     if($db->connect_error){
-        throw new Exception('<p>Cannot connect to database: '
-            . $db->connect_error . "<br>"
-            . $db->connect_errorno . '</p>'
-        );
+        throw new Exception('Cannot connect to database: ' . $db->connect_error);
     }
     return $db;
 }
@@ -291,7 +286,7 @@ function is_unique_page_url(mysqli $db, $page_url){
  */
 function add_page(mysqli $db, $url, $type, $status, $site, $is_parent){
 
-    // Create SQL
+    // SQL
     $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `is_parent`, `site`) VALUES';
     $sql.= '("'.$url.'",';
     $sql.= '"'.$type.'",';
@@ -322,7 +317,7 @@ function add_scan(mysqli $db, $status, array $pages){
     // Serialize pages.
     $pages = serialize($pages);
 
-    // Create SQL
+    // SQL
     $sql = "INSERT INTO `scans` (`status`, `pages`) VALUES";
     $sql.= "('".$status."',";
     $sql.= "'".$pages."')";
@@ -344,7 +339,7 @@ function add_scan(mysqli $db, $status, array $pages){
  */
 function add_pages(mysqli $db, $pages_records){
 
-    // Create SQL
+    // SQL
     $sql = 'INSERT INTO `pages` (`site`, `url`, `status`, `is_parent`, `type`) VALUES';
     
     // Insert Each Record
@@ -612,7 +607,7 @@ function delete_alerts(mysqli $db, $filters = []){
  */
 function add_page_alert(mysqli $db, $page_id, $site, $integration_uri, $details){
     
-    // Create SQL
+    // SQL
     $sql = "INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `details`) VALUES";
     $sql.= "('page',";
     $sql.= "'".$page_id."',";
@@ -637,7 +632,7 @@ function add_page_alert(mysqli $db, $page_id, $site, $integration_uri, $details)
  */
 function add_integration_alert(mysqli $db, $details){
 
-    // Create SQL
+    // SQL
     $sql = "INSERT INTO `alerts` (`source`, `details`) VALUES";
     $sql.= "('integration',";
     $sql.= "'".$details."')";
@@ -652,4 +647,126 @@ function add_integration_alert(mysqli $db, $details){
     // Complete Query
     return $result;
     
+}
+
+/**
+ * Create Alerts Table
+ */
+function create_alerts_table($db){
+
+    // SQL
+    $sql = 
+        'CREATE TABLE `alerts` (
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `source` varchar(200) NOT NULL,
+            `page_id` bigint(20) DEFAULT NULL,
+            `details` text,
+            `integration_uri` varchar(200) DEFAULT NULL,
+            `site` text,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4;';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Error creating table: "'.$result->error.'"');
+    
+}
+
+/**
+ * Create Meta Table
+ */
+function create_meta_table($db){
+
+    // SQL
+    $sql = 
+        'CREATE TABLE `meta` (
+            `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            `usage` bigint(20) NOT NULL DEFAULT "1000",
+            `wave_key` varchar(20) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+          ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Error creating table: "'.$result->error.'"');
+    
+}
+
+/**
+ * Create Pages Table
+ */
+function create_pages_table($db){
+
+    // SQL
+    $sql = 
+        'CREATE TABLE `pages` (
+            `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            `url` text COLLATE utf8mb4_bin NOT NULL,
+            `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
+            `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
+            `site` text COLLATE utf8mb4_bin,
+            `is_parent` tinyint(1) DEFAULT NULL,
+            `scanned` timestamp NULL DEFAULT NULL,
+            PRIMARY KEY (`id`)
+          ) ENGINE=InnoDB AUTO_INCREMENT=7172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Error creating table: "'.$result->error.'"');
+    
+}
+
+/**
+ * Create Scans Table
+ */
+function create_scans_table($db){
+
+    // SQL
+    $sql = 
+        'CREATE TABLE `scans` (
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `pages` blob,
+            `status` varchar(20) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+          ) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4;';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Error creating table: "'.$result->error.'"');
+    
+}
+
+/**
+ * Table Exists
+ */
+function table_exists($db, $table_name){
+
+    // SQL
+    $sql = 
+        'SELECT 1 from '.$table_name;
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Results
+    if($result !== FALSE){
+       return true;
+    }else{
+        return false;
+    }
+
 }
