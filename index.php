@@ -13,49 +13,6 @@ $db = connect(
     DB_NAME
 );
 $records = [];
-
-// Since session always has to be active, it's delcared
-// in this file, which is required on every page.
-session_start();
-
-// Since this is called in the index, we have to make
-// sure the variables are called.
-if(isset($_POST['email'])){
-    $email = $_POST['email'];
-    if( $email == false)
-        throw new Exception ('Email is missing');
-}
-if(isset($_POST['password'])){
-    $password = $_POST['password'];
-    if( $password == false)
-        throw new Exception ('Password is missing'); 
-}
-if(isset($_POST['password'])){
-    $password = $_POST['password'];
-    if( $password == false)
-        throw new Exception ('Password is missing'); 
-}
-
-// We don't need a fallback if the account email doesn't
-// exist because account_password_exists() takes care of 
-// that.
-if(isset($_POST['email']) && isset($_POST['password'])){
-    if(account_email_exists($db, $email) == false)
-        throw new Exception ('No account matches your email'); 
-    if( get_account_password($db, 'blake@edupack.dev') === $password ){
-        $_SESSION['authenticated'] = $email;
-    }else{
-        throw new Exception ('Your password is incorrect'); 
-    }
-}
-
-// Logout is a simple url string.
-if(isset($_GET['logout'])){
-    session_unset();
-    session_destroy();
-}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -71,13 +28,6 @@ if(isset($_GET['logout'])){
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </head>
 <body>
-
-    <?php
-
-    // Begin loggedin session view
-    if(isset($_SESSION['authenticated'])):
-    ?>
-
     <main>
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 280px;">
             <a href="index.php?view=sites" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
@@ -129,10 +79,9 @@ if(isset($_GET['logout'])){
                     </a>
                 </li>
             </ul>
-            <a href="?view=account" class="btn btn-outline-secondary <?php the_active_view('account');?>>">Account Settings</a>
             <div class="border-top mt-3 pt-3">
                 <p class="text-muted">
-                    🎉 <strong><?php echo get_account($db, USER_ID)->usage;?> pages scanned.</strong>
+                    🎉 <strong><?php echo get_meta($db)->usage;?> pages scanned.</strong>
                 </p>
                 <p class="text-muted">
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
@@ -159,15 +108,5 @@ if(isset($_GET['logout'])){
 
         </div>
     </main>
-
-    <?php
-    // Fallback if not logged in:
-    else:
-        require_once 'views/login.php';
-    endif;
-
-    ?>
-    
-
 </body>
 </html>

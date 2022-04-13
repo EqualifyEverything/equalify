@@ -55,8 +55,8 @@ function settings($pages){
 ?>
 
     <div class="form-check form-switch mb-3">
-        <input type="hidden" name="little_forrest_wcag_2_1_page_error_alert" id="little_forrest_wcag_2_1_page_error_alert" value="<?php echo $account_info->little_forrest_wcag_2_1_page_error;?>">
-        <input class="form-check-input" type="checkbox" role="switch" id="little_forrest_wcag_2_1_page_error_alert_switch" <?php if($account_info->little_forrest_wcag_2_1_page_error == true) echo 'checked';?> >
+        <input type="hidden" name="little_forrest_wcag_2_1_page_error_alert" id="little_forrest_wcag_2_1_page_error_alert" value="<?php echo $meta_info->little_forrest_wcag_2_1_page_error;?>">
+        <input class="form-check-input" type="checkbox" role="switch" id="little_forrest_wcag_2_1_page_error_alert_switch" <?php if($meta_info->little_forrest_wcag_2_1_page_error == true) echo 'checked';?> >
         <label class="form-check-label" for="little_forrest_wcag_2_1_page_error_alert_switch">Alert WCAG 2.1 page errors via <a href="https://littleforest.co.uk/feature/web-accessibility/" target="_blank">Little Forrest's scan</a>.</label>
         <script>
         document.getElementById('little_forrest_wcag_2_1_page_error_alert_switch').addEventListener('change', function () {

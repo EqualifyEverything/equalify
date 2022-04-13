@@ -5,6 +5,6 @@
  * Status: Planned
  */
 
-function pantheon_scans($page, $account){
+function pantheon_scans($page, $meta){
 
 }

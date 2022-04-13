@@ -35,7 +35,7 @@ function little_forrest_fields(){
 /**
  * little_forrest Scans
  */
-function little_forrest_scans($page, $account){
+function little_forrest_scans($page, $meta){
 
     // Add DB info and required functions.
     require_once '../config.php';

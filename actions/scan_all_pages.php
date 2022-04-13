@@ -13,7 +13,7 @@ $db = connect(
 );
 
 // Setup queries to minize db calls.
-$account = get_account($db, USER_ID);
+$meta = get_meta($db);
 $page_filters = [
     array(
         'name'  => 'status',
@@ -61,7 +61,7 @@ if( $_GET['action'] == 'do_scan' ){
 
                     // We need to kill the scan if an integration has an error.
                     try {
-                        $integration_scan_function_name($page, $account);
+                        $integration_scan_function_name($page, $meta);
 
                         // Only successful scans get their timestamp updated.
                         update_page_scanned_time($db, $page->id);
@@ -70,7 +70,7 @@ if( $_GET['action'] == 'do_scan' ){
 
                         // We will kill the scan and alert folks of any errors, but
                         // we will also record the successful scans that occured.
-                        add_account_usage($db, USER_ID, $pages_count);
+                        add_usage_meta($db, $pages_count);
                         add_integration_alert($db, $x->getMessage());
                         update_scan_status($db, 'running', 'incomplete');
                         die;
@@ -84,9 +84,9 @@ if( $_GET['action'] == 'do_scan' ){
         
     }
 
-    // Account usage the status is only updated if the scan succeed.
+    // Meta usage the status is only updated if the scan succeed.
     $pages_count = count($active_page_ids);
-    add_account_usage($db, USER_ID, $pages_count);
+    add_usage_meta($db, $pages_count);
     update_scan_status($db, 'running', 'complete');
 
     // Scan info is passed to JSON on the view, so that we can do 

@@ -176,12 +176,12 @@ function get_alerts_by_site(mysqli $db, $site){
 }
 
 /**
- * Get Account Info
+ * Get Meta
  */
-function get_account(mysqli $db, $id){
+function get_meta(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM accounts WHERE id = '.$id;
+    $sql = 'SELECT * FROM meta';
 
     // Query
     $data = [];
@@ -381,19 +381,19 @@ function add_pages(mysqli $db, $pages_records){
 }
 
 /**
- * Add Account Usage
+ * Add Usage Meta
  */
-function add_account_usage(mysqli $db, $id, $usage){
+function add_usage_meta(mysqli $db, $usage){
     
     // SQL
-    $sql = 'UPDATE `accounts` SET `usage` = `usage` + '.$usage.' WHERE `id` = '.$id;
+    $sql = 'UPDATE `meta` SET `usage` = `usage` + '.$usage;
 
     // Execute Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot add "'.$usage.'" for user "'.$id.'"');
+        throw new Exception('Cannot add "'.$usage.'"');
 }
 
 /**
@@ -414,29 +414,28 @@ function get_site_details_uri(mysqli $db, $page_id){
 }
 
 /**
- * Update Account 
+ * Update Meta 
  */
-function update_account(mysqli $db, array $account_records){
+function update_meta(mysqli $db, array $meta_records){
 
     // SQL
-    $sql = 'UPDATE `accounts` SET ';
+    $sql = 'UPDATE `meta` SET ';
 
     // Loop Based on the amount of records updated
-    $record_count = count($account_records);
+    $record_count = count($meta_records);
     $record_iteration = 0;
-    foreach ($account_records as $record){
+    foreach ($meta_records as $record){
         $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
         if(++$record_iteration != $record_count)
             $sql.= ",";
     }
-    $sql.= ' WHERE `id` = "'.USER_ID.'";';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot update account for user '.USER_ID);
+        throw new Exception('Cannot update meta: '.$meta_records);
 
 }
 
@@ -653,44 +652,4 @@ function add_integration_alert(mysqli $db, $details){
     // Complete Query
     return $result;
     
-}
-
-/**
- * Get Account Email
- */
-function account_email_exists(mysqli $db, $email){
-
-    // Create SQL
-    $sql = 'SELECT `email` FROM `accounts` WHERE `email` = "'.$email.'"';
-    
-    // Query
-    $result = $db->query($sql);
-
-    // Fallback
-    if($result->num_rows == 0){
-        return false;
-    }else{
-        return true;
-    }
-}
-
-/**
- * Get Account Password
- */
-function get_account_password(mysqli $db, $email){
-
-    // SQL
-    $sql = 'SELECT `password` FROM `accounts` WHERE `email` = "'.$email.'"';
-
-    // Query
-    $data = [];
-    $data = $db->query($sql)->fetch_object()->password;
-
-    // Result
-    if(!$data){
-        return false;
-    }else{
-        return true;
-    }
-
 }

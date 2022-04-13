@@ -44,11 +44,11 @@ if($old_status == 'Active'){
     if( !empty($integration_fields['db']) ){
         $integration_db_fields = $integration_fields['db'];
 
-        // Setup "accounts" fields.
-        if( !empty($integration_db_fields['accounts']) ){
-            foreach($integration_db_fields['accounts'] as $integration_accounts_field){
-                if(!db_column_exists($db, 'accounts', $integration_accounts_field['name']))
-                    add_db_column($db, 'accounts', $integration_accounts_field['name'], $integration_accounts_field['type']);
+        // Setup "meta" fields.
+        if( !empty($integration_db_fields['meta']) ){
+            foreach($integration_db_fields['meta'] as $integration_meta_field){
+                if(!db_column_exists($db, 'meta', $integration_meta_field['name']))
+                    add_db_column($db, 'meta', $integration_meta_field['name'], $integration_meta_field['type']);
             }
         }
 

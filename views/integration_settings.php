@@ -29,24 +29,24 @@ $settings = $integration_fields['settings'];
 </div>
 
 <?php
-// Account settings.
-if(!empty($settings['account'])):
+// Meta settings.
+if(!empty($settings['meta'])):
 ?>
 
-<section id="account_settings" class="mb-3 pb-3 border-bottom">
+<section id="meta_settings" class="mb-3 pb-3 border-bottom">
     <h2>
-        Account Settings
+        Settings
     </h2>
 
-    <form action="actions/update_account.php" method="post" class="my-3">
+    <form action="actions/update_meta.php" method="post" class="my-3">
         <input type="hidden" name="last_view" value="integration_settings&uri=<?php echo $uri;?>" />
 
         <?php
-        // Get account info
-        $account = get_account($db, USER_ID);
+        // Get meta info
+        $meta = get_meta($db);
         
         // Begin settings.
-        $settings = $settings['account'];
+        $settings = $settings['meta'];
         foreach($settings as $setting):
             $name = $setting['name'];
             $label = $setting['label'];
@@ -61,7 +61,7 @@ if(!empty($settings['account'])):
                 id="<?php echo $name?>_field" 
                 name="<?php echo $name?>"
                 type="<?php echo $type?>"
-                value="<?php echo $account->$name?>"
+                value="<?php echo $meta->$name?>"
                 class="form-control"
             >
         </div>
@@ -79,7 +79,7 @@ if(!empty($settings['account'])):
 </section>
 
 <?php
-// End account settings.
+// End meta settings.
 endif;
 
 // Begin page settings.

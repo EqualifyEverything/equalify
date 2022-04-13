@@ -2,7 +2,7 @@
 /**
  * Name: WAVE
  * Description: Counts WCAG 2.1 errors and links to page reports.
- * Status: Disabled
+ * Status: Active
  */
 
 /**
@@ -15,8 +15,8 @@ function wave_fields(){
         // These fields are added to the database.
         'db' => [
 
-                // Accounts columns.
-                'accounts' => [
+                // Metas columns.
+                'meta' => [
                     array(
                         'name'     => 'wave_key',
                         'type'     => 'VARCHAR(20)',
@@ -36,8 +36,8 @@ function wave_fields(){
         // These fields are HTML fields on the settings view.
         'settings' => [
 
-            // Account settings.
-            'account' => [
+            // Meta settings.
+            'meta' => [
                 array(
                     'name'     => 'wave_key',
                     'label'    => 'WAVE Account Key',
@@ -57,7 +57,7 @@ function wave_fields(){
 /**
  * WAVE Scans
  */
-function wave_scans($page, $account){
+function wave_scans($page, $meta){
 
     // Add DB info and required functions.
     require_once '../config.php';
@@ -76,7 +76,7 @@ function wave_scans($page, $account){
             "verify_peer_name"=> false,
         )
     );
-    $wave_url = 'https://wave.webaim.org/api/request?key='.$account->wave_key.'&url='.$page->url;
+    $wave_url = 'https://wave.webaim.org/api/request?key='.$meta->wave_key.'&url='.$page->url;
     $wave_json = file_get_contents($wave_url, false, stream_context_create($override_https));
     $wave_json_decoded = json_decode($wave_json, true);      
 
