@@ -1,6 +1,5 @@
 <?php
-// TODO: Make site Object Oriented instead of Procedural
-
+// TODO: Make page Object Oriented instead of Procedural
 /**
  * Connect to DB
  */
@@ -14,7 +13,7 @@ function connect($hostname, $username, $password, $database){
     );
     mysqli_set_charset($db, 'utf8mb4');
     if($db->connect_error){
-        die('<p>Cannot connect to database: '
+        throw new Exception('<p>Cannot connect to database: '
             . $db->connect_error . "<br>"
             . $db->connect_errorno . '</p>'
         );
@@ -23,33 +22,28 @@ function connect($hostname, $username, $password, $database){
 }
 
 /**
- * Get All Sites
- */
-function get_all_sites(mysqli $db){
-
-    // SQL
-    $sql = 'SELECT * FROM `sites`';
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
-        }
-    }
-    return $data;
-}
-
-/**
  * Get All Pages
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
-function get_all_pages(mysqli $db, $site_id){
+function get_pages(mysqli $db, $filters = []){
 
     // SQL
-    $sql = 'SELECT * FROM `pages` WHERE `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `pages`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
 
     // Query
     $results = $db->query($sql);
@@ -61,58 +55,70 @@ function get_all_pages(mysqli $db, $site_id){
             $data[] = $row;
         }
     }
+
     return $data;
 }
 
 /**
- * Get All Policies
+ * Get Page Ids
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
-function get_all_policies(mysqli $db){
+function get_page_ids(mysqli $db, $filters = []){
 
     // SQL
-    $sql = 'SELECT * FROM `policies`';
+    $sql = 'SELECT `id` FROM `pages`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
 
     // Query
     $results = $db->query($sql);
 
     // Result
-    $data = [];
     if($results->num_rows > 0){
         while($row = $results->fetch_object()){
-            $data[] = $row;
+            $data[] = $row->id;
         }
     }
     return $data;
+
 }
 
 /**
- * Get Events by Policy
+ * Get Scans
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
  */
-function get_events_by_policy(mysqli $db, $policy_id){
+function get_scans(mysqli $db, $filters = []){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `policy_id` = '.$policy_id;
+    $sql = 'SELECT * FROM `scans`';
 
-    // Query
-    $results = $db->query($sql);
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= ' WHERE ';
 
-    // Result
-    $data = [];
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data[] = $row;
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
         }
     }
-    return $data;
-}
-
-/**
- * Get Events by Site
- */
-function get_events_by_site(mysqli $db, $policy_id){
-
-    // SQL
-    $sql = 'SELECT * FROM `events` WHERE `site_id` = '.$policy_id;
+    $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s") DESC;';
 
     // Query
     $results = $db->query($sql);
@@ -130,10 +136,10 @@ function get_events_by_site(mysqli $db, $policy_id){
 /**
  * Get Alerts
  */
-function get_all_alerts(mysqli $db){
+function get_alerts(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `type` = "alert"';
+    $sql = 'SELECT * FROM `alerts` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
 
     // Query
     $results = $db->query($sql);
@@ -149,12 +155,12 @@ function get_all_alerts(mysqli $db){
 }
 
 /**
- * Get Alerts by Site
+ * Get Alerts By Page Site
  */
-function get_alerts_by_site(mysqli $db, $site_id){
+function get_alerts_by_site(mysqli $db, $site){
 
     // SQL
-    $sql = 'SELECT * FROM `events` WHERE `type` = "alert" AND `site_id` = '.$site_id;
+    $sql = 'SELECT * FROM `alerts` WHERE `site` = "'.$site.'"';
 
     // Query
     $results = $db->query($sql);
@@ -170,83 +176,46 @@ function get_alerts_by_site(mysqli $db, $site_id){
 }
 
 /**
- * Get Policy Details
+ * Get Meta
  */
-function get_policy_details(mysqli $db, $id){
+function get_meta(mysqli $db){
 
     // SQL
-    $sql = 'SELECT * FROM `policies` WHERE `id` = '.$id;
-
-    // Query
-    $results = $db->query($sql);
-
-    // Result
-    $data = '';
-    if($results->num_rows > 0){
-        while($row = $results->fetch_object()){
-            $data = $row;
-        }
-    }
-    return $data;
-}
-
-
-/**
- * Get Account WAVE Key
- */
-function get_account_wave_key(mysqli $db, $id){
-
-    // SQL
-    $sql = 'SELECT wave_key FROM accounts WHERE id = '.$id;
+    $sql = 'SELECT * FROM meta';
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->wave_key;
+    $data = $db->query($sql)->fetch_object();
 
     // Result
     return $data;
+
 }
 
 /**
- * Get Account Credits
+ * Get Page Records
  */
-function get_account_credits(mysqli $db, $id){
+function get_page(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT credits FROM accounts WHERE id = '.$id;
+    $sql = 'SELECT * FROM pages WHERE id = "'.$id.'"';
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->credits;
+    $data = $db->query($sql)->fetch_object();
 
     // Result
     return $data;
+    
 }
 
 /**
- * Get Accessibility Testing Service
+ * Get Page ID
  */
-function get_accessibility_testing_service(mysqli $db, $id){
+function get_page_id(mysqli $db, $url){
 
     // SQL
-    $sql = 'SELECT accessibility_testing_service FROM accounts WHERE id = '.$id;
-
-    // Query
-    $data = [];
-    $data = $db->query($sql)->fetch_object()->accessibility_testing_service;
-
-    // Result
-    return $data;
-
-}
-
-/**
- * Get Site ID
- */
-function get_site_id(mysqli $db, $url){
-
-    // SQL
-    $sql = 'SELECT id FROM sites WHERE url = "'.$url.'"';
+    $sql = 'SELECT `id` FROM `pages` WHERE `url` = "'.$url.'"';
 
     // Query
     $data = [];
@@ -258,12 +227,12 @@ function get_site_id(mysqli $db, $url){
 }
 
 /**
- * Get Site URL
+ * Get Page URL
  */
-function get_site_url(mysqli $db, $id){
+function get_page_url(mysqli $db, $id){
 
     // SQL
-    $sql = 'SELECT `url` FROM sites WHERE id = "'.$id.'"';
+    $sql = 'SELECT `url` FROM pages WHERE `id` = "'.$id.'"';
 
     // Query
     $data = [];
@@ -275,245 +244,412 @@ function get_site_url(mysqli $db, $id){
 }
 
 /**
- * Get Policy Name
+ * Get Site Parent Status
+ * Parent sets the site status.
  */
-function get_policy_name(mysqli $db, $id){
+function get_site_parent_status(mysqli $db, $site){
 
     // SQL
-    $sql = 'SELECT `name` FROM policies WHERE id = "'.$id.'"';
+    $sql = 'SELECT `status` FROM `pages` WHERE `site` = "'.$site.'" AND `is_parent` = 1';
 
     // Query
     $data = [];
-    $data = $db->query($sql)->fetch_object()->name;
+    $data = $db->query($sql)->fetch_object()->status;
 
     // Result
     return $data;
     
 }
 
+
 /**
- * Insert Site
+ * Is Unique Page URL
  */
-function insert_site(mysqli $db, array $record){
+function is_unique_page_url(mysqli $db, $page_url){
+
+    // We don't consider a page with a '/' a unique url
+    // so we will also search for them.
+    if( !str_ends_with($page_url, '/') )
+        $page_url_backslashed = $page_url.'/';
 
     // Require unique URL
-    $url_sql = 'SELECT * FROM sites WHERE url = "'.$record['url'].'"';
-    $url_query = $db->query($url_sql);
-    if(mysqli_num_rows($url_query) > 0)
-        throw new Exception('Site URL is aleady added.');
+    $sql = 'SELECT * FROM `pages` WHERE `url` = "'.$page_url.'"';
+    if(isset($page_url_backslashed))
+        $sql.= ' OR `url` = "'.$page_url_backslashed.'"';
 
-    // SQL
-    $sql = "INSERT INTO `sites` ";
-    $sql.= "(`url`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['url']."'";
-    $sql.= ");";
+    $query = $db->query($sql);
+    if(mysqli_num_rows($query) > 0){
+        return false;
+    }else{
+        return true;
+    }
+
+}
+
+/**
+ * Add Page
+ */
+function add_page(mysqli $db, $url, $type, $status, $site, $is_parent){
+
+    // Create SQL
+    $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `is_parent`, `site`) VALUES';
+    $sql.= '("'.$url.'",';
+    $sql.= '"'.$type.'",';
+    $sql.= '"'.$status.'",';
+    if(empty($is_parent)){
+        $sql.= 'NULL,';
+    }else{
+        $sql.= '"'.$is_parent.'",';
+    }
+    $sql.= '"'.$site.'")';
     
     // Query
     $result = $db->query($sql);
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert site.');
-    $record['id']->insert_id;
-    return $record;
+        throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$site.',"'.$is_parent.'"');
+    
+    // Complete Query
+    return $result;
 }
 
 /**
- * Insert Page
+ * Add Scan
  */
-function insert_page(mysqli $db, array $record){
+function add_scan(mysqli $db, $status, array $pages){
 
-    // SQL
-    $sql = "INSERT INTO `pages` ";
-    $sql.= "(`site_id`, `url`, `wcag_errors`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['site_id']."',";
-    $sql.= "'".$record['url']."',";
-    $sql.= "'".$record['wcag_errors']."'";
-    $sql.= ");";
+    // Serialize pages.
+    $pages = serialize($pages);
 
-    // Query
-    $result = $db->query($sql);
-
-    // Result
-    if(!$result)
-        throw new Exception('Cannot insert pages.');
-    $record['id']->insert_id;
-    return $record;
-}
-
-/**
- * Insert Policy
- */
-function insert_policy(mysqli $db, array $record){
-
-    // SQL
-    $sql = "INSERT INTO `policies` ";
-    $sql.= "(`name`, `action`, `event`, `tested`, `frequency`)";
-    $sql.= " VALUES ";
-    $sql.= "(";
-    $sql.= "'".$record['name']."',";
-    $sql.= "'".$record['action']."',";
-    $sql.= "'".$record['event']."',";
-    $sql.= "'".$record['tested']."',";
-    $sql.= "'".$record['frequency']."'";
-    $sql.= ");";
+    // Create SQL
+    $sql = "INSERT INTO `scans` (`status`, `pages`) VALUES";
+    $sql.= "('".$status."',";
+    $sql.= "'".$pages."')";
     
     // Query
     $result = $db->query($sql);
 
     //Fallback
     if(!$result)
-        throw new Exception('Cannot insert policy.');
-    $record['id']->insert_id;
-    return $record;
+        throw new Exception('Cannot insert scan with status "'.$status.'" and records "'.$records.'"');
+    
+    // Complete Query
+    return $result;
+    
 }
 
 /**
- * Update Policy
+ * Add Pages 
  */
-function update_policy(mysqli $db, array $record, $id){
+function add_pages(mysqli $db, $pages_records){
+
+    // Create SQL
+    $sql = 'INSERT INTO `pages` (`site`, `url`, `status`, `is_parent`, `type`) VALUES';
+    
+    // Insert Each Record
+    $record_count = count($pages_records);
+    $record_iteration = 0;
+    foreach ($pages_records as $record){
+
+        // SQL
+        $sql.= "(";
+        $sql.= "'".$record['site']."',";
+        $sql.= "'".$record['url']."',";
+        $sql.= "'".$record['status']."',";
+        if(empty($record['is_parent'])){
+            $sql.= 'NULL,';
+        }else{
+            $sql.= '"'.$record['is_parent'].'",';
+        }
+        $sql.= "'".$record['type']."'";
+
+        $sql.= ")";
+        if(++$record_iteration != $record_count)
+            $sql.= ",";
+
+    }
+    $sql.= ";";
+    
+    // Query
+    $result = $db->query($sql);
+
+    //Fallback
+    if(!$result)
+        throw new Exception('Cannot insert page records "'.$pages_records.'"');
+
+}
+
+/**
+ * Add Usage Meta
+ */
+function add_usage_meta(mysqli $db, $usage){
+    
+    // SQL
+    $sql = 'UPDATE `meta` SET `usage` = `usage` + '.$usage;
+
+    // Execute Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot add "'.$usage.'"');
+}
+
+/**
+ * Get Details URI
+ */
+function get_site_details_uri(mysqli $db, $page_id){
+
+    // We just need to see if the page is a parent. If 
+    // it is, that page's ID is good so we don't need
+    // to run another query to get the id of the parent.
+    $page = get_page($db, $page_id);
+    if($page->is_parent == 1){
+        return '?view=site_details&id='.$page->id;
+    }else{
+        return '?view=site_details&id='.get_page_id($db, $page->url);
+    }
+    
+}
+
+/**
+ * Update Meta 
+ */
+function update_meta(mysqli $db, array $meta_records){
 
     // SQL
-    $sql = "UPDATE `policies` SET ";
-    $sql.= "name = '".$record['name']."',";
-    $sql.= "action = '".$record['action']."',";
-    $sql.= "event = '".$record['event']."',";
-    $sql.= "tested = '".$record['tested']."',";
-    $sql.= "frequency ='".$record['frequency']."'";
-    $sql.= " WHERE id = ".$id.";";
+    $sql = 'UPDATE `meta` SET ';
+
+    // Loop Based on the amount of records updated
+    $record_count = count($meta_records);
+    $record_iteration = 0;
+    foreach ($meta_records as $record){
+        $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
+        if(++$record_iteration != $record_count)
+            $sql.= ",";
+    }
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot insert policy.');
-    $record['id']->insert_id;
-    return $record;
+        throw new Exception('Cannot update meta: '.$meta_records);
+
 }
 
-
 /**
- * Update Account
+ * Update Status 
  */
-function update_account(mysqli $db, array $record){
+function update_scan_status(mysqli $db, $old_status, $new_status){
 
     // SQL
-    $sql = "UPDATE `accounts` SET ";
-    $sql.= "wave_key = '".$record['wave_key']."',";
-    $sql.= "accessibility_testing_service = '".$record['accessibility_testing_service']."'";
-    $sql.= " WHERE id = 1;";
+    $sql = 'UPDATE `scans` SET `status` = "'.$new_status.'" WHERE `status` = "'.$old_status.'"';
 
     // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot insert account.');
-    $record['id']->insert_id;
-    return $record;
+        throw new Exception('Cannot update scan status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
 }
 
 /**
- * Delete Site
+ * Update Page Scanned Time 
  */
-function delete_site(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `sites` WHERE id = "'.$id.'"';
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
+function update_page_scanned_time(mysqli $db, $id){
 
-    // Execute Query
+    // SQL
+    $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = "'.$id.'"';
+
+    // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot update scan status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
 }
 
 /**
- * Delete Site Pages
+ * Update Page Site Status 
  */
-function delete_site_pages(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
+function update_site_status(mysqli $db, $site, $new_status){
 
-    // Execute Query
+    // SQL
+    $sql = 'UPDATE `pages` SET `status` = "'.$new_status.'" WHERE `site` = "'.$site.'"';
+
+    // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
 }
 
 /**
- * Delete Site Events
+ * Update Page Data 
  */
-function delete_site_events(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `events` WHERE site_id = "'.$id.'"';
+function update_page_data(mysqli $db, $id, $column, $value){
 
-    // Execute Query
+    // SQL
+    $sql = 'UPDATE `pages` SET `'.$column.'` = "'.$value.'" WHERE `id` = "'.$id.'"';
+
+    // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$id.'"');
+
 }
 
 /**
- * Delete Policy
+ * The Page Badge
  */
-function delete_policy(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `policies` WHERE id = "'.$id.'"';
-    $delete_pages_sql = 'DELETE FROM `policies` WHERE id = "'.$id.'"';
+function get_page_badge($db, $page){
 
-    // Execute Query
+    // Badge info
+    if($page->status == 'archived'){
+        $badge_status = 'bg-dark';
+        $badge_content = 'Archived';
+    }elseif($page->scanned == NULL){
+        $badge_status = 'bg-warning text-dark';
+        $badge_content = 'Unscanned';
+    }else{
+
+        // Alerts
+        $alert_count = count(get_alerts_by_site($db, $page->site));
+        if($alert_count == 0){
+            $badge_status = 'bg-success';
+            $badge_content = 'Equalified';
+        }else{
+            $badge_status = 'bg-danger';
+            if($alert_count == 1){
+                $badge_content = $alert_count.' Alert';
+            }else{
+                $badge_content = $alert_count.' Alerts';
+            }
+        };
+
+    }
+    return '<span class="badge mb-2 '.$badge_status.'">'.$badge_content.'</span>';
+
+}
+
+/**
+ * Add DB Column
+ */
+function add_db_column($db, $table, $column_name, $column_type){
+
+    // SQL.
+    $sql = 'ALTER TABLE `'.$table.'` ';
+    $sql.= 'ADD COLUMN '.$column_name.' '.$column_type.';';
+
+    // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete policy.');
+        throw new Exception('Cannot add "'.$column_name.'" to "'.$table.'" with type "'.$column_type.'"');
+
 }
 
 /**
- * Delete Policy Events
+ * DB Column Exists
  */
-function delete_policy_events(mysqli $db, $id){
-    
-    // SQL
-    $sql = 'DELETE FROM `events` WHERE policy_id = "'.$id.'"';
+function db_column_exists($db, $table, $column_name){
 
-    // Execute Query
+    // SQL.
+    $sql = 'SELECT '.$column_name.' FROM `'.$table.'` ';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result){
+        return false;   
+    }else{
+        return true;
+    }
+
+}
+
+/**
+ * Delete Alerts
+ * @param array filters [ array ('name' => $name, 'value' => $value) ]
+ */
+function delete_alerts(mysqli $db, $filters = []){
+
+    // SQL
+    $sql = 'DELETE FROM `alerts`';
+
+    // Add optional filters
+    $filter_count = count($filters);
+    if($filter_count > 0){
+        $sql.= 'WHERE ';
+
+        $filter_iteration = 0;
+        foreach ($filters as $filter){
+            $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+            if(++$filter_iteration != $filter_count)
+                $sql.= ' AND ';
+    
+        }
+    }
+    $sql.= ';';
+
+    // Query
     $result = $db->query($sql);
 
     // Result
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot delete alert using filters "'.$filters.'"');
 }
 
-
 /**
- * Subtract Account Credits
+ * Add Page Alert
  */
-function subtract_account_credits(mysqli $db, $id, $credits){
+function add_page_alert(mysqli $db, $page_id, $site, $integration_uri, $details){
     
-    // SQL
-    $sql = 'UPDATE `accounts` SET credits = credits - '.$credits.' WHERE id = '.$id;
-    $delete_pages_sql = 'DELETE FROM `pages` WHERE site_id = "'.$id.'"';
-
-    // Execute Query
+    // Create SQL
+    $sql = "INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `details`) VALUES";
+    $sql.= "('page',";
+    $sql.= "'".$page_id."',";
+    $sql.= "'".$site."',";
+    $sql.= "'".$integration_uri."',";
+    $sql.= "'".$details."')";
+    
+    // Query
     $result = $db->query($sql);
 
-    // Result
+    // Fallback
     if(!$result)
-        throw new Exception('Cannot delete site.');
+        throw new Exception('Cannot insert integration alert for page "'.$page_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
+    
+    // Complete Query
+    return $result;
+    
+}
+
+/**
+ * Add Integration Alert
+ */
+function add_integration_alert(mysqli $db, $details){
+
+    // Create SQL
+    $sql = "INSERT INTO `alerts` (`source`, `details`) VALUES";
+    $sql.= "('integration',";
+    $sql.= "'".$details."')";
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Cannot insert alert "'.$details.'"');
+    
+    // Complete Query
+    return $result;
+    
 }

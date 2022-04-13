@@ -1,61 +1,60 @@
-<h1>All Sites</h1>
-
-<?php
-// Success Message
-if(strpos($_SERVER['REQUEST_URI'], 'success'))
-    echo '<div class="alert alert-success" role="alert">Sites are updated.</div>'
-?>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Alerts</th>
-            <th scope="col">Site</th>
-        </tr>
-    </thead>
-    <tbody>
-
-    <?php
-    $records = get_all_sites($db);
-    if(count($records) > 0 ):
-        foreach($records as $record):    
-    ?>
-
-    <tr>
-        <td>
-            <a href="?view=site_details&id=<?php echo $record->id;?>#events">
-                <?php echo count(get_alerts_by_site($db, $record->id));?>
-            </a>
-        </td>
-        <td>
-            <a href="?view=site_details&id=<?php echo $record->id;?>">
-                <?php echo $record->url; ?> 
-            </a>
-        </td>
-    </tr>
-
-    <?php 
-        endforeach;
-    else:
-    ?>
-
-    <tr>
-        <td colspan="4">No sites have been equalified.</td>
-    </tr>
-
-    <?php 
-    endif;
-    ?>
-
-    </tbody>
-</table>
-<hr>
-<h2>Add a Site</h2>
-<form action="actions/equalify_site.php" method="get" >
-    <label for="url" class="form-label">Site URL</label>
-    <input type="text" class="form-control" name="url" aria-describedby="url_help" placeholder="https://decubing.com" value="https://decubing.com" >
-    <div class="form-text">
-        Currently supports WordPress 4.2 - 5.9.2 sites with API enabled.
+<section>
+    <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
+        <div>
+            <h1>All Sites</h1>
+        </div>
+        <div>
+            <a href="?view=new_site" class="btn btn-primary">Add Site</a>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary my-3">Equalify Site</button>
-</form>
+    <div class="row row-cols-3 g-4 pb-4">
+        
+        <?php
+        // Show Page Sites
+        $filters = [
+            array(
+                'name'  => 'is_parent',
+                'value' => '1'
+            ),
+        ];
+        $pages = get_pages($db, $filters);
+        if(count($pages) > 0 ):
+            foreach($pages as $page):    
+        ?>
+
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+
+                    <?php
+                    // The Status Badge
+                    echo get_page_badge($db, $page);
+                    ?>
+
+                    <?php
+                    // The Type Badge
+                    the_page_type_badge($page->type);
+                    ?>
+                    
+                    <h2 class="h5 card-title">
+                        <?php echo $page->site; ?> 
+                    </h2>
+                    <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=site_details&id=<?php echo $page->id;?>">View Details</a>
+                </div>
+            </div>
+        </div>
+        
+        <?php 
+            endforeach;
+        else:
+        ?>
+
+            <p>No sites exist.</p>
+
+        <?php 
+        endif;
+        ?>
+
+        </tbody>
+    </div>
+</section>

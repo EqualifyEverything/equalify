@@ -1,119 +1,139 @@
 <?php
-// Set Site ID
+// Set Page ID with optional fallboack.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if($id == false)
+    throw new Exception('Format of page ID "'.$id.'" is invalid');
 
-// Check for correct info
-if($id == false || empty(get_site_url($db, $id)) == 1):
-    throw new Exception('Site ID format is invalid or site does not exist.');
+// Check if Page exists.
+$page = get_page($db, $id);
 
-// Begin Content
-else:
+if(empty($page) == 1)
+    throw new Exception('There is no record of page "'.$id.'"');
 ?>
 
-<h1><?php echo get_site_url($db, $id);?></h1>
+<div class="mb-3 pb-4 border-bottom">
 
-<h2>Pages</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">URL</th>
-            <th scope="col">WCAG Errors</th>
-        </tr>
-    </thead>
-    <tbody>
+    <h1>
+    
+        <?php 
+        // Title
+        echo $page->site;
+        ?>
 
-    <?php
-    $records = get_all_pages($db, $id);
-    if(count($records) > 0 ):
-        foreach($records as $record):    
-    ?>
+        <span class="float-end">
+        
+        <?php
+        // Badge
+        echo get_page_badge($db, $page);
+        ?>
+
+        </span>
+    </h1>
+
+</div>
+
+<section id="relatives" class="mb-3 pb-4">
+    <h2>Pages</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">URL</th>
+                <th scope="col">Scanned</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <?php
+            $page_filters = [
+                array(
+                    'name'  => 'site',
+                    'value' => $page->site
+                ),
+            ];
+            $site = get_pages($db, $page_filters);
+            $site_count = count($site);
+            if($site_count > 0 ):
+                foreach($site as $page):    
+            ?>
+
+            <tr>
+                <td>
+                    <a href="<?php echo $page->url;?>" target="_blank"><?php echo $page->url;?></a>
+                </td>
+
+                <td>
+                    <?php echo $page->scanned; ?>
+                </td>
+            </tr>
+
+            <?php 
+                endforeach;
+            endif;
+            ?>
+
+        </tbody>
+    </table>
+</section>
+<section id="alerts" class="mb-3 pb-4">
+    <h2>Alerts</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Page</th>
+                <th scope="col">Details</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+
+        <?php
+        $alerts = get_alerts_by_site($db, $page->site);
+        if(count($alerts) > 0 ):
+            foreach($alerts as $alert):    
+        ?>
+
         <tr>
-            <td><?php echo $record->url; ?></td>
+            <td><?php echo $alert->time;?></td>
+            <td><?php echo get_page_url($db, $alert->page_id);?></td>
+            <td><?php echo $alert->details;?></td>
             <td>
-                
-                <?php 
-                // Link to page accessibility inspector
-                if(get_accessibility_testing_service($db, USER_ID) == 'Little Forrest')
-                    $wcag_inspector_url = 'https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$record->url;
-                    if(get_accessibility_testing_service($db, USER_ID) == 'WAVE')
-                    $wcag_inspector_url = 'https://wave.webaim.org/report#/'.$record->url
-                ?>
-
-                <a href="<?php echo $wcag_inspector_url;?>" target="_blank"><?php echo $record->wcag_errors; ?></a>
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
+                    Dismiss
+                </a>
             </td>
         </tr>
-    <?php 
-        endforeach;
-    else:
-    ?>
+
+        <?php 
+            endforeach;
+        else:
+        ?>
 
         <tr>
-            <td colspan="2">Site has no pages.</td>
+            <td colspan="4">No alerts found.</td>
         </tr>
 
-    <?php 
-    endif;
-    ?>
+        <?php 
+        endif;
+        ?>
 
-    </tbody>
-</table>
-
-<?php
-// Begin Events
-if(!empty($id)):
-?>
-<hr id="events">
-<h2>Related Events</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Time</th>
-            <th scope="col">Type</th>
-            <th scope="col">Policy</th>
-        </tr>
-    </thead>
+    </table>
+</section>
+<section id="page_options" class="mb-3 pb-4">
+    <h2 class="pb-2">Options</h2>
 
     <?php
-    $records = get_events_by_site($db, $id);
-    if(count($records) > 0 ):
-        foreach($records as $record):    
+    // Set button to status conditions.
+    if($page->status == 'archived'){
+        $button_text = 'Activate Site';
+        $button_class = 'btn-outline-success';
+    }else{
+        $button_text = 'Archive Site and Delete Alerts';
+        $button_class = 'btn-outline-danger';
+    }
     ?>
 
-    <tr>
-        <td><?php echo $record->time;?></td>
-        <td><?php echo ucfirst($record->type);?></td>
-        <td>
-        <a href="?view=policy_details&id=<?php echo $record->policy_id;?>">
-          <?php echo get_policy_name($db, $record->policy_id);?>
-        </a>
-      </td>
-    </tr>
+    <a href="actions/toggle_page_status.php?id=<?php echo $page->id;?>&old_status=<?php echo $page->status;?>" class="btn <?php echo $button_class;?>">
+        <?php echo $button_text;?>
+    </a>
 
-    <?php 
-        endforeach;
-    else:
-    ?>
-
-    <tr>
-        <td colspan="3">No events found.</td>
-    </tr>
-
-    <?php 
-    endif;
-    ?>
-
-</table>
-<?php
-// End Events
-endif;
-?>
-
-<hr>
-<h2 class="mb-3">Other Resources</h2>
-<a href="actions/delete_site_data.php?id=<?php echo $id;?>" class="btn btn-outline-danger">Delete Site + Related Pages and Events</a>
-<div class="form-text">Deletion cannot be undone.</div>
-
-<?php
-// End Content
-endif;
-?>
+</section>

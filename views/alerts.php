@@ -1,45 +1,53 @@
-<h2>All Alerts</h2>
-<table class="table">
-  <thead>
-    <tr>
-        <th scope="col">Time</th>
-        <th scope="col">Site</th>
-        <th scope="col">Policy</th>
-    </tr>
-  </thead>
+<section>
+    <h1 class="mb-3 pb-4 border-bottom">
+    All Alerts</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Source</th>
+                <th scope="col">Details</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
 
-  <?php
-  // Begin Alerts
-  $records = get_all_alerts($db);
-  if(count($records) > 0 ): foreach($records as $record):    
-  ?>
+        <?php
+        // Begin Alerts
+        $alerts = get_alerts($db);
+        if(count($alerts) > 0 ): foreach($alerts as $alert):    
+        ?>
 
-  <tr>
-      <td><?php echo $record->time;?></td>
-      <td>
-        <a href="?view=site_details&id=<?php echo $record->site_id;?>">
-          <?php echo get_site_url($db, $record->site_id);?>
-        </a>
-      </td>
-      <td>
-        <a href="?view=policy_details&id=<?php echo $record->policy_id;?>">
-          <?php echo get_policy_name($db, $record->policy_id);?>
-        </a>
-      </td>
-  </tr>
+        <tr>
+            <td><?php echo $alert->time;?></td>
+            <td><?php echo ucwords($alert->source);?></td>
+            <td><?php echo $alert->details;?></td>
+            <td style="min-width: 200px;">
+                <?php 
+                // Integration alerts link to the integration.
+                if( $alert->source == 'page' ){
+                    echo '<a class="btn btn-primary btn-sm"  href="'.get_site_details_uri($db, $alert->page_id).'">Site Details</a>';
+                }
+                ?>
 
-  <?php 
-  // Fallback
-  endforeach; else:
-  ?>
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>" class="btn btn-outline-secondary btn-sm">
+                    Dismiss
+                </a>
+            </td>
+        </tr>
 
-  <tr>
-      <td colspan="3">No alerts found.</td>
-  </tr>
+        <?php 
+        // Fallback
+        endforeach; else:
+        ?>
 
-  <?php 
-  // End Alerts
-  endif;
-  ?>
+        <tr>
+            <td colspan="4">No alerts found.</td>
+        </tr>
 
-</table>
+        <?php 
+        // End Alerts
+        endif;
+        ?>
+
+    </table>
+</section>
