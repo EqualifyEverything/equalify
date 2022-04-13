@@ -1,25 +1,23 @@
 # Welcome to Equalify!
-Equalify is the world's first open source WebOps platform.
+Equalify is the world's first Open Source WebOps platform.
 
 We aim to manage your server, accessibility, analytics, and CMS in one place. 
 
 ## Why manage WebOps in one place?
-Your server health effects your accessibility, which effects your analytics.
+Server health affects your CMS, which affects accessibility that affects your analytics.
 
-Bringing data from all WebOps services means **richer reporting** and **smarter enforcement** of around your website policies.
+Bringing data from all WebOps services means **richer reporting** and **smarter enforcement** of your website policies.
 
 ## What's Equalify's altruistic purpose?
-Making a positive impact is the most important driving force behind Equalify.
+Making the world better is a driving force behind our work.
 
-In addition to being an open source project, Equalify is also designed to promote accessiblity (particulaly WCAG accessibility).
+Three key "biases" keep our work good:
 
-All Equalify features our features around WCAG accessibility.
+1. **Equalify is Open Source software.** Open Source software inspires others to build ever greater innovations.
+2. **Equalify loves accessibility.** Our product is designed around WCAG accessibility reporting and enforcement, so we can create a more equitable internet.
+3. **Equalify caps income.** Billionaires beware- Equalify's Open Source license caps any person's income, so no one person is getting rich from  Equalify.
 
-We believe the WCAG group is our best chance at creating an open internet. They are designing rules that give everyone access to all content on the intenet. These rules should be mandated into future code, UX, and internet infrustructure design.
-
-Equalify will do all it can to promote WCAG accesssibility so that we can create a more open internet.
-
-## How can you help?
+## You can help develop Equalify!
 1. Download the contents of the repo.
 2. Update `config.php` info.
 3. Upload/run on your server.
