@@ -51,7 +51,13 @@ function get_pages(mysqli $db, $filters = []){
         }
     }
 
-    return $data;
+    // We're adding a condition so that we don't loop
+    // when there is nothing to return.
+    if($results->num_rows == 0){
+        return NULL;
+    }else{
+        return $data;
+    }
 }
 
 /**
@@ -88,7 +94,14 @@ function get_page_ids(mysqli $db, $filters = []){
             $data[] = $row->id;
         }
     }
-    return $data;
+
+    // We're adding a condition so that we don't loop
+    // when there is nothing to return.
+    if($results->num_rows == 0){
+        return NULL;
+    }else{
+        return $data;
+    }
 
 }
 

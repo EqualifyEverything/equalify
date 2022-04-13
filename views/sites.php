@@ -18,7 +18,7 @@
             ),
         ];
         $pages = get_pages($db, $filters);
-        if(count($pages) > 0 ):
+        if($pages != NULL ):
             foreach($pages as $page):    
         ?>
 

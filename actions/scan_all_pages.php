@@ -38,56 +38,61 @@ if( $_GET['action'] == 'add_scan' ){
 // All the scan heavy lifting goes here.
 if( $_GET['action'] == 'do_scan' ){
 
-    // Load active integrations.
+    // This count helps us know how many pages were scanned.
+    $pages_count = 0;
+
+
+    // We're requring active integrations here and not below
+    // because we don't want to require the files over and 
+    // over again.
     foreach($uploaded_integrations as $uploaded_integration){
         if(is_active_integration($uploaded_integration['uri']))
             require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
     }
 
-    // We're counting every page that is successfully scanned.
-    $pages_count = 0;
+    // Scan each active page..
+    foreach ($active_pages as $page){
+        $pages_count++;
 
-    // Scan each active page if there are any..
-    if($active_pages > 0):
-        foreach ($active_pages as $page){
-            $pages_count++;
-    
-            // Run active integration scans.
-            foreach($uploaded_integrations as $uploaded_integration){
-                if(is_active_integration($uploaded_integration['uri'])){
-    
-                    // Fire the '_scans' function. 
-                    $integration_scan_function_name = $uploaded_integration['uri'].'_scans';
-                    if(function_exists($integration_scan_function_name)){
-    
-                        // We need to kill the scan if an integration has an error.
-                        try {
-                            $integration_scan_function_name($page, $meta);
-    
-                            // Only successful scans get their timestamp updated.
-                            update_page_scanned_time($db, $page->id);
-    
-                        } catch (Exception $x) {
-    
-                            // We will kill the scan and alert folks of any errors, but
-                            // we will also record the successful scans that occured.
-                            update_usage_meta($db, $pages_count);
-                            add_integration_alert($db, $x->getMessage());
-                            update_scan_status($db, 'running', 'incomplete');
-                            die;
-    
-                        }
-    
+        // Run active integration scans.
+        foreach($uploaded_integrations as $uploaded_integration){
+            if(is_active_integration($uploaded_integration['uri'])){
+
+                // Fire the '_scans' function. 
+                $integration_scan_function_name = $uploaded_integration['uri'].'_scans';
+                if(function_exists($integration_scan_function_name)){
+
+                    // We need to kill the scan if an integration has an error.
+                    try {
+                        $integration_scan_function_name($page, $meta);
+
+                        // Only successful scans get their timestamp updated.
+                        update_page_scanned_time($db, $page->id);
+
+                    } catch (Exception $x) {
+
+                        // We will kill the scan and alert folks of any errors, but
+                        // we will also record the successful scans that occured.
+                        update_usage_meta($db, $pages_count);
+                        add_integration_alert($db, $x->getMessage());
+                        update_scan_status($db, 'running', 'incomplete');
+                        die;
+
                     }
-    
-                }
-            }
-            
-        }    
-    endif;
 
-    // Meta usage the status is only updated if the scan succeed.
+                }
+
+            }
+        }
+        
+    }    
+
+    // We're updating the count at the end of the scan
+    // because we only want to count succsefully scanned
+    // pages.
     $pages_count = count($active_page_ids);
+
+
     update_usage_meta($db, $pages_count);
     update_scan_status($db, 'running', 'complete');
 

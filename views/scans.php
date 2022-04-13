@@ -42,12 +42,12 @@
                     return response.text();
                 }
 
-                async function refreshTable(data) {
-                    document.getElementById('the_scans_rows').innerHTML = data;
-                }
-
                 async function refreshAlerts(data) {
                     document.getElementById('alert_count').innerHTML = data;
+                }
+
+                async function refreshTable(data) {
+                    document.getElementById('the_scans_rows').innerHTML = data;
                 }
 
                 const handleScan = () => {

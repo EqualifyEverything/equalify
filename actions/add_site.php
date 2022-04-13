@@ -14,12 +14,12 @@ $db = connect(
 // Valid URLs are required so that we can CURL.
 $site_url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($site_url == false)
-    die('URL"'.$_GET['url'].'" format is invalid or missing.');
+    throw new Exception('URL"'.$_GET['url'].'" format is invalid or missing');
 
 // Different types require different scans.
 $type = $_GET['type'];
 if( $type == false)
-    die('Page type is not specified for the URL "'.$site_url.'".');
+    throw new Exception('Page type is not specified for the URL "'.$site_url.'"');
 
 // Requiring unique URLS minimizes unnessary scans.
 if(!is_unique_page_url($db, $site_url))
