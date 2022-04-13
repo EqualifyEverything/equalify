@@ -61,7 +61,11 @@ if(!empty($settings['meta'])):
                 id="<?php echo $name?>_field" 
                 name="<?php echo $name?>"
                 type="<?php echo $type?>"
-                value="<?php echo $meta->$name?>"
+                value="<?php
+                    // This requires a fallback if no key was entered.
+                    if(!empty($meta->$name))
+                        echo $meta->$name
+                    ?>"
                 class="form-control"
             >
         </div>

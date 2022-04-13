@@ -82,6 +82,7 @@ function get_page_ids(mysqli $db, $filters = []){
     $results = $db->query($sql);
 
     // Result
+    $data[] = '';
     if($results->num_rows > 0){
         while($row = $results->fetch_object()){
             $data[] = $row->id;
@@ -376,9 +377,9 @@ function add_pages(mysqli $db, $pages_records){
 }
 
 /**
- * Add Usage Meta
+ * Update Usage Meta
  */
-function add_usage_meta(mysqli $db, $usage){
+function update_usage_meta(mysqli $db, $usage){
     
     // SQL
     $sql = 'UPDATE `meta` SET `usage` = `usage` + '.$usage;
@@ -650,6 +651,25 @@ function add_integration_alert(mysqli $db, $details){
 }
 
 /**
+ * Add Meta
+ */
+function add_meta(mysqli $db, $field, $value){
+
+    // SQL
+    $sql = 'INSERT INTO `meta` (`'.$field.'`) VALUES ("'.$value.'");';
+    
+    // Query
+    $result = $db->query($sql);
+
+    // Fallback
+    if(!$result)
+        throw new Exception('Cannot add meta field "'.$field.'" and value "'.$value.'"');
+    
+    // Complete Query
+    return $result;
+}
+
+/**
  * Create Alerts Table
  */
 function create_alerts_table($db){
@@ -684,11 +704,9 @@ function create_meta_table($db){
     // SQL
     $sql = 
         'CREATE TABLE `meta` (
-            `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `usage` bigint(20) NOT NULL DEFAULT "1000",
-            `wave_key` varchar(20) DEFAULT NULL,
-            PRIMARY KEY (`id`)
-          ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;';
+            `usage` bigint(20) DEFAULT NULL,
+            `wave_key` varchar(20) DEFAULT NULL
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
     
     // Query
     $result = $db->query($sql);

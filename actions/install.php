@@ -11,9 +11,15 @@ $db = connect(
 // All the tables are created with this action.
 if(table_exists($db, 'alerts') == false)
     create_alerts_table($db);
-if(table_exists($db, 'meta') == false)
-    create_meta_table($db);
 if(table_exists($db, 'pages') == false)
     create_pages_table($db);
 if(table_exists($db, 'scans') == false)
     create_scans_table($db);
+if(table_exists($db, 'meta') == false){
+    create_meta_table($db);
+    
+    // We need to add some meta to initialize the table
+    // since we don't use the INSERT statement anywhere.
+    add_meta($db, 'usage', 0);
+
+}
