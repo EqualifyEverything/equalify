@@ -7,7 +7,7 @@ We aim to manage every site's server, accessibility, analytics, and CMS.
 ## Why manage WebOps in one place?
 Server health affects your CMS, which affects accessibility and analytics.
 
-Bringing WebOps data under one roof means **richer reporting** and **smarter enforcement** of your website policies.
+Bringing WebOps data under one roof means **richer reporting** and **smarter enforcement** of your website properties.
 
 ## What is Equalify's altruistic purpose?
 Making the world better is a driving force behind Equalify.
