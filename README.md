@@ -1,4 +1,4 @@
-# Equalify the Internet!
+# Equalify the internet!
 Equalify is the world's first Open Source WebOps platform.
 
 We aim to integrate all your websites and WebOps services into one dashboard. 
