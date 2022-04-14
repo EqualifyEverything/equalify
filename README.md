@@ -1,6 +1,6 @@
 # Equalify the web!
 
-**96.8% of hompages are inaccessible**, according to [WebAim](https://webaim.org/projects/million/).
+**96.8% of homepages are inaccessible**, according to [WebAim](https://webaim.org/projects/million/).
 
 That statistic is unacceptable.
 
