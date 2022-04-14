@@ -22,7 +22,7 @@ The app currently scans pages for WCAG errors.
 
 Any site can be added to Equalify.
 
-The app currently supports two integrations: [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
+Two integrations are supported: [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
 
 After selecting an integration, import a site.
 
