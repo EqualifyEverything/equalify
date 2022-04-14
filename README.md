@@ -16,7 +16,7 @@ I ([@bbertucc](https://github.com/bbertucc/)) took a sabbatical from [my web des
 
 Now, I release Equalify - errata and all. 
 
-I aim to find collaborators and users, as I build Equlaify and work toward [☯️ My Utopia](https://bbertucc.notion.site/My-Ethical-Business-a55c25006c5c4b53b233df1f5c9df4da).
+I aim to find collaborators and users to shape the future of Equalify.
 
 ## Get equalified!
 1. Download or clone the contents of the repo.
