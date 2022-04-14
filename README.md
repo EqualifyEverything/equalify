@@ -7,15 +7,17 @@ We aim to manage every site's server, accessibility, analytics, and CMS.
 ## Why manage WebOps in one place?
 Server health affects your CMS, which affects accessibility and analytics.
 
-WebOps data under one roof means **richer reporting** and **smarter enforcement** of your website policies.
+Bringing WebOps data under one roof means **richer reporting** and **smarter enforcement** of your website policies.
 
 ## What is Equalify's altruistic purpose?
 Making the world better is a driving force behind Equalify.
 
 We build off of these foundational principles:
-1. **Ethics takes priority.** Equalify was built out of a [desire to create an ethical business](https://bbertucc.notion.site/My-Ethical-Business-a55c25006c5c4b53b233df1f5c9df4da). Any ethical issue can be raised in the repo's [Issues tab](https://github.com/bbertucc/equalify/issues) and will be treated as a mission-critical bug.
-2. **Equalify code is Open.** Open Source software inspires others to build ever greater innovations.
-3. **Equalify loves A11Y.** Our product is designed around WCAG accessibility reporting and enforcement to create a more equitable internet.
+1. **Ethics take priority.** Equalify was built out of a [desire to create an ethical business](https://bbertucc.notion.site/My-Ethical-Business-a55c25006c5c4b53b233df1f5c9df4da). Any ethical issue can be raised in the repo's [Issues tab](https://github.com/bbertucc/equalify/issues) and will be treated as a mission-critical bug.
+2. **Code should be Open.** Open Source software inspires others to build ever greater innovations.
+3. **A11Y matters.** Our product is designed around WCAG accessibility reporting and enforcement. The project aims to create a more equitable internet.
+4. **Resources matter.** Efficiency promotes sustainability. Equalify is built to promote the efficiency of your WebOps. 
+5. **People matter.** Collaboration is key to the project's success. The project promotes collaboration by putting people and their ideas first. Everyone is welcome to join the project!
 
 ## You can help develop Equalify!
 1. Download the contents of the repo.
