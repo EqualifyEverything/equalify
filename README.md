@@ -11,20 +11,17 @@ Your server's health affects your CMS, which affects accessibility and analytics
 
 Bringing WebOps data under one roof means **richer reporting** and **smarter management** of your website properties.
 
-## What is Equalify's altruistic purpose?
-Doing good is what motivates Equalify.
+## What's Equalify's story?
+I ([@bbertucc](https://github.com/bbertucc/)) took a sabbatical from [my web design business](https://decubing.com/) to create an ethical business. I spent several months with [on Notion](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6) before I had the confidence to write the code in this repo. 
 
-The project strives to be:
-- **Ethical.** Equalify was built out of a [desire to create an ethical business](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). Any issue with the project's ethics can be raised in the repo's [Issues tab](https://github.com/bbertucc/equalify/issues) and will be treated as a mission-critical bug.
-- **Open.** Open Source software inspires others to build ever greater innovations.
-- **Accessible.** Our product is designed around WCAG accessibility reporting and enforcement. The project aims to create a more equitable internet.
-- **Efficient.** Efficiency promotes sustainability. Equalify is built to promote the efficiency of your WebOps. 
-- **Collaborative.** Equalify promotes collaboration by cultivating a community of compassion. Everyone is welcome to use and build Equalfiy!
+Now, I release Equalify - errata and all. 
 
-## You can help equalify the internet!
+I aim to find collaborators and users, as I build Equlaify and work toward [☯️ My Utopia](https://bbertucc.notion.site/My-Ethical-Business-a55c25006c5c4b53b233df1f5c9df4da)
+
+## Get equalified!
 1. Download or clone the contents of the repo.
 2. Update `config.php` info.
 3. Upload/run on your server.
 4. Contribute: Report [issues](https://github.com/bbertucc/equalify/issues) and patches.
 
-The more you use Equalify, the better the service gets!
+Together, we can equalify the internet.
