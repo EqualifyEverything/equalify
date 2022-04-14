@@ -43,7 +43,7 @@ The goal: **Equalify every website.**
 ## Special Thanks To..
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You constantly push me to deeper meaning. & Grace- You are the 🔥 behind everything I do.
 
-This project is Open Source to inspire as many new collaborations as possible.
+This project is Open Source to inspire new collaborations.
 
 Together, **we can equalify the internet**.
 
