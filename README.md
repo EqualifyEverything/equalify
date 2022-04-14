@@ -38,7 +38,7 @@ The goal: **Equalify every website.**
 1. Download or clone the contents of the repo.
 2. Update `config.php` info.
 3. Upload/run on your server.
-4. Report [issues](https://github.com/bbertucc/equalify/issues) and patches.
+4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 ## Special Thanks
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You constantly push me to deeper meaning. & Grace- You are the 🔥 behind everything I do.
