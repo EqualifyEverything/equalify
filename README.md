@@ -13,7 +13,7 @@ Bringing WebOps data under one roof means **richer reporting** and **smarter enf
 Making the world better is a driving force behind Equalify.
 
 We build off of these foundational principles:
-1. **Ethics take priority.** Equalify was built out of a [desire to create an ethical business](https://bbertucc.notion.site/My-Ethical-Business-a55c25006c5c4b53b233df1f5c9df4da). Any ethical issue can be raised in the repo's [Issues tab](https://github.com/bbertucc/equalify/issues) and will be treated as a mission-critical bug.
+1. **Ethics take priority.** Equalify was built out of a [desire to create an ethical business](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). Any ethical issue can be raised in the repo's [Issues tab](https://github.com/bbertucc/equalify/issues) and will be treated as a mission-critical bug.
 2. **Code should be Open.** Open Source software inspires others to build ever greater innovations.
 3. **A11Y matters.** Our product is designed around WCAG accessibility reporting and enforcement. The project aims to create a more equitable internet.
 4. **Resources matter.** Efficiency promotes sustainability. Equalify is built to promote the efficiency of your WebOps. 
