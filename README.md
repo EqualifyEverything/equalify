@@ -47,4 +47,4 @@ Together, **we can equalify the internet**.
 
 -[@bbertucc](https://github.com/bbertucc)
 
-PS: For more information on the notions behind Equalify, see [My Ethical Business Notion](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). 
+PS: For more information on the notions behind Equalify, see my [Ethical Business Notion page](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). 
