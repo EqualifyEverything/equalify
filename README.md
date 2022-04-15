@@ -10,7 +10,9 @@ Everyone should have access to online information.
 
 Equalify creates deep integrations with services that run your website. 
 
-The app will become a WebOps hub, designed to solve accessibility issues. 
+Imagine: You solve A11Y issues at their source - be that source, the server or a CMS. 
+
+Equalify will become your WebOps hub, designed to solve any accessibility issue. 
 
 <img width="1510" alt="Screen Shot 2022-04-13 at 1 20 11 PM" src="https://user-images.githubusercontent.com/46652/163245142-f9844463-ba06-466e-aac1-92e069d07994.png">
 
