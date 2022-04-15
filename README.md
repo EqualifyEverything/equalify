@@ -17,7 +17,8 @@ Equalify will become your WebOps hub, designed to solve any accessibility issue.
 <img width="1510" alt="Screen Shot 2022-04-13 at 1 20 11 PM" src="https://user-images.githubusercontent.com/46652/163245142-f9844463-ba06-466e-aac1-92e069d07994.png">
 
 ## What does Equalify currently do?
-The App currently scans pages for WCAG errors.
+
+The app currently scans pages for WCAG errors.
 
 Equalify supports [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
 
