@@ -10,7 +10,7 @@ Everyone should have access to online information.
 
 Equalify creates deep integrations with services that run your website. 
 
-Imagine: You solve A11Y issues at their source - be that source, the server or a CMS. 
+Imagine: You solve A11Y issues at their source - be that source the server or a CMS. 
 
 Equalify will become your WebOps hub, designed to solve any accessibility issue. 
 
@@ -43,7 +43,7 @@ The goal: **Equalify every website.**
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You constantly push me to deeper meaning. & Grace- You are the 🔥 behind everything I do.
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
 
 This project is Open Source to inspire new collaborations.
 
