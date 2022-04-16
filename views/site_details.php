@@ -32,47 +32,93 @@ if(empty($page) == 1)
 
 </div>
 
+
+<?php
+// Since we can add columns via integrations,
+// we need to dynamically get columns.
+$columns = get_column_names($db, 'pages');
+if(!empty($columns)):
+?>
+
 <section id="relatives" class="mb-3 pb-4">
     <h2>Pages</h2>
+
     <table class="table">
         <thead>
+
             <tr>
-                <th scope="col">URL</th>
-                <th scope="col">Scanned</th>
+
+    <?php
+    foreach ($columns as $column){
+
+        // Users don't need to see a few columns
+        // because they cannot act on these or they
+        // are listed elsewhere.
+        $excluded_columns = array('is_parent', 'type', 'id');
+        if( !in_array($column->COLUMN_NAME, $excluded_columns )){
+            
+            // Make column name human readable and formatted
+            // with the various special conditions
+            $name = $column->COLUMN_NAME;
+            $name = str_replace('_', ' ', $name);
+            $name = str_replace('url', 'URL', $name);
+            $name = str_replace('wcag', 'WCAG', $name);
+            $name = str_replace('2 1', '2.1', $name);
+            $name = str_replace('wave', 'WAVE', $name);
+            $name = ucwords($name);
+            echo '<th scope="col">'.$name.'</th>';
+ 
+        }
+    }
+    ?>
+
             </tr>
         </thead>
         <tbody>
 
-            <?php
-            $page_filters = [
-                array(
-                    'name'  => 'site',
-                    'value' => $page->site
-                ),
-            ];
-            $site = get_pages($db, $page_filters);
-            $site_count = count($site);
-            if($site_count > 0 ):
-                foreach($site as $page):    
-            ?>
+    <?php
+    // Limit pages to those related to this site.
+    $page_filters = [
+        array(
+            'name'  => 'site',
+            'value' => $page->site
+        ),
+    ];
+    $site = get_pages($db, $page_filters);
+    $site_count = count($site);
+    if($site_count > 0 ):
+        foreach($site as $page):    
+            echo '<tr>';
 
-            <tr>
-                <td>
-                    <a href="<?php echo $page->url;?>" target="_blank"><?php echo $page->url;?></a>
-                </td>
-
-                <td>
-                    <?php echo $page->scanned; ?>
-                </td>
-            </tr>
-
-            <?php 
-                endforeach;
-            endif;
-            ?>
+            // Again, we need to loop columns so that integrations
+            // can add columns if they register new DB fields.
+            foreach ($columns as $column){
+        
+                // Limiting columns again.
+                $excluded_columns = array('is_parent', 'type', 'id');
+                if( !in_array($column->COLUMN_NAME, $excluded_columns )){
+                    
+                    // Make column name human readable.
+                    $text = $column->COLUMN_NAME;
+                    echo '<td scope="col">'.$page->$text.'</td>';
+         
+                }
+;
+            }
+        
+        // End pages list.
+            echo '</tr>';
+        endforeach;
+    endif;
+    ?>
 
         </tbody>
     </table>
+    <?php
+    // End dynamically created columns.
+    endif;
+    ?>
+
 </section>
 <section id="alerts" class="mb-3 pb-4">
     <h2>Alerts</h2>

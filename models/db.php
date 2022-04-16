@@ -182,6 +182,7 @@ function get_alerts_by_site(mysqli $db, $site){
         }
     }
     return $data;
+
 }
 
 /**
@@ -268,6 +269,46 @@ function get_site_parent_status(mysqli $db, $site){
     // Result
     return $data;
     
+}
+
+/**
+ * Get Details URI
+ */
+function get_site_details_uri(mysqli $db, $page_id){
+
+    // We just need to see if the page is a parent. If 
+    // it is, that page's ID is good so we don't need
+    // to run another query to get the id of the parent.
+    $page = get_page($db, $page_id);
+    if($page->is_parent == 1){
+        return '?view=site_details&id='.$page->id;
+    }else{
+        return '?view=site_details&id='.get_page_id($db, $page->url);
+    }
+    
+}
+
+/**
+ * Get Column Names
+ */
+function get_column_names(mysqli $db, $table){
+
+    // SQL
+    $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS ';
+    $sql.= 'WHERE TABLE_NAME = "'.$table.'" AND TABLE_SCHEMA = "'.DB_NAME.'"';
+
+    // Query
+    $results = $db->query($sql);
+
+    // Result
+    $data = [];
+    if($results->num_rows > 0){
+        while($row = $results->fetch_object()){
+            $data[] = $row;
+        }
+    }
+    return $data;
+
 }
 
 
@@ -403,23 +444,6 @@ function update_usage_meta(mysqli $db, $usage){
     // Result
     if(!$result)
         throw new Exception('Cannot add "'.$usage.'"');
-}
-
-/**
- * Get Details URI
- */
-function get_site_details_uri(mysqli $db, $page_id){
-
-    // We just need to see if the page is a parent. If 
-    // it is, that page's ID is good so we don't need
-    // to run another query to get the id of the parent.
-    $page = get_page($db, $page_id);
-    if($page->is_parent == 1){
-        return '?view=site_details&id='.$page->id;
-    }else{
-        return '?view=site_details&id='.get_page_id($db, $page->url);
-    }
-    
 }
 
 /**
