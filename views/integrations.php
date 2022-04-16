@@ -57,7 +57,7 @@
         </div>
 
         <?php
-        // End Integrations List
+        // End integrations list.
         endforeach;
         ?>
 
