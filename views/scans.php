@@ -7,7 +7,7 @@
             <button id="add_scan" class="btn btn-primary">Scan All Pages</button>
             <script>
 
-                // Ansycronistically start scan.
+                // Ansycronistically scan.
                 async function addScan() {
                     const response = await fetch('actions/scan_all_pages.php?action=add_scan', {
                         method: 'GET', 
