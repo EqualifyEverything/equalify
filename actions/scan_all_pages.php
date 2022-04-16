@@ -50,7 +50,7 @@ if( $_GET['action'] == 'do_scan' ){
             require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
     }
 
-    // Scan each active page..
+    // Scan each active page.
     foreach ($active_pages as $page){
         $pages_count++;
 
@@ -76,6 +76,8 @@ if( $_GET['action'] == 'do_scan' ){
                         update_usage_meta($db, $pages_count);
                         add_integration_alert($db, $x->getMessage());
                         update_scan_status($db, 'running', 'incomplete');
+                        $scans = get_scans($db);
+                        the_scan_rows($scans);
                         die;
 
                     }
@@ -91,7 +93,6 @@ if( $_GET['action'] == 'do_scan' ){
     // because we only want to count succsefully scanned
     // pages.
     $pages_count = count($active_page_ids);
-
 
     update_usage_meta($db, $pages_count);
     update_scan_status($db, 'running', 'complete');

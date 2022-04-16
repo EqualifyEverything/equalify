@@ -16,7 +16,6 @@
                             'Content-Type': 'text/html'
                         }
                     });
-                    console.log('hpp');
                     return response.text();
                 }
 
@@ -51,6 +50,7 @@
                 }
 
                 const handleScan = () => {
+
                     addScan()
                     .then(refreshTable)
                     .then(doScan)
@@ -60,7 +60,7 @@
                 }
                 
                 // Event listener.
-                document.getElementById('add_scan').addEventListener('click', handleScan)
+                document.getElementById('add_scan').addEventListener('click', handleScan);
 
             </script>
         </div>
