@@ -23,7 +23,6 @@
             <button type="submit" id="submit" class="btn btn-primary">
                 Add Site
             </button>
-
         </div>
     </form> 
 
