@@ -2,18 +2,27 @@
 /**
  * Get Page Body
  */
-function get_url_contents($url){
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_URL, $url);
+function get_url_contents($site_url, $type = ''){
+    $curl = curl_init($site_url);
+    curl_setopt($curl, CURLOPT_URL, $site_url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_USERAGENT, 'Equalify');
+
+    // Restrict CURL to the type of what you want to add.
+    if($type == 'wordpress')
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+    if($type == 'xml')
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
+
+    // Execute CURL or fallback.
     $url_contents = curl_exec($curl);
     if($url_contents == false)
-        throw new Exception('Contents of "'.$url.'" cannot be loaded');
+        throw new Exception('Contents of "'.$site_url.'" cannot be loaded');
     curl_close($curl);
     return $url_contents;
+
 }
 
 /**
@@ -40,12 +49,12 @@ function wordpress_site_adder($site_url){
     $json_url = $site_url.'wp-json/wp/v2/pages?per_page=100';
 
     // Get URL contents.
-    $url_contents = get_url_contents($site_url);
+    $url_contents = get_url_contents($json_url, 'wordpress');
 
     // Create JSON.
     $wp_api_json = json_decode($url_contents, true);
     if(empty($wp_api_json[0]))
-        throw new Exception('The URL "'.$site_url.'" does not contain valid WordPress API V2 JSON.');
+        throw new Exception('The URL "'.$site_url.'" is not valid output');
 
     // Push JSON to pages array.
     $pages = [];
@@ -60,11 +69,8 @@ function wordpress_site_adder($site_url){
  */
 function xml_site_adder($site_url){
 
-    // Reformat URL for XML request.
-    $xml_url = $site_url;
-
     // Get URL contents.
-    $url_content = get_url_contents($site_url);
+    $url_contents = get_url_contents($site_url, 'xml');
 
     // Valid XML files are only allowed!
     if(!str_starts_with($url_contents, '<?xml'))
