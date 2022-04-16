@@ -14,22 +14,33 @@ $db = connect(
 // Valid URLs are required so that we can CURL.
 $site_url = filter_input(INPUT_GET, 'url', FILTER_VALIDATE_URL);
 if($site_url == false)
-    throw new Exception('URL"'.$_GET['url'].'" format is invalid or missing');
+    throw new Exception('"'.$_GET['url'].'" is an invalid URL');
 
-// Different types require different scans.
+// We need to check the type since a user could manually
+// update the URL string to something unsupported.
 $type = $_GET['type'];
 if( $type == false)
-    throw new Exception('Page type is not specified for the URL "'.$site_url.'"');
+    throw new Exception('Type is not specified for the URL "'.$site_url.'"');
 
-// Requiring unique URLS minimizes unnessary scans.
+// Requiring unique URLs minimizes unnessary scans.
 if(!is_unique_page_url($db, $site_url))
-    die('Page "'.$site_url.'" already exists.');
+    throw new Exception('Page "'.$site_url.'" already exists');
 
 // Static pages are treated as sites in themselves.
 if($type == 'single_page' ){
-    add_page($db, $url = $site_url, $type, 'active', $site = $site_url, $is_parent = 1 );
 
-// WordPress and XML deal with adding pages similarly,
+    // We build an adder so we can tell if the URL can be
+    // scaned.
+    single_page_adder($site_url);
+
+    // Single pages are saved with the following pramenters
+    $type = 'single_page';
+    $status = 'active';
+    $site = $site_url;
+    $is_parent = 1;
+    add_page($db, $url, $type, $status, $site, $is_parent );
+    
+// WordPress and XML deals with adding pages similarly,
 // so their functions are wrapped in one condition.
 }elseif($type == 'wordpress' || $type == 'xml' ){
 
