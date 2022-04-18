@@ -10,13 +10,18 @@ function uploaded_integrations($path_to_integrations){
     $uploaded_integrations = [];
     foreach ($integration_folders as $integration_folder){
 
+		// Exclude certain files or filders
+		$excluded_items = array('.DS_Store');
+
         // Create URI from folder name.
-        array_push(
-            $uploaded_integrations, 
-            array(
-                'uri' => $integration_folder
-            )
-        );
+		if(!in_array($integration_folder, $excluded_items)){
+			array_push(
+				$uploaded_integrations, 
+				array(
+					'uri' => $integration_folder
+				)
+			);
+		}
 
     }
     return $uploaded_integrations;
