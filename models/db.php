@@ -591,6 +591,25 @@ function add_db_column($db, $table, $column_name, $column_type){
 }
 
 /**
+ * Add DB Column
+ */
+function delete_db_column($db, $table, $column_name){
+
+    // SQL.
+    $sql = 'ALTER TABLE `'.$table.'` ';
+    $sql.= 'DROP COLUMN '.$column_name.';';
+
+    // Query
+    $result = $db->query($sql);
+
+    // Result
+    if(!$result)
+        throw new Exception('Cannot drop "'.$column_name.'" to "'.$table.'"');
+
+}
+
+
+/**
  * DB Column Exists
  */
 function db_column_exists($db, $table, $column_name){

@@ -34,6 +34,29 @@ if($old_status == 'Active'){
     ];
     delete_alerts($db, $alerts_filter);
 
+    // Remove fields.
+    $integration_fields = get_integration_fields($uri);
+    if( !empty($integration_fields['db']) ){
+        $integration_db_fields = $integration_fields['db'];
+
+        // Delete "meta" fields.
+        if( !empty($integration_db_fields['meta']) ){
+            foreach($integration_db_fields['meta'] as $integration_meta_field){
+                if(db_column_exists($db, 'meta', $integration_meta_field['name']))
+                    delete_db_column($db, 'meta', $integration_meta_field['name']);
+            }
+        }
+
+        // Delete "pages" fields.
+        if( !empty($integration_db_fields['pages']) ){
+            foreach($integration_db_fields['pages'] as $integration_pages_field){
+                if(db_column_exists($db, 'pages', $integration_pages_field['name']))
+                    delete_db_column($db, 'pages', $integration_pages_field['name']);
+            }
+        }
+
+    }
+
     // Status text.
     $new_status = 'Disabled';
 
