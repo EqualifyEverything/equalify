@@ -103,7 +103,7 @@ function wave_scans($page, $meta){
     $wave_errors = $wave_json_decoded['categories']['error']['count'];
 
     // Set optional alerts.
-    if($wave_errors > 1)
+    if($wave_errors >= 1)
         add_page_alert($db, $page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>');
 
     // Update page data.

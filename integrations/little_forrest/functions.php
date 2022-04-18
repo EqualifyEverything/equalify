@@ -85,7 +85,7 @@ function little_forrest_scans($page, $meta){
     delete_alerts($db, $alerts_filter);
 
     // Set optional alerts.
-    if($little_forrest_errors > 1)
+    if($little_forrest_errors >= 1)
         add_page_alert($db, $page->id, $page->site,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$page->url.'&lang=auto&cache=false" target="_blank">Little Forrest report</a>.');
 
     // Update page data.

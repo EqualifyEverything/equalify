@@ -42,9 +42,9 @@ if( $_GET['action'] == 'do_scan' ){
     $pages_count = 0;
 
 
-    // We're requring active integrations here and not below
-    // because we don't want to require the files over and 
-    // over again.
+    // We're requring active integrations here and not in
+    // the next loop because we don't want to require the
+    // files over and over again.
     foreach($uploaded_integrations as $uploaded_integration){
         if(is_active_integration($uploaded_integration['uri']))
             require_once '../integrations/'.$uploaded_integration['uri'].'/functions.php';
