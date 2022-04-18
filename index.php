@@ -88,10 +88,10 @@ $records = [];
             ?>
 
             <div class="border-top mt-3 pt-3">
-                <p class="text-muted">
+                <p>
                     🎉 <strong><?php echo get_meta($db)->usage;?> pages scanned.</strong>
                 </p>
-                <p class="text-muted">
+                <p>
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
                 <script>window.DonorBox = { widgetLinkClassName: 'custom-dbox-popup' }</script>
                     If the scans are useful to you, <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to the project</a> to keep the service free and maintained.
