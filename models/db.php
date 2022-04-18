@@ -88,10 +88,12 @@ function get_page_ids(mysqli $db, $filters = []){
     $results = $db->query($sql);
 
     // Result
-    $data[] = '';
+    $data = array();
     if($results->num_rows > 0){
         while($row = $results->fetch_object()){
-            $data[] = $row->id;
+            $data[] = array(
+                'id' => $row->id
+            );
         }
     }
 
