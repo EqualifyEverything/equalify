@@ -315,19 +315,16 @@ function get_column_names(mysqli $db, $table){
 
 
 /**
- * Is Unique Page URL
+ * Is Unique Site
  */
-function is_unique_page_url(mysqli $db, $page_url){
+function is_unique_site(mysqli $db, $site_url){
+
+    // Require unique URL
+    $sql = 'SELECT * FROM `pages` WHERE `site` = "'.$site_url.'"';
 
     // We don't consider a page with a '/' a unique url
     // so we will also search for them.
-    if( !str_ends_with($page_url, '/') )
-        $page_url_backslashed = $page_url.'/';
-
-    // Require unique URL
-    $sql = 'SELECT * FROM `pages` WHERE `url` = "'.$page_url.'"';
-    if(isset($page_url_backslashed))
-        $sql.= ' OR `url` = "'.$page_url_backslashed.'"';
+    $sql.= ' OR `site` = "'.$site_url.'/"';
 
     $query = $db->query($sql);
     if(mysqli_num_rows($query) > 0){
