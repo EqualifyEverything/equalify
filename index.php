@@ -6,13 +6,6 @@ require_once 'actions/install.php';
 require_once 'models/view_components.php';
 require_once 'models/integrations.php';
 
-// Setup DB Connection
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
 $records = [];
 ?>
 
@@ -56,7 +49,7 @@ $records = [];
                         <span class="badge bg-danger float-end">
                             <span id="alert_count">
 
-                                <?php echo count(get_alerts($db));?>
+                                <?php echo count(DataAccess::get_alerts());?>
                             
                             </span>
                         </span>
@@ -84,12 +77,12 @@ $records = [];
             <?php
             // As soon as you use Equalify, you know the toll
             // you will be asked to support the service.
-            if(!empty(get_meta($db)->usage)):
+            if(!empty(DataAccess::get_meta()->usage)):
             ?>
 
             <div class="border-top mt-3 pt-3">
                 <p>
-                    🎉 <strong><?php echo get_meta($db)->usage;?> pages scanned.</strong>
+                    🎉 <strong><?php echo DataAccess::get_meta()->usage;?> pages scanned.</strong>
                 </p>
                 <p>
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>

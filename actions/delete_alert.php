@@ -2,12 +2,6 @@
 // Info on DB must be declared to use db.php models.
 require_once '../config.php';
 require_once '../models/db.php';
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
 
 // Get URL parameters.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -24,7 +18,7 @@ $filters = [array(
     'name'  => 'id',
     'value' => $id
 )];
-delete_alerts($db, $filters);
+DataAccess::delete_alerts($filters);
 
 // When the work is done, we can triumphantly return to
 // wherever we came from.

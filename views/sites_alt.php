@@ -21,7 +21,7 @@
             <tbody>
 
                 <?php
-                $pages = get_pages($db);
+                $pages = DataAccess::get_pages();
                 if(count($pages) > 0 ):
                     foreach($pages as $page):    
                 ?>
