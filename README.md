@@ -33,7 +33,7 @@ The goal: **Equalify every website.**
 <img width="1336" alt="Screen Shot 2022-04-14 at 2 00 57 PM" src="https://user-images.githubusercontent.com/46652/163458795-b3d08005-0910-4f3d-b0a0-3aa5ea829a7c.png">
 
 ## To Start
-1. Download or clone the contents of the repo.
+1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Update `config.php` info.
 3. Upload/run on your server.
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
