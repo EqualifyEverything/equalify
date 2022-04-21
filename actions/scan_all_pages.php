@@ -41,7 +41,6 @@ if( $_GET['action'] == 'do_scan' ){
     // This count helps us know how many pages were scanned.
     $pages_count = 0;
 
-
     // We're requring active integrations here and not in
     // the next loop because we don't want to require the
     // files over and over again.
@@ -65,10 +64,6 @@ if( $_GET['action'] == 'do_scan' ){
                     // We need to kill the scan if an integration has an error.
                     try {
                         $integration_scan_function_name($page, $meta);
-
-                        // Only successful scans get their timestamp updated.
-                        update_page_scanned_time($db, $page->id);
-
                     } catch (Exception $x) {
 
                         // We will kill the scan and alert folks of any errors, but
@@ -86,6 +81,9 @@ if( $_GET['action'] == 'do_scan' ){
 
             }
         }
+
+        // Only successful scans get their timestamp updated.
+        update_page_scanned_time($db, $page->id);
         
     }    
 
@@ -94,7 +92,11 @@ if( $_GET['action'] == 'do_scan' ){
     // pages.
     $pages_count = count($active_page_ids);
 
+    // Usage meta helps us keep track of how many times
+    // scans were done.
     update_usage_meta($db, $pages_count);
+
+    // Scan was successful!
     update_scan_status($db, 'running', 'complete');
 
     // Scan info is passed to JSON on the view, so that we can do 
