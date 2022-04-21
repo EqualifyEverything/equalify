@@ -26,12 +26,6 @@ function run_curl($site_url, $type = ''){
     // Add in DB info so we can see if URL is unique.
     require_once '../config.php';
     require_once 'db.php';
-    $db = connect(
-        DB_HOST, 
-        DB_USERNAME,
-        DB_PASSWORD,
-        DB_NAME
-    );
 
     // The curled URL is the URL we use as an ID.
     $curled_url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
@@ -41,7 +35,7 @@ function run_curl($site_url, $type = ''){
     $curled_url = str_replace($json_endpoints, '', $curled_url);
 
     // Make sure URL is unique to minimize scans. 
-    if(!is_unique_site($db, $curled_url))
+    if(!DataAccess::is_unique_site($curled_url))
         throw new Exception('"'.$curled_url.'" already exists');
 
     // Fallback if no contents exist.

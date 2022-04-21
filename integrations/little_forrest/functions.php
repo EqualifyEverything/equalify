@@ -40,12 +40,6 @@ function little_forrest_scans($page, $meta){
     // Add DB info and required functions.
     require_once '../config.php';
     require_once '../models/db.php';
-    $db = connect(
-        DB_HOST, 
-        DB_USERNAME,
-        DB_PASSWORD,
-        DB_NAME
-    );
 
     // Get Little Forrest data.
     $override_https = array(
@@ -82,13 +76,13 @@ function little_forrest_scans($page, $meta){
             'value'  =>  'little_forrest'
         )
     ];
-    delete_alerts($db, $alerts_filter);
+    DataAccess::delete_alerts($alerts_filter);
 
     // Set optional alerts.
     if($little_forrest_errors >= 1)
-        add_page_alert($db, $page->id, $page->site,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$page->url.'&lang=auto&cache=false" target="_blank">Little Forrest report</a>.');
+        DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'WCAG 2.1 page errors found! See <a href="https://inspector.littleforest.co.uk/InspectorWS/Inspector?url='.$page->url.'&lang=auto&cache=false" target="_blank">Little Forrest report</a>.');
 
     // Update page data.
-    update_page_data($db, $page->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);
+    DataAccess::update_page_data($page->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);
         
 }

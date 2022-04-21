@@ -3,13 +3,6 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
-
 // Get URL variables and fallbacks.
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if(empty($id))
@@ -19,9 +12,9 @@ if(empty($old_status))
     throw new Exception('Status is not specfied for page "'.$id.'"');
 
 // Toggle page status.
-$site = get_page($db, $id)->site;
+$site = DataAccess::get_page($id)->site;
 if($old_status == 'active'){
-    update_site_status($db, $site, 'archived');
+    DataAccess::update_site_status($site, 'archived');
 
     // Alerts are deleted when a page is archived.
     $filters = [
@@ -30,11 +23,11 @@ if($old_status == 'active'){
             'value' => $site
         )
     ];
-    delete_alerts($db, $filters);
+    DataAccess::delete_alerts($filters);
     
 }
 if($old_status == 'archived'){
-    update_site_status($db, $site, 'active');
+    DataAccess::update_site_status($site, 'active');
 }
 
 // Redirect

@@ -3,12 +3,6 @@
 require_once '../config.php';
 require_once '../models/integrations.php';
 require_once '../models/db.php';
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
 
 // Get URL parameters.
 $uri = $_GET['uri'];
@@ -32,7 +26,7 @@ if($old_status == 'Active'){
             'value'  =>  $uri
         )
     ];
-    delete_alerts($db, $alerts_filter);
+    DataAccess::delete_alerts($alerts_filter);
 
     // Remove fields.
     $integration_fields = get_integration_fields($uri);
@@ -42,16 +36,16 @@ if($old_status == 'Active'){
         // Delete "meta" fields.
         if( !empty($integration_db_fields['meta']) ){
             foreach($integration_db_fields['meta'] as $integration_meta_field){
-                if(db_column_exists($db, 'meta', $integration_meta_field['name']))
-                    delete_db_column($db, 'meta', $integration_meta_field['name']);
+                if(DataAccess::db_column_exists('meta', $integration_meta_field['name']))
+                    DataAccess::delete_db_column('meta', $integration_meta_field['name']);
             }
         }
 
         // Delete "pages" fields.
         if( !empty($integration_db_fields['pages']) ){
             foreach($integration_db_fields['pages'] as $integration_pages_field){
-                if(db_column_exists($db, 'pages', $integration_pages_field['name']))
-                    delete_db_column($db, 'pages', $integration_pages_field['name']);
+                if(DataAccess::db_column_exists('pages', $integration_pages_field['name']))
+                    DataAccess::delete_db_column('pages', $integration_pages_field['name']);
             }
         }
 
@@ -70,16 +64,16 @@ if($old_status == 'Active'){
         // Setup "meta" fields.
         if( !empty($integration_db_fields['meta']) ){
             foreach($integration_db_fields['meta'] as $integration_meta_field){
-                if(!db_column_exists($db, 'meta', $integration_meta_field['name']))
-                    add_db_column($db, 'meta', $integration_meta_field['name'], $integration_meta_field['type']);
+                if(!DataAccess::db_column_exists('meta', $integration_meta_field['name']))
+                    DataAccess::add_db_column('meta', $integration_meta_field['name'], $integration_meta_field['type']);
             }
         }
 
         // Setup "pages" fields.
         if( !empty($integration_db_fields['pages']) ){
             foreach($integration_db_fields['pages'] as $integration_pages_field){
-                if(!db_column_exists($db, 'pages', $integration_pages_field['name']))
-                    add_db_column($db, 'pages', $integration_pages_field['name'], $integration_pages_field['type']);
+                if(!DataAccess::db_column_exists('pages', $integration_pages_field['name']))
+                    DataAccess::add_db_column('pages', $integration_pages_field['name'], $integration_pages_field['type']);
             }
         }
 

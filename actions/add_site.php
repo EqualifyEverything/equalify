@@ -4,12 +4,6 @@
 require_once '../config.php';
 require_once '../models/adders.php';
 require_once '../models/db.php';
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
 
 // We don't validate the URLs here because cURL does
 // a better job of validating/redirecting in the adders.
@@ -37,7 +31,7 @@ if($type == 'single_page' ){
     $status = 'active';
     $site = $curled_site['url'];
     $is_parent = 1;
-    add_page($db, $site_url, $type, $status, $site, $is_parent );
+    DataAccess::add_page($site_url, $type, $status, $site, $is_parent );
     
 // WordPress and XML deals with adding pages similarly,
 // so their functions are wrapped in one condition.
@@ -56,7 +50,7 @@ if($type == 'single_page' ){
     $site_url = $curled_site['url'];
 
     // We're setting the status and adding pages here so we
-    // do not have to call the $db inside "models/adders.php",
+    // do not have to call the db inside "models/adders.php",
     // keeping each model focused on distinct functions.
     $pages_records = [];
     foreach ($pages as &$page):
@@ -98,7 +92,7 @@ if($type == 'single_page' ){
     }
 
     // Finalllly, we can add pages to the DB.
-    add_pages($db, $pages_records);
+    DataAccess::add_pages($pages_records);
 
 // Since we're passing type through a URL, we have a fallback
 // in case someone passes an unsupported 'type'. 

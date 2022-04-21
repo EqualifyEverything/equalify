@@ -2,12 +2,6 @@
 // Add DB Info
 require_once '../config.php';
 require_once '../models/db.php';
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
 
 // We need the last view, so we can redirect on success.
 if(!empty($_POST['last_view'])){
@@ -33,5 +27,5 @@ if(!empty($_POST['wave_key'])){
 };
 
 // Time to update meta and redirect!
-update_meta($db, $account_records);
+DataAccess::update_meta($account_records);
 header('Location: ../index.php?view='.$last_view.'&status=success');
