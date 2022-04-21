@@ -61,9 +61,6 @@ if( $_GET['action'] == 'do_scan' ){
                     try {
                         $integration_scan_function_name($page, $meta);
 
-                        // Only successful scans get their timestamp updated.
-                        DataAccess::update_page_scanned_time($page->id);
-
                     } catch (Exception $x) {
 
                         // We will kill the scan and alert folks of any errors, but
@@ -81,6 +78,9 @@ if( $_GET['action'] == 'do_scan' ){
 
             }
         }
+
+        // Successful scans get a timestamp.
+        DataAccess::update_page_scanned_time($page->id);
         
     }    
 
