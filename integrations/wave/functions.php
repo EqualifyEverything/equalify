@@ -2,7 +2,7 @@
 /**
  * Name: WAVE
  * Description: Counts WCAG 2.1 errors and links to page reports.
- * Status: Disabled
+ * Status: Active
  */
 
 /**
@@ -98,7 +98,7 @@ function wave_scans($page, $meta){
 
     // Set optional alerts.
     if($wave_errors >= 1)
-        DataAccess::add_page_alert($page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>');
+        DataAccess::add_page_alert($page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>.');
 
     // Update page data.
     DataAccess::update_page_data($page->id, 'wave_wcag_2_1_errors', $wave_errors);

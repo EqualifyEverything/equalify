@@ -19,7 +19,7 @@ class DataAccess {
             return self::$conn;
         }
     }
-
+ 
     /**
      * Get All Pages
      * @param array filters [ array ('name' => $name, 'value' => $value) ]
@@ -175,12 +175,15 @@ class DataAccess {
     public static function get_alerts_by_site($site){
     
         // SQL
-        $sql = 'SELECT * FROM `alerts` WHERE `site` = "'.$site.'"';
+        $sql = 'SELECT * FROM `alerts` WHERE `site` = ?';
     
         // Query
-        $results = self::connect()->query($sql);
+        $stmt = self::connect()->prepare($sql);
+        $stmt->bind_param('s', $site);
+        $stmt->execute();
     
         // Result
+        $results = $stmt->get_result();
         $data = [];
         if($results->num_rows > 0){
             while($row = $results->fetch_object()){
@@ -188,6 +191,9 @@ class DataAccess {
             }
         }
         return $data;
+
+        // Close
+        $results->close();
     
     }
     
