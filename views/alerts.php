@@ -13,7 +13,7 @@
 
         <?php
         // Begin Alerts
-        $alerts = get_alerts($db);
+        $alerts = DataAccess::get_alerts();
         if(count($alerts) > 0 ): foreach($alerts as $alert):    
         ?>
 
@@ -25,7 +25,7 @@
                 <?php 
                 // Integration alerts link to the integration.
                 if( $alert->source == 'page' ){
-                    echo '<a class="btn btn-primary btn-sm"  href="'.get_site_details_uri($db, $alert->page_id).'">Site Details</a>';
+                    echo '<a class="btn btn-primary btn-sm"  href="'.DataAccess::get_site_details_uri($alert->page_id).'">Site Details</a>';
                 }
                 ?>
 

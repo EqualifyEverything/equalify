@@ -79,7 +79,7 @@
             <?php
 
             // Show scans
-            $scans = get_scans($db);
+            $scans = DataAccess::get_scans();
             the_scan_rows($scans);
 
             ?>

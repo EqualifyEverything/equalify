@@ -17,7 +17,7 @@
                 'value' => '1'
             ),
         ];
-        $pages = get_pages($db, $filters);
+        $pages = DataAccess::get_pages($filters);
         if($pages != NULL ):
             foreach($pages as $page):    
         ?>
@@ -28,7 +28,7 @@
 
                     <?php
                     // The Status Badge
-                    echo get_page_badge($db, $page);
+                    echo DataAccess::get_page_badge($page);
                     ?>
 
                     <?php

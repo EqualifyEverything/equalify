@@ -43,7 +43,7 @@ if(!empty($settings['meta'])):
 
         <?php
         // Get meta info
-        $meta = get_meta($db);
+        $meta = DataAccess::get_meta();
         
         // Begin settings.
         $settings = $settings['meta'];

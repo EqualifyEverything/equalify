@@ -5,23 +5,18 @@ require_once '../config.php';
 require_once '../models/db.php';
 require_once '../models/view_components.php';
 require_once '../models/integrations.php';
-$db = connect(
-    DB_HOST, 
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME
-);
+
 
 // Setup queries to minize db calls.
-$meta = get_meta($db);
+$meta = DataAccess::get_meta();
 $page_filters = [
     array(
         'name'  => 'status',
         'value' => 'active'
     ),
 ];
-$active_page_ids = get_page_ids($db, $page_filters);
-$active_pages = get_pages($db, $page_filters);
+$active_page_ids = DataAccess::get_page_ids($page_filters);
+$active_pages = DataAccess::get_pages($page_filters);
 $uploaded_integrations = uploaded_integrations('../integrations');
 
 // Make sure there are pages to scan.
@@ -30,8 +25,8 @@ if($active_page_ids == NULL)
 
 // Adding a scan to display a running task before scans complete.
 if( $_GET['action'] == 'add_scan' ){
-    add_scan($db, 'running', $active_page_ids);
-    $scans = get_scans($db);
+    DataAccess::add_scan('running', $active_page_ids);
+    $scans = DataAccess::get_scans();
     the_scan_rows($scans);
 }
 
@@ -66,17 +61,14 @@ if( $_GET['action'] == 'do_scan' ){
                     try {
                         $integration_scan_function_name($page, $meta);
 
-                        // Only successful scans get their timestamp updated.
-                        update_page_scanned_time($db, $page->id);
-
                     } catch (Exception $x) {
 
                         // We will kill the scan and alert folks of any errors, but
                         // we will also record the successful scans that occured.
-                        update_usage_meta($db, $pages_count);
-                        add_integration_alert($db, $x->getMessage());
-                        update_scan_status($db, 'running', 'incomplete');
-                        $scans = get_scans($db);
+                        DataAccess::update_usage_meta($pages_count);
+                        DataAccess::add_integration_alert($x->getMessage());
+                        DataAccess::update_scan_status('running', 'incomplete');
+                        $scans = DataAccess::get_scans();
                         the_scan_rows($scans);
                         die;
 
@@ -86,6 +78,9 @@ if( $_GET['action'] == 'do_scan' ){
 
             }
         }
+
+        // Successful scans get a timestamp.
+        DataAccess::update_page_scanned_time($page->id);
         
     }    
 
@@ -94,12 +89,12 @@ if( $_GET['action'] == 'do_scan' ){
     // pages.
     $pages_count = count($active_page_ids);
 
-    update_usage_meta($db, $pages_count);
-    update_scan_status($db, 'running', 'complete');
+    DataAccess::update_usage_meta($pages_count);
+    DataAccess::update_scan_status('running', 'complete');
 
     // Scan info is passed to JSON on the view, so that we can do 
     // async scans.
-    $scans = get_scans($db);
+    $scans = DataAccess::get_scans();
     the_scan_rows($scans);
     
 }
@@ -107,5 +102,5 @@ if( $_GET['action'] == 'do_scan' ){
 // This changes the little red number asyncronistically with JS
 // embedded in the view file.
 if( $_GET['action'] == 'get_alerts' ){
-    echo count(get_alerts($db));
+    echo count(DataAccess::get_alerts());
 }

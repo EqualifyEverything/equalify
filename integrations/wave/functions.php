@@ -2,7 +2,7 @@
 /**
  * Name: WAVE
  * Description: Counts WCAG 2.1 errors and links to page reports.
- * Status: Disabled
+ * Status: Active
  */
 
 /**
@@ -59,15 +59,9 @@ function wave_fields(){
  */
 function wave_scans($page, $meta){
 
-    // Add DB info and required functions.
+    // Add DB and required functions.
     require_once '../config.php';
     require_once '../models/db.php';
-    $db = connect(
-        DB_HOST, 
-        DB_USERNAME,
-        DB_PASSWORD,
-        DB_NAME
-    );
 
     // Get WAVE data.
     $override_https = array(
@@ -97,16 +91,16 @@ function wave_scans($page, $meta){
             'value'  =>  'wave'
         )
     ];
-    delete_alerts($db, $alerts_filter);
+    DataAccess::delete_alerts($alerts_filter);
 
     // Get WAVE page errors.
     $wave_errors = $wave_json_decoded['categories']['error']['count'];
 
     // Set optional alerts.
     if($wave_errors >= 1)
-        add_page_alert($db, $page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>');
+        DataAccess::add_page_alert($page->id, $page->site, 'wave', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>.');
 
     // Update page data.
-    update_page_data($db, $page->id, 'wave_wcag_2_1_errors', $wave_errors);
+    DataAccess::update_page_data($page->id, 'wave_wcag_2_1_errors', $wave_errors);
         
 }

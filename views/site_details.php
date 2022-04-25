@@ -5,7 +5,7 @@ if($id == false)
     throw new Exception('Format of page ID "'.$id.'" is invalid');
 
 // Check if Page exists.
-$page = get_page($db, $id);
+$page = DataAccess::get_page($id);
 
 if(empty($page) == 1)
     throw new Exception('There is no record of page "'.$id.'"');
@@ -24,7 +24,7 @@ if(empty($page) == 1)
         
         <?php
         // Badge
-        echo get_page_badge($db, $page);
+        echo DataAccess::get_page_badge($page);
         ?>
 
         </span>
@@ -36,7 +36,7 @@ if(empty($page) == 1)
 <?php
 // Since we can add columns via integrations,
 // we need to dynamically get columns.
-$columns = get_column_names($db, 'pages');
+$columns = DataAccess::get_column_names('pages');
 if(!empty($columns)):
 ?>
 
@@ -84,7 +84,7 @@ if(!empty($columns)):
             'value' => $page->site
         ),
     ];
-    $site = get_pages($db, $page_filters);
+    $site = DataAccess::get_pages($page_filters);
     $site_count = count($site);
     if($site_count > 0 ):
         foreach($site as $page):    
@@ -133,14 +133,14 @@ if(!empty($columns)):
         </thead>
 
         <?php
-        $alerts = get_alerts_by_site($db, $page->site);
+        $alerts = DataAccess::get_alerts_by_site($page->site);
         if(count($alerts) > 0 ):
             foreach($alerts as $alert):    
         ?>
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo get_page_url($db, $alert->page_id);?></td>
+            <td><?php echo DataAccess::get_page_url($alert->page_id);?></td>
             <td><?php echo $alert->details;?></td>
             <td>
                 <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
