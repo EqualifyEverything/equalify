@@ -6,6 +6,15 @@ That statistic is unacceptable.
 
 Everyone should have access to online information.
 
+## Support Equalify
+
+⭐ Star the repo to show your support.
+
+⬇️ [Download and use](https://github.com/bbertucc/equalify#download-and-use) Equalify.
+
+🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
+
+
 ## How will Equalify increase accessibility?
 
 Equalify creates deep integrations with services that run your website. 
@@ -20,7 +29,7 @@ Equalify will become your WebOps hub, designed to solve any accessibility issue.
 
 The app currently scans pages for WCAG errors.
 
-Equalify supports [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
+Equalify supports [Little Forest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
 
 After selecting an integration, import any site.
 
@@ -32,14 +41,14 @@ The goal: **Equalify every website.**
 
 <img width="1336" alt="Screen Shot 2022-04-14 at 2 00 57 PM" src="https://user-images.githubusercontent.com/46652/163458795-b3d08005-0910-4f3d-b0a0-3aa5ea829a7c.png">
 
-## To Start
+## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Update `config.php` info.
 3. Upload/run on your server.
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp)- I consider y'all first contributors - woot woot! & Grace- You are the 🔥 behind everything I do.
 
 This project is Open Source to inspire new collaborations.
 
