@@ -36,7 +36,6 @@ if(empty($page) == 1)
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Time</th>
                 <th scope="col">Page</th>
                 <th scope="col">Details</th>
                 <th scope="col">Actions</th>
@@ -50,7 +49,6 @@ if(empty($page) == 1)
         ?>
 
         <tr>
-            <td><?php echo $alert->time;?></td>
             <td><?php echo DataAccess::get_page_url($alert->page_id);?></td>
             <td><?php echo $alert->details;?></td>
             <td>
