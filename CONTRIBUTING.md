@@ -38,6 +38,10 @@ Eventually, I imagine people will want different accounts.
 
 Like so many features, we will build an auth system when folks request it.
 
+## Usable hooks and patterns. 
+
+Checkout [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/actions/scan_all_pages.php](/actions/scan_all_pages.php).
+
 ## Progress Depends on Bugs
 I am inspired by the development of [Gutenberg](https://github.com/WordPress/gutenberg).
 
