@@ -1,5 +1,6 @@
 <?php
 // Add Dependencies
+require_once 'models/hooks.php';
 require_once 'config.php';
 require_once 'models/db.php';
 require_once 'actions/install.php';
