@@ -31,7 +31,50 @@ if(empty($page) == 1)
     </h1>
 
 </div>
+<section id="alerts" class="mb-3 pb-4">
+    <h2>Alerts</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Page</th>
+                <th scope="col">Details</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
 
+        <?php
+        $alerts = DataAccess::get_alerts_by_site($page->site);
+        if(count($alerts) > 0 ):
+            foreach($alerts as $alert):    
+        ?>
+
+        <tr>
+            <td><?php echo $alert->time;?></td>
+            <td><?php echo DataAccess::get_page_url($alert->page_id);?></td>
+            <td><?php echo $alert->details;?></td>
+            <td>
+                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
+                    Dismiss
+                </a>
+            </td>
+        </tr>
+
+        <?php 
+            endforeach;
+        else:
+        ?>
+
+        <tr>
+            <td colspan="4">No alerts found.</td>
+        </tr>
+
+        <?php 
+        endif;
+        ?>
+
+    </table>
+</section>
 
 <?php
 // Since we can add columns via integrations,
@@ -120,50 +163,6 @@ if(!empty($columns)):
     ?>
 
 </section>
-<section id="alerts" class="mb-3 pb-4">
-    <h2>Alerts</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Time</th>
-                <th scope="col">Page</th>
-                <th scope="col">Details</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-
-        <?php
-        $alerts = DataAccess::get_alerts_by_site($page->site);
-        if(count($alerts) > 0 ):
-            foreach($alerts as $alert):    
-        ?>
-
-        <tr>
-            <td><?php echo $alert->time;?></td>
-            <td><?php echo DataAccess::get_page_url($alert->page_id);?></td>
-            <td><?php echo $alert->details;?></td>
-            <td>
-                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
-                    Dismiss
-                </a>
-            </td>
-        </tr>
-
-        <?php 
-            endforeach;
-        else:
-        ?>
-
-        <tr>
-            <td colspan="4">No alerts found.</td>
-        </tr>
-
-        <?php 
-        endif;
-        ?>
-
-    </table>
-</section>
 <section id="page_options" class="mb-3 pb-4">
     <h2 class="pb-2">Options</h2>
 
@@ -181,5 +180,4 @@ if(!empty($columns)):
     <a href="actions/toggle_page_status.php?id=<?php echo $page->id;?>&old_status=<?php echo $page->status;?>" class="btn <?php echo $button_class;?>">
         <?php echo $button_text;?>
     </a>
-
 </section>
