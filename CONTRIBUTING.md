@@ -4,7 +4,7 @@ Equalify is in an Alpha MVP "Wild West" phase.
 
 The only limits are your imagination.
 
-I know limits will be created eventually.
+I know this wild west needs rules eventually.
 
 For now, let's hack! 
 
@@ -22,7 +22,7 @@ I'm up for any new coding standards!
 
 Exceptions allow me to log errors. 
 
-**I consider User Errors System Errors.  🚩**
+**I consider User Errors System Errors.**
 
 What some platforms display a warning for, like "wrong password," I ring alarm bells for.
 
@@ -34,10 +34,6 @@ Users should never hit roadblocks.
 
 Equalify is being designed as open as possible.
 
-Eventually, I imagine people will want different accounts.
-
-Like so many features, we will build an auth system when folks request it.
-
 ## Usable hooks and patterns. 
 
 Checkout [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/actions/scan_all_pages.php](/actions/scan_all_pages.php).
@@ -45,7 +41,7 @@ Checkout [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/act
 ## Progress Depends on Bugs
 I am inspired by the development of [Gutenberg](https://github.com/WordPress/gutenberg).
 
-A community of engaged devs builds the future of WordPress around issues that can be easily reported by any user.
+A community of engaged devs builds the future of WordPress around issues that are reported by users.
 
 I hope folks, no matter their expertise, contribute to Equalify.
 
