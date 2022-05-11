@@ -22,6 +22,12 @@ $records = [];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </head>
 <body>
+
+    <?php
+    // Run "before_content" hook.
+    $hook_system->run_hook('before_content');
+    ?>
+
     <main>
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 230px;">
             <a href="index.php?view=sites" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
