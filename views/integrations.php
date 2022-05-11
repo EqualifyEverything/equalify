@@ -4,10 +4,22 @@
     <div class="row row-cols-3 g-4 pb-4">
 
         <?php
+        // Get list of active integrations to use in the integrations list.
+        $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
+
         // Begin Integrations List
         $integrations = uploaded_integrations('integrations');
         foreach($integrations as $integration):
             $meta = get_integration_meta('integrations/'.$integration['uri'].'/functions.php');
+
+            // Set status.
+            if(!empty($meta['status'])){
+                $status = $meta['status'];
+            }elseif (($key = array_search($integration['uri'], $active_integrations)) !== false) {
+                $status = 'Active';
+            }else{
+                $status = 'Disabled';
+            }
         ?>
 
         <div class="col">
@@ -26,7 +38,6 @@
                         
                         <?php
                         // Badge.
-                        $status = $meta['status'];
                         the_integration_status_badge($status);
                         ?>
                         
@@ -44,12 +55,12 @@
                     // Show settings button if integration has settings
                     $integration_fields = get_integration_fields( $integration['uri'] );
                     if(!empty($integration_fields['settings']))
-                        the_integration_settings_button($integration['uri'], $meta['status']);
+                        the_integration_settings_button($integration['uri'], $status);
                     ?>
 
                     <?php
                     // Activation button.
-                    the_integration_activation_button($integration['uri'], $meta['status']);
+                    the_integration_activation_button($integration['uri'], $status);
                     ?>
 
                 </div>

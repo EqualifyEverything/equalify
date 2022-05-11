@@ -42,9 +42,6 @@ if(!empty($settings['meta'])):
         <input type="hidden" name="last_view" value="integration_settings&uri=<?php echo $uri;?>" />
 
         <?php
-        // Get meta info
-        $meta = DataAccess::get_meta();
-        
         // Begin settings.
         $settings = $settings['meta'];
         foreach($settings as $setting):
@@ -63,8 +60,9 @@ if(!empty($settings['meta'])):
                 type="<?php echo $type?>"
                 value="<?php
                     // This requires a fallback if no key was entered.
-                    if(!empty($meta->$name))
-                        echo $meta->$name
+                    $meta_value = DataAccess::get_meta_value($name);
+                    if($meta_value != false)
+                        echo $meta_value;
                     ?>"
                 class="form-control"
             >

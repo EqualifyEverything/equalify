@@ -198,19 +198,29 @@ class DataAccess {
     }
     
     /**
-     * Get Meta
+     * Get Meta Value
      */
-    public static function get_meta(){
-    
+    public static function get_meta_value($meta_name){
+
         // SQL
-        $sql = 'SELECT * FROM meta';
+        $sql = 'SELECT * FROM `meta` WHERE `meta_name` = "'.$meta_name.'"';
     
         // Query
         $data = [];
         $data = self::connect()->query($sql)->fetch_object();
-    
-        // Result
-        return $data;
+
+        // Results
+        if($data == NULL){
+
+            // Returns "false" if no data exists.
+            return false; 
+
+        }else{
+
+            // Returns meta_value.
+            return $data->meta_value;
+
+        }
     
     }
     
@@ -443,48 +453,6 @@ class DataAccess {
     }
     
     /**
-     * Update Usage Meta
-     */
-    public static function update_usage_meta($usage){
-        
-        // SQL
-        $sql = 'UPDATE `meta` SET `usage` = `usage` + '.$usage;
-    
-        // Execute Query
-        $result = self::connect()->query($sql);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot add "'.$usage.'"');
-    }
-    
-    /**
-     * Update Meta 
-     */
-    public static function update_meta(array $meta_records){
-    
-        // SQL
-        $sql = 'UPDATE `meta` SET ';
-    
-        // Loop Based on the amount of records updated
-        $record_count = count($meta_records);
-        $record_iteration = 0;
-        foreach ($meta_records as $record){
-            $sql.= '`'.$record['key'].'` = "'.$record['value'].'"';
-            if(++$record_iteration != $record_count)
-                $sql.= ",";
-        }
-    
-        // Query
-        $result = self::connect()->query($sql);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update meta: '.$meta_records);
-    
-    }
-    
-    /**
      * Update Status 
      */
     public static function update_scan_status($old_status, $new_status){
@@ -670,6 +638,7 @@ class DataAccess {
         // Result
         if(!$result)
             throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+    
     }
     
     /**
@@ -722,22 +691,62 @@ class DataAccess {
     /**
      * Add Meta
      */
-    public static function add_meta($field, $value){
+    public static function add_meta($meta_name, $meta_value = ''){
     
         // SQL
-        $sql = 'INSERT INTO `meta` (`'.$field.'`) VALUES ("'.$value.'");';
+        $sql = 'INSERT INTO `meta` (`meta_name`, `meta_value`) VALUES ("'.$meta_name.'", "'.$meta_value.'")';
         
         // Query
         $result = self::connect()->query($sql);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot add meta field "'.$field.'" and value "'.$value.'"');
+            throw new Exception('Cannot add meta field "'.$meta_name.'" and value "'.$meta_value.'"');
         
         // Complete Query
         return $result;
     }
+
+    /**
+     * Delete Meta
+     */
+    public static function delete_meta($meta_name){
     
+        // SQL
+        $sql = 'DELETE FROM `meta` WHERE `meta_name` = "'.$meta_name.'"';
+    
+        // Query
+        $result = self::connect()->query($sql);
+    
+        // Result
+        if(!$result)
+            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+    
+        // Complete Query
+        return $result;
+
+    }
+
+    /**
+     * Update Meta 
+     */
+    public static function update_meta_value($meta_name, $meta_value){
+
+        // SQL
+        $sql = "UPDATE `meta` SET `meta_value` = '".$meta_value."' WHERE `meta_name` = '".$meta_name."'";
+
+        // Query
+        $result = self::connect()->query($sql);
+
+        // Result
+        if(!$result)
+            throw new Exception('Cannot update "'.$meta_name.'" with value "'.$meta_value.'"');
+    
+        // Complete Query
+        return $result;
+
+    }
+        
     /**
      * Create Alerts Table
      */
@@ -771,15 +780,25 @@ class DataAccess {
     public static function create_meta_table(){
     
         // SQL
-        $sql = 
-            'CREATE TABLE `meta` (
-                `usage` bigint(20) DEFAULT NULL,
-                `wave_key` varchar(20) DEFAULT NULL
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
-        
-        // Query
-        $result = self::connect()->query($sql);
+        $sql_1 = 
+        'CREATE TABLE `meta` (
+            `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            `meta_name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT "",
+            `meta_value` longtext COLLATE utf8mb4_unicode_520_ci,
+            PRIMARY KEY (`meta_id`),
+            UNIQUE KEY `option_name` (`meta_name`)
+          ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+        ';
+
+        // Query 1
+        $result = self::connect()->query($sql_1);
+
+        $sql_2 = 
+        'INSERT INTO `meta` (`meta_id`, `meta_name`, `meta_value`)
+        VALUES (1, "active_integrations", "a:1:{i:0;s:14:\"little_forrest\";}")';
     
+        $result = self::connect()->query($sql_2);
+
         // Fallback
         if(!$result)
             throw new Exception('Error creating table: "'.$result->error.'"');

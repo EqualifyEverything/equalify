@@ -2,7 +2,6 @@
 /**
  * Name: Little Forrest
  * Description: Counts WCAG 2.1 errors and links to page reports.
- * Status: Active
  */
 
 /**
@@ -35,7 +34,7 @@ function little_forrest_fields(){
 /**
  * little_forrest Scans
  */
-function little_forrest_scans($page, $meta){
+function little_forrest_scans($page){
 
     // Add DB info and required functions.
     require_once '../config.php';

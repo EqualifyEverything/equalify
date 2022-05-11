@@ -44,8 +44,8 @@ function uploaded_integrations($path_to_integrations){
  */
 function get_integration_meta( $file ) {
 
-	// We need to read and write to change the status.
-	$fp = fopen( $file, 'r+' );
+	// We need to read the meta.
+	$fp = fopen( $file, 'r' );
 
 	if ( $fp ) {
 
@@ -93,24 +93,6 @@ function get_integration_fields( $uri ){
 		return $integration_db_fields();
 	}else{
 		false;
-	}
-
-}
-
-/**
- * Is Active Integration
- */
-function is_active_integration($uri){
-
-	// Get integration meta.
-	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
-    $integration_meta = get_integration_meta($integration_path);
-
-	// Return true if it is active.
-	if($integration_meta['status'] == 'Active'){
-		return true;
-	}else{
-		return false;
 	}
 
 }

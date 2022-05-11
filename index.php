@@ -84,12 +84,13 @@ $records = [];
             <?php
             // As soon as you use Equalify, you know the toll
             // you will be asked to support the service.
-            if(!empty(DataAccess::get_meta()->usage)):
+            $usage_meta = DataAccess::get_meta_value('usage');
+            if(!empty($usage_meta)):
             ?>
 
             <div class="border-top mt-3 pt-3">
                 <p>
-                    🎉 <strong><?php echo DataAccess::get_meta()->usage;?> pages scanned.</strong>
+                    🎉 <strong><?php echo $usage_meta;?> pages scanned.</strong>
                 </p>
                 <p>
                 <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
