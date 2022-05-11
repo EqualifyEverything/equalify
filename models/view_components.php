@@ -73,6 +73,9 @@ function the_integration_activation_button($integration_uri, $integration_status
     }elseif($integration_status == 'Active'){
         $button_class = 'btn btn-outline-danger';
         $button_text = 'Disable';
+    }else{
+        $button_class = NULL;
+        $button_text = NULL;
     }
     echo '<a href="actions/toggle_integration_status.php?uri='.$integration_uri.'&old_status='.$integration_status.'" class="btn '.$button_class.'">'.$button_text.'</a>';
 
