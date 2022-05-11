@@ -95,7 +95,7 @@ if(!empty($columns)):
         // Users don't need to see a few columns
         // because they cannot act on these or they
         // are listed elsewhere.
-        $excluded_columns = array('is_parent', 'type', 'id');
+        $excluded_columns = array('is_parent', 'type', 'id', 'site', 'status');
         if( !in_array($column->COLUMN_NAME, $excluded_columns )){
             
             // Make column name human readable and formatted
@@ -136,7 +136,7 @@ if(!empty($columns)):
             foreach ($columns as $column){
         
                 // Limiting columns again.
-                $excluded_columns = array('is_parent', 'type', 'id');
+                $excluded_columns = array('is_parent', 'type', 'id', 'site', 'status');
                 if( !in_array($column->COLUMN_NAME, $excluded_columns )){
                     
                     // Make column name human readable.
