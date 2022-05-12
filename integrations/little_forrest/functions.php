@@ -83,5 +83,5 @@ function little_forrest_scans($page){
 
     // Update page data.
     DataAccess::update_page_data($page->id, 'little_forrest_wcag_2_1_errors', $little_forrest_errors);
-        
+
 }

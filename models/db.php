@@ -312,7 +312,7 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS ';
-        $sql.= 'WHERE TABLE_NAME = "'.$table.'" AND TABLE_SCHEMA = "'.DB_NAME.'"';
+        $sql.= 'WHERE TABLE_NAME = "'.$table.'" AND TABLE_SCHEMA = "'.$GLOBALS['DB_NAME'].'"';
     
         // Query
         $results = self::connect()->query($sql);
@@ -788,7 +788,7 @@ class DataAccess {
 
         $sql_2 = 
         'INSERT INTO `meta` (`meta_id`, `meta_name`, `meta_value`)
-        VALUES (1, "active_integrations", "a:1:{i:0;s:14:\"little_forrest\";}")';
+        VALUES (1, "active_integrations", "a:1:{i:0;s:14:\"little_forrest\";}")'; // Little Forrest is activated here.
     
         $result = self::connect()->query($sql_2);
 
@@ -803,7 +803,7 @@ class DataAccess {
      */
     public static function create_pages_table(){
     
-        // SQL
+        // SQL 
         $sql = 
             'CREATE TABLE `pages` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -813,6 +813,7 @@ class DataAccess {
                 `site` text COLLATE utf8mb4_bin,
                 `is_parent` tinyint(1) DEFAULT NULL,
                 `scanned` timestamp NULL DEFAULT NULL,
+                `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB AUTO_INCREMENT=7172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
         
