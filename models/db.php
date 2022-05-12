@@ -398,7 +398,6 @@ class DataAccess {
     
         //Fallback
         if(!$result)
-            // TODO: Fix this error message
             throw new Exception('Cannot insert scan with status "'.$status.'" and records "'.$records.'"');
         
         // Complete Query
@@ -476,8 +475,7 @@ class DataAccess {
     
         // Result
         if(!$result)
-            // TODO: Fix this error message
-            throw new Exception('Cannot update scan status where old status is "'.$old_status.'" and new status is "'.$new_status.'"');
+            throw new Exception('Cannot update scan time for scan with id "'.$id.'"');
     }
     
     /**
