@@ -1,18 +1,13 @@
 <?php
 class DataAccess {
-    private static $conn = null;
-    private static $creds = [
-        DB_HOST, 
-        DB_USERNAME,
-        DB_PASSWORD,
-        DB_NAME
-    ];
 
+    // Connect to MySQL.
+    private static $conn = null;
     private static function connect() {
         if (self::$conn) {
             return self::$conn;
         } else {
-            self::$conn = new mysqli(...self::$creds);
+            self::$conn = new mysqli($GLOBALS['DB_HOST'], $GLOBALS['DB_USERNAME'], $GLOBALS['DB_PASSWORD'], $GLOBALS['DB_NAME']);
             if(self::$conn->connect_error){
                 throw new Exception('Cannot connect to database: ' . self::$conn->connect_error);
             }

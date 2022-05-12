@@ -34,7 +34,7 @@ The goal: **Equalify every website.**
 
 ## To Start
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
-2. Update `config.php` info.
+2. Change `sample-config.php` to `config.php` and update info.
 3. Upload/run on your server (PHP 8 + MySQL required).
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
