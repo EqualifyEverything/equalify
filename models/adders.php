@@ -77,7 +77,7 @@ function wordpress_site_adder($site_url){
     // Create JSON.
     $wp_api_json = json_decode($curled_site['contents'], true);
     if(empty($wp_api_json[0]))
-        throw new Exception('The URL "'.$site_url.'" is not valid output');
+        throw new Exception('"'.$site_url.'" does not include WordPress functionality that Equalify requires');
 
     // Push JSON to pages array.
     $pages = [];
