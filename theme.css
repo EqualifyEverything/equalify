@@ -39,3 +39,6 @@ main{
     padding-top: .5rem;
 
 }
+pre code{
+    white-space: break-spaces;
+}

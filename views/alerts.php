@@ -22,7 +22,7 @@
             <td><?php echo $alert->time;?></td>
             <td><?php echo ucwords($alert->source);?></td>
             <td><?php echo ucwords($alert->type);?></td>
-            <td><?php echo $alert->message;?></td>
+            <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
                 <?php 
                 // Integration alerts link to the integration.
