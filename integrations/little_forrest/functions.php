@@ -96,7 +96,7 @@ function little_forrest_scans($page){
             );
 
             // Create message.
-            if(!empty($error['Code'])){
+            if(!empty($error['Code']) && $error['Code'] != 'null'){
                 $code = htmlentities('[code]'.$error['Code'].'[/code]');
                 $message = $code.$error['Message'];
             }else{
@@ -120,11 +120,11 @@ function little_forrest_scans($page){
             );
 
             // Create message.
-            if(!empty($error['Code'])){
-                $code = htmlentities('[code]'.$error['Code'].'[/code]');
-                $message = $code.$error['Message'];
+            if(!empty($notice['Code']) && $notice['Code'] != 'null'){
+                $code = htmlentities('[code]'.$notice['Code'].'[/code]');
+                $message = $code.$notice['Message'];
             }else{
-                $message = $error['Message'];
+                $message = $notice['Message'];
             }
 
             // Add notice.
@@ -144,11 +144,11 @@ function little_forrest_scans($page){
             );
 
             // Create message.
-            if(!empty($error['Code'])){
-                $code = htmlentities('[code]'.$error['Code'].'[/code]');
-                $message = $code.$error['Message'];
+            if(!empty($warning['Code']) && $warning['Code'] != 'null'){
+                $code = htmlentities('[code]'.$warning['Code'].'[/code]');
+                $message = $code.$warning['Message'];
             }else{
-                $message = $error['Message'];
+                $message = $warning['Message'];
             }
 
             // Add warning.
