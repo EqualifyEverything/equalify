@@ -37,7 +37,7 @@ if(empty($page) == 1)
         <thead>
             <tr>
                 <th scope="col">Page</th>
-                <th scope="col">Details</th>
+                <th scope="col">Message</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -50,7 +50,7 @@ if(empty($page) == 1)
 
         <tr>
             <td><?php echo DataAccess::get_page_url($alert->page_id);?></td>
-            <td><?php echo $alert->details;?></td>
+            <td><?php echo $alert->message;?></td>
             <td>
                 <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>&site_details_redirect=<?php echo $id;?>" class="btn btn-outline-secondary btn-sm">
                     Dismiss

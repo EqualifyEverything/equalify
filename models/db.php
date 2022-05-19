@@ -637,22 +637,28 @@ class DataAccess {
     /**
      * Add Page Alert
      */
-    public static function add_page_alert($page_id, $site, $integration_uri, $details){
+    public static function add_page_alert($page_id, $site, $integration_uri, $type, $message, $meta = []){
         
+        // Sanitize items.
+        $message = filter_var($message, FILTER_SANITIZE_STRING);
+        $meta = filter_var(serialize($meta), FILTER_SANITIZE_STRING);
+
         // SQL
-        $sql = "INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `details`) VALUES";
-        $sql.= "('page',";
-        $sql.= "'".$page_id."',";
-        $sql.= "'".$site."',";
-        $sql.= "'".$integration_uri."',";
-        $sql.= "'".$details."')";
+        $sql = 'INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
+        $sql.= '("page",';
+        $sql.= '"'.$page_id.'",';
+        $sql.= '"'.$site.'",';
+        $sql.= '"'.$integration_uri.'",';
+        $sql.= '"'.$type.'",';
+        $sql.= '"'.$message.'",';
+        $sql.= '"'.$meta.'")';
         
         // Query
         $result = self::connect()->query($sql);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert integration alert for page "'.$page_id.'" with integration uri "'.$integration_uri.'" details "'.$details.'"');
+            throw new Exception('Cannot insert integration alert for "'.$page_id.'", "'.$site.'", "'.$integration_uri.'", "'.$type.'", "'.$message.'"');
         
         // Complete Query
         return $result;
@@ -662,19 +668,19 @@ class DataAccess {
     /**
      * Add Integration Alert
      */
-    public static function add_integration_alert($details){
+    public static function add_integration_alert($message){
     
         // SQL
-        $sql = "INSERT INTO `alerts` (`source`, `details`) VALUES";
+        $sql = "INSERT INTO `alerts` (`source`, `message`) VALUES";
         $sql.= "('integration',";
-        $sql.= "'".$details."')";
+        $sql.= "'".$message."')";
         
         // Query
         $result = self::connect()->query($sql);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert alert "'.$details.'"');
+            throw new Exception('Cannot insert alert "'.$message.'"');
         
         // Complete Query
         return $result;
@@ -751,12 +757,13 @@ class DataAccess {
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `source` varchar(200) NOT NULL,
-                `page_id` bigint(20) DEFAULT NULL,
-                `details` text,
-                `integration_uri` varchar(200) DEFAULT NULL,
-                `site` text,
+                `page_id` bigint(20) NOT NULL,
+                `message` text NOT NULL,
+                `integration_uri` varchar(200) NOT NULL,
+                `site` text NOT NULL,
+                `type` varchar(200) NOT NULL,
                 PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4;';
+              ) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4;';
         
         // Query
         $result = self::connect()->query($sql);
