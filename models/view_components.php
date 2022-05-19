@@ -174,6 +174,7 @@ function get_current_page_number(){
 
 /**
  * The Pagination
+ * Inspired by https://www.myprogrammingtutorials.com/create-pagination-with-php-and-mysql.html
  */
 function the_pagination($total_pages){
 
