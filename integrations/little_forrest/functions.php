@@ -109,39 +109,53 @@ function little_forrest_scans($page){
         }
     }
 
-    // // Add notices.
-    // if(count($little_forrest_notices) >= 1){
-    //     foreach($little_forrest_notices as $notice){
+    // Add notices.
+    if(count($little_forrest_notices) >= 1){
+        foreach($little_forrest_notices as $notice){
 
-    //         // Create Meta
-    //         $meta = array(
-    //             'guideline' => $notice['Guideline'],
-    //             'tag'       => $notice['Tag'],
-    //             'code'      => $notice['Code']
-    //         );
+            // Create Meta
+            $meta = array(
+                'guideline' => $notice['Guideline'],
+                'tag'       => $notice['Tag']
+            );
 
-    //         // Add notice.
-    //         DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'notice', $notice['Message'], $meta);
+            // Create message.
+            if(!empty($error['Code'])){
+                $code = htmlentities('[code]'.$error['Code'].'[/code]');
+                $message = $code.$error['Message'];
+            }else{
+                $message = $error['Message'];
+            }
 
-    //     }
-    // }
+            // Add notice.
+            DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'notice', $message, $meta);
 
-    // // Add warnings.
-    // if(count($little_forrest_warnings) >= 1){
-    //     foreach($little_forrest_warnings as $warning){
+        }
+    }
 
-    //         // Create Meta
-    //         $meta = array(
-    //             'guideline' => $warning['Guideline'],
-    //             'tag'       => $warning['Tag'],
-    //             'code'      => $warning['Code']
-    //         );
+    // Add warnings.
+    if(count($little_forrest_warnings) >= 1){
+        foreach($little_forrest_warnings as $warning){
 
-    //         // Add warning.
-    //         DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'warning', $warning['Message'], $meta);
+            // Create Meta
+            $meta = array(
+                'guideline' => $warning['Guideline'],
+                'tag'       => $warning['Tag']
+            );
 
-    //     }
-    // }
+            // Create message.
+            if(!empty($error['Code'])){
+                $code = htmlentities('[code]'.$error['Code'].'[/code]');
+                $message = $code.$error['Message'];
+            }else{
+                $message = $error['Message'];
+            }
+
+            // Add warning.
+            DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'warning', $message, $meta);
+
+        }
+    }
 
 
     // Update page data.
