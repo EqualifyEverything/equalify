@@ -1,6 +1,7 @@
 <section>
     <h1 class="mb-3 pb-4 border-bottom">
-    All Alerts</h1>
+        All Alerts
+    </h1>
     <table class="table">
         <thead>
             <tr>
