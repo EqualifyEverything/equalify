@@ -147,7 +147,7 @@ function covert_code_shortcode($subject){
 
     // Convert text between [code][/code] into styled
     // code.
-    $subject = str_replace('[code]', '<pre class="bg-dark text-white p-3 mb-1"><code>', $subject);
+    $subject = str_replace('[code]', '<pre class="rounded bg-secondary text-white p-3 mb-1"><code>', $subject);
     $subject = str_replace('[/code]', '</code></pre>', $subject);
 
     // [code] is converted!
