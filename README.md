@@ -44,7 +44,7 @@ The goal: **Equalify every website.**
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Update `config.php` info.
-3. Upload/run on your server.
+3. Upload/run on your server.  (PHP 8 is required)
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 ## Special Thanks
