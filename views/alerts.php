@@ -14,8 +14,9 @@
 
         <?php
         // Begin Alerts
-        $alerts = DataAccess::get_alerts();
-        if(count($alerts) > 0 ): foreach($alerts as $alert):    
+        $alerts = DataAccess::get_alerts([], get_current_page_number());
+        $alerts_content = $alerts['content'];
+        if(count($alerts_content) > 0 ): foreach($alerts_content as $alert):    
         ?>
 
         <tr>
@@ -52,4 +53,10 @@
         ?>
 
     </table>
+
+    <?php
+    // The pagination
+    the_pagination($alerts['total_pages']);
+    ?>
+
 </section>

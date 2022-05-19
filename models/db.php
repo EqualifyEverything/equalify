@@ -1,6 +1,9 @@
 <?php
 class DataAccess {
 
+    // Set the records per page.
+    private const ITEMS_PER_PAGE = 10;
+
     // Connect to MySQL.
     private static $conn = null;
     private static function connect() {
@@ -142,26 +145,57 @@ class DataAccess {
         }
         return $data;
     }
-    
+
     /**
      * Get Alerts
+     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param string page
      */
-    public static function get_alerts(){
+    public static function get_alerts($filters = [], $page = 1){
+
+        // Set alerts per page.
+        $alerts_per_page = self::ITEMS_PER_PAGE;
+        $page_offset = ($page-1) * $alerts_per_page;
+
+        // Count the number of items for pagination
+        $total_pages_sql = "SELECT COUNT(*) FROM `alerts`";
+        $total_pages_result = self::connect()->query($total_pages_sql);
+        $total_pages_rows = mysqli_fetch_array($total_pages_result)[0];
+        $total_pages = ceil($total_pages_rows / $alerts_per_page);
     
         // SQL
-        $sql = 'SELECT * FROM `alerts` ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s")';
+        $content_sql = "SELECT * FROM `alerts` LIMIT $page_offset, $alerts_per_page ";
     
-        // Query
-        $results = self::connect()->query($sql);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
+        // Add optional filters
+        $filter_count = count($filters);
+        if($filter_count > 0){
+            $content_sql.= 'WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $content_sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                if(++$filter_iteration != $filter_count)
+                    $content_sql.= ' AND ';
+        
             }
         }
+        $content_sql.= ';';
+    
+        // Content Query
+        $content_results = self::connect()->query($content_sql);
+        $content = [];
+        if($content_results->num_rows > 0){
+            while($row = $content_results->fetch_object()){
+                $content[] = $row;
+            }
+        }
+    
+        // Create and return data.
+        $data = [
+            'total_pages' => $total_pages,
+            'content' => $content
+        ];
         return $data;
+
     }
     
     /**
