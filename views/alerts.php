@@ -2,6 +2,37 @@
     <h1 class="mb-3 pb-4 border-bottom">
         All Alerts
     </h1>
+    <div class="d-flex">
+        <div class="me-auto" aria-label="Filters">
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    Source
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    Type
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-outline-secondary">Meta</button>
+        </div>
+        <div class="" aria-label="Search">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Keyword.." aria-label="Search Term" aria-describedby="basic-addon1">
+                <button class="btn btn-outline-secondary" type="button">Search</button>
+            </div>
+        </div>
+    </div>
     <table class="table">
         <thead>
             <tr>
