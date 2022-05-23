@@ -253,7 +253,7 @@ class DataAccess {
     
         // Query
         $data = [];
-        $data = self::connect()->query($sql)->fetch_object();
+        $data = self::connect()->query($sql)->fetch_object()->meta_value;
 
         // Results
         if($data == NULL){
@@ -264,7 +264,7 @@ class DataAccess {
         }else{
 
             // Returns meta_value.
-            return $data->meta_value;
+            return $data;
 
         }
     
