@@ -43,3 +43,6 @@ pre code{
     white-space: break-spaces;
     word-break: break-word !important;
 }
+.nav-link{
+    color: #212529;
+}
