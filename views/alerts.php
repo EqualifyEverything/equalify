@@ -2,35 +2,70 @@
     <h1 class="mb-3 pb-4 border-bottom">
         All Alerts
     </h1>
-    <div class="d-flex">
-        <div class="me-auto" aria-label="Filters">
-            <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                    Source
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                    Type
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-outline-secondary">Meta</button>
-        </div>
-        <div class="" aria-label="Search">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Keyword.." aria-label="Search Term" aria-describedby="basic-addon1">
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">View One <span class="ms-1 badge bg-primary rounded">14</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">View Two <span class="ms-1 badge bg-secondary rounded">2</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">View Three <span class="ms-1 badge bg-secondary rounded">19</span></a>
+        </li>
+        <li class="nav-item">
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewSettingsModal">+ Add View</button>
+        </li>
+    </ul>
+
+    <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+        <div class="col-12">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" placeholder="Keyword or Website.." aria-label="Search Term" aria-describedby="basic-addon1">
                 <button class="btn btn-outline-secondary" type="button">Search</button>
             </div>
+        </div>
+        <div class="col-12">
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewSettingsModal">
+                View Filters & Settings
+            </button>
+            <div class="modal fade" id="viewSettingsModal" aria-labelledby="filterModalLabel" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title h4" id="filterModalLabel">"View One"</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="actions/save_alert_filters.php">
+                            <div class="modal-body">
+                                <h3 class="h5">Settings</h3>
+                                <div class="mb-3">
+                                    <label for="viewSetting1" class="form-label">View Name</label>
+                                    <input type="text" id="viewSetting2" class="form-control" aria-describedby="metaFilter1Help" value="View One">
+                                </div>
+                                <hr>
+                                <h3 class="h5">Filters</h3>
+                                <div class="mb-3">
+                                    <label for="metaFilter1" class="form-label">Little Forrest Guidelines</label>
+                                    <input type="text" id="metaFilter1" class="form-control" aria-describedby="metaFilter1Help">
+                                    <div id="metaFilter1Help" class="form-text">All possible guidelines are listed on <a href="https://littleforest.co.uk/">Little Forrest's website</a>. Separate guidelines with commas.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="metaFilter1" class="form-label">Little Forrest Tags</label>
+                                    <input type="text" id="metaFilter1" class="form-control" aria-describedby="metaFilter2Help">
+                                    <div id="metaFilter2Help" class="form-text">All possible tags are listed on <a href="https://littleforest.co.uk/">Little Forrest's website</a>. Separate tags with commas.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-outline-danger">Delete View</button>
+                                <button type="submit" class="btn btn-primary">Save View</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 fs-7 text-secondary">
+            Showing xx of xxx results.
         </div>
     </div>
     <table class="table">
