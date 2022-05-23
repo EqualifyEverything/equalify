@@ -197,6 +197,23 @@ class DataAccess {
         return $data;
 
     }
+
+    /**
+     * Count Alerts
+     */
+    public static function count_alerts(){
+
+        // SQL
+        $sql = 'SELECT COUNT(*) AS TOTAL FROM `alerts`';
+
+        // Query
+        $data = self::connect()->query($sql)->fetch_object()->TOTAL;
+
+        // Result
+        return $data;
+
+    }
+
     
     /**
      * Get Alerts By Page Site

@@ -56,7 +56,7 @@ $records = [];
                         <span class="badge bg-danger float-end">
                             <span id="alert_count">
 
-                                <?php echo count(DataAccess::get_alerts());?>
+                                <?php echo DataAccess::count_alerts();?>
                             
                             </span>
                         </span>
