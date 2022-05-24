@@ -27,11 +27,15 @@ class DataAccess {
      * @return mysqli_result|boolean
      */
     private static function query($sql, $params, $return) {
+        $connection = self::connect();
         if (empty($params)) {
-            $results = self::connect()->query($sql);
+            $results = $connection->query($sql);
         } else {
-            $statement = self::connect()->prepare($sql);
-            $statement->bind(str_repeat('s', count($params)), ...$params);
+            $statement = $connection->prepare($sql);
+            if ($statement === false) {
+                throw new Exception('Unable to prepare SQL: ' . $connection->error);
+            }
+            $statement->bind_param(str_repeat('s', count($params)), ...$params);
             $results = $statement->execute();
             if ($return) {
                 $results = $statement->get_result();
@@ -435,7 +439,7 @@ class DataAccess {
         // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
         $sql.= ' OR `site` = ?';
     
-        $params = array($site_url, $site_url. . '/');
+        $params = array($site_url, $site_url . '/');
         $results = self::query($sql, $params, true);
         if($results->num_rows() > 0){
             return false;
