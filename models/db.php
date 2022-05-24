@@ -157,30 +157,34 @@ class DataAccess {
         $alerts_per_page = self::ITEMS_PER_PAGE;
         $page_offset = ($page-1) * $alerts_per_page;
 
-        // Count the number of items for pagination
+        // Create 'total_pages' SQL.
         $total_pages_sql = "SELECT COUNT(*) FROM `alerts`";
+
+        // Create 'content' SQL.
+        $content_sql = "SELECT * FROM `alerts`";
+
+        // Add optional filters to content and total_pages.
+        $filter_count = count($filters);
+        if($filter_count > 0){
+            $filters_sql = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $filters_sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                if(++$filter_iteration != $filter_count)
+                    $filters_sql.= ' AND ';
+        
+            }
+            $filters_sql.= ' LIMIT '.$page_offset.', '.$alerts_per_page;
+            $total_pages_sql.= $filters_sql;
+            $content_sql.= $filters_sql;
+        }
+
+        // Run 'total_pages' SQL.
         $total_pages_result = self::connect()->query($total_pages_sql);
         $total_pages_rows = mysqli_fetch_array($total_pages_result)[0];
         $total_pages = ceil($total_pages_rows / $alerts_per_page);
     
-        // SQL
-        $content_sql = "SELECT * FROM `alerts` LIMIT $page_offset, $alerts_per_page ";
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $content_sql.= 'WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $content_sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
-                if(++$filter_iteration != $filter_count)
-                    $content_sql.= ' AND ';
-        
-            }
-        }
-        $content_sql.= ';';
-    
-        // Content Query
+        // Run 'content' SQL
         $content_results = self::connect()->query($content_sql);
         $content = [];
         if($content_results->num_rows > 0){
@@ -253,7 +257,7 @@ class DataAccess {
     
         // Query
         $data = [];
-        $data = self::connect()->query($sql)->fetch_object()->meta_value;
+        $data = self::connect()->query($sql)->fetch_object();
 
         // Results
         if($data == NULL){
@@ -264,7 +268,7 @@ class DataAccess {
         }else{
 
             // Returns meta_value.
-            return $data;
+            return $data->meta_value;
 
         }
     
@@ -693,6 +697,11 @@ class DataAccess {
         // Sanitize items.
         $message = filter_var($message, FILTER_SANITIZE_STRING);
         $meta = filter_var(serialize($meta), FILTER_SANITIZE_STRING);
+
+        // Require certain alert types.
+        $allowed_types = array('error', 'warning', 'notice');
+        if(!in_array($type, $allowed_types))
+            throw new Exception('Alert type, "'.$type.'," is not allowed');
 
         // SQL
         $sql = 'INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';

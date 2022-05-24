@@ -194,6 +194,9 @@ function the_pagination($total_pages){
         }
     }
 
+    // Only show pagination for more than one page
+    if($total_pages > 1):
+
 ?>
 
 <nav aria-label="Page Navigation">
@@ -229,7 +232,7 @@ function the_pagination($total_pages){
 
         // If there are more than 5 pages and current page is the last or second to last..
         if($total_pages > 5 && $current_page_number == $total_pages)
-        echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // Show next page number if there are more than 5 pages and current
         // page number isn't first, second, second to last, or last...
@@ -250,6 +253,105 @@ function the_pagination($total_pages){
         </li>
     </ul>
 </nav>
+
+<?php
+    // End pagination.
+    endif;
+}
+
+/**
+ * The Alert View Options
+ */
+function the_alert_options($current_view_data){
+
+    // Setup Variabls
+    if(empty($current_view_data)){
+        $name = 'New View';
+    }else{
+        $name = $current_view_data['name'];
+    }
+?>
+
+<div class="modal fade" id="alertOptions" aria-labelledby="filterModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h4" id="filterModalLabel">"<span id="viewName"><?php echo $name;?></span>" View Options</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="actions/save_alert_filters.php">
+                <div class="modal-body">
+
+                    <?php
+                    // Show Active Integrations
+                    $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
+
+                    // List active integrations
+                    if(!empty($active_integrations)):
+                    ?>
+
+                    <div class="mb-3">
+                        <label for="integration" class="form-label fw-semibold">Integration</label>
+                        <select id="integration" class="form-select" name="integration">
+                            <option value="" selected>Any</option>
+
+                            <?php
+                            // Display an option for each active integration
+                            foreach($active_integrations as $integration)
+                                echo '<option value="'.$integration.'">'.ucwords(str_replace('_', ' ', $integration)).'</option>';
+                            ?>
+
+                        </select>
+                    </div>
+
+                    <?php
+                    // End active integrations
+                    endif;
+                    ?>
+                    
+                    <div class="mb-3">
+                        <label for="type" class="form-label fw-semibold">Alert Type</label>
+                        <select id="type" class="form-select" name="type">
+                            <option value="" selected>Any</option>
+                            <option value="error">Error</option>
+                            <option value="warning">Warning</option>
+                            <option value="notice">Notice</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="source" class="form-label fw-semibold">Alert Source</label>
+                        <select id="source" class="form-select" name="source">
+                            <option value="" selected>Any</option>
+                            <option value="error">Page</option>
+                            <option value="warning">System</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="viewNameInput" class="form-label fw-semibold">View Name</label>
+                        <input type="text" id="viewNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $name;?>">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-danger">Delete View</button>
+                    <button type="submit" class="btn btn-primary">Save Options</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+// Change view name text as you type.
+const source = document.getElementById('viewNameInput');
+const result = document.getElementById('viewName');
+
+const inputHandler = function(e) {
+  result.innerHTML = e.target.value;
+}
+
+source.addEventListener('input', inputHandler);
+source.addEventListener('propertychange', inputHandler);
+</script>
 
 <?php
 }
