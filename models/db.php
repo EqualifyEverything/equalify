@@ -19,6 +19,29 @@ class DataAccess {
     }
  
     /**
+     * Query helper.
+     *
+     * @param string $sql The query SQL.
+     * @param array $params The query parameters to bind.
+     * @param boolean $return If we're expecting a result.
+     * @return mysqli_result|boolean
+     */
+    private static function query($sql, $params, $return) {
+        if (empty($params)) {
+            $results = self::connect()->query($sql);
+        } else {
+            $statement = self::connect()->prepare($sql);
+            $statement->bind(str_repeat('s', count($params)), ...$params);
+            $results = $statement->execute();
+            if ($return) {
+                $results = $statement->get_result();
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Get All Pages
      * @param array filters [ array ('name' => $name, 'value' => $value) ]
      */
@@ -26,6 +49,7 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT * FROM `pages`';
+        $params = array();
     
         // Add optional filters
         $filter_count = count($filters);
@@ -34,7 +58,8 @@ class DataAccess {
     
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $sql.= ' AND ';
         
@@ -43,7 +68,7 @@ class DataAccess {
         $sql.= ';';
     
         // Query
-        $results = self::connect()->query($sql);
+        $results = self::query($sql, $params, true);
     
         // Result
         $data = [];
@@ -70,6 +95,7 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT `id` FROM `pages`';
+        $params = array();
     
         // Add optional filters
         $filter_count = count($filters);
@@ -78,7 +104,8 @@ class DataAccess {
     
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $sql.= ' AND ';
         
@@ -87,7 +114,7 @@ class DataAccess {
         $sql.= ';';
     
         // Query
-        $results = self::connect()->query($sql);
+        $results = self::query($sql, $params, true);
     
         // Result
         $data = array();
@@ -117,6 +144,7 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT * FROM `scans`';
+        $params = array();
     
         // Add optional filters
         $filter_count = count($filters);
@@ -125,7 +153,8 @@ class DataAccess {
     
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $sql.= ' AND ';
         
@@ -134,7 +163,7 @@ class DataAccess {
         $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s") DESC;';
     
         // Query
-        $results = self::connect()->query($sql);
+        $results = self::query($sql, $params, true);
     
         // Result
         $data = [];
@@ -162,6 +191,7 @@ class DataAccess {
 
         // Create 'content' SQL.
         $content_sql = "SELECT * FROM `alerts`";
+        $params = array();
 
         // Add optional filters to content and total_pages.
         $filter_count = count($filters);
@@ -169,7 +199,8 @@ class DataAccess {
             $filters_sql = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                $filters_sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $filters_sql.= ' AND ';
         
@@ -180,12 +211,12 @@ class DataAccess {
         }
 
         // Run 'total_pages' SQL.
-        $total_pages_result = self::connect()->query($total_pages_sql);
-        $total_pages_rows = mysqli_fetch_array($total_pages_result)[0];
+        $total_pages_result = self::query($total_pages_sql, $params, true);
+        $total_pages_rows = $total_pages_result->fetch_array()[0];
         $total_pages = ceil($total_pages_rows / $alerts_per_page);
     
         // Run 'content' SQL
-        $content_results = self::connect()->query($content_sql);
+        $content_results = self::query($content_sql, $params, true);
         $content = [];
         if($content_results->num_rows > 0){
             while($row = $content_results->fetch_object()){
@@ -209,11 +240,13 @@ class DataAccess {
 
         // SQL
         $sql = 'SELECT COUNT(*) AS TOTAL FROM `alerts`';
+        $params = array();
 
         // Query
-        $data = self::connect()->query($sql)->fetch_object()->TOTAL;
+        $results = self::query($sql, $params, true);
 
         // Result
+        $data = $results->fetch_object()->TOTAL;
         return $data;
 
     }
@@ -226,14 +259,12 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT * FROM `alerts` WHERE `site` = ?';
+        $params = array($site);
     
         // Query
-        $stmt = self::connect()->prepare($sql);
-        $stmt->bind_param('s', $site);
-        $stmt->execute();
+        $results = self::query($sql, $params, true);
     
         // Result
-        $results = $stmt->get_result();
         $data = [];
         if($results->num_rows > 0){
             while($row = $results->fetch_object()){
@@ -253,13 +284,14 @@ class DataAccess {
     public static function get_meta_value($meta_name){
 
         // SQL
-        $sql = 'SELECT * FROM `meta` WHERE `meta_name` = "'.$meta_name.'"';
+        $sql = 'SELECT * FROM `meta` WHERE `meta_name` = ?';
+        $params = array($meta_name);
     
         // Query
-        $data = [];
-        $data = self::connect()->query($sql)->fetch_object();
+        $results = self::query($sql, $params, true);
 
         // Results
+        $data = $results->fetch_object();
         if($data == NULL){
 
             // Returns "false" if no data exists.
@@ -280,13 +312,14 @@ class DataAccess {
     public static function get_page($id){
     
         // SQL
-        $sql = 'SELECT * FROM pages WHERE id = "'.$id.'"';
+        $sql = 'SELECT * FROM pages WHERE id = ?';
+        $params = array($id);
     
         // Query
-        $data = [];
-        $data = self::connect()->query($sql)->fetch_object();
+        $results = self::query($sql, $params, true);
     
         // Result
+        $data = $results->fetch_object();
         return $data;
         
     }
@@ -297,13 +330,14 @@ class DataAccess {
     public static function get_page_id($url){
     
         // SQL
-        $sql = 'SELECT `id` FROM `pages` WHERE `url` = "'.$url.'"';
+        $sql = 'SELECT `id` FROM `pages` WHERE `url` = ?';
+        $params = array($url);
     
         // Query
-        $data = [];
-        $data = self::connect()->query($sql)->fetch_object()->id;
+        $results = self::query($sql, $params, true);
     
         // Result
+        $data = $results->fetch_object()->id;
         return $data;
         
     }
@@ -314,13 +348,14 @@ class DataAccess {
     public static function get_page_url($id){
     
         // SQL
-        $sql = 'SELECT `url` FROM pages WHERE `id` = "'.$id.'"';
+        $sql = 'SELECT `url` FROM pages WHERE `id` = ?';
+        $params = array($id);
     
         // Query
-        $data = [];
-        $data = self::connect()->query($sql)->fetch_object()->url;
+        $results = self::query($sql, $params, true);
     
         // Result
+        $data = $results->fetch_object()->url;
         return $data;
         
     }
@@ -332,13 +367,14 @@ class DataAccess {
     public static function get_site_parent_status($site){
     
         // SQL
-        $sql = 'SELECT `status` FROM `pages` WHERE `site` = "'.$site.'" AND `is_parent` = 1';
+        $sql = 'SELECT `status` FROM `pages` WHERE `site` = ? AND `is_parent` = 1';
+        $params = array($site);
     
         // Query
-        $data = [];
-        $data = self::connect()->query($sql)->fetch_object()->status;
+        $results = self::query($sql, $params, true);
     
         // Result
+        $data = $results->fetch_object()->status;
         return $data;
         
     }
@@ -367,10 +403,11 @@ class DataAccess {
     
         // SQL
         $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS ';
-        $sql.= 'WHERE TABLE_NAME = "'.$table.'" AND TABLE_SCHEMA = "'.$GLOBALS['DB_NAME'].'"';
+        $sql.= 'WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?';
+        $params = array($table, $GLOBALS['DB_NAME']);
     
         // Query
-        $results = self::connect()->query($sql);
+        $results = self::query($sql, $params, true);
     
         // Result
         $data = [];
@@ -390,16 +427,17 @@ class DataAccess {
     public static function is_unique_site($site_url){
     
         // Require unique URL
-        $sql = 'SELECT * FROM `pages` WHERE `site` = "'.$site_url.'"';
+        $sql = 'SELECT * FROM `pages` WHERE `site` = ?';
     
         // We don't consider a page with a '/' a unique url
         // so we will also search for them.
         // Possible injection point:
         // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
-        $sql.= ' OR `site` = "'.$site_url.'/"';
+        $sql.= ' OR `site` = ?';
     
-        $query = self::connect()->query($sql);
-        if(mysqli_num_rows($query) > 0){
+        $params = array($site_url, $site_url. . '/');
+        $results = self::query($sql, $params, true);
+        if($results->num_rows() > 0){
             return false;
         }else{
             return true;
@@ -414,18 +452,19 @@ class DataAccess {
     
         // SQL
         $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `is_parent`, `site`) VALUES';
-        $sql.= '("'.$url.'",';
-        $sql.= '"'.$type.'",';
-        $sql.= '"'.$status.'",';
+        $sql.= '(?, ?, ?,';
+        $params = array($url, $type, $status);
         if(empty($is_parent)){
             $sql.= 'NULL,';
         }else{
-            $sql.= '"'.$is_parent.'",';
+            $sql.= '?,';
+            $params[] = $is_parent;
         }
-        $sql.= '"'.$site.'")';
+        $sql.= '?)';
+        $params[] = $site;
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         //Fallback
         if(!$result)
@@ -444,12 +483,12 @@ class DataAccess {
         $pages = serialize($pages);
     
         // SQL
-        $sql = "INSERT INTO `scans` (`status`, `pages`) VALUES";
-        $sql.= "('".$status."',";
-        $sql.= "'".$pages."')";
+        $sql = 'INSERT INTO `scans` (`status`, `pages`) VALUES';
+        $sql.= '(?, ?)';
+        $params = array($status, $pages);
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         //Fallback
         if(!$result)
@@ -471,21 +510,23 @@ class DataAccess {
         // Insert Each Record
         $record_count = count($pages_records);
         $record_iteration = 0;
+        $params = array();
         foreach ($pages_records as $record){
     
             // SQL
-            $sql.= "(";
-            $sql.= "'".$record['site']."',";
-            $sql.= "'".$record['url']."',";
-            $sql.= "'".$record['status']."',";
+            $sql.= "(?, ?, ?,";
+            $params[] = $record['site'];
+            $params[] = $record['url'];
+            $params[] = $record['status'];
             if(empty($record['is_parent'])){
                 $sql.= 'NULL,';
             }else{
-                $sql.= '"'.$record['is_parent'].'",';
+                $sql.= '?,';
+                $params[] = $record['is_parent'];
             }
-            $sql.= "'".$record['type']."'";
-    
-            $sql.= ")";
+            $sql.= '?)';
+            $params[] = $record['type'];
+
             if(++$record_iteration != $record_count)
                 $sql.= ",";
     
@@ -493,7 +534,7 @@ class DataAccess {
         $sql.= ";";
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         //Fallback
         if(!$result)
@@ -507,10 +548,11 @@ class DataAccess {
     public static function update_scan_status($old_status, $new_status){
     
         // SQL
-        $sql = 'UPDATE `scans` SET `status` = "'.$new_status.'" WHERE `status` = "'.$old_status.'"';
+        $sql = 'UPDATE `scans` SET `status` = ? WHERE `status` = ?';
+        $params = array($new_status, $old_status);
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -523,10 +565,11 @@ class DataAccess {
     public static function update_page_scanned_time($id){
     
         // SQL
-        $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = "'.$id.'"';
+        $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `id` = ?';
+        $params = array($id);
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -539,10 +582,11 @@ class DataAccess {
     public static function update_site_status($site, $new_status){
     
         // SQL
-        $sql = 'UPDATE `pages` SET `status` = "'.$new_status.'" WHERE `site` = "'.$site.'"';
+        $sql = 'UPDATE `pages` SET `status` = ? WHERE `site` = ?';
+        $params = array($new_status, $site);
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -555,10 +599,11 @@ class DataAccess {
     public static function update_page_data($id, $column, $value){
     
         // SQL
-        $sql = 'UPDATE `pages` SET `'.$column.'` = "'.$value.'" WHERE `id` = "'.$id.'"';
+        $sql = 'UPDATE `pages` SET `'.$column.'` = ? WHERE `id` = ?';
+        $params = array($value, $id);
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -607,9 +652,10 @@ class DataAccess {
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
         $sql.= 'ADD COLUMN '.$column_name.' '.$column_type.';';
+        $params = array();
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -625,9 +671,10 @@ class DataAccess {
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
         $sql.= 'DROP COLUMN '.$column_name.';';
+        $params = array();
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -643,9 +690,10 @@ class DataAccess {
     
         // SQL.
         $sql = 'SELECT '.$column_name.' FROM `'.$table.'` ';
+        $params = array();
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result){
@@ -664,6 +712,7 @@ class DataAccess {
     
         // SQL
         $sql = 'DELETE FROM `alerts`';
+        $params = array();
     
         // Add optional filters
         $filter_count = count($filters);
@@ -672,7 +721,8 @@ class DataAccess {
     
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = "'.$filter['value'].'"';
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $sql.= ' AND ';
         
@@ -681,7 +731,7 @@ class DataAccess {
         $sql.= ';';
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -705,16 +755,11 @@ class DataAccess {
 
         // SQL
         $sql = 'INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
-        $sql.= '("page",';
-        $sql.= '"'.$page_id.'",';
-        $sql.= '"'.$site.'",';
-        $sql.= '"'.$integration_uri.'",';
-        $sql.= '"'.$type.'",';
-        $sql.= '"'.$message.'",';
-        $sql.= '"'.$meta.'")';
+        $sql.= '(?, ?, ?, ?, ?, ?, ?)';
+        $params = array('page', $page_id, $site, $integration_uri, $type, $message, $meta);
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -731,12 +776,12 @@ class DataAccess {
     public static function add_integration_alert($message){
     
         // SQL
-        $sql = "INSERT INTO `alerts` (`source`, `message`) VALUES";
-        $sql.= "('integration',";
-        $sql.= "'".$message."')";
+        $sql = 'INSERT INTO `alerts` (`source`, `message`) VALUES';
+        $sql.= '(?, ?)';
+        $params = array('integration', $message);
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -753,10 +798,11 @@ class DataAccess {
     public static function add_meta($meta_name, $meta_value = ''){
     
         // SQL
-        $sql = 'INSERT INTO `meta` (`meta_name`, `meta_value`) VALUES ("'.$meta_name.'", "'.$meta_value.'")';
+        $sql = 'INSERT INTO `meta` (`meta_name`, `meta_value`) VALUES (?, ?)';
+        $params = array($meta_name, $meta_value);
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -772,10 +818,11 @@ class DataAccess {
     public static function delete_meta($meta_name){
     
         // SQL
-        $sql = 'DELETE FROM `meta` WHERE `meta_name` = "'.$meta_name.'"';
+        $sql = 'DELETE FROM `meta` WHERE `meta_name` = ?';
+        $params = array($meta_name);
     
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
@@ -792,10 +839,11 @@ class DataAccess {
     public static function update_meta_value($meta_name, $meta_value){
 
         // SQL
-        $sql = "UPDATE `meta` SET `meta_value` = '".$meta_value."' WHERE `meta_name` = '".$meta_name."'";
+        $sql = "UPDATE `meta` SET `meta_value` = ? WHERE `meta_name` = ?";
+        $params = array($meta_value, $meta_name);
 
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
 
         // Result
         if(!$result)
@@ -823,10 +871,11 @@ class DataAccess {
                 `site` text NOT NULL,
                 `type` varchar(200) NOT NULL,
                 PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4;';
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -847,22 +896,19 @@ class DataAccess {
             `meta_value` longtext COLLATE utf8mb4_unicode_520_ci,
             PRIMARY KEY (`meta_id`),
             UNIQUE KEY `option_name` (`meta_name`)
-          ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
         ';
+        $params = array();
 
         // Query 1
-        $result = self::connect()->query($sql_1);
-
-        $sql_2 = 
-        'INSERT INTO `meta` (`meta_id`, `meta_name`, `meta_value`)
-        VALUES (1, "active_integrations", "a:1:{i:0;s:14:\"little_forrest\";}")'; // Little Forrest is activated here.
-    
-        $result = self::connect()->query($sql_2);
+        $result = self::query($sql_1, $params, false);
 
         // Fallback
         if(!$result)
             throw new Exception('Error creating table: "'.$result->error.'"');
-        
+
+        // Little Forrest is activated here.
+        self::add_meta('active_integrations', serialize(['little_forrest']));
     }
     
     /**
@@ -882,10 +928,11 @@ class DataAccess {
                 `scanned` timestamp NULL DEFAULT NULL,
                 `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
                 PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB AUTO_INCREMENT=7172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
+        $params = array();
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -906,10 +953,11 @@ class DataAccess {
                 `pages` blob,
                 `status` varchar(20) DEFAULT NULL,
                 PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4;';
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
@@ -925,9 +973,10 @@ class DataAccess {
         // SQL
         $sql = 
             'SELECT 1 from '.$table_name;
+        $params = array();
         
         // Query
-        $result = self::connect()->query($sql);
+        $result = self::query($sql, $params, false);
     
         // Results
         if($result !== FALSE){
