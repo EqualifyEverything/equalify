@@ -16,7 +16,6 @@
             <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewSettingsModal">+ Add View</button>
         </li>
     </ul>
-
     <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
         <div class="col-12">
             <div class="input-group input-group-sm">
