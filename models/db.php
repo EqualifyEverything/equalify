@@ -441,7 +441,7 @@ class DataAccess {
     
         $params = array($site_url, $site_url . '/');
         $results = self::query($sql, $params, true);
-        if($results->num_rows() > 0){
+        if($results->num_rows > 0){
             return false;
         }else{
             return true;

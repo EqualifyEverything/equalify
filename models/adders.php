@@ -129,13 +129,3 @@ function xml_site_adder($site_url){
     );
     
 }
-
-// update this to the path to the "vendor/" directory, relative to this file
-require_once __DIR__.'/vendor/autoload.php';
-
-use PhpXmlRpc\Value;
-use PhpXmlRpc\Request;
-use PhpXmlRpc\Client;
-
-$client = new Client('https://edupack.app');
-$response = $client->send(new Request('method', array(new Value('parameter'))));
