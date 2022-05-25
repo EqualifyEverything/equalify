@@ -264,11 +264,29 @@ function the_pagination($total_pages){
  */
 function the_alert_options($current_view_data){
 
-    // Setup Variabls
+    // Setup filters array to make it easier to return
+    // filter data.
+    $reformatted_filters = [
+        'type' => '',
+        'source' => '',
+        'integration_uri' => ''
+    ];
+    
+    // Setup data variables.
     if(empty($current_view_data)){
-        $name = 'New View';
+        $view_name = 'New View';
     }else{
-        $name = $current_view_data['name'];
+        $view_name = $current_view_data['name'];
+        $filters = $current_view_data['filters'];
+        foreach($filters as $filter){
+            if($filter['name'] == 'type')
+                $reformatted_filters['type'] = $filter['value'];
+            if($filter['name'] == 'source')
+                $reformatted_filters['source'] = $filter['value'];
+            if($filter['name'] == 'integration_uri')
+                $reformatted_filters['integration_uri'] = $filter['value'];
+        }
+
     }
 ?>
 
@@ -276,29 +294,33 @@ function the_alert_options($current_view_data){
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title h4" id="filterModalLabel">"<span id="viewName"><?php echo $name;?></span>" View Options</h2>
+                <h2 class="modal-title h4" id="filterModalLabel">"<span id="viewName"><?php echo $view_name;?></span>" View Options</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="actions/save_alert_filters.php">
+            <form action="actions/save_alert_options.php" method="post">
                 <div class="modal-body">
 
                     <?php
-                    // Show Active Integrations
+                    // Get View Details
+                    $alert_options = unserialize(DataAccess::get_meta_value('alert_options'));
+
+                    // Show active integrations.
                     $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
 
-                    // List active integrations
+                    // List active integrations.
                     if(!empty($active_integrations)):
                     ?>
 
                     <div class="mb-3">
-                        <label for="integration" class="form-label fw-semibold">Integration</label>
-                        <select id="integration" class="form-select" name="integration">
-                            <option value="" selected>Any</option>
+                        <label for="integrationSelect" class="form-label fw-semibold">Integration</label>
+                        <select id="integrationSelect" class="form-select" name="integration_uri">
+                            <option value="" >Any</option>
 
                             <?php
                             // Display an option for each active integration
-                            foreach($active_integrations as $integration)
+                            foreach($active_integrations as $integration){
                                 echo '<option value="'.$integration.'">'.ucwords(str_replace('_', ' ', $integration)).'</option>';
+                            }
                             ?>
 
                         </select>
@@ -310,47 +332,108 @@ function the_alert_options($current_view_data){
                     ?>
                     
                     <div class="mb-3">
-                        <label for="type" class="form-label fw-semibold">Alert Type</label>
-                        <select id="type" class="form-select" name="type">
-                            <option value="" selected>Any</option>
-                            <option value="error">Error</option>
-                            <option value="warning">Warning</option>
-                            <option value="notice">Notice</option>
+                        <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
+                        <select id="typeSelect" class="form-select" name="type">
+                        <option value="">Any</option>
+
+                        <?php 
+                        // Set types as array so we can simplify the logic
+                        // when building the option html.
+                        $type_options = array(
+                            'error', 'warning', 'notice'
+                        );
+                        
+                        // Build options.
+                        foreach ($type_options as $option)
+                            echo '<option value="'.$option.'">'.ucwords($option).'</option>';
+                        ?>
+                
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="source" class="form-label fw-semibold">Alert Source</label>
-                        <select id="source" class="form-select" name="source">
-                            <option value="" selected>Any</option>
-                            <option value="error">Page</option>
-                            <option value="warning">System</option>
+                        <label for="sourceSelect" class="form-label fw-semibold">Alert Source</label>
+                        <select id="sourceSelect" class="form-select" name="source">
+                        <option value="">Any</option>
+                        
+                        <?php 
+
+                        // Set sources as array so we can simplify the logic
+                        // when building the option html.
+                        $source_options = array(
+                            'page', 'system'
+                        );
+                        
+                        // Build options.
+                        foreach ($source_options as $option)
+                            echo '<option value="'.$option.'">'.ucwords($option).'</option>';
+                        ?>
+
                         </select>
                     </div>
                     <hr>
                     <div class="mb-3">
                         <label for="viewNameInput" class="form-label fw-semibold">View Name</label>
-                        <input type="text" id="viewNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $name;?>">
+                        <input type="text" id="viewNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $view_name;?>" name="view_name" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-outline-danger">Delete View</button>
-                    <button type="submit" class="btn btn-primary">Save Options</button>
+                    
+                    <?php
+                    // Users shouldn't delete a view if it's the only view
+                    // that exists.
+                    if(count($alert_options['views']) > 1)
+                        echo '<a type="submit" href="actions/delete_alert_view.php" class="btn btn-outline-danger">Delete View</a>';
+                    ?>
+
+                    <button type="submit" class="btn btn-primary" id="saveButton">Save Options</button>
                 </div>
+                <input type="hidden" name="existing_view" value="" id="existingViewInput">
             </form>
         </div>
     </div>
 </div>
 <script>
+// Define fields and buttons.
+const integrationSelect = document.getElementById('integrationSelect');
+const typeSelect = document.getElementById('typeSelect');
+const sourceSelect = document.getElementById('sourceSelect');
+const viewNameInput = document.getElementById('viewNameInput');
+const existingViewInput = document.getElementById('existingViewInput');
+const addViewButton = document.getElementById('addViewButton');
+const editViewOptionsButton = document.getElementById('editViewOptionsButton');
+const saveButton = document.getElementById('saveButton');
+const viewName = document.getElementById('viewName');
+
 // Change view name text as you type.
-const source = document.getElementById('viewNameInput');
-const result = document.getElementById('viewName');
-
-const inputHandler = function(e) {
-  result.innerHTML = e.target.value;
+const changeViewName = function(e) {
+    viewName.innerHTML = e.target.value;
 }
+viewNameInput.addEventListener('input', changeViewName);
+viewNameInput.addEventListener('propertychange', changeViewName);
 
-source.addEventListener('input', inputHandler);
-source.addEventListener('propertychange', inputHandler);
+// Set "new_view" save action.
+const setNewViewSaveAction = function(e) {
+    viewName.innerHTML = 'Unnamed';
+    viewNameInput.value = 'Unnamed';
+    integrationSelect.value = '';
+    typeSelect.value = '';
+    sourceSelect.value = '';
+    saveButton.innerHTML = 'Create New View';
+}
+addViewButton.addEventListener('click', setNewViewSaveAction);
+
+// Set "update_view" action.
+const setUpdateViewSaveAction = function(e) {
+    viewName.innerHTML = '<?php echo $view_name;?>';
+    viewNameInput.value = '<?php echo $view_name;?>';
+    integrationSelect.value = '<?php echo $reformatted_filters['integration_uri'];?>'
+    typeSelect.value = '<?php echo $reformatted_filters['type'];?>'
+    sourceSelect.value = '<?php echo $reformatted_filters['source'];?>'
+    existingViewInput.value = '<?php echo $view_name;?>';
+
+}
+editViewOptionsButton.addEventListener('click', setUpdateViewSaveAction);
+
 </script>
 
 <?php

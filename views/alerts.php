@@ -7,56 +7,34 @@
         <?php
         // Setup alert options
         $alert_options = DataAccess::get_meta_value('alert_options');
-        $alert_options = array( // Sample output
-            'current_view' => 'Sample View Two',
-            'views'  => array(
-                'Sample View One' => array(
-                    'name' => 'Sample View One',
-                    'filters' => array(
-                        0 => array(
-                            'name'  => 'integration_uri',
-                            'value' => 'little_forrest'
-                        ),
-                        1 => array(
-                            'name' => 'type',
-                            'value' => 'error'
-                        ),
-                        2 => array(
-                            'name' => 'source',
-                            'value' => 'page'
-                        )
-                    )
-                ), 
-                'Sample View Two' => array(
-                    'name' => 'Sample View Two',
-                    'filters' => array(
-                        0 => array(
-                            'name'  => 'integration_uri',
-                            'value' => 'little_forrest'
-                        ),
-                        1 => array(
-                            'name' => 'type',
-                            'value' => 'warning'
-                        ),
-                        2 => array(
-                            'name' => 'source',
-                            'value' => 'page'
+        if(empty($alert_options)){
+
+            // By default, we include an "All Alerts" tab.
+            $alert_options = array(
+                'current_view' => 'All Alerts',
+                'views'  => array(
+                    'All Alerts' => array(
+                        'name' => 'All Alerts',
+                        'filters' => array(
                         )
                     )
                 )
-            )
-        );
-        if(empty($alert_options)){
-            $views = '';
-            $current_view = '';
-            $current_view_data = '';
-            $filters = [];
+            );
+            DataAccess::add_meta('alert_options', $alert_options);
+
         }else{
-            $views = $alert_options['views'];
-            $current_view = $alert_options['current_view'];
-            $current_view_data = $views[$current_view];
-            $filters = $current_view_data['filters'];
+
+            // We need to unserialze MySQL data if that data 
+            // exists.
+            $alert_options = unserialize($alert_options);
+
         }
+
+        // Setup variables
+        $views = $alert_options['views'];
+        $current_view = $alert_options['current_view'];
+        $current_view_data = $views[$current_view];
+        $filters = $current_view_data['filters'];
 
         // Start Views Loop
         if(!empty($views)): foreach ($views as $view):
@@ -93,7 +71,7 @@
         ?>
 
         <li class="nav-item <?php if(empty($views)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
-            <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions">+ Add View</a>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="addViewButton">+ Add View</button>
         </li>
     </ul>
     <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
@@ -104,7 +82,7 @@
             </div>
         </div>
         <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions">
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editViewOptionsButton">
                 View Filters & Settings
             </button>
 
