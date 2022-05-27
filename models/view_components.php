@@ -213,12 +213,12 @@ function the_pagination($total_pages){
         // and if there are more than 5 pages and we're not on page 3,
         // display a disabled elipses so that the user knows to click
         // 'previous'.
-        if($current_page_number != 1 && ($total_pages > 3 && $current_page_number != 2) && ($total_pages > 5 && $current_page_number != 3))
+        if($current_page_number != 1 && ($total_pages > 3 && $current_page_number != 2) && ($total_pages > 5 && $current_page_number != 3) || ($total_pages == 4 && $current_page_number == 4))
             echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
 
         // If there are more than 5 pages and current page number isn't
-        // first, second, or last...
-        if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages)
+        // first, second, or last or if we're on the third page of 4...
+        if(($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages) || ($total_pages == 4 && $current_page_number == 3))
             echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // If there are more than 3 pages and current page number isn't
@@ -226,8 +226,8 @@ function the_pagination($total_pages){
         if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
             echo '<li class="page-item active"><a class="page-link" href="?view='.$current_view.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
 
-        // If there are more than 5 pages and current page is the first or second..
-        if($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2))
+        // If there are more than 5 pages and current page is the first or second or we're on the second page of fur..
+        if(($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2)) || ($total_pages == 4 && $current_page_number == 2))
             echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // If there are more than 5 pages and current page is the last or second to last..
