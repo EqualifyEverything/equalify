@@ -199,6 +199,7 @@ class DataAccess {
 
         // Add optional filters to content and total_pages.
         $filter_count = count($filters);
+        $filters_sql = '';
         if($filter_count > 0){
             $filters_sql = ' WHERE ';
             $filter_iteration = 0;
@@ -209,10 +210,12 @@ class DataAccess {
                     $filters_sql.= ' AND ';
         
             }
-            $filters_sql.= ' LIMIT '.$page_offset.', '.$alerts_per_page;
-            $total_pages_sql.= $filters_sql;
-            $content_sql.= $filters_sql;
         }
+
+        // Add filters and page limit.
+        $filters_sql.= ' LIMIT '.$page_offset.', '.$alerts_per_page;
+        $total_pages_sql.= $filters_sql;
+        $content_sql.= $filters_sql;
 
         // Run 'total_pages' SQL.
         $total_pages_result = self::query($total_pages_sql, $params, true);
