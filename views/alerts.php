@@ -9,13 +9,13 @@
         $alert_tabs = DataAccess::get_meta_value('alert_tabs');
         if(empty($alert_tabs)){
 
-            // By default, we include an "All Alerts" tab.
+            // By default, we include an "Default Alerts" tab.
             $alert_tabs = array(
                 'current_tab' => 1,
                 'tabs'  => array(
                     1 => array(
                         'id'        => 1,
-                        'name'      => 'All Alerts',
+                        'name'      => 'My Alerts',
                         'filters'   => array()
                     )
                 )
@@ -84,13 +84,13 @@
             </div>
         </div>
         <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabButton">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabButton">
                 Tab Filters & Settings
             </button>
 
             <?php 
             // Alert tabs Modal
-            the_alert_tabs($current_tab_data);
+            the_alert_tab_options($current_tab_data);
             ?>
 
         </div>

@@ -262,7 +262,7 @@ function the_pagination($total_pages){
 /**
  * The Alert Tab Options
  */
-function the_alert_tabs($current_tab_data){
+function the_alert_tab_options($current_tab_data){
 
     // Setup filters array to make it easier to return
     // filter data.
@@ -295,7 +295,7 @@ function the_alert_tabs($current_tab_data){
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title h4" id="filterModalLabel">"<span id="tabName"><?php echo $tab_name;?></span>" Tab Options</h2>
+                <h2 class="modal-title h4" id="filterModalLabel">"<span id="tabName"><?php echo $tab_name;?></span>" Options</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="actions/save_alert_tab.php" method="post">
@@ -414,8 +414,8 @@ tabNameInput.addEventListener('propertychange', changetabName);
 
 // Set new tab save action.
 const setNewTabSaveAction = function(e) {
-    tabName.innerHTML = 'Unnamed';
-    tabNameInput.value = 'Unnamed';
+    tabName.innerHTML = 'Unnamed Tab';
+    tabNameInput.value = 'Unnamed Tab';
     integrationSelect.value = '';
     typeSelect.value = '';
     sourceSelect.value = '';
