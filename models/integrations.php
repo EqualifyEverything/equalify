@@ -6,7 +6,7 @@
 function uploaded_integrations($path_to_integrations){
 
     // List all uploaded integrations.
-    $integration_folders = array_diff(scandir($path_to_integrations), array('..', '.'));;
+    $integration_folders = array_diff(scandir($path_to_integrations), array('..', '.'));
     $uploaded_integrations = [];
     foreach ($integration_folders as $integration_folder){
 

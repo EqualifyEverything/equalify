@@ -5,60 +5,61 @@
     <ul class="nav nav-tabs mb-3">
 
         <?php
-        // Setup alert options
-        $alert_options = DataAccess::get_meta_value('alert_options');
-        if(empty($alert_options)){
+        // Setup alert tabs.
+        $alert_tabs = DataAccess::get_meta_value('alert_tabs');
+        if(empty($alert_tabs)){
 
             // By default, we include an "All Alerts" tab.
-            $alert_options = array(
-                'current_view' => 'All Alerts',
-                'views'  => array(
-                    'All Alerts' => array(
-                        'name' => 'All Alerts',
-                        'filters' => array(
-                        )
+            $alert_tabs = array(
+                'current_tab' => 1,
+                'tabs'  => array(
+                    1 => array(
+                        'id'        => 1,
+                        'name'      => 'All Alerts',
+                        'filters'   => array()
                     )
                 )
             );
-            DataAccess::add_meta('alert_options', $alert_options);
+            DataAccess::add_meta('alert_tabs', $alert_tabs);
 
         }else{
 
             // We need to unserialze MySQL data if that data 
             // exists.
-            $alert_options = unserialize($alert_options);
+            $alert_tabs = unserialize($alert_tabs);
 
         }
 
-        // Setup variables
-        $views = $alert_options['views'];
-        $current_view = $alert_options['current_view'];
-        $current_view_data = $views[$current_view];
-        $filters = $current_view_data['filters'];
+        // Setup variables.
+        $tabs = $alert_tabs['tabs'];
+        $current_tab = $alert_tabs['current_tab'];
+        $current_tab_data = $tabs[$current_tab];
+        $filters = $current_tab_data['filters'];
 
-        // Start Views Loop
-        if(!empty($views)): foreach ($views as $view):
+        // Start tabs Loop
+        if(!empty($tabs)): foreach ($tabs as $tab):
         ?>
 
         <li class="nav-item">
+        
             <a 
-                class="nav-link <?php if($current_view == $view['name']) echo 'active';?>" 
+                class="nav-link <?php if($current_tab == $tab['id']) echo 'active';?>" 
                 aria-current="page" 
-                href="#<?php echo $view['name'];?>"
+                href="actions/switch_alert_tab.php?alert_tab=<?php echo $tab['id'];?>"
             >
             
-                <?php echo $view['name']; ?>
+                <?php echo $tab['name']; ?>
 
                 <span class="
                     ms-1
                     badge 
-                    bg-<?php if($current_view == $view['name']){ echo 'primary'; }else{ echo 'secondary'; }?> 
+                    bg-<?php if($current_tab == $tab['id']){ echo 'primary'; }else{ echo 'secondary'; }?> 
                     rounded
                 ">
 
                 <?php
                 // Counter Alerts
-                echo DataAccess::count_alerts($view['filters']);
+                echo DataAccess::count_alerts($tab['filters']);
                 ?>
 
                 </span>
@@ -66,12 +67,12 @@
         </li>
 
         <?php
-        // End Views loop
+        // End tabs loop
         endforeach; endif;
         ?>
 
-        <li class="nav-item <?php if(empty($views)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
-            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="addViewButton">+ Add View</button>
+        <li class="nav-item <?php if(empty($tabs)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="addTabButton">+ Add Tab</button>
         </li>
     </ul>
     <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
@@ -82,18 +83,15 @@
             </div>
         </div>
         <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editViewOptionsButton">
-                View Filters & Settings
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabTabsButton">
+                Tab Filters & Settings
             </button>
 
             <?php 
-            // Alert Options Modal
-            the_alert_options($current_view_data);
+            // Alert tabs Modal
+            the_alert_tabs($current_tab_data);
             ?>
 
-        </div>
-        <div class="col-12 fs-7 text-secondary">
-            Showing xx of xxx results.
         </div>
     </div>
     <table class="table">

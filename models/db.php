@@ -844,9 +844,6 @@ class DataAccess {
      * Update Meta 
      */
     public static function update_meta_value($meta_name, $meta_value){
-        
-        // Serialize meta_value.
-        $meta_value = serialize($meta_value);
 
         // SQL
         $sql = "UPDATE `meta` SET `meta_value` = ? WHERE `meta_name` = ?";

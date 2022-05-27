@@ -182,7 +182,7 @@ function the_pagination($total_pages){
     $current_page_number = get_current_page_number();
 
     // Defined current view
-    $current_view = $_GET['view'];
+    $current_tab = $_GET['view'];
 
     // Set active state as function so we don't have to keep
     // writing this condition.
@@ -202,10 +202,10 @@ function the_pagination($total_pages){
 <nav aria-label="Page Navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item <?php if($current_page_number <= 1){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo '?view='.$current_view.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
+            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo '?view='.$current_tab.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
         </li>
         <li class="page-item  <?php echo get_active_state($current_page_number, 1)?>">
-            <a class="page-link" href="?view=<?php echo $current_view;?>&current_page_number=1">1</a>
+            <a class="page-link" href="?view=<?php echo $current_tab;?>&current_page_number=1">1</a>
         </li>
 
         <?php
@@ -219,25 +219,25 @@ function the_pagination($total_pages){
         // If there are more than 5 pages and current page number isn't
         // first, second, or last...
         if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="?view='.$current_tab.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // If there are more than 3 pages and current page number isn't
         // first or last...
         if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
-            echo '<li class="page-item active"><a class="page-link" href="?view='.$current_view.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
+            echo '<li class="page-item active"><a class="page-link" href="?view='.$current_tab.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
 
         // If there are more than 5 pages and current page is the first or second..
         if($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2))
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="?view='.$current_tab.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // If there are more than 5 pages and current page is the last or second to last..
         if($total_pages > 5 && $current_page_number == $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="?view='.$current_tab.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // Show next page number if there are more than 5 pages and current
         // page number isn't first, second, second to last, or last...
         if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $total_pages != ($current_page_number+1) && $current_page_number != $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="?view='.$current_tab.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // Show "..." if there are more than 3 pages and we're not on the page before,
         // the last display a disabled elipses so that the user knows to click 'next'.
@@ -246,10 +246,10 @@ function the_pagination($total_pages){
         ?>
 
         <li class="page-item <?php echo get_active_state($current_page_number, $total_pages)?>">
-            <a class="page-link" href="?view=<?php echo $current_view;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
+            <a class="page-link" href="?view=<?php echo $current_tab;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
         </li>
         <li class="page-item <?php if($current_page_number >= $total_pages){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo '?view='.$current_view.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
+            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo '?view='.$current_tab.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
         </li>
     </ul>
 </nav>
@@ -260,9 +260,9 @@ function the_pagination($total_pages){
 }
 
 /**
- * The Alert View Options
+ * The Alert Tab Options
  */
-function the_alert_options($current_view_data){
+function the_alert_tabs($current_tab_data){
 
     // Setup filters array to make it easier to return
     // filter data.
@@ -273,11 +273,12 @@ function the_alert_options($current_view_data){
     ];
     
     // Setup data variables.
-    if(empty($current_view_data)){
-        $view_name = 'New View';
+    if(empty($current_tab_data)){
+        $tab_name = 'New Tab';
     }else{
-        $view_name = $current_view_data['name'];
-        $filters = $current_view_data['filters'];
+        $tab_name = $current_tab_data['name'];
+        $tab_id = $current_tab_data['id'];
+        $filters = $current_tab_data['filters'];
         foreach($filters as $filter){
             if($filter['name'] == 'type')
                 $reformatted_filters['type'] = $filter['value'];
@@ -294,15 +295,15 @@ function the_alert_options($current_view_data){
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title h4" id="filterModalLabel">"<span id="viewName"><?php echo $view_name;?></span>" View Options</h2>
+                <h2 class="modal-title h4" id="filterModalLabel">"<span id="tabName"><?php echo $tab_name;?></span>" Tab Options</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="actions/save_alert_options.php" method="post">
+            <form action="actions/save_alert_tab.php" method="post">
                 <div class="modal-body">
 
                     <?php
-                    // Get View Details
-                    $alert_options = unserialize(DataAccess::get_meta_value('alert_options'));
+                    // Get Tab Details
+                    $alert_tabs = unserialize(DataAccess::get_meta_value('alert_tabs'));
 
                     // Show active integrations.
                     $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
@@ -372,22 +373,22 @@ function the_alert_options($current_view_data){
                     </div>
                     <hr>
                     <div class="mb-3">
-                        <label for="viewNameInput" class="form-label fw-semibold">View Name</label>
-                        <input type="text" id="viewNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $view_name;?>" name="view_name" required>
+                        <label for="tabNameInput" class="form-label fw-semibold">Tab Name</label>
+                        <input type="text" id="tabNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $tab_name;?>" name="tab_name" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     
                     <?php
-                    // Users shouldn't delete a view if it's the only view
-                    // that exists.
-                    if(count($alert_options['views']) > 1)
-                        echo '<a type="submit" href="actions/delete_alert_view.php" class="btn btn-outline-danger">Delete View</a>';
+                    // Users shouldn't delete the first tab so that they
+                    // always know all the alerts being reported.
+                    if($tab_id != 1)
+                        echo '<a href="actions/delete_alert_tab.php?tab='.$tab_id.'" class="btn btn-outline-danger">Delete Tab</a>';
                     ?>
 
                     <button type="submit" class="btn btn-primary" id="saveButton">Save Options</button>
                 </div>
-                <input type="hidden" name="existing_view" value="" id="existingViewInput">
+                <input type="hidden" name="tab_id" value="<?php echo $tab_id;?>" id="alertTabID">
             </form>
         </div>
     </div>
@@ -397,42 +398,42 @@ function the_alert_options($current_view_data){
 const integrationSelect = document.getElementById('integrationSelect');
 const typeSelect = document.getElementById('typeSelect');
 const sourceSelect = document.getElementById('sourceSelect');
-const viewNameInput = document.getElementById('viewNameInput');
-const existingViewInput = document.getElementById('existingViewInput');
-const addViewButton = document.getElementById('addViewButton');
-const editViewOptionsButton = document.getElementById('editViewOptionsButton');
+const tabNameInput = document.getElementById('tabNameInput');
+const alertTabID = document.getElementById('alertTabID');
+const addTabButton = document.getElementById('addTabButton');
+const editTabOptionsButton = document.getElementById('editTabOptionsButton');
 const saveButton = document.getElementById('saveButton');
-const viewName = document.getElementById('viewName');
+const tabName = document.getElementById('tabName');
 
-// Change view name text as you type.
-const changeViewName = function(e) {
-    viewName.innerHTML = e.target.value;
+// Change tab name text as you type.
+const changetabName = function(e) {
+    tabName.innerHTML = e.target.value;
 }
-viewNameInput.addEventListener('input', changeViewName);
-viewNameInput.addEventListener('propertychange', changeViewName);
+tabNameInput.addEventListener('input', changetabName);
+tabNameInput.addEventListener('propertychange', changetabName);
 
-// Set "new_view" save action.
-const setNewViewSaveAction = function(e) {
-    viewName.innerHTML = 'Unnamed';
-    viewNameInput.value = 'Unnamed';
+// Set new tab save action.
+const setNewTabSaveAction = function(e) {
+    tabName.innerHTML = 'Unnamed';
+    tabNameInput.value = 'Unnamed';
     integrationSelect.value = '';
     typeSelect.value = '';
     sourceSelect.value = '';
-    saveButton.innerHTML = 'Create New View';
+    saveButton.innerHTML = 'Create New Tab';
+    alertTabID.value = '';
 }
-addViewButton.addEventListener('click', setNewViewSaveAction);
+addTabButton.addEventListener('click', setNewTabSaveAction);
 
-// Set "update_view" action.
-const setUpdateViewSaveAction = function(e) {
-    viewName.innerHTML = '<?php echo $view_name;?>';
-    viewNameInput.value = '<?php echo $view_name;?>';
+// Set update tab action.
+const setUpdateTabSaveAction = function(e) {
+    tabName.innerHTML = '<?php echo $tab_name;?>';
+    tabNameInput.value = '<?php echo $tab_name;?>';
     integrationSelect.value = '<?php echo $reformatted_filters['integration_uri'];?>'
     typeSelect.value = '<?php echo $reformatted_filters['type'];?>'
     sourceSelect.value = '<?php echo $reformatted_filters['source'];?>'
-    existingViewInput.value = '<?php echo $view_name;?>';
-
+    alertTabID.value = '<?php echo $tab_id;?>';
 }
-editViewOptionsButton.addEventListener('click', setUpdateViewSaveAction);
+editTabOptionsButton.addEventListener('click', setUpdateTabSaveAction);
 
 </script>
 
