@@ -277,7 +277,6 @@ class DataAccess {
 
     }
 
-    
     /**
      * Get Alerts By Page Site
      */
@@ -402,23 +401,6 @@ class DataAccess {
         // Result
         $data = $results->fetch_object()->status;
         return $data;
-        
-    }
-    
-    /**
-     * Get Details URI
-     */
-    public static function get_site_details_uri($page_id){
-    
-        // We just need to see if the page is a parent. If 
-        // it is, that page's ID is good so we don't need
-        // to run another query to get the id of the parent.
-        $page = self::get_page($page_id);
-        if($page->is_parent == 1){
-            return '?view=site_details&id='.$page->id;
-        }else{
-            return '?view=site_details&id='.self::get_page_id($page->url);
-        }
         
     }
     
