@@ -335,7 +335,7 @@ function the_alert_tabs($current_tab_data){
                     <div class="mb-3">
                         <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
                         <select id="typeSelect" class="form-select" name="type">
-                        <option value="">Any</option>
+                            <option value="">Any</option>
 
                         <?php 
                         // Set types as array so we can simplify the logic
@@ -354,7 +354,7 @@ function the_alert_tabs($current_tab_data){
                     <div class="mb-3">
                         <label for="sourceSelect" class="form-label fw-semibold">Alert Source</label>
                         <select id="sourceSelect" class="form-select" name="source">
-                        <option value="">Any</option>
+                            <option value="">Any</option>
                         
                         <?php 
 
@@ -401,7 +401,7 @@ const sourceSelect = document.getElementById('sourceSelect');
 const tabNameInput = document.getElementById('tabNameInput');
 const alertTabID = document.getElementById('alertTabID');
 const addTabButton = document.getElementById('addTabButton');
-const editTabOptionsButton = document.getElementById('editTabOptionsButton');
+const editTabButton = document.getElementById('editTabButton');
 const saveButton = document.getElementById('saveButton');
 const tabName = document.getElementById('tabName');
 
@@ -424,18 +424,16 @@ const setNewTabSaveAction = function(e) {
 }
 addTabButton.addEventListener('click', setNewTabSaveAction);
 
-// Set update tab action.
-const setUpdateTabSaveAction = function(e) {
+// Set edit tab action.
+const editTabAction = function(e) {
     tabName.innerHTML = '<?php echo $tab_name;?>';
     tabNameInput.value = '<?php echo $tab_name;?>';
-    integrationSelect.value = '<?php echo $reformatted_filters['integration_uri'];?>'
-    typeSelect.value = '<?php echo $reformatted_filters['type'];?>'
-    sourceSelect.value = '<?php echo $reformatted_filters['source'];?>'
+    integrationSelect.value = '<?php echo $reformatted_filters['integration_uri'];?>';
+    typeSelect.value = '<?php echo $reformatted_filters['type'];?>';
+    sourceSelect.value = '<?php echo $reformatted_filters['source'];?>';
     alertTabID.value = '<?php echo $tab_id;?>';
 }
-if(editTabOptionsButton){
-    editTabOptionsButton.addEventListener('click', setUpdateTabSaveAction);
-}
+editTabButton.addEventListener('click', editTabAction);
 </script>
 
 <?php

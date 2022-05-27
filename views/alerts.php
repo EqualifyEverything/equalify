@@ -34,7 +34,6 @@
         $tabs = $alert_tabs['tabs'];
         $current_tab = $alert_tabs['current_tab'];
         $current_tab_data = $tabs[$current_tab];
-        $filters = $current_tab_data['filters'];
 
         // Start tabs Loop
         if(!empty($tabs)): foreach ($tabs as $tab):
@@ -58,8 +57,9 @@
                 ">
 
                 <?php
-                // Counter Alerts
-                echo DataAccess::count_alerts($tab['filters']);
+                //  Alert counter
+                $alert_count = DataAccess::count_alerts($tab['filters']);
+                echo $alert_count;
                 ?>
 
                 </span>
@@ -68,7 +68,8 @@
 
         <?php
         // End tabs loop
-        endforeach; endif;
+        endforeach; 
+    endif;
         ?>
 
         <li class="nav-item <?php if(empty($tabs)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
@@ -83,7 +84,7 @@
             </div>
         </div>
         <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabTabsButton">
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabButton">
                 Tab Filters & Settings
             </button>
 
@@ -107,6 +108,7 @@
 
         <?php
         // Begin Alerts
+        $filters = $current_tab_data['filters'];
         $alerts = DataAccess::get_alerts($filters, get_current_page_number());
         $alerts_content = $alerts['content'];
         if(count($alerts_content) > 0 ): foreach($alerts_content as $alert):    

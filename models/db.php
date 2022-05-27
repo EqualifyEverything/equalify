@@ -213,9 +213,8 @@ class DataAccess {
         }
 
         // Add filters and page limit.
-        $filters_sql.= ' LIMIT '.$page_offset.', '.$alerts_per_page;
         $total_pages_sql.= $filters_sql;
-        $content_sql.= $filters_sql;
+        $content_sql.= $filters_sql.' LIMIT '.$page_offset.', '.$alerts_per_page;
 
         // Run 'total_pages' SQL.
         $total_pages_result = self::query($total_pages_sql, $params, true);
@@ -233,6 +232,7 @@ class DataAccess {
     
         // Create and return data.
         $data = [
+            'total_alerts' => $total_pages_rows,
             'total_pages' => $total_pages,
             'content' => $content
         ];
@@ -242,12 +242,31 @@ class DataAccess {
 
     /**
      * Count Alerts
+     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param string page
      */
-    public static function count_alerts(){
+    public static function count_alerts($filters = []){
 
         // SQL
         $sql = 'SELECT COUNT(*) AS TOTAL FROM `alerts`';
         $params = array();
+
+        // Add optional filters to content and total_pages.
+        $filter_count = count($filters);
+        $filters_sql = '';
+        if($filter_count > 0){
+            $filters_sql = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $filters_sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $filters_sql.= ' AND ';
+        
+            }
+        }
+        $sql.= $filters_sql;
+
 
         // Query
         $results = self::query($sql, $params, true);
