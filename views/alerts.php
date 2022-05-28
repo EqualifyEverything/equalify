@@ -120,13 +120,6 @@
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
-                <?php 
-                // Integration alerts link to the integration.
-                if( $alert->source == 'page' ){
-                    echo '<a class="btn btn-primary btn-sm"  href="'.DataAccess::get_site_details_uri($alert->page_id).'">Site Details</a>';
-                }
-                ?>
-
                 <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>" class="btn btn-outline-secondary btn-sm">
                     Dismiss
                 </a>

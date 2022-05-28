@@ -39,7 +39,21 @@
                     <h2 class="h5 card-title">
                         <?php echo $page->site; ?> 
                     </h2>
-                    <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=site_details&id=<?php echo $page->id;?>">View Details</a>
+
+                    <?php
+                    // Button status depends on site status.
+                    if($page->status == 'archived'){
+                        $button_text = 'Activate Site';
+                        $button_class = 'btn-outline-success';
+                    }else{
+                        $button_text = 'Archive Site';
+                        $button_class = 'btn-outline-secondary';
+                    }
+                    ?>
+
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_page_status.php?id=<?php echo $page->id;?>&old_status=<?php echo $page->status;?>">
+                        <?php echo $button_text;?>
+                    </a>
                 </div>
             </div>
         </div>

@@ -31,4 +31,4 @@ if($old_status == 'archived'){
 }
 
 // Redirect
-header('Location: ../index.php?view=site_details&id='.$id.'&status=success');
+header('Location: ../index.php?view=sites&status=success');
