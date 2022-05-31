@@ -44,8 +44,9 @@ The goal: **Equalify every website.**
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Update `config.php` info.
-3. Upload/run on your server.  (PHP 8 is required)
-4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
+3. Upload/run on your server - PHP 8 and MySQL is required.
+4. Checkout our [demo video](https://www.youtube.com/watch?v=PASHGkgjVqY) for usage tips.
+5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 ## Special Thanks
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp)- I consider y'all first contributors - woot woot! & Grace- You are the 🔥 behind everything I do.
