@@ -14,7 +14,6 @@
         $sites = DataAccess::get_sites();
         if($sites != NULL ):
             foreach($sites as $site):  
-            $site = $site->site;  
         ?>
 
         <div class="col">

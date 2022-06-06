@@ -59,26 +59,23 @@ function scan($scan_id){
 
     // We are only looking at active parents for now because if
     // their URLs don't work, their pages wont work.
-    $filtered_by_active_parents = array(
+    $filtered_to_active_sites = array(
         array(
-            'name' => 'is_parent',
-            'value' => 1
-        ), array(
             'name' => 'status',
             'value' => 'active'
         )
     );
-    $active_parents = DataAccess::get_pages($filtered_by_active_parents);
-    if(!empty($active_parents)):
+    $active_sites = DataAccess::get_sites($filtered_to_active_sites);
+    if(!empty($active_sites)):
         $working_sites = [];
-        foreach($active_parents as $parent){
+        foreach($active_sites as $site){
 
             // Set scanning_page so we can bug check if issues arrise.
-            DataAccess::update_meta_value('scanning_page', $parent->url);
+            DataAccess::update_meta_value('scanning_page', $site);
             
             // Curl parent to determin if the site exists.
-            $curl = curl_init($parent->site);
-            curl_setopt($curl, CURLOPT_URL, $parent->site);
+            $curl = curl_init($site);
+            curl_setopt($curl, CURLOPT_URL, $site);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -92,12 +89,12 @@ function scan($scan_id){
 
             // Alert folks if site can't be reached.
             if($url_contents == false){
-                DataAccess::add_alert('system', $parent->id, $parent->site, NULL, 'error', 'Site is unreachable.', NULL);
+                DataAccess::add_alert('system', NULL, $site, NULL, 'error', 'Site is unreachable.', NULL);
             }else{
 
                 // Parents that work are saved into a variable we
                 // use for the next process.
-                array_push($working_sites, $parent);
+                array_push($working_sites, $site);
 
             }
             
@@ -118,12 +115,15 @@ function scan($scan_id){
             // currently scanning a page.
             DataAccess::update_meta_value('scanning_page', '');
 
+            // Set type before we delete all the pages.
+            $type = DataAccess::get_site_type($site);
+
             // We'll need to delete pages and alerts of a site before 
             // we re-add the site.
             $filtered_by_site = array(
                 array(
                     'name' => 'site',
-                    'value' => $site->site
+                    'value' => $site
                 )
             );
             DataAccess::delete_pages($filtered_by_site);
@@ -132,23 +132,23 @@ function scan($scan_id){
             // Use the adders to generate pages of sites again with
             // a fallback if any adder encounters an excemption.
             try{
-                if($site->type == 'xml'){
-                    xml_site_adder($site->url);
+                if($type == 'xml'){
+                    xml_site_adder($site);
                     DataAccess::update_meta_value('scanning_process', 'Adding XML pages.');
                 }
-                if($site->type == 'wordpress'){
-                    wordpress_site_adder($site->url);
+                if($type == 'wordpress'){
+                    wordpress_site_adder($site);
                     DataAccess::update_meta_value('scanning_process', 'Adding WordPress pages.');
                 }
-                if($site->type == 'single_page'){
-                    single_page_adder($site->url);
+                if($type == 'single_page'){
+                    single_page_adder($site);
                     DataAccess::update_meta_value('scanning_process', 'Adding single pages.');
                 }
             }
             catch(Exception $exemption){
                 
                 // Alert every site that cannot be scanned.
-                DataAccess::add_alert('system', $site->url, $site->parent, NULL, 'error', $exemption->getMessage(), NULL);
+                DataAccess::add_alert('system', NULL, $site, NULL, 'error', $exemption->getMessage(), NULL);
                 DataAccess::update_scan_status($scan_id, 'incomplete');
                 die;
 
@@ -160,7 +160,7 @@ function scan($scan_id){
             $filtered_by_site = array(
                 array(
                     'name' => 'site',
-                    'value' => $site->site
+                    'value' => $site
                 )
             );
             $pages = DataAccess::get_pages($filtered_by_site);
@@ -177,6 +177,10 @@ function scan($scan_id){
 
         }
 
+        // We'll need to set the pages_count before any integration
+        // so that all scans are counted, even without integrations.
+        $pages_count = 0;
+
         // With our working urls set, we can now run the integrations!
         $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
         foreach($active_integrations as $integration){
@@ -186,7 +190,6 @@ function scan($scan_id){
             DataAccess::update_meta_value('scanning_process', $integration);
 
             // Run integration scan on every working url.
-            $pages_count = 0;
             foreach ($working_urls as $url){
                 $pages_count++;
 

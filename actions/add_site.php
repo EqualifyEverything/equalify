@@ -26,7 +26,7 @@ if($type == 'single_page' ){
     wordpress_site_adder($site_url);
 
 // .XML sites use the latest version of XML standards.
-}elseif($type == 'XML'){
+}elseif($type == 'xml'){
     xml_site_adder($site_url);
 
 // Since we're passing type through a URL, we have a fallback

@@ -93,21 +93,37 @@ class DataAccess {
 
     /**
      * Get Sites
+     * @param array filters [ array ('name' => $name, 'value' => $value) ]
      */
-    public static function get_sites(){
+    public static function get_sites($filters = []){
     
         // SQL
         $sql = 'SELECT DISTINCT `site` FROM `pages`';
         $params = array();
+
+        // Add optional filters
+        $filter_count = count($filters);
+        if($filter_count > 0){
+            $sql.= ' WHERE ';
+    
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $sql.= ' AND ';
+        
+            }
+        }
     
         // Query
-        $results = self::query($sql, $params, false);
+        $results = self::query($sql, $params, true);
     
         // Result
         $data = [];
         if($results->num_rows > 0){
             while($row = $results->fetch_object()){
-                $data[] = $row;
+                array_push($data, $row->site);
             }
         }
         return $data;
