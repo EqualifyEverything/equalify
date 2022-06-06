@@ -389,7 +389,7 @@ class DataAccess {
     }
     
     /**
-     * Get Page Records
+     * Get Page
      */
     public static function get_page($id){
     
@@ -402,6 +402,24 @@ class DataAccess {
     
         // Result
         $data = $results->fetch_object();
+        return $data;
+        
+    }
+
+    /**
+     * Get Page Site
+     */
+    public static function get_page_site($url){
+    
+        // SQL
+        $sql = 'SELECT `site` FROM `pages` WHERE `url` = ?';
+        $params = array($url);
+    
+        // Query
+        $results = self::query($sql, $params, true);
+    
+        // Result
+        $data = $results->fetch_object()->site;
         return $data;
         
     }
@@ -679,18 +697,18 @@ class DataAccess {
     /**
      * Update Page Data 
      */
-    public static function update_page_data($id, $column, $value){
+    public static function update_page_data($url, $column, $value){
     
         // SQL
-        $sql = 'UPDATE `pages` SET `'.$column.'` = ? WHERE `id` = ?';
-        $params = array($value, $id);
+        $sql = 'UPDATE `pages` SET `'.$column.'` = ? WHERE `url` = ?';
+        $params = array($value, $url);
     
         // Query
         $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
-            throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$id.'"');
+            throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$url.'"');
     
     }
     
@@ -766,7 +784,7 @@ class DataAccess {
         // Add optional filters
         $filter_count = count($filters);
         if($filter_count > 0){
-            $sql.= 'WHERE ';
+            $sql.= ' WHERE ';
     
             $filter_iteration = 0;
             foreach ($filters as $filter){
@@ -791,7 +809,7 @@ class DataAccess {
     /**
      * Add Alert
      */
-    public static function add_alert($source, $page_id, $site, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
+    public static function add_alert($source, $url, $site, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
         
         // Sanitize items.
         $message = filter_var($message, FILTER_SANITIZE_STRING);
@@ -810,48 +828,19 @@ class DataAccess {
             throw new Exception('Alert source, "'.$source.'," is not allowed');
 
         // SQL
-        $sql = 'INSERT INTO `alerts` (`source`, `page_id`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
+        $sql = 'INSERT INTO `alerts` (`source`, `url`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
         $sql.= '(?, ?, ?, ?, ?, ?, ?)';
-        $params = array($source, $page_id, $site, $integration_uri, $type, $message, $meta);
+        $params = array($source, $url, $site, $integration_uri, $type, $message, $meta);
         
         // Query
         $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert alert with the variables "'.$page_id.'", "'.$site.'", "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
+            throw new Exception('Cannot insert alert with the variables "'.$source.'", "'.$url.'", "'.$site.'", "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
         
         // Complete Query
         return $result;
-        
-    }
-        
-    /**
-     * Create Alerts Table
-     */
-    public static function create_alerts_table(){
-    
-        // SQL
-        $sql = 
-            'CREATE TABLE `alerts` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `source` varchar(200) NOT NULL,
-                `page_id` bigint(20) NOT NULL,
-                `message` text NOT NULL,
-                `integration_uri` varchar(200) NOT NULL,
-                `site` text NOT NULL,
-                `type` varchar(200) NOT NULL,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
-        $params = array();
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
         
     }
 
@@ -920,6 +909,36 @@ class DataAccess {
         // Complete Query
         return $result;
 
+    }
+
+    /**
+     * Create Alerts Table
+     */
+    public static function create_alerts_table(){
+    
+        // SQL
+        $sql = 
+            'CREATE TABLE `alerts` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `type` varchar(200) NOT NULL,
+                `source` varchar(200) NOT NULL,
+                `url` text,
+                `site` text,
+                `integration_uri` varchar(200) DEFAULT NULL,
+                `message` text,
+                `meta` text,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
+    
+        // Fallback
+        if(!$result)
+            throw new Exception('Error creating table: "'.$result->error.'"');
+        
     }
 
     /**

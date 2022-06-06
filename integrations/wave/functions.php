@@ -56,7 +56,7 @@ function wave_fields(){
 /**
  * WAVE Scans
  */
-function wave_scans($page){
+function wave_scans($url){
 
     // Add DB and required functions.
     require_once '../config.php';
@@ -69,7 +69,7 @@ function wave_scans($page){
             "verify_peer_name"=> false,
         )
     );
-    $wave_url = 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&url='.$page->url;
+    $wave_url = 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&url='.$url;
     $wave_json = file_get_contents($wave_url, false, stream_context_create($override_https));
     $wave_json_decoded = json_decode($wave_json, true);      
 
@@ -82,8 +82,8 @@ function wave_scans($page){
     // scans.
     $alerts_filter = [
         array(
-            'name'   =>  'page_id',
-            'value'  =>  $page->id
+            'name'   =>  'url',
+            'value'  =>  $url
         ),
         array(
             'name'   =>  'integration_uri',
@@ -96,10 +96,12 @@ function wave_scans($page){
     $wave_errors = $wave_json_decoded['categories']['error']['count'];
 
     // Set optional alerts.
-    if($wave_errors >= 1)
-        DataAccess::add_alert('page', $page->id, $page->site, 'wave', 'error', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>.');
+    if($wave_errors >= 1){
+        $site = DataAccess::get_page_site($url);
+        DataAccess::add_alert('page', $url, $site, 'wave', 'error', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>.');
+    }
 
     // Update page data.
-    DataAccess::update_page_data($page->id, 'wave_wcag_2_1_errors', $wave_errors);
+    DataAccess::update_page_data($url, 'wave_wcag_2_1_errors', $wave_errors);
         
 }

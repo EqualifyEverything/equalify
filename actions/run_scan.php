@@ -106,6 +106,10 @@ function scan($scan_id){
     // in that case.
     if(!empty($working_sites)):
 
+        // working_urls will contain all the pages that we want
+        // to run through integrations.
+        $working_urls = [];
+
         // We need to curl all the working sites to get any new
         // pages before we launch into the scan.
         DataAccess::update_meta_value('scanning_process', 'Update site pages.');
@@ -127,7 +131,13 @@ function scan($scan_id){
                 )
             );
             DataAccess::delete_pages($filtered_by_site);
-            DataAccess::delete_alerts($filtered_by_site);
+            $filtered_by_url = array(
+                array(
+                    'name' => 'url',
+                    'value' => $site
+                )
+            );
+            DataAccess::delete_alerts($filtered_by_url);
             
             // Use the adders to generate pages of sites again with
             // a fallback if any adder encounters an excemption.
@@ -148,7 +158,7 @@ function scan($scan_id){
             catch(Exception $exemption){
                 
                 // Alert every site that cannot be scanned.
-                DataAccess::add_alert('system', NULL, $site, NULL, 'error', $exemption->getMessage(), NULL);
+                DataAccess::add_alert('system', $site, $site, NULL, 'error', $exemption->getMessage(), NULL);
                 DataAccess::update_scan_status($scan_id, 'incomplete');
                 die;
 
@@ -156,7 +166,6 @@ function scan($scan_id){
 
             // Now that all the pages are in the system, we can
             // create an array of working pages.
-            $working_urls = [];
             $filtered_by_site = array(
                 array(
                     'name' => 'site',
@@ -203,7 +212,7 @@ function scan($scan_id){
 
                     // We need to kill the scan if there's an error.
                     try {
-                        $integration_scan_function_name($page);
+                        $integration_scan_function_name($url);
 
                     } catch (Exception $x) {
 
@@ -223,9 +232,9 @@ function scan($scan_id){
                             DataAccess::add_meta('usage', $pages_count);
 
                         }else{
-                            DataAccess::update_meta_value('usage', $pages_count+$existing_usage);
+                            DataAccess::update_meta_value('usage', $pages_count+$existing_usage[0]->meta_value);
                         }
-                        DataAccess::add_alert('system', DataAccess::get_page_id($url), $url, NULL, 'error', $x->getMessage(), NULL);
+                        DataAccess::add_alert('system', $url, $site, NULL, 'error', $x->getMessage(), NULL);
                         DataAccess::update_scan_status($scan_id, 'incomplete');
                         die;
 

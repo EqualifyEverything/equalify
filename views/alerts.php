@@ -100,7 +100,7 @@
             <tr>
                 <th scope="col">Time</th>
                 <th scope="col">Source</th>
-                <th scope="col">Site</th>
+                <th scope="col">URL</th>
                 <th scope="col">Type</th>
                 <th scope="col">Message</th>
                 <th scope="col">Actions</th>
@@ -118,7 +118,7 @@
         <tr>
             <td><?php echo $alert->time;?></td>
             <td><?php echo ucwords($alert->source);?></td>
-            <td><?php echo $alert->site;?></td>
+            <td><?php echo $alert->url;?></td>
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">

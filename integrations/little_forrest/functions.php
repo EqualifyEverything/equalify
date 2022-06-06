@@ -34,7 +34,7 @@ function little_forrest_fields(){
 /**
  * little_forrest Scans
  */
-function little_forrest_scans($page){
+function little_forrest_scans($url){
 
     // Add DB info and required functions.
     require_once '../config.php';
@@ -47,7 +47,7 @@ function little_forrest_scans($page){
             "verify_peer_name"=> false,
         )
     );
-    $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$page->url.'&level=WCAG2AA&cache=false';
+    $little_forrest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$url.'&level=WCAG2AA&cache=false';
     $little_forrest_json = file_get_contents($little_forrest_url, false, stream_context_create($override_https));
 
     // Fallback if LF scan doesn't work.
@@ -65,12 +65,8 @@ function little_forrest_scans($page){
     // Remove previously saved alerts.
     $alerts_filter = [
         array(
-            'name'   =>  'page_id',
-            'value'  =>  $page->id
-        ),
-        array(
-            'name'   =>  'page_id',
-            'value'  =>  $page->id
+            'name'   =>  'url',
+            'value'  =>  $url
         ),
         array(
             'name'   =>  'integration_uri',
@@ -84,6 +80,9 @@ function little_forrest_scans($page){
         $little_forrest_errors = [];
     if($little_forrest_warnings == 0)
         $little_forrest_warnings = [];
+
+    // Set site title.
+    $site = DataAccess::get_page_site($url);
 
     // Add errors.
     if(count($little_forrest_errors) >= 1){
@@ -104,7 +103,7 @@ function little_forrest_scans($page){
             }
 
             // Add notice.
-            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'error', $message, $meta);
+            DataAccess::add_alert('page', $url, $site, 'little_forrest', 'error', $message, $meta);
 
         }
     }
@@ -128,7 +127,7 @@ function little_forrest_scans($page){
             }
 
             // Add notice.
-            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'notice', $message, $meta);
+            DataAccess::add_alert('page', $url, $site, 'little_forrest', 'notice', $message, $meta);
 
         }
     }
@@ -152,7 +151,7 @@ function little_forrest_scans($page){
             }
 
             // Add warning.
-            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'warning', $message, $meta);
+            DataAccess::add_alert('page', $url, $site, 'little_forrest', 'warning', $message, $meta);
 
         }
     }
@@ -160,6 +159,6 @@ function little_forrest_scans($page){
 
     // Update page data.
     $total_alerts = count($little_forrest_errors+$little_forrest_notices+$little_forrest_warnings);
-    DataAccess::update_page_data($page->id, 'little_forrest_wcag_2_1_errors', $total_alerts);
+    DataAccess::update_page_data($url, 'little_forrest_wcag_2_1_errors', $total_alerts);
 
 }
