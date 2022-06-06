@@ -1,5 +1,16 @@
 <?php
 /**
+ * Get Default View
+ */
+function get_default_view(){
+
+    // Set the default view if no other view
+    // is selected.
+    return 'views/alerts.php';
+    
+}
+
+/**
  * The Active View
  */
 function the_active_view($view){
@@ -19,21 +30,6 @@ function the_success_message(){
     // Success Message
     if(strpos($_SERVER['REQUEST_URI'], 'success'))
         echo '<div class="alert alert-success" role="alert">Update was successful!</div>';
-
-}
-
-/**
- * The Page Type Badge
- */
-function the_page_type_badge($page_type){
-    
-    // Every letter is uppercase so we have to create
-    // conditions for "WordPress" or "XML" or any other
-    // name that requires unique casing.
-    $page_type = str_replace('_', ' ', strtoupper($page_type));
-    echo '<span class="badge bg-light text-dark">'
-        .$page_type.
-        '<span class="visually-hidden"> Page Type</span></span>';
 
 }
 
@@ -110,15 +106,6 @@ function the_scan_rows($scans){
         <tr>
             <td><?php echo $scan->time;?></td>
             <td><?php echo ucwords($scan->status);?></td>
-            <td>
-
-            <?php             
-            // Link to pages    
-            $page_ids = unserialize($scan->pages);
-            echo count($page_ids);
-            ?>
-
-            </td>
         </tr>
 
         <?php 
@@ -127,7 +114,7 @@ function the_scan_rows($scans){
         ?>
 
         <tr>
-            <td colspan="3">No scans found.</td>
+            <td colspan="2">No scans found.</td>
         </tr>
 
         <?php 
@@ -182,7 +169,11 @@ function the_pagination($total_pages){
     $current_page_number = get_current_page_number();
 
     // Defined current view
-    $current_view = $_GET['view'];
+    if(!empty($_GET['view'])){
+        $current_view = $_GET['view'];
+    }else{
+        $current_view = get_default_view();
+    }
 
     // Set active state as function so we don't have to keep
     // writing this condition.

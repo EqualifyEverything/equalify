@@ -104,7 +104,7 @@ function little_forrest_scans($page){
             }
 
             // Add notice.
-            DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'error', $message, $meta);
+            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'error', $message, $meta);
 
         }
     }
@@ -128,7 +128,7 @@ function little_forrest_scans($page){
             }
 
             // Add notice.
-            DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'notice', $message, $meta);
+            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'notice', $message, $meta);
 
         }
     }
@@ -152,7 +152,7 @@ function little_forrest_scans($page){
             }
 
             // Add warning.
-            DataAccess::add_page_alert($page->id, $page->site,'little_forrest', 'warning', $message, $meta);
+            DataAccess::add_alert('page', $page->id, $page->site, 'little_forrest', 'warning', $message, $meta);
 
         }
     }

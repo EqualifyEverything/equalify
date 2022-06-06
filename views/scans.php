@@ -4,23 +4,22 @@
             <h1>All Scans</h1>
         </div>
         <div>
-            <button id="add_scan" class="btn btn-primary">Scan All Pages</button>
+            <button id="add_scan" class="btn btn-primary">+ New Scan</button>
             <script>
 
                 // Ansycronistically scan.
-                async function addScan() {
-                    const response = await fetch('actions/scan_all_pages.php?action=add_scan', {
+                async function cueScan() {
+                    const response = await fetch('actions/cue_scan.php', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
                             'Content-Type': 'text/html'
                         }
                     });
-                    return response.text();
                 }
 
-                async function doScan() {
-                    const response = await fetch('actions/scan_all_pages.php?action=do_scan', {
+                async function getScans() {
+                    const response = await fetch('actions/get_scans.php', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
@@ -31,7 +30,7 @@
                 }
 
                 async function getAlerts() {
-                    const response = await fetch('actions/scan_all_pages.php?action=get_alerts', {
+                    const response = await fetch('actions/get_alerts.php', {
                         method: 'GET', 
                         cache: 'no-cache',
                         headers: {
@@ -45,16 +44,14 @@
                     document.getElementById('alert_count').innerHTML = data;
                 }
 
-                async function refreshTable(data) {
+                async function refreshScans(data) {
                     document.getElementById('the_scans_rows').innerHTML = data;
                 }
 
                 const handleScan = () => {
-
-                    addScan()
-                    .then(refreshTable)
-                    .then(doScan)
-                    .then(refreshTable)
+                    cueScan()
+                    .then(getScans)
+                    .then(refreshScans)
                     .then(getAlerts)
                     .then(refreshAlerts);
                 }
@@ -71,7 +68,6 @@
             <tr>
                 <th scope="col">Time</th>
                 <th scope="col">Status</th>
-                <th scope="col">Pages Scanned</th>
             </tr>
         </thead>
         <tbody id="the_scans_rows">

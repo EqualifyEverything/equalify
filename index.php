@@ -114,7 +114,7 @@ $records = [];
             if(!empty($_GET['view'])){
                 require_once 'views/'.$_GET['view'].'.php';
             }else{
-                require_once 'views/alerts.php';
+                require_once get_default_view();
             }
 
             ?>

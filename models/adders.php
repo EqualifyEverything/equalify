@@ -58,7 +58,16 @@ function single_page_adder($site_url){
 
     // Get URL contents so we can make sure URL
     // can be scanned.
-    return run_curl($site_url);
+    $curled_site = run_curl($site_url);
+
+    // Site URL changes to the curled URL.
+    $site_url = $curled_site['url'];
+
+    // Single pages are saved with the following pramenters
+    $type = 'single_page';
+    $status = 'active';
+    $site = $curled_site['url'];
+    DataAccess::add_page($site_url, $type, $status, $site);
 
 }
 
@@ -90,10 +99,13 @@ function wordpress_site_adder($site_url){
 
     // Reformat the curled contents to be an array we can 
     // work with.
-    return array(
+    $curled_site = array(
         'url' => $clean_curled_url,
         'contents' => $pages
     );
+
+    // Insert site in DB.
+    add_xml_or_wordpress_site_to_db($curled_site, 'wordpress');    
 
 }
 
@@ -123,9 +135,45 @@ function xml_site_adder($site_url){
 
     // Reformat the curled contents to be an array we can 
     // work with.
-    return array(
+    $curled_site = array(
         'url' => $curled_site['url'],
         'contents' => $pages
     );
+
+    // Insert site in DB.
+    add_xml_or_wordpress_site_to_db($curled_site, 'xml');
     
+}
+
+/**
+ * Add XML or WordPress Site to DB
+ */
+function add_xml_or_wordpress_site_to_db($curled_site, $type){
+
+    // Both XML and WP deliver similar content.
+    $pages = $curled_site['contents'];
+    $site_url = $curled_site['url'];
+
+    // We're setting the status and adding pages here so we
+    // do not have to call the db inside "models/adders.php",
+    // keeping each model focused on distinct functions.
+    $pages_records = [];
+    foreach ($pages as &$page):
+
+        // Push each page to pages' records.
+        array_push(
+            $pages_records, 
+            array(
+                'url'       => $page['url'], 
+                'site'      => $site_url,
+                'status'    => 'active',
+                'type'      => $type
+            )
+        );
+
+    endforeach; 
+
+    // Finalllly, we can add pages to the DB.
+    DataAccess::add_pages($pages_records);
+
 }

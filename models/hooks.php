@@ -58,6 +58,11 @@ $hook_system = new HookSystem([
 // Set initial actions for hooks.
 $hook_system->add_action(
     new Action('before_content', function() { 
-        // This hook has no action...for now.
+        
+        // We trigger scans every time content is loaded to
+        // avoid the bloat and configuration requirements
+        // of server crons. NOTE: This is why Linux is 
+        // required.
+
     })
 );
