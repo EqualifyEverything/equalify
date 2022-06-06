@@ -115,6 +115,8 @@ class DataAccess {
         
             }
         }
+        $sql.= ' ORDER BY `site`;';
+
     
         // Query
         $results = self::query($sql, $params, true);
