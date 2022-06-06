@@ -90,55 +90,6 @@ class DataAccess {
             return $data;
         }
     }
-    
-    /**
-     * Get Page Ids
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_page_ids($filters = []){
-    
-        // SQL
-        $sql = 'SELECT `id` FROM `pages`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= 'WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = array();
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = array(
-                    'id' => $row->id
-                );
-            }
-        }
-    
-        // We're adding a condition so that we don't loop
-        // when there is nothing to return.
-        if($results->num_rows == 0){
-            return NULL;
-        }else{
-            return $data;
-        }
-    
-    }
 
     /**
      * Get Sites
@@ -329,7 +280,7 @@ class DataAccess {
     }
 
     /**
-     * Get Alerts By Page Site
+     * Get Alerts By Site
      */
     public static function get_alerts_by_site($site){
     
@@ -458,24 +409,6 @@ class DataAccess {
     }
     
     /**
-     * Get Page URL
-     */
-    public static function get_page_url($id){
-    
-        // SQL
-        $sql = 'SELECT `url` FROM pages WHERE `id` = ?';
-        $params = array($id);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->url;
-        return $data;
-        
-    }
-    
-    /**
      * Get Site Status
      */
     public static function get_site_status($site){
@@ -582,28 +515,6 @@ class DataAccess {
     }
     
     /**
-     * Add Scan
-     */
-    public static function add_scan($status, $time){
-    
-        // SQL
-        $sql = 'INSERT INTO `scans` (`status`, `time`) VALUES';
-        $sql.= '(?, ?)';
-        $params = array($status, $time);
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert scan with status "'.$status.'" and time "'.$time.'"');
-        
-        // Complete Query
-        return $result;
-        
-    }
-    
-    /**
      * Add Pages 
      */
     public static function add_pages($pages_records){
@@ -675,7 +586,29 @@ class DataAccess {
     }
     
     /**
-     * Update Status 
+     * Add Scan
+     */
+    public static function add_scan($status, $time){
+    
+        // SQL
+        $sql = 'INSERT INTO `scans` (`status`, `time`) VALUES';
+        $sql.= '(?, ?)';
+        $params = array($status, $time);
+        
+        // Query
+        $result = self::query($sql, $params, false);
+    
+        //Fallback
+        if(!$result)
+            throw new Exception('Cannot insert scan with status "'.$status.'" and time "'.$time.'"');
+        
+        // Complete Query
+        return $result;
+        
+    }
+
+    /**
+     * Update Scan Status 
      */
     public static function update_scan_status($scan_id, $new_status){
     
@@ -783,7 +716,6 @@ class DataAccess {
     
     }
     
-    
     /**
      * DB Column Exists
      */
@@ -877,7 +809,36 @@ class DataAccess {
         return $result;
         
     }
+        
+    /**
+     * Create Alerts Table
+     */
+    public static function create_alerts_table(){
     
+        // SQL
+        $sql = 
+            'CREATE TABLE `alerts` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `source` varchar(200) NOT NULL,
+                `page_id` bigint(20) NOT NULL,
+                `message` text NOT NULL,
+                `integration_uri` varchar(200) NOT NULL,
+                `site` text NOT NULL,
+                `type` varchar(200) NOT NULL,
+                PRIMARY KEY (`id`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
+    
+        // Fallback
+        if(!$result)
+            throw new Exception('Error creating table: "'.$result->error.'"');
+        
+    }
+
     /**
      * Add Meta
      */
@@ -944,36 +905,7 @@ class DataAccess {
         return $result;
 
     }
-        
-    /**
-     * Create Alerts Table
-     */
-    public static function create_alerts_table(){
-    
-        // SQL
-        $sql = 
-            'CREATE TABLE `alerts` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `source` varchar(200) NOT NULL,
-                `page_id` bigint(20) NOT NULL,
-                `message` text NOT NULL,
-                `integration_uri` varchar(200) NOT NULL,
-                `site` text NOT NULL,
-                `type` varchar(200) NOT NULL,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
-        $params = array();
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
-        
-    }
-    
+
     /**
      * Create Meta Table
      */
