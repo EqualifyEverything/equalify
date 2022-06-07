@@ -1,13 +1,13 @@
 <?php
-// Add Dependencies
+// Add dependencies.
 require_once 'models/hooks.php';
 require_once 'config.php';
 require_once 'models/db.php';
-require_once 'actions/install.php';
 require_once 'models/view_components.php';
 require_once 'models/integrations.php';
 
-$records = [];
+// We check to make sure all the DB tables are installed.
+require_once 'actions/install.php';
 ?>
 
 <!DOCTYPE html>
@@ -124,6 +124,66 @@ $records = [];
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+    <script>
 
+    // Instead of using cron, we asycronistically run the scan
+    // every page load.
+    async function runScan() {
+        const response = await fetch('actions/run_scan.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+    }
+
+    async function getScans() {
+        const response = await fetch('actions/get_scans.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    async function getAlerts() {
+        const response = await fetch('actions/get_alerts.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    async function refreshAlerts(data) {
+        if (document.getElementById('alert_count'))
+            document.getElementById('alert_count').innerHTML = data;
+    }
+
+    async function refreshScans(data) {
+
+        document.getElementById('the_scans_rows').innerHTML = data;
+
+    }
+
+    const handleCuedScans = () => {
+        runScan()
+        .then(getScans)
+        .then(refreshScans)
+        .then(getAlerts)
+        .then(refreshAlerts);
+    }
+    
+    // Event listener.
+    window.onload = function(){
+        handleCuedScans();
+    };
+
+    </script>
 </body>
 </html>

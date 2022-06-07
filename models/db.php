@@ -188,7 +188,7 @@ class DataAccess {
         if($data == NULL || empty($data)){
 
             // Returns "false" if no data exists.
-            throw new Exception('No cued scans found');
+            return NULL;
 
         }else{
 

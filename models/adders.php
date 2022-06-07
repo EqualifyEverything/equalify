@@ -23,10 +23,6 @@ function run_curl($site_url, $type = ''){
     // Execute CURL
     $url_contents = curl_exec($curl);
 
-    // Add in DB info so we can see if URL is unique.
-    require_once '../config.php';
-    require_once 'db.php';
-
     // The curled URL is the URL we use as an ID.
     $curled_url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
 

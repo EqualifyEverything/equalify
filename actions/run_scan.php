@@ -1,28 +1,30 @@
 <?php
-// Require files to control db.
-require '../config.php';
-require '../models/db.php';
-require '../models/adders.php';
+// Require files to control db and add content.
+require_once '../config.php';
+require_once '../models/db.php';
+require_once '../models/adders.php';
 
-// Since cron should only run when a scan
-// is cued, we should get the next scan
-$next_scan = DataAccess::get_next_scan();
 
-// We only want to run scans that are scheduled
-// after the current time (in the MySQL format).
-$current_date = date('Y-m-d H:i:s');
-if($current_date > $next_scan->time){
-
-    // Do the next scan.
-    scan($next_scan->id);
-
-}else{
-
-    // This fallback message is for testing purposes. This 
-    // shouldn't be seen because scans are triggered via the
-    // cron and cron events are only scheduled on times cued.
-    throw new Exception('No scan scheduled');
-
+// We only want to run scans that are upcoming
+// if no scan is running.
+$filter_by_running_scans = array(
+    array(
+        'name' => 'status',
+        'value' => 'running'
+    )
+);
+$running_scans = DataAccess::get_scans($filter_by_running_scans);
+if(empty($running_scans)){
+    $next_scan = DataAccess::get_next_scan();
+    $current_date = date('Y-m-d H:i:s');
+    if(!empty($next_scan)){
+        if($current_date > $next_scan->time){
+    
+            // Do the next scan.
+            scan($next_scan->id);
+        
+        }
+    }
 }
 
 /**
