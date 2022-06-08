@@ -141,12 +141,13 @@ class DataAccess {
         // SQL
         $sql = 'SELECT * FROM `scans`';
         $params = array();
+        
+
     
         // Add optional filters
         $filter_count = count($filters);
         if($filter_count > 0){
             $sql.= ' WHERE ';
-    
             $filter_iteration = 0;
             foreach ($filters as $filter){
                 $sql.= '`'.$filter['name'].'` = ?';

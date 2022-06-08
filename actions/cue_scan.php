@@ -1,9 +1,8 @@
 <?php
 // Require files to control db.
-include '../config.php';
-include '../models/db.php';
-include '../models/cron.php';
-include '../models/view_components.php';
+require_once '../config.php';
+require_once '../models/db.php';
+require_once '../models/cron.php';
 
 // Add scan to cue.
 $time = date('Y-m-d H:i:s');

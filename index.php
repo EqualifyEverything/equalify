@@ -124,66 +124,92 @@ require_once 'actions/install.php';
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+
     <script>
 
-    // Instead of using cron, we asycronistically run the scan
-    // every page load.
-    async function runScan() {
-        const response = await fetch('actions/run_scan.php', {
-            method: 'GET', 
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-    }
+    // // Instead of using cron, we asycronistically run the scan
+    // // every page load (I hope this changes soon..)
+    // async function runScan() {
+    //     const response = await fetch('actions/run_scan.php', {
+    //         method: 'GET', 
+    //         cache: 'no-cache',
+    //         headers: {
+    //             'Content-Type': 'text/html'
+    //         }
+    //     });
+    // }
 
-    async function getScans() {
-        const response = await fetch('actions/get_scans.php', {
-            method: 'GET', 
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-        return response.text();
-    }
+    // async function getScans() {
+    //     const response = await fetch('actions/get_scans.php', {
+    //         method: 'GET', 
+    //         cache: 'no-cache',
+    //         headers: {
+    //             'Content-Type': 'text/html'
+    //         }
+    //     });
+    //     return response.text();
+    // }
 
-    async function getAlerts() {
-        const response = await fetch('actions/get_alerts.php', {
-            method: 'GET', 
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-        return response.text();
-    }
+    // async function getAlerts() {
+    //     const response = await fetch('actions/get_alerts.php', {
+    //         method: 'GET', 
+    //         cache: 'no-cache',
+    //         headers: {
+    //             'Content-Type': 'text/html'
+    //         }
+    //     });
+    //     return response.text();
+    // }
 
-    async function refreshAlerts(data) {
-        if (document.getElementById('alert_count'))
-            document.getElementById('alert_count').innerHTML = data;
-    }
+    // async function refreshAlerts(data) {
+    //     if (document.getElementById('alert_count'))
+    //         document.getElementById('alert_count').innerHTML = data;
+    // }
 
-    async function refreshScans(data) {
+    // async function refreshScans(data) {
 
-        document.getElementById('the_scans_rows').innerHTML = data;
+    //     document.getElementById('the_scans_rows').innerHTML = data;
 
-    }
+    // }
 
-    const handleCuedScans = () => {
-        runScan()
-        .then(getScans)
-        .then(refreshScans)
-        .then(getAlerts)
-        .then(refreshAlerts);
-    }
+    // const handleCuedScans = () => {
+                
+    //     runScan();
+
+    // <?php
+    // // We only rant to refresh the page if a scan
+    // // is running or cued and we're on the scanning
+    // // view. This minimizes DB calls.
+    // $filter_by_running_scans = array(
+    //     array(
+    //         'name' => 'status',
+    //         'value' => 'running'
+    //     ),
+    // );
+    // $running_scans = DataAccess::get_scans($filter_by_running_scans);
+    // if($_GET['view'] == 'scans' && !empty($running_scans)):
+    // ?>
+
+    //     timer = setInterval(function() {
+    //         getScans()
+    //         .then(refreshScans)
+    //         .then(getAlerts)
+    //         .then(refreshAlerts);
+    //     }, 3000);
+
+    // <?php
+    // endif;
+    // ?>
     
-    // Event listener.
-    window.onload = function(){
-        handleCuedScans();
-    };
+    // }
+
+    // window.onload = function(){
+    //     handleCuedScans();
+    // };
+
 
     </script>
+
 </body>
 </html>
