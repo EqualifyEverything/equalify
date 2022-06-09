@@ -15,6 +15,12 @@ if(empty($old_status))
 // Conditional operations based on status:
 if($old_status == 'Active'){
 
+    // If integration is active on any alert tab, users
+    // must keep the interagration active.
+    $alert_tabs = DataAccess::get_meta_value('alert_tabs');
+    if(str_contains($alert_tabs, $integration_uri))
+        throw new Exception($integration_uri.' is used by an alert tab and this is not allowed');
+    
     // Remove integration-related alerts.
     $alerts_filter = [
         array(
