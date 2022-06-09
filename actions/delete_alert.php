@@ -16,4 +16,4 @@ $filters = [array(
 DataAccess::delete_alerts($filters);
 
 // When the work is done, we can triumphantly go back.
-header('Location: ../index.php?view=alerts&status=success');
+header('Location: ../index.php?view=alerts');
