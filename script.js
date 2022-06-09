@@ -1,5 +1,5 @@
 async function getScans() {
-    console.log('getScans');
+    console.log('3. getScans');
     const response = await fetch('actions/get_scans.php', {
         method: 'GET', 
         cache: 'no-cache',
@@ -12,7 +12,7 @@ async function getScans() {
 }
 
 async function getAlerts() {
-    console.log('getAlerts');
+    console.log('6. getAlerts');
 
     const response = await fetch('actions/get_alerts.php', {
         method: 'GET', 
@@ -25,7 +25,7 @@ async function getAlerts() {
 }
 
 async function runScan() {
-    console.log('runScan');
+    console.log('5b. runScan');
 
     const response = await fetch('actions/run_scan.php', {
         method: 'GET', 
@@ -37,29 +37,29 @@ async function runScan() {
 }
 
 async function handleScans(data){
-    console.log('handleScans');
+    console.log('4. handleScans');
 
     theScanRows = document.getElementById('the_scans_rows');
 
     if(!data.includes('Running') && !data.includes('Cued') && theScanRows){
-        console.log('not running and not cued and scan rows');
+        console.log('5. not running and not cued and scan rows');
         
         theScanRows.innerHTML = data;
         
     }
 
     if(data.includes('Running') && theScanRows){
-        console.log('running and scan rows');
-
         setTimeout(function(){ 
+            console.log('5. running and scan rows');
+
             handlePromises();
             theScanRows.innerHTML = data;
-        }, 1000);
+        }, 5000);
         
     }
 
     if(!data.includes('Running') && data.includes('Cued')){
-        console.log('not running and cued');
+        console.log('5. not running and cued');
 
         runScan().
         then(handlePromises);
@@ -67,19 +67,20 @@ async function handleScans(data){
     }
 
     if(!data.includes('Running') && data.includes('Cued') && theScanRows ){
-        console.log('not running and cued and scan rows');
 
         setTimeout(function(){ 
+            console.log('5. not running and cued and scan rows');
+
             handlePromises();
             theScanRows.innerHTML = data;
-        }, 1000);
+        }, 5000);
         
     }
 
 }
 
 async function handleAlerts(data) {
-    console.log('handleAlerts');
+    console.log('7. handleAlerts');
 
     alertCount = document.getElementById('alert_count');
 
@@ -88,7 +89,7 @@ async function handleAlerts(data) {
 }
 
 const handlePromises = () => {
-    console.log('handlePromises');
+    console.log('2. handlePromises');
 
     getScans()
     .then(handleScans)
@@ -98,7 +99,7 @@ const handlePromises = () => {
 }
 
 window.onload = function(){
-    console.log('window');
+    console.log('1. window');
 
     handlePromises();
 
