@@ -35,30 +35,6 @@ function scan($scan_id){
     // Change status to 'running'.
     DataAccess::update_scan_status($scan_id, 'running');
 
-    // Setup scanning_process and scanning_page meta here, since integrations 
-    // and the system is going can update the meta value.
-    $scanning_process_meta_filters = array(
-        array(
-            'name' => 'meta_name',
-            'value' => 'scanning_process'
-        ),
-    );
-    if(empty(DataAccess::get_meta($scanning_process_meta_filters))){
-        DataAccess::add_meta('scanning_process');
-    }
-    $scanning_page_meta_filters = array(
-        array(
-            'name' => 'meta_name',
-            'value' => 'scanning_page'
-        )
-    );
-    if(empty(DataAccess::get_meta($scanning_page_meta_filters))){
-        DataAccess::add_meta('scanning_page');
-    }
-
-    // We'll start by verifying site urls.
-    DataAccess::update_meta_value('scanning_process', 'Verify site urls.');
-
     // We are only looking at active parents for now because if
     // their URLs don't work, their pages wont work.
     $filtered_to_active_sites = array(
@@ -72,9 +48,6 @@ function scan($scan_id){
         $working_sites = [];
         foreach($active_sites as $site){
 
-            // Set scanning_page so we can bug check if issues arrise.
-            DataAccess::update_meta_value('scanning_page', $site);
-            
             // Curl parent to determin if the site exists.
             $curl = curl_init($site);
             curl_setopt($curl, CURLOPT_URL, $site);
@@ -114,12 +87,7 @@ function scan($scan_id){
 
         // We need to curl all the working sites to get any new
         // pages before we launch into the scan.
-        DataAccess::update_meta_value('scanning_process', 'Update site pages.');
         foreach ($working_sites as $site){
-
-            // We need to clear out the scanning_page, since we're not
-            // currently scanning a page.
-            DataAccess::update_meta_value('scanning_page', '');
 
             // Set type before we delete all the pages.
             $type = DataAccess::get_site_type($site);
@@ -146,15 +114,12 @@ function scan($scan_id){
             try{
                 if($type == 'xml'){
                     xml_site_adder($site);
-                    DataAccess::update_meta_value('scanning_process', 'Adding XML pages.');
                 }
                 if($type == 'wordpress'){
                     wordpress_site_adder($site);
-                    DataAccess::update_meta_value('scanning_process', 'Adding WordPress pages.');
                 }
                 if($type == 'single_page'){
                     single_page_adder($site);
-                    DataAccess::update_meta_value('scanning_process', 'Adding single pages.');
                 }
             }
             catch(Exception $exemption){
@@ -177,10 +142,6 @@ function scan($scan_id){
             $pages = DataAccess::get_pages($filtered_by_site);
             foreach ($pages as $page){
 
-                // Now we can log the page url again, since the scanner
-                // is now directly running on it.
-                DataAccess::update_meta_value('scanning_page', $page->url);
-
                 // We'll use the $working_urls array later.
                 array_push($working_urls, $page->url);
 
@@ -197,15 +158,9 @@ function scan($scan_id){
         foreach($active_integrations as $integration){
             require_once '../integrations/'.$integration.'/functions.php';
 
-            // 'scanning_process' keeps track of what integration is running.
-            DataAccess::update_meta_value('scanning_process', $integration);
-
             // Run integration scan on every working url.
             foreach ($working_urls as $url){
                 $pages_count++;
-
-                // Set scanning_page meta.
-                DataAccess::update_meta_value('scanning_page', $url);
 
                 // Every integration should use the same pattern to run
                 // register thier scan functions.
@@ -277,9 +232,5 @@ function scan($scan_id){
 
     // Change status to 'complete'.
     DataAccess::update_scan_status($scan_id, 'complete');
-
-    // Clear scan process and page after scan is complete.
-    DataAccess::delete_meta('scanning_process');
-    DataAccess::delete_meta('scanning_page');
 
 }
