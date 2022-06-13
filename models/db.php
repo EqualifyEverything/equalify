@@ -1,6 +1,5 @@
 <?php
 class DataAccess {
-
     // Set the records per page.
     private const ITEMS_PER_PAGE = 10;
 
@@ -815,9 +814,9 @@ class DataAccess {
     public static function add_alert($source, $url, $site, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
         
         // Sanitize items.
-        $message = filter_var($message, FILTER_SANITIZE_STRING);
+        $message = htmlspecialchars($message, ENT_NOQUOTES);
         if(is_array($meta)){
-            $meta = filter_var(serialize($meta), FILTER_SANITIZE_STRING);
+            $meta = htmlspecialchars(serialize($meta), ENT_NOQUOTES);
         }
 
         // Require certain alert types.
@@ -1030,15 +1029,21 @@ class DataAccess {
     public static function table_exists($table_name){
     
         // SQL
-        $sql = 
-            'SELECT 1 from '.$table_name;
+        $db_name = $GLOBALS['DB_NAME'];
+        $sql = "
+            SELECT * 
+            FROM information_schema.tables
+            WHERE table_schema = '$db_name' 
+                AND table_name = '$table_name'
+            LIMIT 1;
+        ";
         $params = array();
         
         // Query
         $result = self::query($sql, $params, false);
     
         // Results
-        if($result !== FALSE){
+        if($result && $result->num_rows === 1){
            return true;
         }else{
             return false;

@@ -214,7 +214,7 @@ function scan($scan_id){
             )
         );
         $existing_usage = DataAccess::get_meta($meta_usage_filters)[0]->meta_value;
-        if(empty($existing_usage)){
+        if(empty($existing_usage) && ($existing_usage !== '0')){
 
             // This might be the first time we run a scan, so 
             // we need to create the meta field if none exists.

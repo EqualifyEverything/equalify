@@ -27,7 +27,7 @@ async function getAlerts() {
 async function runScan() {
     console.log('5b. runScan');
 
-    const response = await fetch('actions/run_scan.php', {
+    const response = await fetch('actions/run_scan.php', { // NOTE:
         method: 'GET', 
         cache: 'no-cache',
         headers: {
@@ -50,7 +50,7 @@ async function handleScans(data){
 
     if(data.includes('Running') && theScanRows){
         setTimeout(function(){ 
-            console.log('5. running and scan rows');
+            console.log('5. running and scan rows'); // NOTE:
 
             handlePromises();
             theScanRows.innerHTML = data;
