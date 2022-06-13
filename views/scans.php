@@ -4,7 +4,7 @@
             <h1>All Scans</h1>
         </div>
         <div>
-            <a href="actions/cue_scan.php" class="btn btn-primary">New Scan</a>
+            <a href="actions/queue_scan.php" class="btn btn-primary">New Scan</a>
 
         </div>
     </div>

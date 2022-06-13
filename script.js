@@ -41,8 +41,8 @@ async function handleScans(data){
 
     theScanRows = document.getElementById('the_scans_rows');
 
-    if(!data.includes('Running') && !data.includes('Cued') && theScanRows){
-        console.log('5. not running and not cued and scan rows');
+    if(!data.includes('Running') && !data.includes('Queued') && theScanRows){
+        console.log('5. not running and not queued and scan rows');
         
         theScanRows.innerHTML = data;
         
@@ -58,18 +58,18 @@ async function handleScans(data){
         
     }
 
-    if(!data.includes('Running') && data.includes('Cued')){
-        console.log('5. not running and cued');
+    if(!data.includes('Running') && data.includes('Queued')){
+        console.log('5. not running and queued');
 
         runScan().
         then(handlePromises);
 
     }
 
-    if(!data.includes('Running') && data.includes('Cued') && theScanRows ){
+    if(!data.includes('Running') && data.includes('Queued') && theScanRows ){
 
         setTimeout(function(){ 
-            console.log('5. not running and cued and scan rows');
+            console.log('5. not running and queued and scan rows');
 
             handlePromises();
             theScanRows.innerHTML = data;

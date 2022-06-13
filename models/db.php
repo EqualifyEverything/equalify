@@ -178,7 +178,7 @@ class DataAccess {
     public static function get_next_scan(){
     
         // SQL
-        $sql = 'SELECT * FROM `scans` WHERE status = "cued" ORDER BY `time` ASC LIMIT 1';
+        $sql = 'SELECT * FROM `scans` WHERE status = "queued" ORDER BY `time` ASC LIMIT 1';
         $params = array();
     
         // Query

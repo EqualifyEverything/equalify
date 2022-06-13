@@ -198,13 +198,13 @@ require_once 'actions/install.php';
 
     // }
 
-    // const handleCuedScans = () => {
+    // const handleQueuedScans = () => {
                 
     //     runScan();
 
     // <?php
     // // We only rant to refresh the page if a scan
-    // // is running or cued and we're on the scanning
+    // // is running or queued and we're on the scanning
     // // view. This minimizes DB calls.
     // $filter_by_running_scans = array(
     //     array(
@@ -230,7 +230,7 @@ require_once 'actions/install.php';
     // }
 
     // window.onload = function(){
-    //     handleCuedScans();
+    //     handleQueuedScans();
     // };
 
 
