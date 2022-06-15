@@ -136,6 +136,7 @@ function covert_code_shortcode($subject){
     // code.
     $subject = str_replace('[code]', '<pre class="rounded bg-secondary text-white p-3 mb-1"><code>', $subject);
     $subject = str_replace('[/code]', '</code></pre>', $subject);
+    $subject = html_entity_decode($subject);
 
     // [code] is converted!
     return $subject;
