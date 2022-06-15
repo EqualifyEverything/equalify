@@ -4,15 +4,14 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // Get URL variables and fallbacks.
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if(empty($id))
-    throw new Exception('ID "'.$id.'" is invalid format.');
+$site = $_GET['site'];
+if(empty($site))
+    throw new Exception('Site is not specified');
 $old_status = $_GET['old_status'];
 if(empty($old_status))
-    throw new Exception('Status is not specfied for page "'.$id.'"');
+    throw new Exception('Status is not specfied for "'.$site.'"');
 
-// Toggle page status.
-$site = DataAccess::get_page($id)->site;
+// Toggle site status.
 if($old_status == 'active'){
     DataAccess::update_site_status($site, 'archived');
 
@@ -31,4 +30,4 @@ if($old_status == 'archived'){
 }
 
 // Redirect
-header('Location: ../index.php?view=site_details&id='.$id.'&status=success');
+header('Location: ../index.php?view=sites&status=success');

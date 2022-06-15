@@ -39,3 +39,17 @@ main{
     padding-top: .5rem;
 
 }
+pre code{
+    white-space: break-spaces;
+    word-break: break-word !important;
+}
+.nav-link{
+    color: #212529;
+}
+.fs-7{
+    font-size: .9em;
+}
+#brand{
+    text-transform: uppercase;
+    letter-spacing: .035em;
+}

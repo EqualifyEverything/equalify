@@ -10,16 +10,10 @@
     <div class="row row-cols-3 g-4 pb-4">
         
         <?php
-        // Show Page Sites
-        $filters = [
-            array(
-                'name'  => 'is_parent',
-                'value' => '1'
-            ),
-        ];
-        $pages = DataAccess::get_pages($filters);
-        if($pages != NULL ):
-            foreach($pages as $page):    
+        // Show Sites
+        $sites = DataAccess::get_sites();
+        if($sites != NULL ):
+            foreach($sites as $site):  
         ?>
 
         <div class="col">
@@ -28,18 +22,50 @@
 
                     <?php
                     // The Status Badge
-                    echo DataAccess::get_page_badge($page);
+                    $status = DataAccess::get_site_status($site);
+                    if($status == 'archived'){
+                        $bg_class = 'bg-dark';
+                        $text = 'Archived';
+                    }else{
+                        $bg_class = 'bg-success';
+                        $text = 'Active';
+                    }
+                    echo '<span class="badge mb-2 '.$bg_class.'">'.$text.'</span>';
                     ?>
 
                     <?php
                     // The Type Badge
-                    the_page_type_badge($page->type);
+                    $type = DataAccess::get_site_type($site);
+                    if($type == 'wordpress'){
+                        $type = 'WordPress';
+                    }elseif($type == 'xml'){
+                        $type = 'XML';
+                    }elseif($type == 'single_page'){
+                        $type = 'Single Page';
+                    }
+                    echo '<span class="badge bg-light text-dark">'
+                        .$type.
+                        '<span class="visually-hidden"> Site Type</span></span>';
                     ?>
                     
                     <h2 class="h5 card-title">
-                        <?php echo $page->site; ?> 
+                        <?php echo $site; ?> 
                     </h2>
-                    <a type="button" class="btn btn-outline-primary btn-sm mt-2" href="?view=site_details&id=<?php echo $page->id;?>">View Details</a>
+
+                    <?php
+                    // Button status depends on site status.
+                    if($status == 'archived'){
+                        $button_text = 'Activate';
+                        $button_class = 'btn-outline-success';
+                    }else{
+                        $button_text = 'Archive';
+                        $button_class = 'btn-outline-secondary';
+                    }
+                    ?>
+
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site;?>&old_status=<?php echo $status;?>">
+                        <?php echo $button_text;?>
+                    </a>
                 </div>
             </div>
         </div>

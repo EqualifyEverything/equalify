@@ -17,15 +17,7 @@ if(!empty($_POST['last_view'])){
 // set in the integrations file. See Github Issue #12.
 $account_records = [];
 if(!empty($_POST['wave_key'])){
-    array_push(
-        $account_records,
-        array(
-            'key'   => 'wave_key',
-            'value' => $_POST['wave_key']
-        )
-    );
+    DataAccess::update_meta_value('wave_key', $_POST['wave_key']);
 };
 
-// Time to update meta and redirect!
-DataAccess::update_meta($account_records);
 header('Location: ../index.php?view='.$last_view.'&status=success');
