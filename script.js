@@ -64,6 +64,7 @@ async function handleAlerts(data) {
 }
 
 const handlePromises = () => {
+    console.log(''); // spacing for clarity
     console.log('2. handlePromises');
 
     getScans()
@@ -71,6 +72,7 @@ const handlePromises = () => {
     .then(getAlerts)
     .then(handleAlerts)
     .then(() => setTimeout(handlePromises, 5000));
+
 }
 
 console.log('1. window');
