@@ -1,5 +1,6 @@
 async function getScans() {
     console.log('3. getScans');
+    
     const response = await fetch('actions/get_scans.php', {
         method: 'GET', 
         cache: 'no-cache',
@@ -7,8 +8,36 @@ async function getScans() {
             'Content-Type': 'text/html'
         }
     });
-    return response.text();
 
+    return response.text();
+}
+
+async function handleScans(data){
+    console.log('4. handleScans');
+
+    let theScanRows = document.getElementById('the_scans_rows');
+    
+    if (theScanRows) {
+        theScanRows.innerHTML = data;
+    }
+
+    const isQueued = data.includes('Queued');
+    const isRunning = data.includes('Running');
+
+    // don't start a new scan if one is already running
+    if (isQueued && !isRunning) {
+        console.log('5a. is not running, is queued');
+        console.log('5b. runScan');
+
+        // don't care about the response; just trigger the scan
+        fetch('actions/run_scan.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+    }
 }
 
 async function getAlerts() {
@@ -24,68 +53,14 @@ async function getAlerts() {
     return response.text();
 }
 
-async function runScan() {
-    console.log('5b. runScan');
-
-    const response = await fetch('actions/run_scan.php', { // NOTE:
-        method: 'GET', 
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    });
-}
-
-async function handleScans(data){
-    console.log('4. handleScans');
-
-    theScanRows = document.getElementById('the_scans_rows');
-
-    if(!data.includes('Running') && !data.includes('Queued') && theScanRows){
-        console.log('5. not running and not queued and scan rows');
-        
-        theScanRows.innerHTML = data;
-        
-    }
-
-    if(data.includes('Running') && theScanRows){
-        setTimeout(function(){ 
-            console.log('5. running and scan rows'); // NOTE:
-
-            handlePromises();
-            theScanRows.innerHTML = data;
-        }, 5000);
-        
-    }
-
-    if(!data.includes('Running') && data.includes('Queued')){
-        console.log('5. not running and queued');
-
-        runScan().
-        then(handlePromises);
-
-    }
-
-    if(!data.includes('Running') && data.includes('Queued') && theScanRows ){
-
-        setTimeout(function(){ 
-            console.log('5. not running and queued and scan rows');
-
-            handlePromises();
-            theScanRows.innerHTML = data;
-        }, 5000);
-        
-    }
-
-}
-
 async function handleAlerts(data) {
     console.log('7. handleAlerts');
 
     alertCount = document.getElementById('alert_count');
 
-    if (alertCount)
+    if (alertCount) {
         alertCount.innerHTML = data;
+    }
 }
 
 const handlePromises = () => {
@@ -95,12 +70,8 @@ const handlePromises = () => {
     .then(handleScans)
     .then(getAlerts)
     .then(handleAlerts)
-
+    .then(() => setTimeout(handlePromises, 5000));
 }
 
-window.onload = function(){
-    console.log('1. window');
-
-    handlePromises();
-
-}
+console.log('1. window');
+window.addEventListener('load', handlePromises);
