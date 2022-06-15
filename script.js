@@ -38,6 +38,11 @@ async function handleScans(data){
             }
         });
     }
+
+    // rejecting here breaks the promise loop and stops pinging the server
+    if (!isQueued && !isRunning) {
+        return Promise.reject('No scans queued or running');
+    }
 }
 
 async function getAlerts() {
@@ -71,7 +76,10 @@ const handlePromises = () => {
     .then(handleScans)
     .then(getAlerts)
     .then(handleAlerts)
-    .then(() => setTimeout(handlePromises, 5000));
+    .then(
+        () => setTimeout(handlePromises, 5000),
+        (rejectionReason) => console.log('Loop broken: ' + rejectionReason)
+    );
 
 }
 
