@@ -22,7 +22,8 @@ Imagine: You solve A11Y issues at their source - be that source the server or a 
 
 Equalify will become your WebOps hub, designed to solve any accessibility issue. 
 
-<img width="1510" alt="Screen Shot 2022-04-13 at 1 20 11 PM" src="https://user-images.githubusercontent.com/46652/163245142-f9844463-ba06-466e-aac1-92e069d07994.png">
+<img width="1357" alt="Screen Shot of Equalify's integrations page." src="https://user-images.githubusercontent.com/46652/173918177-be624a4f-c4eb-4eb8-91d4-0fb040d8fdc7.png">
+
 
 ## What does Equalify currently do?
 
@@ -38,7 +39,7 @@ After all your pages are added, click "Scan" and Equalify reports WCAG errors as
 
 The goal: **Equalify every website.**
 
-<img width="1336" alt="Screen Shot 2022-04-14 at 2 00 57 PM" src="https://user-images.githubusercontent.com/46652/163458795-b3d08005-0910-4f3d-b0a0-3aa5ea829a7c.png">
+<img width="1357" alt="Screen shot of Equalify's alerts page." src="https://user-images.githubusercontent.com/46652/173917980-0285437a-c584-4b34-b398-3446c1a171b1.png">
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
