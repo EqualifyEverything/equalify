@@ -326,19 +326,8 @@ class DataAccess {
         // Query
         $results = self::query($sql, $params, true);
 
-        // Results
-        $data = $results->fetch_object();
-        if($data == NULL){
-
-            // Returns "false" if no data exists.
-            return false; 
-
-        }else{
-
-            // Returns meta_value.
-            return $data->meta_value;
-
-        }
+        // Returns meta_value.
+        return $results->fetch_object();
     
     }
     
