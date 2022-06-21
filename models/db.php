@@ -51,7 +51,7 @@ class DataAccess {
     public static function get_sites($filters = []){
     
         // SQL
-        $sql = 'SELECT DISTINCT `url` FROM `sites`';
+        $sql = 'SELECT * FROM `sites`';
         $params = array();
 
         // Add optional filters
@@ -78,7 +78,7 @@ class DataAccess {
         $data = [];
         if($results->num_rows > 0){
             while($row = $results->fetch_object()){
-                array_push($data, $row->url);
+                $data[] = $row;
             }
         }
         return $data;
@@ -94,9 +94,7 @@ class DataAccess {
         // SQL
         $sql = 'SELECT * FROM `scans`';
         $params = array();
-        
-
-    
+            
         // Add optional filters
         $filter_count = count($filters);
         if($filter_count > 0){

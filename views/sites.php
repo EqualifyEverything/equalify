@@ -22,7 +22,7 @@
 
                     <?php
                     // The Status Badge
-                    $status = DataAccess::get_site_status($site);
+                    $status = $site->status;
                     if($status == 'archived'){
                         $bg_class = 'bg-dark';
                         $text = 'Archived';
@@ -35,7 +35,7 @@
 
                     <?php
                     // The Type Badge
-                    $type = DataAccess::get_site_type($site);
+                    $type = $site->type;
                     if($type == 'wordpress'){
                         $type = 'WordPress';
                     }elseif($type == 'xml'){
@@ -49,7 +49,7 @@
                     ?>
                     
                     <h2 class="h5 card-title">
-                        <?php echo $site; ?> 
+                        <?php echo $site->url; ?> 
                     </h2>
 
                     <?php
@@ -63,7 +63,7 @@
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site;?>&old_status=<?php echo $status;?>">
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
                         <?php echo $button_text;?>
                     </a>
                 </div>
