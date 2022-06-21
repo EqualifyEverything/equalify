@@ -800,9 +800,9 @@ class DataAccess {
             )
         ));
         $default_scan_process = '';
-        $default_scannable_pages = '';
-        $default_integrations_processing = '';
-        $default_sites_processing = '';
+        $default_scannable_pages = serialize(array());
+        $default_integrations_processing = serialize(array());
+        $default_sites_processing = serialize(array());
         $params = array(
             $default_active_integrations, $default_alert_tabs,
             $default_scan_process, $default_scannable_pages,
