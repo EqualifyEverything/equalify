@@ -45,7 +45,7 @@ if($type == 'single_page' ){
 // If no errors occur, we can add these sites into the URL
 // with several default items.
 DataAccess::add_site(
-    $url, $type, $status = 'active', $processed = false
+    $url, $type, $status = 'active'
 );
 
 // Back home we go.

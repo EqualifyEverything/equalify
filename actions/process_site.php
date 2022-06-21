@@ -11,71 +11,69 @@ require_once '../models/adders.php';
 $scanable_pages = unserialize(
     DataAccess::get_meta_value('scanable_pages')
 );
-
-// We are only going to process active sites that are
-// unprocessed.
-$filtered_to_active_sites = array(
-    array(
-        'name' => 'status',
-        'value' => 'active'
-    ), array(
-        'name'  => 'processed',
-        'value' => false
-    )
-);
-$sites_processing = DataAccess::get_sites(
-    $filtered_to_active_sites
-);
-if(!empty($sites_processing)){
-
-    // We want to process the first site that isn't 
-    // processed yet.
-    foreach ($sites_processing as $site){
-
-        // Processing a site means adding its site_pages as 
-        // scannable_pages meta, which we do with adders.
-        if($site->type == 'single_page'){
-            $site_pages = single_page_adder($site->url);
-        }
-        if($site->type == 'xml'){
-            $site_pages = xml_site_adder($site->url);
-        }
-        if($site->type == 'wordpress'){
-            $site_pages = wordpress_site_adder($site->url);
-        }
-
-        // Let's add these pages to scanable_pages.
-        foreach ($site_pages as $page){
-            array_push($scanable_pages, $page);
-        }
-        DataAccess::update_meta_value( 'scanable_pages', 
-            serialize($scanable_pages)
-        );
-        
-        // Let's also change the processed value.
-        DataAccess::update_page_meta($site->url, 'processed',
-            true);
-        
-        // Now we can reload the page to run the process again 
-        // - this may seem unnessary, but we want to limit the 
-        // length of the process and a curl of every site page 
-        // can be a cumbersome process that drags down on 
-        // slower servers.
-        header('Refresh:0');
-        exit;
-
-    }
-
+if(empty($scanable_pages)){
+    $scanable_pages = array();
 }
 
-// Once we've iterated through the process, we can clear out
-// sites_processing..
-DataAccess::update_meta_value( 'sites_processing', '');
+// Let's get sites_processing, which was setup in 
+// processs_scan.php.
+$sites_processing = unserialize( 
+    DataAccess::get_meta_value( 'sites_processing')
+);
+
+// Each site is processed individually. We'll always run it
+// on the first site in the loop, until there are no sites.
+if(!empty($sites_processing)){
+    $site = $sites_processing[0];
+}else{
+    $site = '';
+}
+if(!empty($site)){
+
+    // Processing a site means adding its site_pages as 
+    // scanable_pages meta, which we do with adders.
+    if($site->type == 'single_page'){
+        $site_pages = single_page_adder($site->url);
+    }
+    if($site->type == 'xml'){
+        $site_pages = xml_site_adder($site->url);
+    }
+    if($site->type == 'wordpress'){
+        $site_pages = wordpress_site_adder($site->url);
+    }
+
+    // Let's add these pages to new_scanable_pages.
+    foreach ($site_pages as $page){
+        array_push($scanable_pages, $page);
+    }
+
+    // When we're done we can push the scannable pages
+    // to the DB..
+    DataAccess::update_meta_value( 'scanable_pages', 
+        serialize($scanable_pages)
+    );
+
+    // .. and remove the site from sites_processing.
+    unset($sites_processing[0]);
+    $sites_processing_reset = array_values($sites_processing);
+    DataAccess::update_meta_value( 'sites_processing', 
+        serialize($sites_processing_reset)
+    );
+    
+    // Now we can reload the page to run the process again 
+    // - this may seem unnessary, but we want to limit the 
+    // length of the process and a curl of every site page 
+    // can be a cumbersome process that drags down on 
+    // slower servers.
+    header('Refresh:0');
+    exit;
+
+}
 
 // ..and update the meta value to the next process..
 DataAccess::update_meta_value(
     'scan_process', 'run_integrations');
 
 // ..before continuing to process the scan.
-header('Location: process_scan.php');
+//header('Location: process_scan.php');
 exit;

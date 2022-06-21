@@ -27,7 +27,22 @@ if(empty($scan_process)){
 
 // The first process is to process a site.
 if($scan_process == 'process_site'){
-            
+
+    // We only use active pages for sites_processing.
+    $sites_processing = [];
+    $filtered_to_active_sites = array(
+        array(
+            'name' => 'status',
+            'value' => 'active'
+        )
+    );
+    $active_sites = DataAccess::get_sites(
+        $filtered_to_active_sites
+    );
+    DataAccess::update_meta_value( 'sites_processing', 
+        serialize($active_sites)
+    );
+    
     // We'll redirect to a seperate page so slower servers 
     // don't get stuck waiting for big processes to 
     // complete.
@@ -37,12 +52,12 @@ if($scan_process == 'process_site'){
 }
 
 // The second process is running integrations.
-if($scan_processs == 'run_integrations'){
+if($scan_process == 'run_integrations'){
 
     // Again, we'll redirect to the process so slower 
     // servers avoid getting stuck waiting for  giant
     // process to complete.
-    header('Location: process_integrations.php');
+    // header('Location: process_integrations.php');
     exit;
 
 }

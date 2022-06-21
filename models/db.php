@@ -320,7 +320,7 @@ class DataAccess {
     public static function get_meta_value($meta_name){
 
         // SQL
-        $sql = 'SELECT * FROM `meta` WHERE `meta_name` = ?';
+        $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
         $params = array($meta_name);
     
         // Query
@@ -328,26 +328,12 @@ class DataAccess {
 
         // Returns meta_value.
         $data = $results->fetch_object();
-        return $data;
-            
-    }
-    
-    /**
-     * Get Page
-     */
-    public static function get_page($id){
-    
-        // SQL
-        $sql = 'SELECT * FROM pages WHERE id = ?';
-        $params = array($id);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object();
-        return $data;
-        
+        if(empty($data)){
+            return false;
+        }else{
+            return $data->meta_value;
+        }
+
     }
     
     /**
@@ -438,19 +424,19 @@ class DataAccess {
     /**
      * Add Site
      */
-    public static function add_site($url, $type, $status, $processed){
+    public static function add_site($url, $type, $status){
     
         // SQL
-        $sql = 'INSERT INTO `sites` (`url`, `type`, `status`, `processed`) VALUES';
+        $sql = 'INSERT INTO `sites` (`url`, `type`, `status`) VALUES';
         $sql.= '(?, ?, ?, ?)';
-        $params = array($url, $type, $status, $processed);
+        $params = array($url, $type, $status);
         
         // Query
         $result = self::query($sql, $params, false);
     
         //Fallback
         if(!$result)
-            throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$site.'"');
+            throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.'"');
         
         // Complete Query
         return $result;
@@ -713,6 +699,27 @@ class DataAccess {
     }
 
     /**
+     * Update Site Data 
+     */
+    public static function update_site_data($url, $column, $data){
+
+        // SQL
+        $sql = 'UPDATE `sites` SET `'.$column.'` = ? WHERE `url` = ?';
+        $params = array($data, $url);
+
+        // Query
+        $result = self::query($sql, $params, false);
+
+        // Result
+        if(!$result)
+            throw new Exception('Cannot update "'.$url.'" with "'.$data.'"');
+    
+        // Complete Query
+        return $result;
+
+    }
+
+    /**
      * Create Alerts Table
      */
     public static function create_alerts_table(){
@@ -773,7 +780,7 @@ class DataAccess {
             ("active_integrations", ?),
             ("alert_tabs", ?),
             ("scan_process", ?),
-            ("scannable_pages", ?),
+            ("scanable_pages", ?),
             ("integrations_processing", ?),
             ("sites_processing", ?);
 
@@ -790,12 +797,12 @@ class DataAccess {
             )
         ));
         $default_scan_process = '';
-        $default_scannable_pages = serialize(array());
+        $default_scanable_pages = serialize(array());
         $default_integrations_processing = serialize(array());
         $default_sites_processing = serialize(array());
         $params = array(
             $default_active_integrations, $default_alert_tabs,
-            $default_scan_process, $default_scannable_pages,
+            $default_scan_process, $default_scanable_pages,
             $default_integrations_processing,
             $default_sites_processing
         );
@@ -821,7 +828,6 @@ class DataAccess {
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
-                `processed` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "false",
                 `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
