@@ -327,8 +327,9 @@ class DataAccess {
         $results = self::query($sql, $params, true);
 
         // Returns meta_value.
-        return $results->fetch_object();
-    
+        $data = $results->fetch_object();
+        return $data;
+            
     }
     
     /**
