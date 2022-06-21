@@ -1,49 +1,48 @@
 <?php
+// ***************!!EQUALIFY IS FOR EVERYONE!!***************
 
 /**
  * Get Page Body
  */
 function run_curl($site_url, $type = ''){
+
+    // Setup cURL.
     $curl = curl_init($site_url);
     curl_setopt($curl, CURLOPT_URL, $site_url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-    curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+    curl_setopt($curl, CURLOPT_PROTOCOLS,
+        CURLPROTO_HTTP | CURLPROTO_HTTPS);
+    curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS, 
+        CURLPROTO_HTTP | CURLPROTO_HTTPS);
     curl_setopt($curl, CURLOPT_USERAGENT, 'Equalify');
 
-    // Restrict CURL to the type of what you want to add.
+    // Restrict cURL to the type of what you want to add.
     if($type == 'wordpress')
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER, 
+            array('Accept: application/json')
+        );
     if($type == 'xml')
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER,
+             array('Accept: application/xml')
+        );
 
-    // Execute CURL
+    // Execute cURL.
     $url_contents = curl_exec($curl);
-
-    // The curled URL is the URL we use as an ID.
-    $curled_url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-
-    // We don't include added enpoints to the URL.
-    $json_endpoints = '/wp-json/wp/v2/pages?per_page=100';
-    $curled_url = str_replace($json_endpoints, '', $curled_url);
-
-    // Make sure URL is unique to minimize scans. 
-    if(!DataAccess::is_unique_site($curled_url))
-        throw new Exception('"'.$curled_url.'" already exists');
 
     // Fallback if no contents exist.
     if($url_contents == false)
-        throw new Exception('Contents of "'.$curled_url.'" cannot be loaded');
+        throw new Exception(
+            'Contents of "'.$curled_url.'" cannot be loaded'
+        );
     curl_close($curl);
 
     // We use the curled URL as the unique ID.
-    return array(
-        'url' => $curled_url,
-        'contents' => $url_contents
-    );
+    return $url_contents;
 
 }
 
@@ -52,18 +51,12 @@ function run_curl($site_url, $type = ''){
  */
 function single_page_adder($site_url){
 
-    // Get URL contents so we can make sure URL
-    // can be scanned.
+    // We just run cURL to make sure the URL can be accessed
+    // before we run the scan
     $curled_site = run_curl($site_url);
 
-    // Site URL changes to the curled URL.
-    $site_url = $curled_site['url'];
-
-    // Single pages are saved with the following pramenters
-    $type = 'single_page';
-    $status = 'active';
-    $site = $curled_site['url'];
-    DataAccess::add_page($site_url, $type, $status, $site);
+    // If cURL works, we can return the site URL.
+    return array($site_url);
 
 }
 
@@ -80,28 +73,21 @@ function wordpress_site_adder($site_url){
     $curled_site = run_curl($json_url, 'wordpress');
 
     // Create JSON.
-    $wp_api_json = json_decode($curled_site['contents'], true);
+    $wp_api_json = json_decode($curled_site, true);
     if(empty($wp_api_json[0]))
-        throw new Exception('"'.$site_url.'" does not include WordPress functionality that Equalify requires');
+        throw new Exception(
+            '"'.$site_url.'" does not include WordPress
+            functionality that Equalify requires'
+        );
 
     // Push JSON to pages array.
     $pages = [];
     foreach ($wp_api_json as $page):
-        array_push($pages, array('url' => $page['link']));
+        array_push($pages, $page['link']);
     endforeach;
 
-    // Remove WP JSON endbpoints.
-    $clean_curled_url = str_replace($json_endpoints, '', $curled_site['url']);
-
-    // Reformat the curled contents to be an array we can 
-    // work with.
-    $curled_site = array(
-        'url' => $clean_curled_url,
-        'contents' => $pages
-    );
-
-    // Insert site in DB.
-    add_xml_or_wordpress_site_to_db($curled_site, 'wordpress');    
+    // We want an array with each page URL.
+    return $pages;    
 
 }
 
@@ -114,62 +100,25 @@ function xml_site_adder($site_url){
     $curled_site = run_curl($site_url, 'xml');
 
     // Valid XML files are only allowed!
-    $xml_contents = $curled_site['contents'];
+    $xml_contents = $curled_site;
     if(!str_starts_with($xml_contents, '<?xml'))
-        throw new Exception('"'.$curled_site['url'].'" is not a readable XML format');
+        throw new Exception(
+            '"'.$curled_site['url'].'" is not a readable 
+            XML format'
+        );
 
     // Convert XML to JSON, so we can use it later
     $xml = simplexml_load_string($xml_contents);
     $json = json_encode($xml);
-    $json_entries = json_decode($json,TRUE);
+    $json_entries = json_decode($json, TRUE);
 
     // Push JSON to pages array.
     $pages = [];
     foreach ($json_entries['url'] as $page):
-        array_push($pages, array('url' => $page['loc']));
+        array_push($pages, $page['loc']);
     endforeach;
 
-    // Reformat the curled contents to be an array we can 
-    // work with.
-    $curled_site = array(
-        'url' => $curled_site['url'],
-        'contents' => $pages
-    );
-
-    // Insert site in DB.
-    add_xml_or_wordpress_site_to_db($curled_site, 'xml');
+    // Prepare contents and return them.
+    return $pages;
     
-}
-
-/**
- * Add XML or WordPress Site to DB
- */
-function add_xml_or_wordpress_site_to_db($curled_site, $type){
-
-    // Both XML and WP deliver similar content.
-    $pages = $curled_site['contents'];
-    $site_url = $curled_site['url'];
-
-    // We're setting the status and adding pages here so we
-    // do not have to call the db inside "models/adders.php",
-    // keeping each model focused on distinct functions.
-    $pages_records = [];
-    foreach ($pages as &$page):
-
-        // Push each page to pages' records.
-        array_push(
-            $pages_records, 
-            array(
-                'url'       => $page['url'], 
-                'site'      => $site_url,
-                'status'    => 'active',
-                'type'      => $type
-            )
-        );
-
-    endforeach; 
-
-    // Finalllly, we can add pages to the DB.
-    DataAccess::add_pages($pages_records);
-
 }

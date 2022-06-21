@@ -5,30 +5,8 @@
     <ul class="nav nav-tabs mb-3">
 
         <?php
-        // Setup alert tabs.
-        $alert_tabs = DataAccess::get_meta_value('alert_tabs');
-        if(empty($alert_tabs)){
-
-            // By default, we include an "Default Alerts" tab.
-            $alert_tabs = array(
-                'current_tab' => 1,
-                'tabs'  => array(
-                    1 => array(
-                        'id'        => 1,
-                        'name'      => 'My Alerts',
-                        'filters'   => array()
-                    )
-                )
-            );
-            DataAccess::add_meta('alert_tabs', $alert_tabs);
-
-        }else{
-
-            // We need to unserialze MySQL data if that data 
-            // exists.
-            $alert_tabs = unserialize($alert_tabs);
-
-        }
+        // Alert tabs should have been setup on install.
+        $alert_tabs = unserialize(DataAccess::get_meta_value('alert_tabs'));
 
         // Setup variables.
         $tabs = $alert_tabs['tabs'];

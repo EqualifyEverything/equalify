@@ -948,7 +948,7 @@ class DataAccess {
      */
     public static function create_meta_table(){
     
-        // SQL
+        // First, create the meta table
         $sql_1 = 
         'CREATE TABLE `meta` (
             `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -961,14 +961,49 @@ class DataAccess {
         $params = array();
 
         // Query 1
-        $result = self::query($sql_1, $params, false);
+        $result_1 = self::query($sql_1, $params, false);
 
         // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
+        if(!$result_1)
+            throw new Exception('Error creating table: "'.$result_1->error.'"');
 
-        // Little Forrest is activated here.
-        self::add_meta('active_integrations', serialize(['little_forrest']));
+        // Now, create the content in the meta table.
+        $sql_2 = '
+            INSERT INTO `meta` (meta_name, meta_value)
+            VALUES 
+            ("active_integrations", ?),
+            ("alert_tabs", ?),
+            ("scan_process", ?),
+            ("scannable_pages", ?),
+            ("integrations_processing", ?);
+        ';
+        $default_active_integrations = serialize(array('little_forrest'));
+        $default_alert_tabs = serialize(array(
+            'current_tab' => 1,
+            'tabs'  => array(
+                1 => array(
+                    'id'        => 1,
+                    'name'      => 'My Alerts',
+                    'filters'   => array()
+                )
+            )
+        ));
+        $default_scan_process = '';
+        $default_scannable_pages = '';
+        $default_integrations_processing = '';
+        $params = array(
+            $default_active_integrations, $default_alert_tabs,
+            $default_scan_process, $default_scannable_pages,
+            $default_integrations_processing
+        );
+
+        // Query 2
+        $result_2 = self::query($sql_2, $params, false);
+
+        // Fallback
+        if(!$result_2)
+            throw new Exception('Error creating table: "'.$result_2->error.'"');
+        
     }
     
     /**
