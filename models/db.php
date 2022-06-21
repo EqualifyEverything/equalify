@@ -45,52 +45,6 @@ class DataAccess {
     }
 
     /**
-     * Get All Pages
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_pages($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `pages`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= 'WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-    
-        // We're adding a condition so that we don't loop
-        // when there is nothing to return.
-        if($results->num_rows == 0){
-            return NULL;
-        }else{
-            return $data;
-        }
-    }
-
-    /**
      * Get Sites
      * @param array filters [ array ('name' => $name, 'value' => $value) ]
      */
@@ -124,7 +78,7 @@ class DataAccess {
         $data = [];
         if($results->num_rows > 0){
             while($row = $results->fetch_object()){
-                array_push($data, $row->site);
+                array_push($data, $row->url);
             }
         }
         return $data;
@@ -407,42 +361,6 @@ class DataAccess {
         return $data;
         
     }
-
-    /**
-     * Get Page Site
-     */
-    public static function get_page_site($url){
-    
-        // SQL
-        $sql = 'SELECT `site` FROM `pages` WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->site;
-        return $data;
-        
-    }
-    
-    /**
-     * Get Page ID
-     */
-    public static function get_page_id($url){
-    
-        // SQL
-        $sql = 'SELECT `id` FROM `pages` WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->id;
-        return $data;
-        
-    }
     
     /**
      * Get Site Status
@@ -450,7 +368,7 @@ class DataAccess {
     public static function get_site_status($site){
     
         // SQL
-        $sql = 'SELECT `status` FROM `pages` WHERE `site` = ?';
+        $sql = 'SELECT `status` FROM `sites` WHERE `url` = ?';
         $params = array($site);
     
         // Query
@@ -465,11 +383,11 @@ class DataAccess {
     /**
      * Get Site Type
      */
-    public static function get_site_type($site){
+    public static function get_site_type($url){
     
         // SQL
-        $sql = 'SELECT `type` FROM `pages` WHERE `site` = ?';
-        $params = array($site);
+        $sql = 'SELECT `type` FROM `sites` WHERE `url` = ?';
+        $params = array($url);
     
         // Query
         $results = self::query($sql, $params, true);
@@ -508,18 +426,18 @@ class DataAccess {
     /**
      * Is Unique Site
      */
-    public static function is_unique_site($site_url){
+    public static function is_unique_site($url){
     
         // Require unique URL
-        $sql = 'SELECT * FROM `pages` WHERE `site` = ?';
+        $sql = 'SELECT * FROM `sites` WHERE `url` = ?';
     
         // We don't consider a page with a '/' a unique url
         // so we will also search for them.
         // Possible injection point:
         // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
-        $sql.= ' OR `site` = ?';
+        $sql.= ' OR `url` = ?';
     
-        $params = array($site_url, $site_url . '/');
+        $params = array($url, $url . '/');
         $results = self::query($sql, $params, true);
         if($results->num_rows > 0){
             return false;
@@ -530,14 +448,14 @@ class DataAccess {
     }
     
     /**
-     * Add Page
+     * Add Site
      */
-    public static function add_page($url, $type, $status, $site){
+    public static function add_site($url, $type, $status, $processed){
     
         // SQL
-        $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `site`) VALUES';
+        $sql = 'INSERT INTO `sites` (`url`, `type`, `status`, `processed`) VALUES';
         $sql.= '(?, ?, ?, ?)';
-        $params = array($url, $type, $status, $site);
+        $params = array($url, $type, $status, $processed);
         
         // Query
         $result = self::query($sql, $params, false);
@@ -548,77 +466,6 @@ class DataAccess {
         
         // Complete Query
         return $result;
-    }
-    
-    /**
-     * Add Pages 
-     */
-    public static function add_pages($pages_records){
-    
-        // SQL
-        $sql = 'INSERT INTO `pages` (`site`, `url`, `status`, `type`) VALUES';
-        
-        // Insert Each Record
-        $record_count = count($pages_records);
-        $record_iteration = 0;
-        $params = array();
-        foreach ($pages_records as $record){
-    
-            // SQL
-            $sql.= "(?, ?, ?, ?)";
-            $params[] = $record['site'];
-            $params[] = $record['url'];
-            $params[] = $record['status'];
-            $params[] = $record['type'];
-
-            if(++$record_iteration != $record_count)
-                $sql.= ",";
-    
-        }
-        $sql.= ";";
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert page records "'.$pages_records.'"');
-    
-    }
-
-    /**
-     * Delete Pages
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function delete_pages($filters = []){
-    
-        // SQL
-        $sql = 'DELETE FROM `pages`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= 'WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
-    
     }
     
     /**
@@ -662,31 +509,13 @@ class DataAccess {
     }
     
     /**
-     * Update Page Scanned Time 
-     */
-    public static function update_page_scanned_time($url){
-    
-        // SQL
-        $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update scan time for scan with url "'.$url.'"');
-    
-    }
-    
-    /**
      * Update Page Site Status 
      */
-    public static function update_site_status($site, $new_status){
+    public static function update_site_status($url, $new_status){
     
         // SQL
-        $sql = 'UPDATE `pages` SET `status` = ? WHERE `site` = ?';
-        $params = array($new_status, $site);
+        $sql = 'UPDATE `sites` SET `status` = ? WHERE `url` = ?';
+        $params = array($new_status, $url);
     
         // Query
         $result = self::query($sql, $params, false);
@@ -694,24 +523,6 @@ class DataAccess {
         // Result
         if(!$result)
             throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
-    }
-    
-    /**
-     * Update Page Data 
-     */
-    public static function update_page_data($url, $column, $value){
-    
-        // SQL
-        $sql = 'UPDATE `pages` SET `'.$column.'` = ? WHERE `url` = ?';
-        $params = array($value, $url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$url.'"');
-    
     }
     
     /**
