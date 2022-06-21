@@ -104,29 +104,6 @@ require_once 'actions/install.php';
                     </a>
                 </li>
             </ul>
-
-            <?php
-            // As soon as you use Equalify, you know the toll
-            // you will be asked to support the service.
-            $usage_meta = DataAccess::get_meta_value('usage');
-            if(!empty($usage_meta)):
-            ?>
-
-            <div class="border-top mt-3 pt-3">
-                <p>
-                    🎉 <strong><?php echo $usage_meta;?> pages scanned.</strong>
-                </p>
-                <p>
-                <script type="text/javascript" defer src="https://donorbox.org/install-popup-button.js"></script>
-                <script>window.DonorBox = { widgetLinkClassName: 'custom-dbox-popup' }</script>
-                    If the scans are useful to you, <a class="custom-dbox-popup" href="https://donorbox.org/keep-scans-free">donate to the project</a> to keep the service free and maintained.
-                </p>
-            </div>
-            
-            <?php
-            endif;
-            ?>
-
         </div>
         <div class="container py-3">
 
