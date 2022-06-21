@@ -20,7 +20,7 @@ $scan_process = DataAccess::get_meta_value('scan_process');
 
 // If scan has no process set, set it to the first process.
 if(empty($scan_process)){
-    DataAccess::add_meta_value('scan_process', 
+    DataAccess::update_meta_value('scan_process', 
         'process_site');
     $scan_process = 'process_site';
 }

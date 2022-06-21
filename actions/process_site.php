@@ -11,7 +11,6 @@ require_once '../models/adders.php';
 $scanable_pages = unserialize(
     DataAccess::get_meta_value('scanable_pages')
 );
-print_r($scanable_pages); die;
 
 // We are only going to process active sites that are
 // unprocessed.

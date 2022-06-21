@@ -97,7 +97,7 @@ class DataAccess {
     public static function get_sites($filters = []){
     
         // SQL
-        $sql = 'SELECT DISTINCT `site` FROM `pages`';
+        $sql = 'SELECT DISTINCT `url` FROM `sites`';
         $params = array();
 
         // Add optional filters
@@ -114,7 +114,7 @@ class DataAccess {
         
             }
         }
-        $sql.= ' ORDER BY `site`;';
+        $sql.= ' ORDER BY `url`;';
 
     
         // Query
@@ -975,7 +975,9 @@ class DataAccess {
             ("alert_tabs", ?),
             ("scan_process", ?),
             ("scannable_pages", ?),
-            ("integrations_processing", ?);
+            ("integrations_processing", ?),
+            ("sites_processing", ?);
+
         ';
         $default_active_integrations = serialize(array('little_forrest'));
         $default_alert_tabs = serialize(array(
@@ -991,10 +993,12 @@ class DataAccess {
         $default_scan_process = '';
         $default_scannable_pages = '';
         $default_integrations_processing = '';
+        $default_sites_processing = '';
         $params = array(
             $default_active_integrations, $default_alert_tabs,
             $default_scan_process, $default_scannable_pages,
-            $default_integrations_processing
+            $default_integrations_processing,
+            $default_sites_processing
         );
 
         // Query 2
@@ -1007,19 +1011,18 @@ class DataAccess {
     }
     
     /**
-     * Create Pages Table
+     * Create Sites Table
      */
-    public static function create_pages_table(){
+    public static function create_sites_table(){
     
-        // SQL 
+        // SQL
         $sql = 
-            'CREATE TABLE `pages` (
+            'CREATE TABLE `sites` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
-                `site` text COLLATE utf8mb4_bin,
-                `scanned` timestamp NULL DEFAULT NULL,
+                `processed` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "false",
                 `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
@@ -1030,7 +1033,7 @@ class DataAccess {
     
         // Fallback
         if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
+            throw new Exception('Error creating sites table: "'.$result->error.'"');
         
     }
     
