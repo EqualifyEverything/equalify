@@ -55,11 +55,12 @@ if(!empty($site)){
 
     // .. and remove the site from sites_processing.
     unset($sites_processing[0]);
-    $sites_processing_reset = array_values($sites_processing);
+    $sites_processing_reset = 
+        array_values($sites_processing);
     DataAccess::update_meta_value( 'sites_processing', 
         serialize($sites_processing_reset)
     );
-    
+
     // Now we can reload the page to run the process again 
     // - this may seem unnessary, but we want to limit the 
     // length of the process and a curl of every site page 
