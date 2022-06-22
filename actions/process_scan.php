@@ -1,15 +1,12 @@
 <?php
-// ***************!!EQUALIFY IS FOR EVERYONE!!***************
-// This is the scanner, the most important part of Equalify.
-// 
-// The goal is to scan an unlimited number of pages on the 
-// most basic Digital Ocean droplet that is tuned with a 
-// standard LEMP install. You'll notice many Equalify files
-// include the follwing comment to restrict the length of 
-// lines and keep us to our mission of building an app that
-// people, even on the most basic droplet, can use. Enjoy!
-//
-// ***************!!EQUALIFY IS FOR EVERYONE!!***************
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This is the scanner, Equalify's core. 
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 
 // This document is going to use the DB.
 require_once '../config.php';

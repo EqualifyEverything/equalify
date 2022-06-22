@@ -1,28 +1,33 @@
 <?php
 
-/**
- * Equalify is a platformed developed to integrate 
- * various services that manage websites.
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * Equalify is a platform developed to integrate various
+ * services that manage websites.
  * 
- * Copyright (C) 2022 Blake Bertuccelli
+ * The heart of the app is in actions/process_site.php -
+ * which also contains more info about our architecture.
  * 
- * This program is free software: you can 
- * redistribute it and/or modify it under the terms 
- * of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either 
- * version 3 of the License, or (at your option) any 
- * later version.
+ * You'll see comment sections like this at the top of
+ * many files to remind us of basic operating principles
+ * that drive the Equalify project forward.
  * 
- * This program is distributed in the hope that it 
- * will be useful, but WITHOUT ANY WARRANTY; without 
- * even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
- * Affero General Public License for more details.
+ * While Blake Bertuccelli established Equalify's
+ * copyright in 2022, this program is free software: you
+ * can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by
+ * the Free Foundation, either version 3 of the License,
+ * or (at your option) anylater version.
  * 
- * You should have received a copy of the GNU Affero 
- * General Public License along with this program.  
- * If not, see <https://www.gnu.org/licenses/>.
- */
+ * This program is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU Affero
+ * General Public License along with this program. If not, 
+ * see <https://www.gnu.org/licenses/>.
+**********************************************************/
 
 // Add dependencies.
 require_once 'models/hooks.php';

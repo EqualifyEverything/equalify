@@ -1,5 +1,12 @@
 <?php
-// ***************!!EQUALIFY IS FOR EVERYONE!!***************
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document to integrations as they scan each site.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 
 // This document is going to use the DB.
 require_once '../config.php';

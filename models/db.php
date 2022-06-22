@@ -1,4 +1,14 @@
 <?php
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document contains all the integrations with the 
+ * app's MySQL database.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 class DataAccess {
     // Set the records per page.
     private const ITEMS_PER_PAGE = 10;

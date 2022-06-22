@@ -38,6 +38,13 @@ The goal: **Equalify every website.**
 3. Upload/run on a Linux server (PHP 8 + MySQL required).
 4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
+## Reccomended Server
+**Equalify is for everyone!**
+
+We test all operations on a Unix server with 1GB of Memory and 1 shared CPU. Our LEMP stack includes Nginx (1.17.10), MySQL (8.0.21) and PHP (8.0) with XML, xmlreader, and xmlrpc installed.
+
+Making sure all of our functions work on that basic server helps us ensure that Equalify is for everyone.
+
 ## Special Thanks
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
 
