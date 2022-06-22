@@ -1,4 +1,14 @@
 <?php
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document adds a scan to our queue, which script.js
+ * will process.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 // Require files to control db.
 require_once '../config.php';
 require_once '../models/db.php';

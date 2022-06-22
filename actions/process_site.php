@@ -84,5 +84,5 @@ DataAccess::update_meta_value(
     'scan_process', 'run_integrations');
 
 // ..before continuing to process the scan.
-//header('Location: process_scan.php');
+header('Location: process_scan.php');
 exit;

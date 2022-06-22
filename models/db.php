@@ -162,6 +162,29 @@ class DataAccess {
     }
 
     /**
+     * Get Current Scan
+     */
+    public static function get_current_scan_id(){
+    
+        // SQL
+        $sql = 'SELECT `id` FROM `scans` WHERE `status` = ?';
+        $params = array('running');
+    
+        // Query
+        $results = self::query($sql, $params, true);
+    
+        // Result
+        $data = $results->fetch_object();
+        if(empty($data)){
+            return '';
+        }else{
+            return $data->id;
+        }
+        return $data;
+    
+    }
+
+    /**
      * Get Alerts
      * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
      * @param string page

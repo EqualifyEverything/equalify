@@ -1,7 +1,19 @@
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This script triggers the scan, asyncronistically. We're
+ * doing it this way so that we don't have to depend on 
+ * CRON, thus simplifying the app's installation.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 async function getScans() {
     console.log('3. getScans');
     
-    const response = await fetch('actions/get_scans.php', {
+    const response = await fetch('actions/get_scans.php', 
+    {
         method: 'GET', 
         cache: 'no-cache',
         headers: {
@@ -15,7 +27,8 @@ async function getScans() {
 async function handleScans(data){
     console.log('4. handleScans');
 
-    let theScanRows = document.getElementById('the_scans_rows');
+    let theScanRows = 
+        document.getElementById('the_scans_rows');
     
     if (theScanRows) {
         theScanRows.innerHTML = data;
@@ -24,13 +37,14 @@ async function handleScans(data){
     const isQueued = data.includes('Queued');
     const isRunning = data.includes('Running');
 
-    // don't start a new scan if one is already running
+    // don't start a new scan if one is already running.
     if (isQueued && !isRunning) {
         console.log('5a. is not running, is queued');
         console.log('5b. runScan');
 
-        // don't care about the response; just trigger the scan
-        fetch('actions/run_scan.php', {
+        // Don't care about the response; just trigger
+        // the scan.
+        fetch('actions/process_scan.php', {
             method: 'GET', 
             cache: 'no-cache',
             headers: {
@@ -39,16 +53,20 @@ async function handleScans(data){
         });
     }
 
-    // rejecting here breaks the promise loop and stops pinging the server
+    // Rejecting here breaks the promise loop and stops 
+    // pinging the server.
     if (!isQueued && !isRunning) {
-        return Promise.reject('No scans queued or running');
+        return Promise.reject(
+            'No scans queued or running'
+        );
     }
 }
 
 async function getAlerts() {
     console.log('6. getAlerts');
 
-    const response = await fetch('actions/get_alerts.php', {
+    const response = await fetch('actions/get_alerts.php',
+    {
         method: 'GET', 
         cache: 'no-cache',
         headers: {
@@ -78,7 +96,8 @@ const handlePromises = () => {
     .then(handleAlerts)
     .then(
         () => setTimeout(handlePromises, 5000),
-        (rejectionReason) => console.log('Loop broken: ' + rejectionReason)
+        (rejectionReason) => console.log(
+            'Loop broken: ' + rejectionReason)
     );
 
 }
