@@ -40,7 +40,7 @@ async function handleScans(data){
     // don't start a new scan if one is already running.
     if (isQueued && !isRunning) {
         console.log('5a. is not running, is queued');
-        console.log('5b. runScan');
+        console.log('5b. process scan.');
 
         // Don't care about the response; just trigger
         // the scan.
