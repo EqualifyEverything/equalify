@@ -60,7 +60,7 @@ function run_scan(){
 ?>
 
 <script>
-async function scanSites() {    
+async function runScan() {    
     fetch('actions/process_scan.php', {
         method: 'GET', 
         cache: 'no-cache',
@@ -69,7 +69,10 @@ async function scanSites() {
         }
     });
 }
-window.addEventListener('load', scanSites);
+const handlePromises = () => {
+    runScan();
+}
+window.addEventListener('load', handlePromises);
 </script>
 
 <?php
