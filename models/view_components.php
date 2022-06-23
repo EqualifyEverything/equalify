@@ -92,42 +92,6 @@ function the_integration_settings_button($integration_uri, $integration_status){
 }
 
 /**
- * The Scan Rows
- */
-function the_scan_rows($scans){
-
-    // Needs output buffer so HTML can be stored.
-    ob_start();
-
-        // Begin Scans
-        if(count($scans) > 0 ): foreach($scans as $scan):    
-        ?>
-
-        <tr>
-            <td><?php echo $scan->time;?></td>
-            <td><?php echo ucwords($scan->status);?></td>
-        </tr>
-
-        <?php 
-        // Fallback
-        endforeach; else:
-        ?>
-
-        <tr>
-            <td colspan="2">No scans found.</td>
-        </tr>
-
-        <?php 
-        
-        // End Scans
-        endif;
-
-    // Clean the buff.
-    echo ob_get_clean();
-
-}
-
-/**
  * Convert Code Shortcode
  */
 function covert_code_shortcode($subject){

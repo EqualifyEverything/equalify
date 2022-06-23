@@ -1,7 +1,7 @@
 <section>
-    <h1 class="mb-3 pb-4 border-bottom">
-        All Alerts
-    </h1>
+    <div class="mb-3 pb-4 border-bottom">
+        <h1>All Alerts</h1>
+    </div>
     <ul class="nav nav-tabs mb-3">
 
         <?php

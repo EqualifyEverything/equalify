@@ -74,7 +74,7 @@ if(!empty($site)){
     // length of the process and a curl of every site page 
     // can be a cumbersome process that drags down on 
     // slower servers.
-    header('Refresh:0');
+    header('Location: process_site.php');
     exit;
 
 }

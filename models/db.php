@@ -94,95 +94,6 @@ class DataAccess {
         return $data;
     
     }
-    
-    /**
-     * Get Scans
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_scans($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `scans`';
-        $params = array();
-            
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s") DESC;';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * Get Next Scan
-     */
-    public static function get_next_scan(){
-    
-        // SQL
-        $sql = 'SELECT * FROM `scans` WHERE status = "queued" ORDER BY `time` ASC LIMIT 1';
-        $params = array();
-    
-        // Query
-        $results = self::query($sql, $params, false);
-    
-        // Results
-        $data = $results->fetch_object();
-        if($data == NULL || empty($data)){
-
-            // Returns "false" if no data exists.
-            return NULL;
-
-        }else{
-
-            // Returns meta_value.
-            return $data;
-
-        }
-    
-    }
-
-    /**
-     * Get Current Scan
-     */
-    public static function get_current_scan_id(){
-    
-        // SQL
-        $sql = 'SELECT `id` FROM `scans` WHERE `status` = ?';
-        $params = array('running');
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object();
-        if(empty($data)){
-            return '';
-        }else{
-            return $data->id;
-        }
-        return $data;
-    
-    }
 
     /**
      * Get Alerts
@@ -475,46 +386,7 @@ class DataAccess {
         return $result;
     }
     
-    /**
-     * Add Scan
-     */
-    public static function add_scan($status, $time){
-    
-        // SQL
-        $sql = 'INSERT INTO `scans` (`status`, `time`) VALUES';
-        $sql.= '(?, ?)';
-        $params = array($status, $time);
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert scan with status "'.$status.'" and time "'.$time.'"');
-        
-        // Complete Query
-        return $result;
-        
-    }
 
-    /**
-     * Update Scan Status 
-     */
-    public static function update_scan_status($scan_id, $new_status){
-    
-        // SQL
-        $sql = 'UPDATE `scans` SET `status` = ? WHERE `id` = ?';
-        $params = array($new_status, $scan_id);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update scan id "'.$scan_id.'" to new status "'.$new_status.'"');
-    
-    }
-    
     /**
      * Update Page Site Status 
      */
@@ -815,7 +687,8 @@ class DataAccess {
             ("scan_process", ?),
             ("scanable_pages", ?),
             ("integrations_processing", ?),
-            ("sites_processing", ?);
+            ("sites_processing", ?),
+            ("last_scan_time", ?);
 
         ';
         $default_active_integrations = serialize(array('little_forrest'));
@@ -833,11 +706,13 @@ class DataAccess {
         $default_scanable_pages = serialize(array());
         $default_integrations_processing = serialize(array());
         $default_sites_processing = serialize(array());
+        $default_last_scan_time = '';
         $params = array(
             $default_active_integrations, $default_alert_tabs,
             $default_scan_process, $default_scanable_pages,
             $default_integrations_processing,
-            $default_sites_processing
+            $default_sites_processing,
+            $default_last_scan_time
         );
 
         // Query 2
@@ -872,30 +747,6 @@ class DataAccess {
         // Fallback
         if(!$result)
             throw new Exception('Error creating sites table: "'.$result->error.'"');
-        
-    }
-    
-    /**
-     * Create Scans Table
-     */
-    public static function create_scans_table(){
-    
-        // SQL
-        $sql = 
-            'CREATE TABLE `scans` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NULL DEFAULT NULL,
-                `status` varchar(20) NOT NULL,
-                PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;';
-        $params = array();
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
         
     }
     
