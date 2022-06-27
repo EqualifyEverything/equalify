@@ -9,8 +9,8 @@
 **********************************************************/
 
 // This document is going to use the DB.
-require_once '../config.php';
-require_once '../models/db.php';
+require_once 'config.php';
+require_once 'models/db.php';
 
 // scan_process helps us redirect to different processes.
 $scan_process = DataAccess::get_meta_value('scan_process');
@@ -46,7 +46,7 @@ if($scan_process == 'process_site'){
     // We'll redirect to a seperate page so slower servers 
     // don't get stuck waiting for big processes to 
     // complete.
-    header('Location: process_site.php');
+    shell_exec($GLOBALS['PHP_PATH'].' cli/process_site.php > /dev/null 2>/dev/null &');
     exit;
 
 }

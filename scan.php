@@ -28,7 +28,7 @@ if(empty($scan_time)){
 }else{
 
     // When scan time is not empty we should set the time 
-    // of the next scan.
+    // of the next scan.te
     $scan_time = new DateTime($scan_time); 
     $next_scan_time = $scan_time->modify('+1 day');
 
@@ -54,26 +54,7 @@ if(empty($scan_time)){
  */
 function run_scan(){
 
-    // We trigger the scan via javascript, so it runs in 
-    // the background and spares users with the headache 
-    // of setting up CRON.
-?>
-
-<script>
-async function runScan() {    
-    fetch('actions/process_scan.php', {
-        method: 'GET', 
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    });
-}
-const handlePromises = () => {
-    runScan();
-}
-window.addEventListener('load', handlePromises);
-</script>
-
-<?php
+    // The scan runs in the background.
+    shell_exec($GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &');
+    
 }

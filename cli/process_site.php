@@ -10,9 +10,9 @@
 **********************************************************/
 
 // This document is going to use the DB and adders.
-require_once '../config.php';
-require_once '../models/db.php';
-require_once '../models/adders.php';
+require_once 'config.php';
+require_once 'models/db.php';
+require_once 'models/adders.php';
 
 // The main purpose of this process is to declare the 
 // 'scanable_pages' meta, which may have been created.
@@ -74,7 +74,7 @@ if(!empty($site)){
     // length of the process and a curl of every site page 
     // can be a cumbersome process that drags down on 
     // slower servers.
-    header('Location: process_site.php');
+    shell_exec($GLOBALS['PHP_PATH'].' cli/process_site.php > /dev/null 2>/dev/null &');
     exit;
 
 }
@@ -84,5 +84,5 @@ DataAccess::update_meta_value(
     'scan_process', 'run_integrations');
 
 // ..before continuing to process the scan.
-header('Location: process_scan.php');
+shell_exec($GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &');
 exit;
