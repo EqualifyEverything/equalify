@@ -19,7 +19,7 @@ class DataAccess {
         if (self::$conn) {
             return self::$conn;
         } else {
-            self::$conn = new mysqli($GLOBALS['DB_HOST'], $GLOBALS['DB_USERNAME'], $GLOBALS['DB_PASSWORD'], $GLOBALS['DB_NAME']);
+            self::$conn = new mysqli($GLOBALS['DB_HOST'], $GLOBALS['DB_USERNAME'], $GLOBALS['DB_PASSWORD'], $GLOBALS['DB_NAME'],  $GLOBALS['DB_PORT'],  $GLOBALS['DB_SOCKET']);
             if(self::$conn->connect_error){
                 throw new Exception('Cannot connect to database: ' . self::$conn->connect_error);
             }
