@@ -33,7 +33,10 @@ if(empty($scan_time)){
     $next_scan_time = $scan_time->modify('+1 day');
 
     // Is the scan_time after the current time?
-    if( $next_scan_time->format('Y-m-d H:i:s') < date('Y-m-d H:i:s') ){
+    if( 
+        $next_scan_time->format('Y-m-d H:i:s') 
+        < date('Y-m-d H:i:s') 
+    ){
 
         // We don't want any scan process to be running,
         //  so we don't overwrite an existing process.
@@ -55,6 +58,8 @@ if(empty($scan_time)){
 function run_scan(){
 
     // The scan runs in the background.
-    shell_exec($GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &');
+    shell_exec(
+        $GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &'
+    );
     
 }
