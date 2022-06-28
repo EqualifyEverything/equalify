@@ -501,7 +501,7 @@ class DataAccess {
     /**
      * Add Alert
      */
-    public static function add_alert($source, $url, $site, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
+    public static function add_alert($source, $url, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
         
         // Sanitize items.
         $message = htmlspecialchars($message, ENT_NOQUOTES);
@@ -520,16 +520,16 @@ class DataAccess {
             throw new Exception('Alert source, "'.$source.'," is not allowed');
 
         // SQL
-        $sql = 'INSERT INTO `alerts` (`source`, `url`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
-        $sql.= '(?, ?, ?, ?, ?, ?, ?)';
-        $params = array($source, $url, $site, $integration_uri, $type, $message, $meta);
+        $sql = 'INSERT INTO `alerts` (`source`, `url`, `integration_uri`, `type`, `message`, `meta`) VALUES';
+        $sql.= '(?, ?, ?, ?, ?, ?)';
+        $params = array($source, $url, $integration_uri, $type, $message, $meta);
         
         // Query
         $result = self::query($sql, $params, false);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert alert with the variables "'.$source.'", "'.$url.'", "'.$site.'", "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
+            throw new Exception('Cannot insert alert with the variables "'.$source.'", "'.$url.'",  "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
         
         // Complete Query
         return $result;
@@ -736,7 +736,6 @@ class DataAccess {
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
-                `little_forest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forest is activated here.
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
         $params = array();

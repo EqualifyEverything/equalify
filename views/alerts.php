@@ -57,7 +57,7 @@
     <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
         <div class="col-12">
             <div class="input-group input-group-sm">
-                <input type="text" class="form-control" placeholder="Keyword or Website.." aria-label="Search Term" aria-describedby="basic-addon1">
+                <input type="text" class="form-control" placeholder="Keyword or URL.." aria-label="Search Term" aria-describedby="basic-addon1">
                 <button class="btn btn-outline-secondary" type="button">Search</button>
             </div>
         </div>

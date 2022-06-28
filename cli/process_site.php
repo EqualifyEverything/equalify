@@ -52,7 +52,7 @@ if(!empty($site)){
 
     // Let's add these pages to new_scanable_pages.
     foreach ($site_pages as $page){
-        array_push($scanable_pages, $page);
+        array_push($scanable_pages, $page);        
     }
 
     // When we're done we can push the scannable pages
@@ -69,20 +69,14 @@ if(!empty($site)){
         serialize($sites_processing_reset)
     );
 
-    // Now we can reload the page to run the process again 
-    // - this may seem unnessary, but we want to limit the 
-    // length of the process and a curl of every site page 
-    // can be a cumbersome process that drags down on 
+    // Now we can run the process again - we want to limit
+    // the length of the process and a curl of every site 
+    // page can be a cumbersome process that drags down on 
     // slower servers.
-    shell_exec($GLOBALS['PHP_PATH'].' cli/process_site.php > /dev/null 2>/dev/null &');
-    exit;
+    shell_exec(
+        $GLOBALS['PHP_PATH'].
+        ' cli/process_site.php'
+    );
+    die;
 
 }
-
-// ..and update the meta value to the next process..
-DataAccess::update_meta_value(
-    'scan_process', 'run_integrations');
-
-// ..before continuing to process the scan.
-shell_exec($GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &');
-exit;

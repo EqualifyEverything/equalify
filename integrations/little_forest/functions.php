@@ -5,40 +5,13 @@
  */
 
 /**
- * Little Forest Fields
- */
-function little_forest_fields(){
-
-    $little_forest_fields = array(
-        
-        // These fields are added to the database.
-        'db' => [
-
-                // Pages fields.
-                'pages' => [
-                    array(
-                        'name' => 'little_forest_wcag_2_1_errors',
-                        'type'  => 'VARCHAR(20)'
-                    )
-                ]
-            
-        ]
-        
-    );
-
-    // Return fields
-    return $little_forest_fields;
-
-}
-
-/**
  * little_forest Scans
  */
 function little_forest_scans($url){
 
     // Add DB info and required functions.
-    require_once '../config.php';
-    require_once '../models/db.php';
+    require_once 'config.php';
+    require_once 'models/db.php';
 
     // Get Little Forest data.
     $override_https = array(
@@ -61,28 +34,12 @@ function little_forest_scans($url){
     $little_forest_warnings = $little_forest_json_decoded['Warnings'];
     if($little_forest_errors == NULL)
         $little_forest_errors = 0;
-        
-    // Remove previously saved alerts.
-    $alerts_filter = [
-        array(
-            'name'   =>  'url',
-            'value'  =>  $url
-        ),
-        array(
-            'name'   =>  'integration_uri',
-            'value'  =>  'little_forest'
-        )
-    ];
-    DataAccess::delete_alerts($alerts_filter);
 
     // Prevent a bug that occurs because LF adds "0" when no notices or errors.
     if($little_forest_errors == 0)
         $little_forest_errors = [];
     if($little_forest_warnings == 0)
         $little_forest_warnings = [];
-
-    // Set site title.
-    $site = DataAccess::get_page_site($url);
 
     // Add errors.
     if(count($little_forest_errors) >= 1){
@@ -103,7 +60,7 @@ function little_forest_scans($url){
             }
 
             // Add notice.
-            DataAccess::add_alert('page', $url, $site, 'little_forest', 'error', $message, $meta);
+            DataAccess::add_alert('page', $url, 'little_forest', 'error', $message, $meta);
 
         }
     }
@@ -127,7 +84,7 @@ function little_forest_scans($url){
             }
 
             // Add notice.
-            DataAccess::add_alert('page', $url, $site, 'little_forest', 'notice', $message, $meta);
+            DataAccess::add_alert('page', $url, 'little_forest', 'notice', $message, $meta);
 
         }
     }
@@ -151,14 +108,9 @@ function little_forest_scans($url){
             }
 
             // Add warning.
-            DataAccess::add_alert('page', $url, $site, 'little_forest', 'warning', $message, $meta);
+            DataAccess::add_alert('page', $url, 'little_forest', 'warning', $message, $meta);
 
         }
     }
-
-
-    // Update page data.
-    $total_alerts = count($little_forest_errors+$little_forest_notices+$little_forest_warnings);
-    DataAccess::update_page_data($url, 'little_forest_wcag_2_1_errors', $total_alerts);
 
 }

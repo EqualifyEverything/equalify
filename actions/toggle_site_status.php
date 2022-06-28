@@ -14,16 +14,6 @@ if(empty($old_status))
 // Toggle site status.
 if($old_status == 'active'){
     DataAccess::update_site_status($site, 'archived');
-
-    // Alerts are deleted when a page is archived.
-    $filters = [
-        array(
-            'name'  => 'site',
-            'value' => $site
-        )
-    ];
-    DataAccess::delete_alerts($filters);
-    
 }
 if($old_status == 'archived'){
     DataAccess::update_site_status($site, 'active');
