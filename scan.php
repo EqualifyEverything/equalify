@@ -59,7 +59,8 @@ function run_scan(){
 
     // The scan runs in the background.
     shell_exec(
-        $GLOBALS['PHP_PATH'].' cli/process_scan.php > /dev/null 2>/dev/null &'
+        $GLOBALS['PHP_PATH'].
+        ' cli/process_scan.php > /dev/null 2>/dev/null &'
     );
     
 }
