@@ -44,8 +44,7 @@ if($scan_process == 'process_site'){
     );
     
     // We'll redirect to a seperate page so slower servers 
-    // don't get stuck waiting for big processes to 
-    // complete.
+    // don't get stuck waiting for big processes.
     shell_exec($GLOBALS['PHP_PATH'].' cli/process_site.php > /dev/null 2>/dev/null &');
     exit;
 
