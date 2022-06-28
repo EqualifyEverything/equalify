@@ -691,7 +691,7 @@ class DataAccess {
             ("last_scan_time", ?);
 
         ';
-        $default_active_integrations = serialize(array('little_forrest'));
+        $default_active_integrations = serialize(array('little_forest'));
         $default_alert_tabs = serialize(array(
             'current_tab' => 1,
             'tabs'  => array(
@@ -736,7 +736,7 @@ class DataAccess {
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
-                `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
+                `little_forest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forest is activated here.
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
         $params = array();

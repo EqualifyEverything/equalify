@@ -20,7 +20,7 @@ Equalify will become your WebOps hub, designed to solve any accessibility issue.
 
 The app currently scans pages for WCAG errors.
 
-Equalify supports [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
+Equalify supports [Little Forest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
 
 After selecting an integration, import any site.
 
@@ -46,7 +46,7 @@ We test all operations on a Unix server with 1GB of Memory and 1 shared CPU. Our
 Making sure all of our functions work on that basic server helps us ensure that Equalify is for everyone.
 
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forrest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
 
 This project is Open Source to inspire new collaborations.
 
