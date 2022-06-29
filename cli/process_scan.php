@@ -46,4 +46,4 @@ $added_alerts = number_format(
     $ending_alerts_count - $starting_alerts_count
 );
 echo "\n\n\nEqualify logged $added_alerts new alerts in just 
-    $exec_time seconds.\n\n\nHow can we do better?\n\n\n";
+    $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";

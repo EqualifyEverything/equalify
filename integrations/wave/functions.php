@@ -49,7 +49,6 @@ function wave_fields(){
  * WAVE Scans
  */
 function wave_scans($url){
-    echo "$url\n";
 
     // Add DB and required functions.
     require_once 'config.php';

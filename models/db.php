@@ -637,7 +637,6 @@ class DataAccess {
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `url` text,
-                `site` text,
                 `integration_uri` varchar(200) DEFAULT NULL,
                 `message` text,
                 `meta` text,
