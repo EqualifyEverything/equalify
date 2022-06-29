@@ -49,6 +49,7 @@ function wave_fields(){
  * WAVE Scans
  */
 function wave_scans($url){
+    echo "$url\n";
 
     // Add DB and required functions.
     require_once 'config.php';
@@ -73,9 +74,7 @@ function wave_scans($url){
     $wave_errors = $wave_json_decoded['categories']['error']['count'];
 
     // Set optional alerts.
-    if($wave_errors >= 1){
-        $site = DataAccess::get_page_site($url);
-        DataAccess::add_alert('page', $url, 'wave', 'error', 'WCAG 2.1 page errors found! See <a href="https://wave.webaim.org/report#/'.$page->url.'" target="_blank">WAVE report</a>.');
-    }
+    if($wave_errors >= 1)
+        DataAccess::add_alert('page', $url, 'wave', 'error', 'WCAG 2.1 page error found! See <a href="https://wave.webaim.org/report#/'.$url.'" target="_blank">WAVE report</a>.');
         
 }
