@@ -1,7 +1,7 @@
 <?php
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document to integrations as they scan each site.
+ * This document runs integrations as they scan each site.
  * 
  * As always, we must remember that every function should 
  * be designed to be as effcient as possible so that 
