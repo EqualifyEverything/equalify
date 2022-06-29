@@ -684,10 +684,8 @@ class DataAccess {
             VALUES 
             ("active_integrations", ?),
             ("alert_tabs", ?),
-            ("scan_process", ?),
+            ("scan_status", ?),
             ("scanable_pages", ?),
-            ("integrations_processing", ?),
-            ("sites_processing", ?),
             ("last_scan_time", ?);
 
         ';
@@ -702,16 +700,12 @@ class DataAccess {
                 )
             )
         ));
-        $default_scan_process = '';
+        $default_scan_status = '';
         $default_scanable_pages = serialize(array());
-        $default_integrations_processing = serialize(array());
-        $default_sites_processing = serialize(array());
         $default_last_scan_time = '';
         $params = array(
             $default_active_integrations, $default_alert_tabs,
-            $default_scan_process, $default_scanable_pages,
-            $default_integrations_processing,
-            $default_sites_processing,
+            $default_scan_status, $default_scanable_pages,
             $default_last_scan_time
         );
 

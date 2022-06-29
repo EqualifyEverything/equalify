@@ -8,33 +8,56 @@
  * Equalify works for everyone.
 **********************************************************/
 
+// First, we'll log our progress.
+echo "\n\n\n> Processing integrations...";
+
 // This document is going to use the DB.
 require_once 'config.php';
 require_once 'models/db.php';
 
-// `integrations_processing` meta records what 
-// integrations are running or left to run.
-$integrations_processing = unserialize(
-    DataAccess::get_meta_value('integrations_processing')
+// This process is going to run active integrations.
+$active_integrations = unserialize(
+    DataAccess::get_meta_value('active_integrations')
 );
 
-// Now we run each integration.
-if(!empty($integrations_processing)){
-    foreach ($integrations_processing as $integration){
+// Let's log our progress.
+$active_integrations_count = count($active_integrations);
+echo "\n> $active_integrations_count active integration";
+if($active_integrations_count > 1 ){
+    echo 's';
+}
+echo ':';
+
+// If there's no integrations ready to process, we don't
+// need to run the process.
+if(!empty($active_integrations)){
+
+    // Now we run each integration.
+    foreach ($active_integrations as $integration){
+
+        // Let's log our progress and time.
+        echo "\n>>> Running \"$integration.\"";
+        $time_pre = microtime(true);
 
         // Every integration file is added using a
         // standard pattern.
         require_once 
             'integrations/'.$integration.'/functions.php';
 
-        // We'll run each integration against pages that
-        // the integration hasn't scanned.
+        // We'll run each integration against meta we 
+        // setup in process_site.php
         $scanable_pages = 
             unserialize(DataAccess::get_meta_value(
                 'scanable_pages'
             ))
         ;
+
+        // No scanable pages means no need for the
+        // integration process.
         if(!empty($scanable_pages)){
+
+            // Each page is run against the integration's
+            // functions.
             foreach ($scanable_pages as $page){
             
                 // Every integration should use the same 
@@ -50,8 +73,8 @@ if(!empty($integrations_processing)){
 
                     } catch (Exception $x) {
 
-                        // We will alert folks when an error
-                        // occurs.
+                        // We will alert folks if an error
+                        // occurs in the integration.
                         DataAccess::add_alert(
                             'system', $page, $integration, 
                             'error', $x->getMessage(), NULL
@@ -64,25 +87,13 @@ if(!empty($integrations_processing)){
 
         }
 
-        // Once there's no more unscanned pages, we can 
-        // remove the integration from the array.
-        unset($integrations_processing[0]);
-        $integrations_processing_reset = 
-            array_values($integrations_processing);
-        DataAccess::update_meta_value( 
-            'integrations_processing', 
-            serialize($integrations_processing_reset)
+        // Log our progress.
+        $time_post = microtime(true);
+        $exec_time = $time_post - $time_pre;
+        $alerts_count = number_format(
+            DataAccess::count_alerts()
         );
-
-        // Now we can run the process again - we want to 
-        // limit the length of the process and a curl of 
-        // every site  page can be a cumbersome process 
-        // that drags down on  slower servers.
-        shell_exec(
-            $GLOBALS['PHP_PATH'].
-            ' cli/process_integration.php'
-        );
-        die;
+        echo "\n>>> Completed \"$integration\" in $exec_time seconds.";
 
     }
 }
