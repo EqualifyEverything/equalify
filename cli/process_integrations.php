@@ -12,8 +12,9 @@
 echo "\n\n\n> Processing integrations...";
 
 // This document is going to use the DB.
-require_once 'config.php';
-require_once 'models/db.php';
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/config.php');
+require_once(__ROOT__.'/models/db.php');
 
 // This process is going to run active integrations.
 $active_integrations = unserialize(

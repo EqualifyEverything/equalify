@@ -11,7 +11,7 @@
         
         <?php
         // Show Sites
-        $sites = DataAccess::get_sites();
+        $sites = DataAccess::get_db_entries('sites');
         if($sites != NULL ):
             foreach($sites as $site):  
         ?>

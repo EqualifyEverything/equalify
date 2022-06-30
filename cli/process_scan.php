@@ -8,8 +8,9 @@
 **********************************************************/
 
 // This document is going to use the DB.
-require_once 'config.php';
-require_once 'models/db.php';
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/config.php');
+require_once(__ROOT__.'/models/db.php');
 
 // We keep track of the scan process in the DB, so we can
 // see if the scan is running in other areas of our app.

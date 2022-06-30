@@ -19,9 +19,18 @@ class DataAccess {
         if (self::$conn) {
             return self::$conn;
         } else {
-            self::$conn = new mysqli($GLOBALS['DB_HOST'], $GLOBALS['DB_USERNAME'], $GLOBALS['DB_PASSWORD'], $GLOBALS['DB_NAME'],  $GLOBALS['DB_PORT'],  $GLOBALS['DB_SOCKET']);
+            self::$conn = new mysqli(
+                $GLOBALS['DB_HOST'], 
+                $GLOBALS['DB_USERNAME'], 
+                $GLOBALS['DB_PASSWORD'], 
+                $GLOBALS['DB_NAME'],  
+                $GLOBALS['DB_PORT'],  
+                $GLOBALS['DB_SOCKET']);
             if(self::$conn->connect_error){
-                throw new Exception('Cannot connect to database: ' . self::$conn->connect_error);
+                throw new Exception(
+                    'Cannot connect to database: '
+                    .self::$conn->connect_error
+                );
             }
             return self::$conn;
         }
@@ -35,16 +44,22 @@ class DataAccess {
      * @param boolean $return If we're expecting a result.
      * @return mysqli_result|boolean
      */
-    private static function query($sql, $params, $return) {
+    private static function query($sql, $params, $return) 
+    {
         $connection = self::connect();
         if (empty($params)) {
             $results = $connection->query($sql);
         } else {
             $statement = $connection->prepare($sql);
             if ($statement === false) {
-                throw new Exception('Unable to prepare SQL: ' . $connection->error);
+                throw new Exception(
+                    'Unable to prepare SQL: '
+                    .$connection->error
+                );
             }
-            $statement->bind_param(str_repeat('s', count($params)), ...$params);
+            $statement->bind_param(str_repeat(
+                's', count($params)
+            ), ...$params);
             $results = $statement->execute();
             if ($return) {
                 $results = $statement->get_result();
@@ -55,52 +70,18 @@ class DataAccess {
     }
 
     /**
-     * Get Sites
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_sites($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `sites`';
-        $params = array();
-
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ' ORDER BY `url`;';
-
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    
-    }
-
-    /**
      * Get Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param array filters 
+     * * [ array (
+     * * * 'name' => $name, 
+     * * * 'value' => $value, 
+     * * * 'page' => $page
+     * * ) ]
      * @param string page
      */
-    public static function get_alerts($filters = [], $page = 1){
+    public static function get_alerts(
+        $filters = [], $page = 1
+    ){
 
         // Set alerts per page.
         $alerts_per_page = self::ITEMS_PER_PAGE;
@@ -194,71 +175,6 @@ class DataAccess {
     }
 
     /**
-     * Get Alerts By Site
-     */
-    public static function get_alerts_by_site($site){
-    
-        // SQL
-        $sql = 'SELECT * FROM `alerts` WHERE `site` = ?';
-        $params = array($site);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-
-        // Close
-        $results->close();
-    
-    }
-
-    /**
-     * Get Meta
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_meta($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `meta`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    }
-    
-    /**
      * Get Meta Value
      */
     public static function get_meta_value($meta_name){
@@ -279,68 +195,7 @@ class DataAccess {
         }
 
     }
-    
-    /**
-     * Get Site Status
-     */
-    public static function get_site_status($site){
-    
-        // SQL
-        $sql = 'SELECT `status` FROM `sites` WHERE `url` = ?';
-        $params = array($site);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->status;
-        return $data;
-        
-    }
 
-    /**
-     * Get Site Type
-     */
-    public static function get_site_type($url){
-    
-        // SQL
-        $sql = 'SELECT `type` FROM `sites` WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->type;
-        return $data;
-        
-    }
-    
-    /**
-     * Get Column Names
-     */
-    public static function get_column_names($table){
-    
-        // SQL
-        $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS ';
-        $sql.= 'WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?';
-        $params = array($table, $GLOBALS['DB_NAME']);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    
-    }
-    
-    
     /**
      * Is Unique Site
      */
@@ -403,6 +258,45 @@ class DataAccess {
         if(!$result)
             throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
     }
+
+    /**
+     * Get DB Entries
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value) ]
+     */
+    public static function get_db_entries($db, $filters = []){
+    
+        // SQL
+        $sql = 'SELECT * FROM `'.$db.'`';
+        $params = array();
+
+        // Add optional filters
+        $filter_count = count($filters);
+        if($filter_count > 0){
+            $sql.= ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $sql.= ' AND ';
+        
+            }
+        }
+    
+        // Query
+        $results = self::query($sql, $params, true);
+    
+        // Result
+        $data = [];
+        if($results->num_rows > 0){
+            while($row = $results->fetch_object()){
+                $data[] = $row;
+            }
+        }
+        return $data;
+    
+    }
     
     /**
      * Add DB Column
@@ -445,10 +339,13 @@ class DataAccess {
     /**
      * DB Column Exists
      */
-    public static function db_column_exists($table, $column_name){
+    public static function db_column_exists(
+        $table, $column_name
+    ){
     
         // SQL.
-        $sql = 'SELECT '.$column_name.' FROM `'.$table.'` ';
+        $sql = 'SELECT '.$column_name.' FROM `
+            '.$table.'` ';
         $params = array();
     
         // Query
@@ -462,74 +359,96 @@ class DataAccess {
         }
     
     }
-    
+
     /**
-     * Delete Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
+     * Update DB Column Data
      */
-    public static function delete_alerts($filters = []){
+    public static function update_db_column_data(
+        $db, $id, $column_name, $data
+    ){
     
         // SQL
-        $sql = 'DELETE FROM `alerts`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
+        $sql = 
+            'UPDATE `'.$db.'` SET `'.$column_name.'` 
+            = ? WHERE `id` = ?';
+        $params = array($data, $id);
     
         // Query
         $result = self::query($sql, $params, false);
     
         // Result
         if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+            throw new Exception(
+                'Cannot update  "'.$db.'" - "'.$id.'" 
+                data "'.$data.'". for 
+                "'.$column_name.'"'
+            );
+    
+    }
+
+    /**
+     * Get Column Names
+     */
+    public static function get_column_names($table){
+    
+        // SQL
+        $sql = 'SELECT COLUMN_NAME FROM 
+            INFORMATION_SCHEMA.COLUMNS ';
+        $sql.= 'WHERE TABLE_NAME = ? AND 
+            TABLE_SCHEMA = ?';
+        $params = array($table, $GLOBALS['DB_NAME']);
+    
+        // Query
+        $results = self::query($sql, $params, true);
+    
+        // Result
+        $data = [];
+        if($results->num_rows > 0){
+            while($row = $results->fetch_object()){
+                $data[] = $row;
+            }
+        }
+        return $data;
     
     }
     
     /**
-     * Add Alert
+     * Add DB Entry
+     * @param var db
+     * @param array fields  
+     * [ array('name' => $name, 'value' => $value) ]
      */
-    public static function add_alert($source, $url, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
+    public static function add_db_entry($db, array $fields){
         
-        // Sanitize items.
-        $message = htmlspecialchars($message, ENT_NOQUOTES);
-        if(is_array($meta)){
-            $meta = htmlspecialchars(serialize($meta), ENT_NOQUOTES);
+        // We're going to use the field count a few times,
+        // so let's create the variable first.
+        $field_count = count($fields);
+
+        // Let's reformat fields into something easier for
+        // MySQL to deal with.
+        $field_names = ''; 
+        $field_values = array();
+        if(!empty($fields)){
+            $counter = 0; 
+            foreach($fields as $field){
+                $counter++;
+                $field_names.= '`'.$field['name'].'`';
+                if($counter !== $field_count)
+                    $field_names.= ', ';
+                array_push($field_values, $field['value']);
+            }
         }
 
-        // Require certain alert types.
-        $allowed_types = array('error', 'warning', 'notice');
-        if(!in_array($type, $allowed_types))
-            throw new Exception('Alert type, "'.$type.'," is not allowed');
-
-        // Require certain alert sources.
-        $allowed_sources = array('system', 'page');
-        if(!in_array($source, $allowed_sources))
-            throw new Exception('Alert source, "'.$source.'," is not allowed');
-
         // SQL
-        $sql = 'INSERT INTO `alerts` (`source`, `url`, `integration_uri`, `type`, `message`, `meta`) VALUES';
-        $sql.= '(?, ?, ?, ?, ?, ?)';
-        $params = array($source, $url, $integration_uri, $type, $message, $meta);
+        $sql = 'INSERT INTO `'.$db.'` ('.$field_names.') VALUES ';
+        $sql.= '('.str_repeat('?', $field_count).')';
         
         // Query
-        $result = self::query($sql, $params, false);
+        $result = self::query($sql, $field_values, false);
     
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert alert with the variables "'.$source.'", "'.$url.'",  "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
+            throw new Exception('Cannot add DB entry');
         
         // Complete Query
         return $result;
@@ -634,6 +553,7 @@ class DataAccess {
             'CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `status` varchar(200) NOT NULL,
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `url` text,

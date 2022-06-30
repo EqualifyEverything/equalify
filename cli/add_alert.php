@@ -9,28 +9,76 @@
 **********************************************************/
 
 // First, we'll log what we're doing.
-echo "\n Adding an alert.";
+echo "\nAdding an alert.";
 
-// We're going to use the DB.
-require_once 'config.php';
-require_once 'models/db.php';
 
-// We require five arguements to run this process.
-if($argc !== 6)
-    throw new Exception('5 arguments are required', 1);
+// We require five arguements to run this process (we're
+// asking for 8 because PHP adds the request as an arg).
+if($argc !== 8)
+    throw new Exception('g arguments are required -
+    '.$argc.' passed', 1);
 
 // We can scope the arguments to their variables.
 $source          = $argv[1];
 $url             = $argv[2];
 $integration_uri = $argv[3];
-$type            = $argv[4]; 
-$message         = $argv[5];
-$meta            = $argv[6];
+$type            = $argv[4];
+$status          = $argv[5]; 
+$message         = $argv[6];
+$meta            = $argv[7];
 
-// Since integrations add alerts when they run, and they 
-// can run multiple times, we need to see if the same
-// data was saved as an alert before.
-$filtered_to_arguments = array(
+// Now lets log the arguments.
+echo "
+    > source: $source
+    > url: $url
+    > integration: $integration_uri
+    > type: $type 
+    > status: $status 
+    > message: $message
+    > meta: $meta
+";
+
+// We're going to use the DB.
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/config.php');
+require_once(__ROOT__.'/models/db.php');
+
+// Let's validate the variables to make sure they include
+// allowed data.
+$allowed_sources = array('system', 'page');
+if(!in_array($source, $allowed_sources))
+    throw new Exception(
+        'Alert source, "'.$source.'," is invalid'
+    );
+$allowed_types = array(
+    'error', 'warning', 'notice'
+);
+if(!in_array($type, $allowed_types))
+    throw new Exception(
+        'Alert type, "'.$type.'," is not allowed'
+    );
+$allowed_statuses = array(
+    'unread', 'read', 'ignored'
+);
+if(!in_array($status, $allowed_statuses))
+    throw new Exception(
+        'Alert status, "'.$status.'," is invalid'
+    );
+
+// We should also sanitize the message to a format ready
+// for the DB.
+$message = htmlspecialchars(
+    $message, ENT_NOQUOTES
+);
+if(is_array($meta)){
+    $meta = htmlspecialchars(
+        serialize($meta), ENT_NOQUOTES
+    );
+}
+
+// Let's reformat the arguments so that they can be used
+// in our DB calls.
+$alert_arguments = array(
     array(
         'name' => 'source',
         'value'=> $source
@@ -48,6 +96,10 @@ $filtered_to_arguments = array(
         'value'=> $type
     ),
     array(
+        'name' => 'status',
+        'value'=> $status
+    ),
+    array(
         'name' => 'message',
         'value'=> $message
     ),
@@ -56,18 +108,31 @@ $filtered_to_arguments = array(
         'value'=> $meta
     ),
 );
-$existing_alerts = DataAccess::get_alerts(
-    $filtered_to_arguments
+
+// Since integrations add alerts when they run, and they 
+// can run multiple times, let's see if the same data
+// was saved as an alert before.
+$existing_alerts = DataAccess::get_db_entries(
+    'alerts', $alert_arguments
 );
 if(!empty($existing_alerts)){
 
-    // We are going to update existing alerts to set 
-    // thier timestamp and an "unread" status if the
-    // alert does not have an "ignored" status.
+    // All alerts with the same data will need to be
+    // updated.
+    foreach($existing_alerts as $alert){
+
+        // Updating the alert's status will also update
+        // its timestamp. 
+        DataAccess::update_db_column_data( 
+            'alerts', $alert->id, 'status', 'unread'
+        );
+
+    }
 
 }else{
 
-    // Lets add the alert, since it doesn't already
-    // exist.
+    // Lets add an unread alert, since it doesn't already 
+    // exists.
+    DataAccess::add_db_entry( 'alerts', $alert_arguments);
 
 }
