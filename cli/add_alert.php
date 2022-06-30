@@ -9,12 +9,12 @@
 **********************************************************/
 
 // First, we'll log what we're doing.
-echo "\nAdding an alert.";
+echo "\nAdding an alert:";
 
 
 // We require five arguements to run this process (we're
-// asking for 8 because PHP adds the request as an arg).
-if($argc !== 8)
+// asking for 7 because PHP adds the request as an arg).
+if($argc !== 7)
     throw new Exception('g arguments are required -
     '.$argc.' passed', 1);
 
@@ -23,9 +23,8 @@ $source          = $argv[1];
 $url             = $argv[2];
 $integration_uri = $argv[3];
 $type            = $argv[4];
-$status          = $argv[5]; 
-$message         = $argv[6];
-$meta            = $argv[7];
+$message         = $argv[5];
+$meta            = $argv[6];
 
 // Now lets log the arguments.
 echo "
@@ -33,7 +32,6 @@ echo "
     > url: $url
     > integration: $integration_uri
     > type: $type 
-    > status: $status 
     > message: $message
     > meta: $meta
 ";
@@ -56,13 +54,6 @@ $allowed_types = array(
 if(!in_array($type, $allowed_types))
     throw new Exception(
         'Alert type, "'.$type.'," is not allowed'
-    );
-$allowed_statuses = array(
-    'unread', 'read', 'ignored'
-);
-if(!in_array($status, $allowed_statuses))
-    throw new Exception(
-        'Alert status, "'.$status.'," is invalid'
     );
 
 // We should also sanitize the message to a format ready
@@ -96,10 +87,6 @@ $alert_arguments = array(
         'value'=> $type
     ),
     array(
-        'name' => 'status',
-        'value'=> $status
-    ),
-    array(
         'name' => 'message',
         'value'=> $message
     ),
@@ -129,10 +116,16 @@ if(!empty($existing_alerts)){
 
     }
 
-}else{
+    // Now lets log the status.
+    echo "\n Updated!";
 
+}else{
+    
     // Lets add an unread alert, since it doesn't already 
     // exists.
     DataAccess::add_db_entry( 'alerts', $alert_arguments);
+
+    // Now lets log the status.
+    echo "\n Added!";
 
 }

@@ -439,13 +439,14 @@ class DataAccess {
             }
         }
 
-        // SQL
+        // Prepare the SQL.
         $sql = 'INSERT INTO `'.$db.'` ('.$field_names.') VALUES ';
-        $sql.= '('.str_repeat('?', $field_count).')';
+        $sql.= '('.str_repeat('?, ', $field_count).')';
+        $sql = str_replace(', )', ')', $sql);
         
         // Query
         $result = self::query($sql, $field_values, false);
-    
+
         // Fallback
         if(!$result)
             throw new Exception('Cannot add DB entry');
@@ -471,7 +472,8 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
-    
+        print_r($sql);
+
         // Fallback
         if(!$result)
             throw new Exception('Cannot add meta field "'.$meta_name.'" and value "'.$meta_value.'"');
@@ -553,7 +555,7 @@ class DataAccess {
             'CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) NOT NULL,
+                `status` varchar(200) DEFAULT "unread",
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `url` text,
