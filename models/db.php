@@ -329,7 +329,7 @@ class DataAccess {
      * Update DB Column Data
      */
     public static function update_db_column_data(
-        $db, $id, $column_name, $data
+        $db, $fields, $data
     ){
     
         // SQL
@@ -349,6 +349,63 @@ class DataAccess {
                 "'.$column_name.'"'
             );
     
+    }
+
+    /**
+     * Update DB rows
+     * @param string db
+     * @param array new_data [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param array filters [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     */
+    public static function update_db_rows(
+        $db, $data, $filters = [],
+    ){
+
+        // Start SQL.
+        $sql = 'UPDATE `'.$db.'`';
+
+        // Create update SQL from array parameters.
+        $data_count = count($data);
+        $data_sql = '';
+        if($data_count > 0){
+            $data_sql = ' SET ';
+            $data_iteration = 0;
+            foreach ($data as $datum){
+                $data_sql.= '`'.$datum['name'].'` = ?';
+                $params[] = $datum['value'];
+                if(++$data_iteration != $data_count)
+                    $data_sql.= ' AND ';
+        
+            }
+        }
+        $sql.= $filters_sql;
+
+        // Add optional filters to content and total_pages.
+        $filter_count = count($filters);
+        $filters_sql = '';
+        if($filter_count > 0){
+            $filters_sql = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $filters_sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $filters_sql.= ' AND ';
+        
+            }
+        }
+        $sql.= $filters_sql;
+
+
+        // Query
+        $results = self::query($sql, $params, true);
+
+        // Result
+        $data = $results->fetch_object()->TOTAL;
+        return $data;
+
     }
 
     /**
@@ -383,7 +440,8 @@ class DataAccess {
      * @param array fields  
      * [ array('name' => $name, 'value' => $value) ]
      */
-    public static function add_db_entry($db, array $fields){
+    public static function add_db_entry($db, array $fields)
+    {
         
         // We're going to use the field count a few times,
         // so let's create the variable first.
@@ -405,8 +463,8 @@ class DataAccess {
         }
 
         // Prepare the SQL.
-        $sql = 'INSERT INTO `'.$db.'` ('.$field_names.') VALUES ';
-        $sql.= '('.str_repeat('?, ', $field_count).')';
+        $sql = 'INSERT INTO `'.$db.'` ('.$field_names.') ';
+        $sql.= 'VALUES ('.str_repeat('?, ', $field_count).')';
         $sql = str_replace(', )', ')', $sql);
         
         // Query

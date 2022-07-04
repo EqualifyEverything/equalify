@@ -12,8 +12,8 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // If there's an ID, we'll update an existing label.
-if(!empty($_GET['id'])){
-    $id = $_GET['id'];
+if(!empty($_GET['name'])){
+    $name = $_GET['name'];
 }
 
 // Now let's create an array that we'll use to post to.
@@ -35,26 +35,47 @@ if(!empty($_POST['type'])){
 }else{
     throw new Exception('Type missing');
 }
-if(!empty($_POST['name'])){
-    $updated_label['name'] = $_POST['name'];    
+if(!empty($_POST['title'])){
+    $updated_label['title'] = $_POST['title'];    
 }else{
-    throw new Exception('Name missing');
+    throw new Exception('Title missing');
 }
 
 // Save label data with data that MySQL understands.
 $updated_label = serialize($updated_label);
 
-// Depending on if the ID is present, we'll either save or
-// update the label.
+// Depending on if the ID is present, we'll either save
+// or update the label.
 if(empty($id)){
 
-    // No ID means we need to save the label.
-    $id = DataAccess::add_label($updated_label);
+    // No ID means we need to generate an id by counting
+    // all the rows in meta 
+    $meta_count = DataAccess::count_db_rows('meta');
+
+    // Now we can create the meta.
+    $fields = array(
+        array(
+            'name' => 'meta_name',
+            'value' => 'label_'.$meta_count
+        ),
+        array(
+            'name' => 'meta_value',
+            'value' => $update_label
+        )
+    );
+    DataAccess::add_db_entry('meta', $fields);
+
 
 }else{
 
     // Otherwise we can update the meta.
-    DataAccess::update_meta('label_'.$id, $updated_label);
+    $filtered_to_label = array(
+        array(
+            'name' => 'meta_name',
+            'value' => $name
+        )
+    );
+    DataAccess::update_db_rows('meta', $updated_label);
 
 }
 
