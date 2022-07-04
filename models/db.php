@@ -137,42 +137,7 @@ class DataAccess {
 
     }
 
-    /**
-     * Count Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
-     * @param string page
-     */
-    public static function count_alerts($filters = []){
 
-        // SQL
-        $sql = 'SELECT COUNT(*) AS TOTAL FROM `alerts`';
-        $params = array();
-
-        // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
-        
-            }
-        }
-        $sql.= $filters_sql;
-
-
-        // Query
-        $results = self::query($sql, $params, true);
-
-        // Result
-        $data = $results->fetch_object()->TOTAL;
-        return $data;
-
-    }
 
     /**
      * Get Meta Value
@@ -414,7 +379,7 @@ class DataAccess {
     
     /**
      * Add DB Entry
-     * @param var db
+     * @param string db
      * @param array fields  
      * [ array('name' => $name, 'value' => $value) ]
      */
@@ -454,6 +419,44 @@ class DataAccess {
         // Complete Query
         return $result;
         
+    }
+
+    /**
+     * Count DB rows
+     * @param string db
+     * @param array filters [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     */
+    public static function count_db_rows($db, $filters = []){
+
+        // SQL
+        $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$db.'`';
+        $params = array();
+
+        // Add optional filters to content and total_pages.
+        $filter_count = count($filters);
+        $filters_sql = '';
+        if($filter_count > 0){
+            $filters_sql = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                $filters_sql.= '`'.$filter['name'].'` = ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $filters_sql.= ' AND ';
+        
+            }
+        }
+        $sql.= $filters_sql;
+
+
+        // Query
+        $results = self::query($sql, $params, true);
+
+        // Result
+        $data = $results->fetch_object()->TOTAL;
+        return $data;
+
     }
 
     /**
@@ -604,28 +607,17 @@ class DataAccess {
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES 
             ("active_integrations", ?),
-            ("alert_tabs", ?),
             ("scan_status", ?),
             ("scanable_pages", ?),
             ("last_scan_time", ?);
 
         ';
         $default_active_integrations = serialize(array('little_forest'));
-        $default_alert_tabs = serialize(array(
-            'current_tab' => 1,
-            'tabs'  => array(
-                1 => array(
-                    'id'        => 1,
-                    'name'      => 'My Alerts',
-                    'filters'   => array()
-                )
-            )
-        ));
         $default_scan_status = '';
         $default_scanable_pages = serialize(array());
         $default_last_scan_time = '';
         $params = array(
-            $default_active_integrations, $default_alert_tabs,
+            $default_active_integrations,
             $default_scan_status, $default_scanable_pages,
             $default_last_scan_time
         );

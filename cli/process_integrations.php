@@ -92,7 +92,7 @@ if(!empty($active_integrations)){
         $time_post = microtime(true);
         $exec_time = $time_post - $time_pre;
         $alerts_count = number_format(
-            DataAccess::count_alerts()
+            DataAccess::count_db_rows('alerts')
         );
         echo "\n>>> Completed \"$integration\" in $exec_time seconds.";
 

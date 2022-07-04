@@ -36,7 +36,7 @@
 
                 <?php
                 //  Alert counter
-                $alert_count = DataAccess::count_alerts($tab['filters']);
+                $alert_count =DataAccess::count_db_rows('alerts', $tab['filters']);
                 echo $alert_count;
                 ?>
 
@@ -66,10 +66,7 @@
                 Tab Filters & Settings
             </a>
 
-            <?php 
-            // Alert tabs Modal
-            the_alert_tab_options($current_tab_data);
-            ?>
+
 
         </div>
     </div>

@@ -23,7 +23,7 @@ DataAccess::update_meta_value( 'scan_status',
 // as possible..
 echo "\n\n\nLet's Equalify some sites!";
 $starting_time = microtime(true);
-$starting_alerts_count = DataAccess::count_alerts();
+$starting_alerts_count = DataAccess::count_db_rows('alerts');
     
 // Now we'll start our first process.
 require_once('cli/process_sites.php');
@@ -42,7 +42,7 @@ DataAccess::update_meta_value(
 // Log our progress..
 $ending_time = microtime(true);
 $exec_time = $ending_time - $starting_time;
-$ending_alerts_count = DataAccess::count_alerts();
+$ending_alerts_count = DataAccess::count_db_rows('alerts');
 $added_alerts = number_format(
     $ending_alerts_count - $starting_alerts_count
 );

@@ -5,4 +5,4 @@ require '../models/db.php';
 
 // This changes the little red number asyncronistically with JS
 // embedded in the view file.
-echo DataAccess::count_alerts();
+echo DataAccess::count_db_rows('alerts');

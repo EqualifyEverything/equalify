@@ -16,7 +16,7 @@ $type   = '';
 $source = '';
 
 // We use this view to customize labels if a id is 
-// providded.
+// provided, otherwise we create a new label.
 if(!empty($_GET['id'])){
     $id = $_GET['id'];
     
