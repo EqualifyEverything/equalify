@@ -62,9 +62,9 @@
             </div>
         </div>
         <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabButton">
+            <a href="index.php?view=label_customizer&label_id=<?php echo $current_tab_data['id'];?>&label_name=<?php echo $current_tab_data['name'];?>">
                 Tab Filters & Settings
-            </button>
+            </a>
 
             <?php 
             // Alert tabs Modal
