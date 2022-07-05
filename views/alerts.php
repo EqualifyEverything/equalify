@@ -1,73 +1,75 @@
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the alerts view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
+// Sometimes this view is filtered to a label's data.
+if(!empty($_GET['label'])){
+
+    // Load the data of a selected label.
+    $filtered_to_label = array(
+        array(
+            'name' => 'meta_name',
+            'value' => $_GET['label']
+        )
+    );
+    $label =  unserialize( DataAccess::get_db_entries(
+        'meta', $filtered_to_labels
+    ) )[0];
+
+}else{
+
+    // When there's no label data, we set default data.
+    $label = array(
+        'meta_name' => '', // Default has no id.
+        'meta_value' => array(
+            array(
+                'name' => 'title',
+                'value' => 'All Alerts'
+            )
+        )
+    );
+
+}
+
+// Let's extract the "title" meta, so we can use it 
+// later and so we can use any label's meta_values to
+// fitler the alerts
+foreach($label['meta_value'] as $the_meta){
+    if( $the_meta['name'] == 'title'){
+        $the_title = $the_meta['value'];
+        unset($the_meta);
+    }
+}
+print_r($label);
+
+die;
+
+?>
+
 <section>
-    <div class="mb-3 pb-4 border-bottom">
-        <h1>All Alerts</h1>
-    </div>
-    <ul class="nav nav-tabs mb-3">
-
-        <?php
-        // Alert tabs should have been setup on install.
-        $alert_tabs = unserialize(DataAccess::get_meta_value('alert_tabs'));
-
-        // Setup variables.
-        $tabs = $alert_tabs['tabs'];
-        $current_tab = $alert_tabs['current_tab'];
-        $current_tab_data = $tabs[$current_tab];
-
-        // Start tabs Loop
-        if(!empty($tabs)): foreach ($tabs as $tab):
-        ?>
-
-        <li class="nav-item">
-        
-            <a 
-                class="nav-link <?php if($current_tab == $tab['id']) echo 'active';?>" 
-                aria-current="page" 
-                href="actions/switch_alert_tab.php?alert_tab=<?php echo $tab['id'];?>"
-            >
-            
-                <?php echo $tab['name']; ?>
-
-                <span class="
-                    ms-1
-                    badge 
-                    bg-<?php if($current_tab == $tab['id']){ echo 'primary'; }else{ echo 'secondary'; }?> 
-                    rounded
-                ">
-
-                <?php
-                //  Alert counter
-                $alert_count =DataAccess::count_db_rows('alerts', $tab['filters']);
-                echo $alert_count;
-                ?>
-
-                </span>
-            </a>
-        </li>
-
-        <?php
-        // End tabs loop
-        endforeach; 
-    endif;
-        ?>
-
-        <li class="nav-item <?php if(empty($tabs)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
-            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="addTabButton">+ Add Tab</button>
-        </li>
-    </ul>
-    <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
-        <div class="col-12">
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control" placeholder="Keyword or URL.." aria-label="Search Term" aria-describedby="basic-addon1">
-                <button class="btn btn-outline-secondary" type="button">Search</button>
-            </div>
+    <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
+        <div>
+            <h1><?php echo $the_title;?></h1>
         </div>
-        <div class="col-12">
-            <a href="index.php?view=label_customizer&label_id=<?php echo $current_tab_data['id'];?>&label_name=<?php echo $current_tab_data['name'];?>">
-                Tab Filters & Settings
+        <div>
+            <?php
+            // If we're not on the main 'All Alerts' page,
+            // we are on a label page that can be edited.
+            if($the_title !== 'All Alerts'):
+            ?>
+
+            <a href="index.php?view=label_customizer&name=<?php echo $label['id'];?>">
+                Label Settings
             </a>
 
-
-
+            <?php
+            endif;
+            ?>
         </div>
     </div>
     <table class="table">
@@ -83,11 +85,14 @@
         </thead>
 
         <?php
-        // Begin Alerts
-        $filters = $current_tab_data['filters'];
-        $alerts = DataAccess::get_alerts($filters, get_current_page_number());
-        $alerts_content = $alerts['content'];
-        if(count($alerts_content) > 0 ): foreach($alerts_content as $alert):    
+        // We need to setup the different filters from the
+        // all label meta.
+        $filters = $label['meta_value'];
+        $alerts = DataAccess::get_db_entries( 'alerts',
+            $filters, get_current_page_number()
+        );
+        if( count($alerts_content) > 0 ): 
+            foreach($alerts_content as $alert):    
         ?>
 
         <tr>

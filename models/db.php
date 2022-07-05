@@ -228,9 +228,9 @@ class DataAccess {
      * Get DB Entries
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 'operator' => '=' ) ]
-     * @param string like
+     * @param string current_page_number
      */
-    public static function get_db_entries($table, $filters = []){
+    public static function get_db_entries($table, $filters = [], $current_page_number = ''){
     
         // SQL
         $sql = 'SELECT * FROM `'.$table.'`';

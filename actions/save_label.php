@@ -90,5 +90,5 @@ if(empty($_POST['name'])){
 }
 
 // When done, we can checkout the saved label.
-header('Location: ../index.php?view=alerts&name='.$name);
+header('Location: ../index.php?view=alerts&label='.$name);
 ?>
