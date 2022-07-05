@@ -227,28 +227,34 @@ class DataAccess {
     /**
      * Get DB Entries
      * @param array filters  
-     * [ array ('name' => $name, 'value' => $value) ]
+     * [ array ('name' => $name, 'value' => $value, 'operator' => '=' ) ]
+     * @param string like
      */
     public static function get_db_entries($table, $filters = []){
     
         // SQL
-        $sql = 'SELECT * FROM `'.$db.'`';
+        $sql = 'SELECT * FROM `'.$table.'`';
         $params = array();
 
-        // Add optional filters
+        // Add optional filters.
         $filter_count = count($filters);
         if($filter_count > 0){
             $sql.= ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
+                if(empty($filter['operator'])){
+                    $operator = '=';
+                }else{
+                    $operator = $filter['operator'];
+                }
+                $sql.= '`'.$filter['name'].'` '.$operator.' ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $sql.= ' AND ';
         
             }
         }
-    
+
         // Query
         $results = self::query($sql, $params, true);
     

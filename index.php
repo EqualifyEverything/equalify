@@ -95,6 +95,43 @@ require_once 'scan.php';
                         </span>
                     </a>
                 </li>
+
+                <?php
+                // Show various labels.
+                $filtered_to_labels = array(
+                    array(
+                        'name' => 'meta_name',
+                        'value' => 'label_7',
+                        'operator' => '='
+                    )
+                );
+                $labels =  DataAccess::get_db_entries('meta', $filtered_to_labels);
+                if(!empty($labels)): foreach($labels as $label):
+                ?>
+
+                <li class="nav-item">
+                    <a href="index.php?view=<?php echo $label->meta_name;?>" class="nav-link <?php the_active_view('label_customizer');?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 bi bi-bookmark" viewBox="0 0 16 16">
+                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
+                        </svg>
+                        
+                        <?php
+                        // We'll get some data to make the title.
+                        $label_values = unserialize($label->meta_value);
+                        foreach ($label_values as $value){
+                            if($value['name'] == 'title')
+                                echo $value['value'];
+                        }
+                        ?>
+
+                    </a>
+                </li>
+
+                <?php
+                // End labels.
+                endforeach; endif;
+                ?>
+
                 <li class="nav-item">
                     <a href="index.php?view=label_customizer" class="nav-link <?php the_active_view('label_customizer');?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-plus-circle-dotted" viewBox="0 0 16 16">
