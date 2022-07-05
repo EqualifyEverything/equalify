@@ -1,11 +1,20 @@
 <?php
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * Here we set functions that are regularly used to create
+ * our views.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 /**
  * Get Default View
  */
 function get_default_view(){
 
-    // Set the default view if no other view
-    // is selected.
+    // Set the default view if no other view is selected.
     return 'views/alerts.php';
     
 }
@@ -14,12 +23,33 @@ function get_default_view(){
  * The Active View
  */
 function the_active_view($view){
+
+    // The URL may include the name of the view.
     if(!empty($_GET['view'])){
-        if($_GET['view'] == $view)
+
+        // Labels need special treatment.
+        if(
+            !empty($_GET['label'])
+            && ($_GET['label'] == $view)
+        ){
+
+            // The active class is what we use to show a
+            // page is selected.
             echo 'active';
+
+        // Anything that's not a label will be active if
+        // the view is also set in the URL
+        }elseif(
+            $_GET['view'] == $view 
+            && empty($_GET['label'])
+         ){
+            echo 'active';
+        }
+
     }else{
         return null;
     }
+    
 }
 
 /**
@@ -28,26 +58,40 @@ function the_active_view($view){
 function the_success_message(){
 
     // Success Message
-    if(strpos($_SERVER['REQUEST_URI'], 'success'))
-        echo '<div class="alert alert-success" role="alert">Update was successful!</div>';
+    if(strpos($_SERVER['REQUEST_URI'], 'success')){
+?>
+
+    <div class="alert alert-success" role="alert">
+        Update was successful!
+    </div>
+
+<?php
+    }
 
 }
 
 /**
  * The Integration Status Badge
  */
-function the_integration_status_badge($integration_status){
+function the_integration_status_badge(
+    $integration_status
+    ){
 
-    // Set badge
-    // doesn't include 'planned' 'cuz the button says that.
+    // Set badge doesn't include 'planned' 
+    // 'cuz the button says that.
     if($integration_status == 'Disabled'){
         $badge_class = 'bg-secondary';
         $badge_text = 'Disabled';
-        echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
+        echo '
+            <span class="badge '.$badge_class.'">'
+            .$badge_text.'<span class="visually-hidden"> 
+            Integration Status</span></span>';
     }elseif($integration_status == 'Active'){
         $badge_class = 'bg-success';
         $badge_text = 'Active';
-        echo '<span class="badge '.$badge_class.'">'.$badge_text.'<span class="visually-hidden"> Integration Status</span></span>';
+        echo '<span class="badge '.$badge_class.'">'
+            .$badge_text.'<span class="visually-hidden"> 
+            Integration Status</span></span>';
     }else{
         return false;
     }
@@ -57,7 +101,9 @@ function the_integration_status_badge($integration_status){
 /**
  * The Integration Activation Button
  */
-function the_integration_activation_button($integration_uri, $integration_status){
+function the_integration_activation_button(
+    $integration_uri, $integration_status
+    ){
 
     // Set button.
     if($integration_status == 'Planned'){
@@ -73,18 +119,24 @@ function the_integration_activation_button($integration_uri, $integration_status
         $button_class = NULL;
         $button_text = NULL;
     }
-    echo '<a href="actions/toggle_integration_status.php?uri='.$integration_uri.'&old_status='.$integration_status.'" class="btn '.$button_class.'">'.$button_text.'</a>';
+    echo '<a href="actions/toggle_integration_status.php?uri='
+        .$integration_uri.'&old_status='.$integration_status
+        .'" class="btn '.$button_class.'">'.$button_text.'</a>';
 
 }
 
 /**
  * The Integration Settings Button
  */
-function the_integration_settings_button($integration_uri, $integration_status){
+function the_integration_settings_button(
+    $integration_uri, $integration_status
+    ){
 
     // Only show button on active inteagrations
     if($integration_status == 'Active'){
-        echo '<a href="?view=integration_settings&uri='.$integration_uri.'" class="btn btn-secondary">Settings</a>';
+        echo '<a href="?view=integration_settings&uri='
+            .$integration_uri.'" class="btn btn-secondary">
+            Settings</a>';
     }else{
         return false;
     }
@@ -98,8 +150,13 @@ function covert_code_shortcode($subject){
 
     // Convert text between [code][/code] into styled
     // code.
-    $subject = str_replace('[code]', '<pre class="rounded bg-secondary text-white p-3 mb-1"><code>', $subject);
-    $subject = str_replace('[/code]', '</code></pre>', $subject);
+    $subject = str_replace(
+        '[code]', '<pre class="rounded bg-secondary 
+        text-white p-3 mb-1"><code>', $subject
+    );
+    $subject = str_replace(
+        '[/code]', '</code></pre>', $subject
+    );
     $subject = html_entity_decode($subject);
 
     // [code] is converted!
@@ -142,7 +199,9 @@ function the_pagination($total_pages){
 
     // Set active state as function so we don't have to keep
     // writing this condition.
-    function get_active_state($current_page_number, $item_number){
+    function get_active_state(
+        $current_page_number, $item_number
+    ){
         if($current_page_number == $item_number){ 
             return 'active'; 
         }else{
