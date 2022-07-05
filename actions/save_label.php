@@ -11,60 +11,67 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-// If there's an ID, we'll update an existing label.
-if(!empty($_GET['name'])){
-    $name = $_GET['name'];
-}
+// First let's create an array that we'll use to post to.
+$updated_fields = array();
 
-// Now let's create an array that we'll use to post to.
-$updated_label = array();
-
-// The array is populated with Url parameters.
+// The array is populated with URL parameters.
 if(!empty($_POST['integration'])){
-    $updated_label['integration'] = $_POST['integration'];    
-}else{
-    throw new Exception('Integration missing');
+    array_push(
+        $updated_fields,
+        array(
+            'name' => 'integration',
+            'value' => $_POST['integration']
+        )
+    );
 }
 if(!empty($_POST['source'])){
-    $updated_label['source'] = $_POST['source'];    
-}else{
-    throw new Exception('Source missing');
+    array_push(
+        $updated_fields,
+        array(
+            'name' => 'source',
+            'value' => $_POST['source']
+        )
+    );
 }
 if(!empty($_POST['type'])){
-    $updated_label['type'] = $_POST['type'];    
-}else{
-    throw new Exception('Type missing');
+    array_push(
+        $updated_fields,
+        array(
+            'name' => 'type',
+            'value' => $_POST['type']
+        )
+    );
 }
 if(!empty($_POST['title'])){
-    $updated_label['title'] = $_POST['title'];    
-}else{
-    throw new Exception('Title missing');
+    array_push(
+        $updated_fields,
+        array(
+            'name' => 'title',
+            'value' => $_POST['title']
+        )
+    );
 }
 
-// Save label data with data that MySQL understands.
-$updated_label = serialize($updated_label);
-
-// Depending on if the ID is present, we'll either save
+// Depending on if the name is present, we'll either save
 // or update the label.
-if(empty($id)){
+if(empty($_POST['name'])){
 
     // No ID means we need to generate an id by counting
     // all the rows in meta 
-    $meta_count = DataAccess::count_db_rows('meta');
+    $name = 'label_'.DataAccess::count_db_rows('meta');
 
     // Now we can create the meta.
     $fields = array(
         array(
             'name' => 'meta_name',
-            'value' => 'label_'.$meta_count
+            'value' => $name
         ),
         array(
             'name' => 'meta_value',
-            'value' => $update_label
+            'value' => serialize($updated_fields)
         )
     );
     DataAccess::add_db_entry('meta', $fields);
-
 
 }else{
 
@@ -75,10 +82,13 @@ if(empty($id)){
             'value' => $name
         )
     );
-    DataAccess::update_db_rows('meta', $updated_label);
+    DataAccess::update_db_rows('meta', $updated_fields, $updated_label);
+
+    // And let's set the name with the post variable.
+    $name = $_POST['name'];
 
 }
 
 // When done, we can checkout the saved label.
-header('Location: ../index.php?view=alerts&id='.$id);
+header('Location: ../index.php?view=alerts&name='.$name);
 ?>

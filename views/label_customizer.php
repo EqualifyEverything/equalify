@@ -9,22 +9,22 @@
 
 // Let's setup the variables that we're going to be using
 // in this document.
-$id   = '';
-$name = 'Untitled';
+$name   = '';
+$title = 'Untitled';
 $integration = '';
 $type   = '';
 $source = '';
 
 // We use this view to customize labels if a id is 
 // provided, otherwise we create a new label.
-if(!empty($_GET['id'])){
-    $id = $_GET['id'];
+if(!empty($_GET['name'])){
+    $name = $_GET['name'];
     
     // Let's load in predefined variables for the label.
     $existing_label = unserialize(
-        DataAccess::get_meta_value('label_'.$id)
+        DataAccess::get_meta_value($name)
     );
-    $name =  $existing_label['name'];
+    $title =  $existing_label['title'];
     $integration = $existing_label['integration'];
     $type   = $existing_label['type'];
     $source = $existing_label['source'];
@@ -36,7 +36,7 @@ if(!empty($_GET['id'])){
 <section>
     <div class="mb-3 pb-4 border-bottom">
         <h1>
-            "<span id="labelName"><?php echo $name;?></span>" Label
+            "<span id="labelName"><?php echo $title;?></span>" Label
         </h1>
     </div>
     <form action="actions/save_label.php" method="post">
@@ -56,7 +56,7 @@ if(!empty($_GET['id'])){
 
         <div class="mb-3">
             <label for="integrationSelect" class="form-label fw-semibold">Integration</label>
-            <select id="integrationSelect" class="form-select" name="integration_uri">
+            <select id="integrationSelect" class="form-select" name="inte">
                 <option value="" >Any</option>
 
                 <?php
@@ -156,22 +156,22 @@ if(!empty($_GET['id'])){
             </div>
             <hr>
             <div class="mb-3">
-                <label for="labelNameInput" class="form-label fw-semibold">Tab Name</label>
-                <input type="text" id="labelNameInput" class="form-control" aria-describedby="metaFilter1Help" value="<?php echo $name;?>" name="name" required>
+                <label for="labelTitleInput" class="form-label fw-semibold">Label Name</label>
+                <input type="text" id="labelTitleInput" class="form-control" value="<?php echo $title;?>" name="title" required>
             </div>
             
             <?php
             // New labels can't be deleted
-            if(!empty($id))
-                echo '<a href="actions/delete_label.php?id='.$id.'" class="btn btn-outline-danger">Delete Tab</a>';
+            if(!empty($name))
+                echo '<a href="actions/delete_label.php?name='.$name.'" class="btn btn-outline-danger">Delete Label</a>';
             ?>
 
             <button type="submit" class="btn btn-primary" id="saveButton">Save Label</button>
-            <input type="hidden" name="id" value="<?php echo $id;?>" id="alertTabID">
+            <input type="hidden" name="name" value="<?php echo $name;?>">
     </form>
 </section>
 <script>
-// Change label name text as you type.
+// Change label title text as you type.
 const labelName = document.getElementById('labelName');
 const labelNameInput = document.getElementById('labelNameInput');
 const changelabelName = function(e) {

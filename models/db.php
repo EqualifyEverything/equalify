@@ -229,7 +229,7 @@ class DataAccess {
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value) ]
      */
-    public static function get_db_entries($db, $filters = []){
+    public static function get_db_entries($table, $filters = []){
     
         // SQL
         $sql = 'SELECT * FROM `'.$db.'`';
@@ -329,7 +329,7 @@ class DataAccess {
      * Update DB Column Data
      */
     public static function update_db_column_data(
-        $db, $fields, $data
+        $table, $fields, $data, $id
     ){
     
         // SQL
@@ -344,7 +344,7 @@ class DataAccess {
         // Result
         if(!$result)
             throw new Exception(
-                'Cannot update  "'.$db.'" - "'.$id.'" 
+                'Cannot update  "'.$table.'" - "'.$id.'" 
                 data "'.$data.'". for 
                 "'.$column_name.'"'
             );
@@ -353,36 +353,34 @@ class DataAccess {
 
     /**
      * Update DB rows
-     * @param string db
-     * @param array new_data [ array ( 
+     * @param string table
+     * @param array fields [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      */
     public static function update_db_rows(
-        $db, $data, $filters = [],
+        $table, $fields, $filters = [],
     ){
 
-        // Start SQL.
-        $sql = 'UPDATE `'.$db.'`';
+        // Prepare the SQL.
+        $sql = 'UPDATE `'.$table.'` SET ';
 
-        // Create update SQL from array parameters.
-        $data_count = count($data);
-        $data_sql = '';
-        if($data_count > 0){
-            $data_sql = ' SET ';
-            $data_iteration = 0;
-            foreach ($data as $datum){
-                $data_sql.= '`'.$datum['name'].'` = ?';
-                $params[] = $datum['value'];
-                if(++$data_iteration != $data_count)
-                    $data_sql.= ' AND ';
-        
+        // Add fields that we're updating.
+        $field_count = count($filters);
+        $field_sql = '';
+        if($field_count > 0){
+            $field_iteration = 0;
+            foreach ($fields as $field){
+                $field_sql.= '`'.$field['name'].'` = ?';
+                $params[] = $field['value'];
+                if(++$field_iteration != $field_count)
+                    $field_sql.= ', ';
             }
         }
-        $sql.= $filters_sql;
+        $sql.= $field_sql;
 
-        // Add optional filters to content and total_pages.
+        // Add optional filters.
         $filter_count = count($filters);
         $filters_sql = '';
         if($filter_count > 0){
@@ -397,7 +395,6 @@ class DataAccess {
             }
         }
         $sql.= $filters_sql;
-
 
         // Query
         $results = self::query($sql, $params, true);
@@ -436,11 +433,11 @@ class DataAccess {
     
     /**
      * Add DB Entry
-     * @param string db
+     * @param string table
      * @param array fields  
      * [ array('name' => $name, 'value' => $value) ]
      */
-    public static function add_db_entry($db, array $fields)
+    public static function add_db_entry($table, array $fields)
     {
         
         // We're going to use the field count a few times,
@@ -463,7 +460,7 @@ class DataAccess {
         }
 
         // Prepare the SQL.
-        $sql = 'INSERT INTO `'.$db.'` ('.$field_names.') ';
+        $sql = 'INSERT INTO `'.$table.'` ('.$field_names.') ';
         $sql.= 'VALUES ('.str_repeat('?, ', $field_count).')';
         $sql = str_replace(', )', ')', $sql);
         
@@ -481,14 +478,14 @@ class DataAccess {
 
     /**
      * Count DB rows
-     * @param string db
+     * @param string table
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      */
-    public static function count_db_rows($db, $filters = []){
+    public static function count_db_rows($table, $filters = []){
 
         // SQL
-        $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$db.'`';
+        $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$table.'`';
         $params = array();
 
         // Add optional filters to content and total_pages.
