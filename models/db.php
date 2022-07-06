@@ -159,13 +159,14 @@ class DataAccess {
      * [ array ('name' => $name, 'value' => $value, 
      * 'operator' => '=' ) ]
      * @param string page
+     * @param string entries_per_page
      */
     public static function get_db_entries(
-        $table, $filters = [], $page = 1
+        $table, $filters = [], $page = 1, 
+        $entries_per_page = self::ITEMS_PER_PAGE
     ){
 
         // Set entries per page.
-        $entries_per_page = self::ITEMS_PER_PAGE;
         $page_offset = ($page-1) * $entries_per_page;
 
         // Create 'total_pages' SQL.
