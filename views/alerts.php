@@ -32,7 +32,7 @@ if(!empty($_GET['label'])){
         'meta_value' => array(
             array(
                 'name' => 'title',
-                'value' => 'All Alerts'
+                'value' => 'All'
             )
         )
     );
@@ -45,7 +45,7 @@ if(!empty($_GET['label'])){
 // fitler the alerts.
 foreach($label_meta as $k => $val) {
     if($val['name'] == 'title') {
-        $the_title = $val['value'];
+        $the_title = '"'.$val['value'].'"';
         unset($label_meta[$k]);
     }
 }
@@ -54,13 +54,13 @@ foreach($label_meta as $k => $val) {
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h1><?php echo $the_title;?></h1>
+            <h1><?php echo $the_title;?> Alerts</h1>
         </div>
         <div>
             <?php
             // If we're not on the main 'All Alerts' page,
             // we are on a label page that can be edited.
-            if($the_title !== 'All Alerts'):
+            if($the_title !== 'All'):
             ?>
 
             <a href="index.php?view=label_customizer&name=<?php echo $label->meta_name;?>" class="btn btn-primary">

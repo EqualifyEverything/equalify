@@ -24,10 +24,19 @@ if(!empty($_GET['name'])){
     $existing_label = unserialize(
         DataAccess::get_meta_value($name)
     );
-    $title =  $existing_label['title'];
-    $integration = $existing_label['integration'];
-    $type   = $existing_label['type'];
-    $source = $existing_label['source'];
+
+    // Let's reformat the meta so we can use it in a
+    // more understandable format.
+    foreach($existing_label as $label) {
+        if($label['name'] == 'title') 
+            $title = $label['value'];
+        if($label['name'] == 'integration') 
+            $integration = $label['value'];
+        if($label['name'] == 'type') 
+            $type = $label['value'];
+        if($label['name'] == 'source') 
+            $source = $label['value'];
+    }
 
 }
 
@@ -36,7 +45,14 @@ if(!empty($_GET['name'])){
 <section>
     <div class="mb-3 pb-4 border-bottom">
         <h1>
-            "<span id="labelName"><?php echo $title;?></span>" Label
+            <?php
+            // Lets add helper text, depending on if we're
+            // editing the label.
+            if(!empty($name))
+                echo 'Editing ';
+            ?>
+            
+            "<span id="labelName"><?php echo $title;?></span>" Alerts Label
         </h1>
     </div>
     <form action="actions/save_label.php" method="post">
@@ -161,7 +177,7 @@ if(!empty($_GET['name'])){
             </div>
             
             <?php
-            // New labels can't be deleted
+            // New labels can't be deleted.
             if(!empty($name))
                 echo '<a href="actions/delete_label.php?name='.$name.'" class="btn btn-outline-danger">Delete Label</a>';
             ?>

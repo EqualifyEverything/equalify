@@ -37,6 +37,14 @@ function the_active_view($view){
             // page is selected.
             echo 'active';
 
+        // Customizing labels also need special treatment.
+        }elseif(
+            !empty($_GET['name'])
+            && ($_GET['view'] == 'label_customizer')
+        ){
+
+            echo '';
+
         // Anything that's not a label will be active if
         // the view is also set in the URL
         }elseif(

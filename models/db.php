@@ -364,11 +364,10 @@ class DataAccess {
         $sql.= $filters_sql;
 
         // Query
-        $results = self::query($sql, $params, true);
+        $results = self::query($sql, $params, false);
 
-        // Result
-        $data = $results->fetch_object()->TOTAL;
-        return $data;
+        // Complete Query
+        return $results;
 
     }
     

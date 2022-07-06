@@ -11,13 +11,14 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-// First let's create an array that we'll use to post to.
-$updated_fields = array();
+// First let's create an array that we'll use to update 
+// the meta from.
+$updated_meta = array();
 
 // The array is populated with URL parameters.
 if(!empty($_POST['integration'])){
     array_push(
-        $updated_fields,
+        $updated_meta,
         array(
             'name' => 'integration',
             'value' => $_POST['integration']
@@ -26,7 +27,7 @@ if(!empty($_POST['integration'])){
 }
 if(!empty($_POST['source'])){
     array_push(
-        $updated_fields,
+        $updated_meta,
         array(
             'name' => 'source',
             'value' => $_POST['source']
@@ -35,7 +36,7 @@ if(!empty($_POST['source'])){
 }
 if(!empty($_POST['type'])){
     array_push(
-        $updated_fields,
+        $updated_meta,
         array(
             'name' => 'type',
             'value' => $_POST['type']
@@ -44,7 +45,7 @@ if(!empty($_POST['type'])){
 }
 if(!empty($_POST['title'])){
     array_push(
-        $updated_fields,
+        $updated_meta,
         array(
             'name' => 'title',
             'value' => $_POST['title']
@@ -68,21 +69,31 @@ if(empty($_POST['name'])){
         ),
         array(
             'name' => 'meta_value',
-            'value' => serialize($updated_fields)
+            'value' => serialize($updated_meta)
         )
     );
     DataAccess::add_db_entry('meta', $fields);
 
 }else{
 
-    // Otherwise we can update the meta.
+    // Otherwise we can update the fields.
+    $fields = array(
+        array(
+            'name' => 'meta_value',
+            'value' => serialize($updated_meta)
+        )
+    );
+
+    // All fields are filtered to the current post.
     $filtered_to_label = array(
         array(
             'name' => 'meta_name',
-            'value' => $name
+            'value' => $_POST['name']
         )
     );
-    DataAccess::update_db_rows('meta', $updated_fields, $updated_label);
+    DataAccess::update_db_rows(
+        'meta', $fields, $filtered_to_label
+    );
 
     // And let's set the name with the post variable.
     $name = $_POST['name'];
