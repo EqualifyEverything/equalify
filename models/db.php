@@ -70,76 +70,6 @@ class DataAccess {
     }
 
     /**
-     * Get Alerts
-     * @param array filters 
-     * * [ array (
-     * * * 'name' => $name, 
-     * * * 'value' => $value, 
-     * * * 'page' => $page
-     * * ) ]
-     * @param string page
-     */
-    public static function get_alerts(
-        $filters = [], $page = 1
-    ){
-
-        // Set alerts per page.
-        $alerts_per_page = self::ITEMS_PER_PAGE;
-        $page_offset = ($page-1) * $alerts_per_page;
-
-        // Create 'total_pages' SQL.
-        $total_pages_sql = "SELECT COUNT(*) FROM `alerts`";
-
-        // Create 'content' SQL.
-        $content_sql = "SELECT * FROM `alerts`";
-        $params = array();
-
-        // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
-        
-            }
-        }
-
-        // Add filters and page limit.
-        $total_pages_sql.= $filters_sql;
-        $content_sql.= $filters_sql.' LIMIT '.$page_offset.', '.$alerts_per_page;
-
-        // Run 'total_pages' SQL.
-        $total_pages_result = self::query($total_pages_sql, $params, true);
-        $total_pages_rows = $total_pages_result->fetch_array()[0];
-        $total_pages = ceil($total_pages_rows / $alerts_per_page);
-    
-        // Run 'content' SQL
-        $content_results = self::query($content_sql, $params, true);
-        $content = [];
-        if($content_results->num_rows > 0){
-            while($row = $content_results->fetch_object()){
-                $content[] = $row;
-            }
-        }
-    
-        // Create and return data.
-        $data = [
-            'total_alerts' => $total_pages_rows,
-            'total_pages' => $total_pages,
-            'content' => $content
-        ];
-        return $data;
-
-    }
-
-
-
-    /**
      * Get Meta Value
      */
     public static function get_meta_value($meta_name){
@@ -206,7 +136,6 @@ class DataAccess {
         return $result;
     }
     
-
     /**
      * Update Page Site Status 
      */
@@ -227,19 +156,31 @@ class DataAccess {
     /**
      * Get DB Entries
      * @param array filters  
-     * [ array ('name' => $name, 'value' => $value, 'operator' => '=' ) ]
-     * @param string current_page_number
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=' ) ]
+     * @param string page
      */
-    public static function get_db_entries($table, $filters = [], $current_page_number = ''){
+    public static function get_db_entries(
+        $table, $filters = [], $page = 1
+    ){
+
+        // Set entries per page.
+        $entries_per_page = self::ITEMS_PER_PAGE;
+        $page_offset = ($page-1) * $entries_per_page;
+
+        // Create 'total_pages' SQL.
+        $total_pages_sql = 'SELECT COUNT(*) FROM 
+            `'.$table.'`';
     
-        // SQL
-        $sql = 'SELECT * FROM `'.$table.'`';
+        // Create 'content' SQL.
+        $content_sql = 'SELECT * FROM `'.$table.'`';
         $params = array();
 
-        // Add optional filters.
+        // Add optional filters to content and total_pages.
         $filter_count = count($filters);
+        $filters_sql = '';
         if($filter_count > 0){
-            $sql.= ' WHERE ';
+            $filters_sql = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
                 if(empty($filter['operator'])){
@@ -247,24 +188,42 @@ class DataAccess {
                 }else{
                     $operator = $filter['operator'];
                 }
-                $sql.= '`'.$filter['name'].'` '.$operator.' ?';
+                $filters_sql.= '`'.$filter['name'].'` '.$operator
+                    .' ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
+                    $filters_sql.= ' AND ';
         
             }
         }
 
-        // Query
-        $results = self::query($sql, $params, true);
+        // Add filters and page limit.
+        $total_pages_sql.= $filters_sql;
+        $content_sql.= $filters_sql.' LIMIT '.$page_offset
+            .', '.$entries_per_page;
+
+        // Run 'total_pages' SQL.
+        $total_pages_result = self::query(
+            $total_pages_sql, $params, true
+        );
+        $total_pages_rows = $total_pages_result->fetch_array()[0];
+        $total_pages = ceil($total_pages_rows / $entries_per_page);
     
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
+        // Run 'content' SQL
+        $content_results = self::query($content_sql, $params, true);
+        $content = [];
+        if($content_results->num_rows > 0){
+            while($row = $content_results->fetch_object()){
+                $content[] = $row;
             }
         }
+    
+        // Create and return data.
+        $data = [
+            'total_entries' => $total_pages_rows,
+            'total_pages' => $total_pages,
+            'content' => $content
+        ];
         return $data;
     
     }
@@ -272,7 +231,8 @@ class DataAccess {
     /**
      * Add DB Column
      */
-    public static function add_db_column($table, $column_name, $column_type){
+    public static function add_db_column(
+        $table, $column_name, $column_type){
     
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
@@ -291,7 +251,8 @@ class DataAccess {
     /**
      * Add DB Column
      */
-    public static function delete_db_column($table, $column_name){
+    public static function delete_db_column(
+        $table, $column_name){
     
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
@@ -410,32 +371,6 @@ class DataAccess {
         return $data;
 
     }
-
-    /**
-     * Get Column Names
-     */
-    public static function get_column_names($table){
-    
-        // SQL
-        $sql = 'SELECT COLUMN_NAME FROM 
-            INFORMATION_SCHEMA.COLUMNS ';
-        $sql.= 'WHERE TABLE_NAME = ? AND 
-            TABLE_SCHEMA = ?';
-        $params = array($table, $GLOBALS['DB_NAME']);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    
-    }
     
     /**
      * Add DB Entry
@@ -488,7 +423,9 @@ class DataAccess {
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      */
-    public static function count_db_rows($table, $filters = []){
+    public static function count_db_rows(
+        $table, $filters = []
+    ){
 
         // SQL
         $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$table.'`';
@@ -523,7 +460,9 @@ class DataAccess {
     /**
      * Add Meta
      */
-    public static function add_meta($meta_name, $meta_value = NULL){
+    public static function add_meta(
+        $meta_name, $meta_value = NULL
+    ){
     
         // Serialize meta_value.
         if(is_array($meta_value)){
@@ -582,27 +521,6 @@ class DataAccess {
         // Result
         if(!$result)
             throw new Exception('Cannot update "'.$meta_name.'" with value "'.$meta_value.'"');
-    
-        // Complete Query
-        return $result;
-
-    }
-
-    /**
-     * Update Site Data 
-     */
-    public static function update_site_data($url, $column, $data){
-
-        // SQL
-        $sql = 'UPDATE `sites` SET `'.$column.'` = ? WHERE `url` = ?';
-        $params = array($data, $url);
-
-        // Query
-        $result = self::query($sql, $params, false);
-
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update "'.$url.'" with "'.$data.'"');
     
         // Complete Query
         return $result;

@@ -1,3 +1,14 @@
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the sites view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
+?>
+
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
@@ -9,12 +20,14 @@
     </div>
     <div class="row row-cols-3 g-4 pb-4">
         
-        <?php
-        // Show Sites
-        $sites = DataAccess::get_db_entries('sites');
-        if($sites != NULL ):
-            foreach($sites as $site):  
-        ?>
+<?php
+// Show Sites
+$sites = DataAccess::get_db_entries(
+    'sites', [], get_current_page_number()
+);
+if( count($sites['content']) > 0 ):
+    foreach($sites['content'] as $site):  
+?>
 
         <div class="col">
             <div class="card">
@@ -30,8 +43,11 @@
                         $bg_class = 'bg-success';
                         $text = 'Active';
                     }
-                    echo '<span class="badge mb-2 '.$bg_class.'">'.$text.'</span>';
                     ?>
+
+                    <span class="badge mb-2 <?php echo $bg_class;?>">
+                        <?php echo $text;?>
+                    </span>
 
                     <?php
                     // The Type Badge
@@ -43,11 +59,15 @@
                     }elseif($type == 'single_page'){
                         $type = 'Single Page';
                     }
-                    echo '<span class="badge bg-light text-dark">'
-                        .$type.
-                        '<span class="visually-hidden"> Site Type</span></span>';
                     ?>
-                    
+
+                    <span class="badge bg-light text-dark">
+                        <?php echo $type;?>
+                        <span class="visually-hidden">
+                            Site Type
+                        </span>
+                    </span>
+
                     <h2 class="h5 card-title">
                         <?php echo $site->url; ?> 
                     </h2>
@@ -71,16 +91,22 @@
         </div>
         
         <?php 
-            endforeach;
-        else:
+        // Fallback.
+        endforeach; else:
         ?>
 
             <p>No sites exist.</p>
 
         <?php 
+        // End Sites
         endif;
         ?>
 
-        </tbody>
     </div>
+
+    <?php
+    // The pagination
+    the_pagination($sites['total_pages']);
+    ?>
+
 </section>

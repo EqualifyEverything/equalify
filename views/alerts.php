@@ -17,9 +17,12 @@ if(!empty($_GET['label'])){
             'value' => $_GET['label']
         )
     );
-    $label =  unserialize( DataAccess::get_db_entries(
-        'meta', $filtered_to_labels
-    ) )[0];
+    $label = DataAccess::get_db_entries(
+        'meta', $filtered_to_label
+    )['content'][0];
+
+    // We need to unserialize the meta from the label.
+    $label_meta = unserialize($label->meta_value);
 
 }else{
 
@@ -33,22 +36,19 @@ if(!empty($_GET['label'])){
             )
         )
     );
+    $label_meta = $label['meta_value'];
 
 }
 
 // Let's extract the "title" meta, so we can use it 
 // later and so we can use any label's meta_values to
-// fitler the alerts
-foreach($label['meta_value'] as $the_meta){
-    if( $the_meta['name'] == 'title'){
-        $the_title = $the_meta['value'];
-        unset($the_meta);
+// fitler the alerts.
+foreach($label_meta as $k => $val) {
+    if($val['name'] == 'title') {
+        $the_title = $val['value'];
+        unset($label_meta[$k]);
     }
 }
-print_r($label);
-
-die;
-
 ?>
 
 <section>
@@ -63,13 +63,14 @@ die;
             if($the_title !== 'All Alerts'):
             ?>
 
-            <a href="index.php?view=label_customizer&name=<?php echo $label['id'];?>">
-                Label Settings
+            <a href="index.php?view=label_customizer&name=<?php echo $label->meta_name;?>" class="btn btn-primary">
+                Edit Label
             </a>
 
             <?php
             endif;
             ?>
+
         </div>
     </div>
     <table class="table">
@@ -87,12 +88,12 @@ die;
         <?php
         // We need to setup the different filters from the
         // all label meta.
-        $filters = $label['meta_value'];
+        $filters = $label_meta;
         $alerts = DataAccess::get_db_entries( 'alerts',
             $filters, get_current_page_number()
         );
-        if( count($alerts_content) > 0 ): 
-            foreach($alerts_content as $alert):    
+        if( count($alerts['content']) > 0 ): 
+            foreach($alerts['content'] as $alert):    
         ?>
 
         <tr>
@@ -109,7 +110,7 @@ die;
         </tr>
 
         <?php 
-        // Fallback
+        // Fallback.
         endforeach; else:
         ?>
 

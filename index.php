@@ -105,7 +105,7 @@ require_once 'scan.php';
                         'operator' => 'LIKE'
                     )
                 );
-                $labels =  DataAccess::get_db_entries('meta', $filtered_to_labels);
+                $labels = DataAccess::get_db_entries('meta', $filtered_to_labels)['content'];
                 if(!empty($labels)): foreach($labels as $label):
                 ?>
 
