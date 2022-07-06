@@ -45,7 +45,7 @@ if(!empty($_GET['label'])){
 // fitler the alerts.
 foreach($label_meta as $k => $val) {
     if($val['name'] == 'title') {
-        $the_title = '"'.$val['value'].'"';
+        $the_title = $val['value'];
         unset($label_meta[$k]);
     }
 }

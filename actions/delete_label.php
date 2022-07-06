@@ -12,24 +12,17 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // Setup variables.
-$alert_label = $_GET['id'];
+$alert_label = $_GET['name'];
 
-// Get existing meta.
-$alert_labels = unserialize(
-    DataAccess::get_meta_value('alert_labels')
+// Delete DB 
+$filtered_to_label = array(
+    array(
+        'name' => 'meta_name',
+        'value' => $_GET['name'],
+    )
 );
-
-// Remove the label.
-unset($alert_labels['labels'][$alert_label]);
-
-// Change the current label to the first label, which can 
-// never be deleted.
-$alert_labels['current_label'] = 1;
-
-// Save view data with data that MySQL understands.
-$serialized_alert_labels = serialize($alert_labels);
-DataAccess::update_meta_value(
-    'alert_labels', $serialized_alert_labels
+ DataAccess::delete_db_entry(
+    'meta', $filtered_to_label
 );
 
 // Reload alerts page.

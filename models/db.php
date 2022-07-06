@@ -418,6 +418,47 @@ class DataAccess {
     }
 
     /**
+     * Delete DB Entry
+     * @param string table
+
+     * @param array filters [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     */
+    public static function delete_db_entry($table, $filters){
+    
+        // SQL
+        $sql = 'DELETE FROM `'.$table.'`';
+
+        // Add optional filters to content and total_pages.
+        $filter_count = count($filters);
+        $filters_sql = '';
+        if($filter_count > 0){
+            $filters_sql = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+                if(empty($filter['operator'])){
+                    $operator = '=';
+                }else{
+                    $operator = $filter['operator'];
+                }
+                $filters_sql.= '`'.$filter['name'].'` '.$operator
+                    .' ?';
+                $params[] = $filter['value'];
+                if(++$filter_iteration != $filter_count)
+                    $filters_sql.= ' AND ';
+        
+            }
+        }
+    
+        // Query
+        $result = self::query($sql, $params, false);
+    
+        // Complete Query
+        return $result;
+
+    }
+
+    /**
      * Count DB rows
      * @param string table
      * @param array filters [ array ( 
