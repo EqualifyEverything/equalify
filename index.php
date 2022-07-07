@@ -86,8 +86,16 @@ require_once 'scan.php';
                             <span id="alert_count">
 
                                 <?php 
-                                // Count alerts
-                                echo DataAccess::count_db_rows('alerts');
+                                // Count active alerts.
+                                $filtered_to_active_status = array(
+                                    array(
+                                        'name' => 'status',
+                                        'value' => 'active'
+                                    )
+                                );
+                                echo DataAccess::count_db_rows(
+                                    'alerts', $filtered_to_active_status
+                                );
                                 ?>
                             
                             </span>

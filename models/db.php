@@ -473,20 +473,17 @@ class DataAccess {
 
         // Add optional filters to content and total_pages.
         $filter_count = count($filters);
-        $filters_sql = '';
         if($filter_count > 0){
-            $filters_sql = ' WHERE ';
+            $sql.= ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
+                $sql.= '`'.$filter['name'].'` = ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
+                    $sql.= ' AND ';
         
             }
         }
-        $sql.= $filters_sql;
-
 
         // Query
         $results = self::query($sql, $params, true);
