@@ -12,7 +12,6 @@
 echo "\n\n\n> Processing integrations...";
 
 // This document is going to use the DB.
-define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 

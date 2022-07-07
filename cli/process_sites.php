@@ -13,7 +13,6 @@
 echo "\n\n\n> Processing sites...";
 
 // This document uses the DB and adders.
-define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/models/adders.php');
@@ -41,10 +40,10 @@ $filtered_to_active_sites = array(
 );
 $active_sites = DataAccess::get_db_entries( 'sites',
     $filtered_to_active_sites
-);
+)['content'];
 
 // Log our progress..
-$active_sites_count = count( $active_sites);
+$active_sites_count = count($active_sites);
 echo "\n> $active_sites_count active site";
 if($active_sites_count > 1 ){
     echo 's';
