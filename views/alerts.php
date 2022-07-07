@@ -24,6 +24,23 @@ if(!empty($_GET['label'])){
     // We need to unserialize the meta from the label.
     $label_meta = unserialize($label->meta_value);
 
+// We also have special presets
+}elseif(!empty($_GET['preset'])){
+
+    // The inbox preset contains all 'active' alerts.
+    if($_GET['preset'] == 'inbox'){
+        $label = array(
+            'meta_name' => '', // Default has no id.
+            'meta_value' => array(
+                array(
+                    'name' => 'status',
+                    'value' => 'active'
+                )
+            )
+        );
+        $label_meta = $label['meta_value'];
+    }
+
 }else{
 
     // When there's no label data, we set default data.
@@ -115,7 +132,15 @@ foreach($label_meta as $k => $val) {
         ?>
 
         <tr>
-            <td colspan="6">No alerts found.</td>
+            <td colspan="6">
+                <p class="text-center my-2 lead">
+                    No alerts found.<br>
+                </p>
+                <p class="text-center my-2">
+                    <img src="plumeria.png" alt="Three frangiapani flowers. The flowers five pedals. Color eminates fron the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <strong>Get out and smell the frangiapani!</strong>
+                </p>
+            </td>
         </tr>
 
         <?php 
