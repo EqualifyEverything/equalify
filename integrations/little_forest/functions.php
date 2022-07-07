@@ -9,9 +9,8 @@
  */
 function little_forest_scans($url){
 
-    // Add DB info and required functions.
-    require_once 'config.php';
-    require_once 'models/db.php';
+    // Add helpers for the integration.
+    require_once 'helpers.php';
 
     // Get Little Forest data.
     $override_https = array(
@@ -60,6 +59,7 @@ function little_forest_scans($url){
             }
 
             // Add notice.
+            
             DataAccess::add_alert('page', $url, 'little_forest', 'error', $message, $meta);
 
         }

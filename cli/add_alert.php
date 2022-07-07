@@ -11,11 +11,10 @@
 // First, we'll log what we're doing.
 echo "\nAdding an alert:";
 
-
 // We require five arguements to run this process (we're
 // asking for 7 because PHP adds the request as an arg).
 if($argc !== 7)
-    throw new Exception('g arguments are required -
+    throw new Exception('5 arguments are required -
     '.$argc.' passed', 1);
 
 // We can scope the arguments to their variables.
