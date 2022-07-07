@@ -48,11 +48,14 @@ if(!empty($_GET['name'])){
             <?php
             // Lets add helper text, depending on if we're
             // editing the label.
-            if(!empty($name))
+            if(!empty($name)){
                 echo 'Editing ';
+            }else{
+                echo 'New ';
+            }
             ?>
             
-            "<span id="labelName"><?php echo $title;?></span>" Alerts Label
+            "<span id="labelName"><?php echo $title;?></span>" Label
         </h1>
     </div>
     <form action="actions/save_label.php" method="post">

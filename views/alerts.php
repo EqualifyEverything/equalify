@@ -34,7 +34,7 @@ if(!empty($_GET['label'])){
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Active'
+                    'value' => 'Active Alerts'
                 ),
                 array(
                     'name' => 'status',
@@ -51,7 +51,7 @@ if(!empty($_GET['label'])){
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Ignored'
+                    'value' => 'Ignored Alerts'
                 ),
                 array(
                     'name' => 'status',
@@ -69,7 +69,7 @@ if(!empty($_GET['label'])){
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Equalified'
+                    'value' => 'Equalified Alerts'
                 ),
                 array(
                     'name' => 'status',
@@ -88,7 +88,7 @@ if(!empty($_GET['label'])){
         'meta_value' => array(
             array(
                 'name' => 'title',
-                'value' => 'All'
+                'value' => 'All Alerts'
             )
         )
     );
@@ -110,7 +110,7 @@ foreach($label_meta as $k => $val) {
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h1><?php echo $the_title;?> Alerts</h1>
+            <h1><?php echo $the_title;?></h1>
         </div>
         <div>
             <?php

@@ -64,7 +64,7 @@ require_once 'scan.php';
     ?>
 
     <main>
-        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 230px;">
+        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 250px;">
             <a href="index.php?view=alerts" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
                 <svg viewBox="1409.501 -1033.757 1999.787 2000.193"  width="40" height="40" class="me-2">
                     <ellipse style="fill-rule: evenodd; stroke: rgba(0, 0, 0, 0); stroke-opacity: 0; stroke-width: 0px; fill: rgb(25, 135, 84);" cx="2411.173" cy="-35.364" rx="995.702" ry="997.687"/>
