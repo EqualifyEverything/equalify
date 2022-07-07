@@ -20,17 +20,22 @@ function get_default_view(){
 }
 
 /**
- * The Active View
+ * The Active Selection
  */
-function the_active_view($view){
+function the_active_class($selection){
 
-    // The URL may include the name of the view.
+    // 'active' class is largely dependant on view.
     if(!empty($_GET['view'])){
 
-        // Labels need special treatment.
+        // Labels and presets need special treatment.
         if(
-            !empty($_GET['label'])
-            && ($_GET['label'] == $view)
+            (
+                !empty($_GET['label'])
+                && ($_GET['label'] == $selection)
+            ) || (
+                !empty($_GET['preset'])
+                && ($_GET['preset'] == $selection)
+            )
         ){
 
             // The active class is what we use to show a
@@ -46,10 +51,11 @@ function the_active_view($view){
             echo '';
 
         // Anything that's not a label will be active if
-        // the view is also set in the URL
+        // the selection is also set in the view.
         }elseif(
-            $_GET['view'] == $view 
+            $_GET['view'] == $selection 
             && empty($_GET['label'])
+            && empty($_GET['preset'])
          ){
             echo 'active';
         }

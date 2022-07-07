@@ -27,14 +27,53 @@ if(!empty($_GET['label'])){
 // We also have special presets
 }elseif(!empty($_GET['preset'])){
 
-    // The inbox preset contains all 'active' alerts.
-    if($_GET['preset'] == 'inbox'){
+    // The active preset contains all 'active' alerts.
+    if($_GET['preset'] == 'active'){
         $label = array(
-            'meta_name' => '', // Default has no id.
+            'meta_name' => '',
             'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'Active'
+                ),
                 array(
                     'name' => 'status',
                     'value' => 'active'
+                )
+            )
+        );
+        $label_meta = $label['meta_value'];
+
+    // The ignored preset contains all 'ignored' alerts.
+    }elseif($_GET['preset'] == 'ignored'){
+        $label = array(
+            'meta_name' => '',
+            'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'Ignored'
+                ),
+                array(
+                    'name' => 'status',
+                    'value' => 'ignored'
+                )
+            )
+        );
+        $label_meta = $label['meta_value'];
+
+    // The equalified preset contains all 'equalified' 
+    // alerts.
+    }elseif($_GET['preset'] == 'equalified'){
+        $label = array(
+            'meta_name' => '',
+            'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'Equalified'
+                ),
+                array(
+                    'name' => 'status',
+                    'value' => 'equalified'
                 )
             )
         );
@@ -45,7 +84,7 @@ if(!empty($_GET['label'])){
 
     // When there's no label data, we set default data.
     $label = array(
-        'meta_name' => '', // Default has no id.
+        'meta_name' => '',
         'meta_value' => array(
             array(
                 'name' => 'title',
@@ -75,9 +114,9 @@ foreach($label_meta as $k => $val) {
         </div>
         <div>
             <?php
-            // If we're not on the main 'All Alerts' page,
-            // we are on a label page that can be edited.
-            if($the_title !== 'All'):
+            // If we're not on a label page, we can't edit
+            // the page.
+            if(!empty($_GET['label'])):
             ?>
 
             <a href="index.php?view=label_customizer&name=<?php echo $label->meta_name;?>" class="btn btn-primary">
