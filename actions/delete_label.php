@@ -21,7 +21,7 @@ $filtered_to_label = array(
         'value' => $_GET['name'],
     )
 );
- DataAccess::delete_db_entry(
+DataAccess::delete_db_entry(
     'meta', $filtered_to_label
 );
 

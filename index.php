@@ -107,7 +107,7 @@ require_once 'scan.php';
                 );
                 $labels = DataAccess::get_db_entries(
                     'meta', $filtered_to_labels, 1, 1000
-                )['content'];
+                    )['content'];
                 if(!empty($labels)): foreach($labels as $label):
                 ?>
 

@@ -431,9 +431,8 @@ class DataAccess {
 
         // Add optional filters to content and total_pages.
         $filter_count = count($filters);
-        $filters_sql = '';
         if($filter_count > 0){
-            $filters_sql = ' WHERE ';
+            $sql.= ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
                 if(empty($filter['operator'])){
@@ -441,11 +440,11 @@ class DataAccess {
                 }else{
                     $operator = $filter['operator'];
                 }
-                $filters_sql.= '`'.$filter['name'].'` '.$operator
+                $sql.= '`'.$filter['name'].'` '.$operator
                     .' ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
+                    $sql.= ' AND ';
         
             }
         }
