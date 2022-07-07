@@ -147,9 +147,9 @@ require_once 'scan.php';
 
                 <li class="nav-item">
                     <a href="index.php?view=alerts&label=<?php echo $label->meta_name;?>" class="nav-link <?php the_active_class($label->meta_name);?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-tag-fill" viewBox="0 0 16 16">
-                        <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-tag-fill" viewBox="0 0 16 16">
+                            <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+                        </svg>
                         
                         <?php
                         // We'll get some data to make the title.
@@ -158,7 +158,7 @@ require_once 'scan.php';
                             if($value['name'] == 'title')
                                 echo $value['value'];
                         }
-                        ?>
+                        ?>                        
 
                     </a>
                 </li>

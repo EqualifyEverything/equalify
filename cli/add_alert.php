@@ -111,7 +111,7 @@ if(!empty($existing_alerts)){
         // Updating the alert's status will also update
         // its timestamp. 
         DataAccess::update_db_column_data( 
-            'alerts', $alert->id, 'status', 'unread'
+            'alerts', $alert->id, 'status', 'active'
         );
 
     }
@@ -121,7 +121,7 @@ if(!empty($existing_alerts)){
 
 }else{
     
-    // Lets add an unread alert, since it doesn't already 
+    // Lets add an active alert, since it doesn't already 
     // exists.
     DataAccess::add_db_entry( 'alerts', $alert_arguments);
 

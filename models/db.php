@@ -574,7 +574,7 @@ class DataAccess {
             'CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) DEFAULT "unread",
+                `status` varchar(200) DEFAULT "active",
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `url` text,
