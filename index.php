@@ -152,14 +152,33 @@ require_once 'scan.php';
                         </svg>
                         
                         <?php
-                        // We'll get some data to make the title.
-                        $label_values = unserialize($label->meta_value);
-                        foreach ($label_values as $value){
-                            if($value['name'] == 'title')
-                                echo $value['value'];
+                        // We'll get some data to make the label.
+                        $label_meta = unserialize($label->meta_value);
+
+                        // Let's extract the "title" meta, so we can use it 
+                        // later and so we can use any label's meta_values to
+                        // fitler the alerts.
+                        foreach($label_meta as $k => $val) {
+                            if($val['name'] == 'title') {
+                                $the_title = $val['value'];
+                                unset($label_meta[$k]);
+                            }
                         }
+                        echo $the_title;
                         ?>                        
 
+                        <span class="badge text-bg-light float-end">
+                            <span id="alert_count">
+
+                                <?php 
+                                // Count items, filtered to label_meta.
+                                echo DataAccess::count_db_rows(
+                                    'alerts', $label_meta
+                                );
+                                ?>
+                            
+                            </span>
+                        </span>
                     </a>
                 </li>
 
