@@ -8,13 +8,13 @@ require_once '../models/db.php';
 
 // We don't validate the URLs here because cURL does a better
 // job of validating/redirecting in the adders.
-$url = $_GET['url'];
+$url = $_POST['url'];
 if($url == false)
     throw new Exception('URL is missing');
 
 // We need to check the type since a user could manually
 // update the URL string to something unsupported.
-$type = $_GET['type'];
+$type = $_POST['type'];
 if( $type == false)
     throw new Exception(
         'Type is not specified for the URL "'.$url.'"'

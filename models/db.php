@@ -135,7 +135,7 @@ class DataAccess {
         // Complete Query
         return $result;
     }
-    
+
     /**
      * Update Page Site Status 
      */
@@ -418,6 +418,41 @@ class DataAccess {
     }
 
     /**
+     * Update DB Entry
+     * @param string table
+     * @param string id
+     * @param array fields  
+     * [ array('name' => $name, 'value' => $value) ]
+     */
+    public static function update_db_entry($table, $id, array $fields)
+    {
+
+        // Prepare the UPDATE SQL.
+        $sql = 'UPDATE `'.$table.'` SET ';
+        $field_count = count($fields);
+        $params = array();
+        $counter = 0;
+        foreach($fields as $field){
+            $counter++;
+            $sql.= $field['name'].' = ?';
+            if($counter !== $field_count)
+                $sql.= ', ';
+            $params[] = $field['value'];
+        }
+
+        // We're 
+        $sql.= ' WHERE id = ?';
+        $params[] = $id;
+
+        // Query
+        $result = self::query($sql, $params, true);
+        
+        // Complete Query
+        return $result;
+        
+    }
+
+    /**
      * Delete DB Entry
      * @param string table
 
@@ -523,6 +558,137 @@ class DataAccess {
     }
 
     /**
+     * Add Alert
+     * @param array attributes ['source' => '', 'url' => '', 
+     * 'integration_uri' => '', 'type' => '', 'message' => '', 
+     * 'meta' => ''] 
+     */
+    public static function add_alert( array $attributes){
+
+        // First, we'll make sure we have the required
+        // attributes to create an alert.
+        if(empty($attributes['source']))
+            throw new Exception('Source is missing', 1);
+        if(empty($attributes['type']))
+            throw new Exception('Type is missing', 1);
+
+        // Let's set fallbacks for non-required sources so
+        // that we can refer to the attributes, no matter if
+        // they are empty or not.
+        if(empty($attributes['url']))
+            $attributes['url'] = '';
+        if(empty($attributes['message']))
+            $attributes['message'] = '';
+        if(empty($attributes['meta']))
+            $attributes['meta'] = '';
+
+        // Let's validate the variables to make sure they
+        // include allowed data.
+        $allowed_types = array(
+            'error', 'warning', 'notice'
+        );
+        if(!in_array($attributes['type'], $allowed_types))
+            throw new Exception(
+                'Alert type "'.$attributes['type'].'" is invlaid'
+            );
+
+        // We should also sanitize the message to a format
+        // ready for the DB.
+        $attributes['message'] = htmlspecialchars(
+            $attributes['message'], ENT_NOQUOTES
+        );
+        if(is_array($attributes['meta'])){
+            $attributes['meta'] = htmlspecialchars(
+                serialize($attributes['meta']), ENT_NOQUOTES
+            );
+        }
+
+        // Let's setup attributes in a usable way for the DB.
+        $alert_arguments = array(
+            array(
+
+                // Where is the alert being reported by? We
+                // often use the integration URI or 'system'
+                // for Equalify-created alerts.
+                'name' => 'source',
+                'value'=> $attributes['source']
+
+            ),
+            array(
+
+                // What URL is the report related to?
+                'name' => 'url',
+                'value'=> $attributes['url']
+
+            ),
+            array(
+
+                // What type of alert is this?
+                'name' => 'type',
+                'value'=> $attributes['type']
+
+            ),
+            array(
+
+                // Any message to include for the user?
+                'name' => 'message',
+                'value'=> $attributes['message']
+                
+            ),
+            array(
+
+                // What else? You can add arrays if you
+                // want.
+                'name' => 'meta',
+                'value'=> $attributes['meta']
+
+            )
+        );
+
+        // Time to get exsiting alerts, so we're not posting
+        // duplicate alerts.
+        $existing_alerts = self::get_db_entries(
+            'alerts', $alert_arguments
+        )['content'];
+
+        // We can now add the status of active, since every 
+        // new alert should be active.
+        array_push( $alert_arguments, 
+            array(
+                'name' => 'status',
+                'value'=> 'active'
+            )
+        );
+
+        // Now let's update or add the alert, depending on 
+        // if a similar alert already exists.x
+        if(!empty($existing_alerts)){
+
+            // All alerts with the same data will need to be
+            // updated.
+            foreach($existing_alerts as $alert){
+
+                // Updating the alert's status will also
+                // update its timestamp. 
+                self::update_db_entry( 
+                    'alerts', $alert->id, $alert_arguments
+                );
+
+            }
+
+        }else{
+            
+            // Lets add an active alert, since it doesn't 
+            // already exists.
+            self::add_db_entry( 
+                'alerts', $alert_arguments
+            );
+
+        }
+    
+    }
+
+    /**
      * Delete Meta
      */
     public static function delete_meta($meta_name){
@@ -536,7 +702,7 @@ class DataAccess {
     
         // Result
         if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+            throw new Exception('Cannot delete meta using filters "'.$filters.'"');
     
         // Complete Query
         return $result;
@@ -574,11 +740,10 @@ class DataAccess {
             'CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) DEFAULT "active",
+                `status` varchar(200) NOT NULL DEFAULT "active",
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `url` text,
-                `integration_uri` varchar(200) DEFAULT NULL,
                 `message` text,
                 `meta` text,
                 PRIMARY KEY (`id`)

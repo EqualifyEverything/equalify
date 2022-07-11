@@ -7,7 +7,7 @@
  * Equalify works for everyone.
 **********************************************************/
 
-// Info on DB must be declared to use db.php models.
+// We're going to use the DB in this document.
 require_once '../config.php';
 require_once '../models/db.php';
 

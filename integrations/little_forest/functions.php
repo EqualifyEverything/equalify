@@ -10,7 +10,7 @@
 function little_forest_scans($url){
 
     // Add helpers for the integration.
-    require_once 'helpers.php';
+    require_once 'models/helpers.php';
 
     // Get Little Forest data.
     $override_https = array(
@@ -58,9 +58,10 @@ function little_forest_scans($url){
                 $message = $error['Message'];
             }
 
-            // Add notice.
-            
-            DataAccess::add_alert('page', $url, 'little_forest', 'error', $message, $meta);
+            // Add error.
+            add_equalify_alert(
+                'page', $url, 'little_forest', 'error', $message, $meta
+            );
 
         }
     }
@@ -84,7 +85,9 @@ function little_forest_scans($url){
             }
 
             // Add notice.
-            DataAccess::add_alert('page', $url, 'little_forest', 'notice', $message, $meta);
+            add_equalify_alert(
+                'page', $url, 'little_forest', 'notice', $message, $meta
+            );
 
         }
     }
@@ -108,7 +111,9 @@ function little_forest_scans($url){
             }
 
             // Add warning.
-            DataAccess::add_alert('page', $url, 'little_forest', 'warning', $message, $meta);
+            add_equalify_alert(
+                'page', $url, 'little_forest', 'warning', $message, $meta
+            );
 
         }
     }
