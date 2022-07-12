@@ -16,21 +16,12 @@ require_once '../models/db.php';
 $updated_meta = array();
 
 // The array is populated with URL parameters.
-if(!empty($_POST['integration'])){
+if(!empty($_POST['status'])){
     array_push(
         $updated_meta,
         array(
-            'name' => 'integration',
-            'value' => $_POST['integration']
-        )
-    );
-}
-if(!empty($_POST['source'])){
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'source',
-            'value' => $_POST['source']
+            'name' => 'status',
+            'value' => $_POST['status']
         )
     );
 }
@@ -101,5 +92,5 @@ if(empty($_POST['name'])){
 }
 
 // When done, we can checkout the saved label.
-header('Location: ../index.php?view=alerts&label='.$name);
+header('Location: ../index.php?view=alerts&status=success&label='.$name);
 ?>
