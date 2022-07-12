@@ -9,8 +9,13 @@
  */
 function little_forest_scans($url){
 
-    // Add helpers for the integration.
-    require_once 'models/helpers.php';
+    // We don't know where helpers are being called, so we
+    // have to set the directory if it isn't already set.
+    if(!defined('__ROOT__'))
+        define('__ROOT__', dirname(dirname(__FILE__)));
+
+    // We'll use the directory to include required files.
+    require_once(__ROOT__.'/helpers/add_alert.php');
 
     // Get Little Forest data.
     $override_https = array(
@@ -58,10 +63,15 @@ function little_forest_scans($url){
                 $message = $error['Message'];
             }
 
-            // Add error.
-            add_equalify_alert(
-                'page', $url, 'little_forest', 'error', $message, $meta
+            // Add notice.
+            $attributes = array(
+                'source'  => 'little_forrest',
+                'url'     => $url,
+                'type'    => 'error',
+                'message' => $message,
+                'meta'    => $meta
             );
+            add_alert( $attributes );
 
         }
     }
@@ -85,9 +95,14 @@ function little_forest_scans($url){
             }
 
             // Add notice.
-            add_equalify_alert(
-                'page', $url, 'little_forest', 'notice', $message, $meta
+            $attributes = array(
+                'source'  => 'little_forrest',
+                'url'     => $url,
+                'type'    => 'notice',
+                'message' => $message,
+                'meta'    => $meta
             );
+            add_alert( $attributes );
 
         }
     }
@@ -111,9 +126,14 @@ function little_forest_scans($url){
             }
 
             // Add warning.
-            add_equalify_alert(
-                'page', $url, 'little_forest', 'warning', $message, $meta
+            $attributes = array(
+                'source'  => 'little_forrest',
+                'url'     => $url,
+                'type'    => 'warning',
+                'message' => $message,
+                'meta'    => $meta
             );
+            add_alert( $attributes );
 
         }
     }
