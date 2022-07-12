@@ -50,9 +50,13 @@ function wave_fields(){
  */
 function wave_scans($url){
 
-    // Add DB and required functions.
-    require_once 'config.php';
-    require_once 'models/db.php';
+    // We don't know where helpers are being called, so we
+    // have to set the directory if it isn't already set.
+    if(!defined('__ROOT__'))
+        define('__ROOT__', dirname(dirname(__FILE__)));
+
+    // We'll use the directory to include required files.
+    require_once(__ROOT__.'/helpers/add_alert.php');
 
     // Get WAVE data.
     $override_https = array(
@@ -73,7 +77,17 @@ function wave_scans($url){
     $wave_errors = $wave_json_decoded['categories']['error']['count'];
 
     // Set optional alerts.
-    if($wave_errors >= 1)
-        DataAccess::add_alert('page', $url, 'wave', 'error', 'WCAG 2.1 page error found! See <a href="https://wave.webaim.org/report#/'.$url.'" target="_blank">WAVE report</a>.');
+    if($wave_errors >= 1){
+
+        // Add alert.
+        $attributes = array(
+            'source'  => 'WAVE',
+            'url'     => $url,
+            'type'    => 'error',
+            'message' => 'WCAG 2.1 page error found! See <a href="https://wave.webaim.org/report#/'.$url.'" target="_blank">WAVE report</a>.',
+        );
+        add_alert( $attributes );
         
+    }
+
 }

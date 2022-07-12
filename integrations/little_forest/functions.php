@@ -63,7 +63,7 @@ function little_forest_scans($url){
                 $message = $error['Message'];
             }
 
-            // Add notice.
+            // Add error.
             $attributes = array(
                 'source'  => 'Little Forrest',
                 'url'     => $url,
