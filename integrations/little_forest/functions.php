@@ -65,7 +65,7 @@ function little_forest_scans($url){
 
             // Add notice.
             $attributes = array(
-                'source'  => 'little_forrest',
+                'source'  => 'Little Forrest',
                 'url'     => $url,
                 'type'    => 'error',
                 'message' => $message,
@@ -96,7 +96,7 @@ function little_forest_scans($url){
 
             // Add notice.
             $attributes = array(
-                'source'  => 'little_forrest',
+                'source'  => 'Little Forrest',
                 'url'     => $url,
                 'type'    => 'notice',
                 'message' => $message,
@@ -127,7 +127,7 @@ function little_forest_scans($url){
 
             // Add warning.
             $attributes = array(
-                'source'  => 'little_forrest',
+                'source'  => 'Little Forrest',
                 'url'     => $url,
                 'type'    => 'warning',
                 'message' => $message,
