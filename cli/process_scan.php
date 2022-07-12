@@ -7,44 +7,100 @@
  * Equalify works for everyone.
 **********************************************************/
 
-// This document is going to use the DB.
-define('__ROOT__', dirname(dirname(__FILE__)));
+// Since this file is meant for CLI, we must set the 
+// directory if it isn't already set.
+if(!defined('__ROOT__'))
+    define('__ROOT__', dirname(dirname(__FILE__)));
+
+// We'll use the directory to include required files.
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
-
-// We keep track of the scan process in the DB, so we can
-// see if the scan is running in other areas of our app.
-DataAccess::update_meta_value( 'scan_status', 
-    'running'
+require_once(__ROOT__.'/helpers/process_sites.php');
+require_once(__ROOT__.'/helpers/process_integrations.php');
+require_once(
+    __ROOT__.'/helpers/process_integrations.php'
 );
 
-// We'll keep a log, time, and alert count because our goal
-// is to find as many alerts as possible in as short a time
-// as possible..
-echo "\n\n\nLet's Equalify some sites!";
-$starting_time = microtime(true);
-$starting_alerts_count = DataAccess::count_db_rows('alerts');
+/**
+ * Scan
+ */
+function scan(){
+
+    // We keep track of the scan process in the DB to see
+    // if the scan is running in other areas of our app.
+    DataAccess::update_meta_value( 'scan_status', 
+        'running'
+    );
+
+    // We'll log time and alert count because our goal is
+    // to find as many alerts as possible in as short a
+    // time as possible..
+    echo "\n\n\nLet's Equalify some sites!";
+    $starting_time = microtime(true);
+    $starting_alerts_count = DataAccess::count_db_rows(
+        'alerts'
+    );
+        
+    // Now we'll start our first process.
+    process_sites();
+
+    // Time to run the integrations!
+    process_integrations();
+
+    // At the end of our processes, we should clear all
+    // the meta for the next scan and set the timestamp.
+    DataAccess::update_meta_value('scan_status', '');
+    DataAccess::update_meta_value('scanable_pages', '');
+    DataAccess::update_meta_value(
+        'last_scan_time',  date('Y-m-d H:i:s')
+    );
+
+    // Log our progress..
+    $ending_time = microtime(true);
+    $exec_time = $ending_time - $starting_time;
+    $ending_alerts_count = DataAccess::count_db_rows('alerts');
+    $added_alerts = number_format(
+        $ending_alerts_count - $starting_alerts_count
+    );
+    echo "\n\n\nEqualify logged $added_alerts new alerts in just 
+        $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";
     
-// Now we'll start our first process.
-require_once('cli/process_sites.php');
+}
 
-// Time to run the integrations!
-require_once('cli/process_integrations.php');
+/**
+ * Cleanup
+ */
+function cleanup(){
 
-// At the end of our processes, we should clear all
-// the meta for the next scan and set the timestamp.
-DataAccess::update_meta_value('scan_status', '');
-DataAccess::update_meta_value('scanable_pages', '');
-DataAccess::update_meta_value(
-    'last_scan_time',  date('Y-m-d H:i:s')
-);
+    // We need to clear all the meta when a scan stops.
+    DataAccess::update_meta_value('scan_status', '');
+    DataAccess::update_meta_value('scanable_pages', '');
 
-// Log our progress..
-$ending_time = microtime(true);
-$exec_time = $ending_time - $starting_time;
-$ending_alerts_count = DataAccess::count_db_rows('alerts');
-$added_alerts = number_format(
-    $ending_alerts_count - $starting_alerts_count
-);
-echo "\n\n\nEqualify logged $added_alerts new alerts in just 
-    $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";
+}
+
+// Promised handle errors.
+try {
+
+    // Let's run the process.
+    scan();
+
+} catch (Exception $e) {
+
+    // When an error occurs, we have to clear scan
+    // variables that affect future scans.
+    cleanup(); 
+
+    // Let's log the erorr for CLI.
+    echo "\nCaught exception: ",  $e->getMessage(), "\n";
+
+
+} finally {
+
+    // After a successful scan, we cleanup the db and
+    // set a timestamp.
+    cleanup(); 
+    DataAccess::update_meta_value(
+        'last_scan_time',  date('Y-m-d H:i:s')
+    );
+
+}
