@@ -159,9 +159,28 @@ foreach($label_meta as $k => $val) {
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
-                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>" class="btn btn-outline-secondary btn-sm">
-                    Dismiss
+
+                <?php
+                // Active alerts can be ignored.
+                if( $alert->status == 'active' ){
+                ?>
+
+                <a href="actions/ignore_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
+                    Ignore Alert
                 </a>
+
+                <?php
+                // Ignored alerts can be activated.
+                }elseif( $alert->status == 'ignored' ){
+                ?>
+
+                <a href="actions/activate_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-success btn-sm">
+                    Activate Alert
+                </a>
+
+                <?php
+                }
+                ?>
             </td>
         </tr>
 
