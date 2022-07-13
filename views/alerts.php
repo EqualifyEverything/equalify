@@ -27,22 +27,18 @@ if(!empty($_GET['label'])){
 // We also have special presets
 }elseif(!empty($_GET['preset'])){
 
-    // The active preset contains all 'active' alerts.
-    if($_GET['preset'] == 'active'){
+    // The active preset contains all alerts.
+    if($_GET['preset'] == 'all'){
         $label = array(
             'meta_name' => '',
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Active Alerts'
-                ),
-                array(
-                    'name' => 'status',
-                    'value' => 'active'
+                    'value' => 'All Alerts'
                 )
             )
         );
-        $label_meta = $label['meta_value'];
+        $label_meta = $label['meta_value'];    
 
     // The ignored preset contains all 'ignored' alerts.
     }elseif($_GET['preset'] == 'ignored'){
@@ -78,17 +74,22 @@ if(!empty($_GET['label'])){
             )
         );
         $label_meta = $label['meta_value'];
+        
     }
 
 }else{
 
-    // When there's no label data, we set default data.
+    // When there's no label data, we get active alerts.
     $label = array(
         'meta_name' => '',
         'meta_value' => array(
             array(
                 'name' => 'title',
-                'value' => 'All Alerts'
+                'value' => 'Active Alerts'
+            ),
+            array(
+                'name' => 'status',
+                'value' => 'active'
             )
         )
     );

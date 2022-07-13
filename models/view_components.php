@@ -15,7 +15,7 @@
 function get_default_view(){
 
     // Set the default view if no other view is selected.
-    return 'views/alerts.php';
+    return "views/alerts.php";
     
 }
 
@@ -60,6 +60,11 @@ function the_active_class($selection){
             echo 'active';
         }
 
+    // We need to return active for the default view.
+    }elseif(empty($_GET['view']) && $selection == 'alerts'){
+
+        echo 'active';
+    
     }else{
         return null;
     }
