@@ -154,22 +154,22 @@ class DataAccess {
     }
 
     /**
-     * Get DB Entries
+     * Get DB Rows
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
      * 'operator' => '=' ) ]
      * @param string page
-     * @param string entries_per_page
+     * @param string rows_per_page
      * @param string operator
      */
-    public static function get_db_entries(
+    public static function get_db_rows(
         $table, $filters = [], $page = 1, 
-        $entries_per_page = self::ITEMS_PER_PAGE,
+        $rows_per_page = self::ITEMS_PER_PAGE,
         $operator = 'AND'
     ){
 
-        // Set entries per page.
-        $page_offset = ($page-1) * $entries_per_page;
+        // Set rows per page.
+        $page_offset = ($page-1) * $rows_per_page;
 
         // Create 'total_pages' SQL.
         $total_pages_sql = 'SELECT COUNT(*) FROM 
@@ -203,14 +203,14 @@ class DataAccess {
         // Add filters and page limit.
         $total_pages_sql.= $filters_sql;
         $content_sql.= $filters_sql.' LIMIT '.$page_offset
-            .', '.$entries_per_page;
+            .', '.$rows_per_page;
 
         // Run 'total_pages' SQL.
         $total_pages_result = self::query(
             $total_pages_sql, $params, true
         );
         $total_pages_rows = $total_pages_result->fetch_array()[0];
-        $total_pages = ceil($total_pages_rows / $entries_per_page);
+        $total_pages = ceil($total_pages_rows / $rows_per_page);
     
         // Run 'content' SQL
         $content_results = self::query($content_sql, $params, true);
@@ -223,7 +223,7 @@ class DataAccess {
     
         // Create and return data.
         $data = [
-            'total_entries' => $total_pages_rows,
+            'total_rows' => $total_pages_rows,
             'total_pages' => $total_pages,
             'content' => $content
         ];
@@ -420,18 +420,18 @@ class DataAccess {
     }
 
     /**
-     * Add DB Entries
+     * Add DB Rows
      * @param string table
      * @param array data  
      * [ array($field => $value, ...) ]
      */
-    public static function add_db_entries(
+    public static function add_db_rows(
         $table, array $data
     ){
         
         // Let's first format the field names. Note:
         // these fieldnames should be represented in the
-        // first set of entries as they are in the last.
+        // first set of rows as they are in the last.
         $field_names = implode(', ',array_keys($data[0]));  
         
         // Now we format the unprepared values.

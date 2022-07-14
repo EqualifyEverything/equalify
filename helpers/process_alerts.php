@@ -46,7 +46,7 @@ function process_alerts(array $queued_alerts){
             'value'    => $url
         ));
     };
-    $existing_alerts = DataAccess::get_db_entries(
+    $existing_alerts = DataAccess::get_db_rows(
         'alerts', $existing_alert_filters, 1, 10000, 'OR'
     )['content'];
 
@@ -128,7 +128,7 @@ function process_alerts(array $queued_alerts){
 
     // Any existing queued alerts are new alerts.
     if(!empty($queued_alerts)){
-        DataAccess::add_db_entries(
+        DataAccess::add_db_rows(
             'alerts', $queued_alerts
         );
     }

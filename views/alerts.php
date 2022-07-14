@@ -17,7 +17,7 @@ if(!empty($_GET['label'])){
             'value' => $_GET['label']
         )
     );
-    $label = DataAccess::get_db_entries(
+    $label = DataAccess::get_db_rows(
         'meta', $filtered_to_label
     )['content'][0];
 
@@ -146,7 +146,7 @@ foreach($label_meta as $k => $val) {
         // We need to setup the different filters from the
         // all label meta.
         $filters = $label_meta;
-        $alerts = DataAccess::get_db_entries( 'alerts',
+        $alerts = DataAccess::get_db_rows( 'alerts',
             $filters, get_current_page_number()
         );
         if( count($alerts['content']) > 0 ): 

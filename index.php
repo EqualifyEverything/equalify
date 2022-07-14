@@ -139,7 +139,7 @@ require_once 'scan.php';
                         'operator' => 'LIKE'
                     )
                 );
-                $labels = DataAccess::get_db_entries(
+                $labels = DataAccess::get_db_rows(
                     'meta', $filtered_to_labels, 1, 1000
                 )['content'];
                 if(!empty($labels)): foreach($labels as $label):

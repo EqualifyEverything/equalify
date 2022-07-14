@@ -47,7 +47,7 @@ function process_sites(){
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_entries( 'sites',
+    $active_sites = DataAccess::get_db_rows( 'sites',
         $filtered_to_active_sites
     )['content'];
 

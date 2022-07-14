@@ -106,7 +106,7 @@ function queue_alert(array $attributes){
 
     // Time to get exsiting alerts, so we're not posting
     // duplicate alerts.
-    $existing_alerts = DataAccess::get_db_entries(
+    $existing_alerts = DataAccess::get_db_rows(
         'alerts', $alert_arguments
     )['content'];
 

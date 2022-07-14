@@ -22,7 +22,7 @@
         
 <?php
 // Show Sites
-$sites = DataAccess::get_db_entries(
+$sites = DataAccess::get_db_rows(
     'sites', [], get_current_page_number()
 );
 if( count($sites['content']) > 0 ):
