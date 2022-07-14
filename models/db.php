@@ -160,10 +160,12 @@ class DataAccess {
      * 'operator' => '=' ) ]
      * @param string page
      * @param string entries_per_page
+     * @param string operator
      */
     public static function get_db_entries(
         $table, $filters = [], $page = 1, 
-        $entries_per_page = self::ITEMS_PER_PAGE
+        $entries_per_page = self::ITEMS_PER_PAGE,
+        $operator = 'AND'
     ){
 
         // Set entries per page.
@@ -185,15 +187,15 @@ class DataAccess {
             $filter_iteration = 0;
             foreach ($filters as $filter){
                 if(empty($filter['operator'])){
-                    $operator = '=';
+                    $sub_operator = '=';
                 }else{
-                    $operator = $filter['operator'];
+                    $sub_operator = $filter['operator'];
                 }
-                $filters_sql.= '`'.$filter['name'].'` '.$operator
+                $filters_sql.= '`'.$filter['name'].'` '.$sub_operator
                     .' ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
+                    $filters_sql.= ' '.$operator.' ';
         
             }
         }
@@ -418,6 +420,56 @@ class DataAccess {
     }
 
     /**
+     * Add DB Entries
+     * @param string table
+     * @param array data  
+     * [ array($field => $value, ...) ]
+     */
+    public static function add_db_entries(
+        $table, array $data
+    ){
+        
+        // Let's first format the field names. Note:
+        // these fieldnames should be represented in the
+        // first set of entries as they are in the last.
+        $field_names = implode(', ',array_keys($data[0]));  
+        
+        // Now we format the unprepared values.
+        $values = '';
+        $value_count = 0;
+        foreach ($data as $datum){
+            $value_count++;    
+            $values.= '('.str_repeat('?, ', count(
+                $datum
+            ));
+            $values = substr($values, 0, -2);
+            $values.= ')';
+            if($value_count !== count($data))
+                $values.= ', ';
+        }
+        
+        // All the values need to go into their own params.
+        $value_count = 0;
+        $params = array();
+        foreach ($data as $datum){
+            foreach($datum as $the_alert){
+                array_push($params, $the_alert);
+            }
+        }
+        
+        // Time to prepare the SQL!
+        $sql = 'INSERT INTO `'.$table.'` ('.$field_names
+            .') VALUES '.$values.';';
+
+        // Let's esecute the query
+        $result = self::query($sql, $params, true);
+        
+        // And complete the query.
+        return $result;
+
+    }
+
+    /**
      * Update DB Entry
      * @param string table
      * @param string id
@@ -440,7 +492,7 @@ class DataAccess {
             $params[] = $field['value'];
         }
 
-        // We're 
+        // Finish up the SQL.
         $sql.= ' WHERE id = ?';
         $params[] = $id;
 

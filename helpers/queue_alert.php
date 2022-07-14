@@ -14,7 +14,7 @@
  * @param array attributes ['source' => '', 'url' => '', 
  * 'type' => '', 'message' => '', 'meta' => '']
  */
-function add_alert(array $attributes){
+function queue_alert(array $attributes){
 
     // We don't know where helpers are being called, so we
     // have to set the directory if it isn't already set.
@@ -144,7 +144,5 @@ function add_alert(array $attributes){
         );
 
     }
-
-
 
 }

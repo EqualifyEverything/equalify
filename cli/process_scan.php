@@ -16,6 +16,7 @@ if(!defined('__ROOT__'))
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/helpers/process_sites.php');
+require_once(__ROOT__.'/helpers/process_equalify.php');
 require_once(__ROOT__.'/helpers/process_integrations.php');
 require_once(
     __ROOT__.'/helpers/process_integrations.php'
@@ -46,6 +47,9 @@ function scan(){
 
     // Time to run the integrations!
     process_integrations();
+
+    // Finally, we can equalify alerts.
+    process_alerts();
 
     // At the end of our processes, we should clear all
     // the meta for the next scan and set the timestamp.
