@@ -1,7 +1,7 @@
 <?php
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * These functions create a mark alerts as equalifed.
+ * This doc deals with the alerts in a process.
  * 
  * As always, we must remember that every function should 
  * be designed to be as effcient as possible so that 
@@ -11,7 +11,9 @@
 /**
  * Process Alerts
  */
-function process_alerts(array $queued_alerts){
+function process_alerts(
+    array $queued_alerts, array $process_info
+){
 
     // Let's log our process for the CLI.
     echo "\n\n\n> Processing alerts...";
@@ -25,22 +27,10 @@ function process_alerts(array $queued_alerts){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // We'll need to get a list of the urls and sources
-    // included in the queued alerts, so we can limit
-    // the amount of exisitng alerts we compare.
-    $urls_queued = [];
-    $sources_queued = [];
-    foreach ($queued_alerts as $alert){
-        if(!in_array($alert['url'], $urls_queued))
-            array_push($urls_queued, $alert['url']);
-        if(!in_array($alert['source'], $sources_queued))
-            array_push($sources_queued, $alert['source']);
-    }
-
     // Now lets get our existing alerts, filtered to the
     // pages we're interested in.
     $existing_alert_filters = [];
-    foreach ( $urls_queued as $url){
+    foreach ( $process_info['urls'] as $url){
         array_push($existing_alert_filters, array(
             'name'     => 'url',
             'value'    => $url
@@ -50,22 +40,25 @@ function process_alerts(array $queued_alerts){
         'alerts', $existing_alert_filters, 1, 10000, 'OR'
     )['content'];
 
-    // Let's further filter existing alerts by only 
-    // including alerts with queued sources.
+    // Let's further filter existing alerts.
     foreach (
         $existing_alerts as $key => $existing_alert
     ) {
+
+        // We only include alerts with queued sources.
         if(!in_array(
-            $existing_alert->source, $sources_queued
+            $existing_alert->source, 
+            $process_info['sources']
         ))
             unset($existing_alerts[$key]);
+            
     }
 
     // We'll now seperate duplicate alerts.
     $duplicate_alerts = [];
     foreach(
         $queued_alerts as 
-        $key => $queued_alert
+        $queued_key => $queued_alert
     ):
 
         // We compare queued alerts to existing alerts.
@@ -74,7 +67,7 @@ function process_alerts(array $queued_alerts){
             $key => $existing_alert
         ){
 
-            // Every attribute except 'status' and 'time' is
+            // Every attribute except status, time' is
             // compared.
             if(
                 (
@@ -99,31 +92,63 @@ function process_alerts(array $queued_alerts){
                 )
             ){
                 
-                // We move duplicates to updated_alerts.
-                array_push($duplicate_alerts, $existing_alert);
+                // Move duplicates away from existing alerts.
+                array_push(
+                    $duplicate_alerts, $existing_alert
+                );
                 unset($existing_alerts[$key]);
-                unset($queued_alerts[$key]);
 
             }
 
         }
 
+        // Now we need to move duplicates from queued alerts.
+        foreach ($duplicate_alerts as $duplicate_alert){
+
+            // We don't compare time, id, and status.
+            unset($duplicate_alert->id);
+            unset($duplicate_alert->time);
+            unset($duplicate_alert->status);
+
+            // Let's also convert the current obj into an array.
+            $duplicate_alert_array = (array) $duplicate_alert;
+
+            // Duplicates will have id, time, and status which
+            // we aren't comparing.
+            if( 
+                array_diff_assoc(
+                    $duplicate_alert_array, $queued_alert
+                ) == array()
+            )
+                unset($queued_alerts[$queued_key]);
+
+        }
+
     endforeach;
 
-    // Let's update the duplicate alerts in the db so we have an
-    // updated timestamp.
-    if(!empty($duplicate_alerts)){
-        DataAccess::update_db_rows(
-            'alerts', $duplicate_fields, $duplicate_filters
-        );
-    }
+    // Now we can deal with any existing alerts.
+    if(!empty($existing_alerts)){
 
-    // Now we know that any remaining existing alerts can be
-    // marked as 'equalified'.
-    if(!empty($equalified_alerts)){
-        DataAccess::update_db_rows(
-            'alerts', $equalified_fields, $equalified_filters
+        // We need to update their status to 'equalified'.
+        $fields_updated = array(
+            array(
+                'name'  => 'status',
+                'value' => 'equalified'
+            )
         );
+
+        // Let's build a way to filter by IDs.
+        $filterd_by_ids = [];
+        foreach($existing_alerts as $alert){
+            array_push($filterd_by_ids, array(
+                'name' => 'id',
+                'value'=> $alert->id
+            ));
+        }
+        DataAccess::update_db_rows(
+            'alerts', $fields_updated, $filterd_by_ids, 'OR'
+        );
+
     }
 
     // Any existing queued alerts are new alerts.
@@ -138,6 +163,5 @@ function process_alerts(array $queued_alerts){
         count($duplicate_alerts)+count($existing_alerts)
         +count($queued_alerts);
     echo "\n> Processed $alert_counts alerts.";
-
 
 }

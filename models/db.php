@@ -322,22 +322,23 @@ class DataAccess {
     }
 
     /**
-     * Update DB rows
+     * Update DB Rows
      * @param string table
      * @param array fields [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param string operator 
      */
     public static function update_db_rows(
-        $table, $fields, $filters = [],
+        $table, $fields, $filters = [], $operator = 'AND'
     ){
 
         // Prepare the SQL.
         $sql = 'UPDATE `'.$table.'` SET ';
 
         // Add fields that we're updating.
-        $field_count = count($filters);
+        $field_count = count($fields);
         $field_sql = '';
         if($field_count > 0){
             $field_iteration = 0;
@@ -360,7 +361,7 @@ class DataAccess {
                 $filters_sql.= '`'.$filter['name'].'` = ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
+                    $filters_sql.= ' '.$operator.' ';
         
             }
         }
@@ -368,9 +369,6 @@ class DataAccess {
 
         // Query
         $results = self::query($sql, $params, false);
-
-        // Complete Query
-        return $results;
 
     }
     

@@ -4,34 +4,19 @@
 // For testing purposed, let's make up an array of 
 // queued alerts. By the end of this,
 $queued_alerts = array(
-    array(
-        'source'  => 'existing source',
-        'url'     => 'newurl.com',
-        'type'    => 'duplicate',
-        'status'  => 'duplicate',
-        'message' => 'duplicate',
-        'meta'    => 'duplicate'
+
+
+);
+$process_info = array(
+    'sources'  => array(
+        'new source', 'source 2', 'existing source'
     ),
-    array(
-        'source'  => 'existing source',
-        'url'     => 'existingurl.com',
-        'type'    => 'new',
-        'status'  => 'new',
-        'message' => 'new',
-        'meta'    => 'new'
-    ),
-    array(
-        'source'  => 'new source',
-        'url'     => 'existingurl2.com',
-        'type'    => 'new',
-        'status'  => 'new',
-        'message' => 'new',
-        'meta'    => 'new'
+    'urls'     => array(
+        'newurl.com', 'existingurl2.com', 'newurl2.com'
     )
 );
-
 
 // We'll use the process alert helper
 require_once('helpers/process_alerts.php');
 
-process_alerts($queued_alerts);
+process_alerts($queued_alerts, $process_info);
