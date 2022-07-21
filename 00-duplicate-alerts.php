@@ -74,7 +74,7 @@ function get_duplicate_alerts(&$existing_alerts, &$new_alerts, &$duplicate_alert
   $new_alerts = array_values($new_alerts);
 }
 
-$duplicate_alerts = [];
+$duplicate_alerts = array(); 
 get_duplicate_alerts($existing_alerts, $new_alerts, $duplicate_alerts);
 
 print('$existing_alerts = ' . var_export($existing_alerts, true) . "\n\n");
