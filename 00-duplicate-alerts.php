@@ -54,13 +54,12 @@ function make_alert_key($alert) {
 
 function get_duplicate_alerts(&$existing_alerts, &$new_alerts, &$duplicate_alerts) {
   $alert_keys = array();
-  for ($i = 0; $i < count($existing_alerts); $i++) {
-    $existing_alert = $existing_alerts[$i];
-    $alert_key = make_alert_key($existing_alert);
-    $alert_keys[$alert_key] = $i;
+  // Gather unique keys for existing alerts.
+  foreach ($existing_alerts as $i => $existing_alert) {
+    $alert_keys[make_alert_key($existing_alert)] = $i;
   }
-  for ($j = 0; $j < count($new_alerts); $j++) {
-    $new_alert = $new_alerts[$j];
+  // Compare with keys for new alerts.
+  foreach ($new_alerts as $j => $new_alert) {
     $alert_key = make_alert_key($new_alert);
     if (isset($alert_keys[$alert_key])) {
       $i = $alert_keys[$alert_key];
@@ -69,6 +68,7 @@ function get_duplicate_alerts(&$existing_alerts, &$new_alerts, &$duplicate_alert
       unset($new_alerts[$j]);
     }
   }
+
   // Reset array indices after removing duplicates
   $existing_alerts = array_values($existing_alerts);
   $new_alerts = array_values($new_alerts);
