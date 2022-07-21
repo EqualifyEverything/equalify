@@ -65,7 +65,7 @@ function get_duplicate_alerts(&$existing_alerts, &$new_alerts, &$duplicate_alert
     if (isset($alert_keys[$alert_key])) {
       $i = $alert_keys[$alert_key];
       $duplicate_alerts[] = $new_alert;
-      unset($existing_alerts[$]);
+      unset($existing_alerts[$i]);
       unset($new_alerts[$j]);
     }
   }
