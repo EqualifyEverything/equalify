@@ -5,17 +5,13 @@
  */
 
 /**
- * little_forest Scans
+ * Little Forest Alerts
+ * @param string url
  */
-function little_forest_scans($url){
+function little_forest_alerts($url){
 
-    // We don't know where helpers are being called, so we
-    // have to set the directory if it isn't already set.
-    if(!defined('__ROOT__'))
-        define('__ROOT__', dirname(dirname(__FILE__)));
-
-    // We'll use the directory to include required files.
-    require_once(__ROOT__.'/helpers/add_alert.php');
+    // Our goal is to return alerts.
+    $little_forest_alerts = array();
 
     // Get Little Forest data.
     $override_https = array(
@@ -63,15 +59,15 @@ function little_forest_scans($url){
                 $message = $error['Message'];
             }
 
-            // Add error.
-            $attributes = array(
-                'source'  => 'Little Forrest',
+            // Push alert to returnable array.
+            $alert = array(
+                'source'  => 'little_forest',
                 'url'     => $url,
                 'type'    => 'error',
                 'message' => $message,
                 'meta'    => $meta
             );
-            add_alert( $attributes );
+            array_push($little_forest_alerts, $alert);
 
         }
     }
@@ -94,15 +90,15 @@ function little_forest_scans($url){
                 $message = $notice['Message'];
             }
 
-            // Add notice.
-            $attributes = array(
-                'source'  => 'Little Forrest',
+            // Push alert to returnable array.
+            $alert = array(
+                'source'  => 'little_forest',
                 'url'     => $url,
                 'type'    => 'notice',
                 'message' => $message,
                 'meta'    => $meta
             );
-            add_alert( $attributes );
+            array_push($little_forest_alerts, $alert);
 
         }
     }
@@ -125,17 +121,20 @@ function little_forest_scans($url){
                 $message = $warning['Message'];
             }
 
-            // Add warning.
-            $attributes = array(
-                'source'  => 'Little Forrest',
+            // Push alert to returnable array.
+            $alert = array(
+                'source'  => 'little_forest',
                 'url'     => $url,
                 'type'    => 'warning',
                 'message' => $message,
                 'meta'    => $meta
             );
-            add_alert( $attributes );
+            array_push($little_forest_alerts, $alert);
 
         }
     }
+
+    // Return alerts.
+    return $little_forest_alerts;
 
 }

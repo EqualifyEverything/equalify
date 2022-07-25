@@ -450,8 +450,11 @@ class DataAccess {
         $value_count = 0;
         $params = array();
         foreach ($data as $datum){
-            foreach($datum as $the_alert){
-                array_push($params, $the_alert);
+            foreach($datum as $value){
+                if(is_array($value)){
+                    $value = serialize($value);
+                }                
+                array_push($params, $value);
             }
         }
         

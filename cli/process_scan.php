@@ -43,13 +43,13 @@ function scan(){
     );
         
     // Now we'll start our first process.
-    process_sites();
+    $site_output = process_sites();
 
     // Time to run the integrations!
-    process_integrations();
+    $integration_output = process_integrations($site_output);
 
     // Finally, we can equalify alerts.
-    process_alerts();
+    process_alerts($integration_output);
 
     // At the end of our processes, we should clear all
     // the meta for the next scan and set the timestamp.
