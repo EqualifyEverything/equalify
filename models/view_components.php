@@ -176,7 +176,6 @@ function covert_code_shortcode($subject){
     $subject = str_replace(
         '[/code]', '</code></pre>', $subject
     );
-    $subject = html_entity_decode($subject);
 
     // [code] is converted!
     return $subject;
