@@ -145,6 +145,6 @@ function process_alerts( array $integration_output) {
         count($equalified_alerts)+count($new_alerts);
     $alerts_processed = 
         count($queued_alerts)+count($existing_alerts);
-    echo "\n> Updated $alerts_updated of $alerts_processed processed alerts.\n";
+    echo "\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n";
 
 }
