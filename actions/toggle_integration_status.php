@@ -82,4 +82,4 @@ if($old_status == 'Active'){
 }
 
 // Redirect.
-header('Location: ../index.php?view=integrations&id='.$integration_uri.'&status=success');
+header('Location: ../index.php?view=integrations&id='.$integration_uri);
