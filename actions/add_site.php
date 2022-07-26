@@ -44,8 +44,22 @@ if($type == 'single_page' ){
 
 // If no errors occur, we can add these sites into the URL
 // with several default items.
-DataAccess::add_site(
-    $url, $type, $status = 'active'
+$fields = array(
+    array(
+        'name' => 'url',
+        'value' => $url
+    ),
+    array(
+        'name' => 'type',
+        'value' => $type
+    ),
+    array(
+        'name' => 'status',
+        'value' => 'active'
+    )
+);
+DataAccess::add_db_entry(
+    'sites', $fields
 );
 
 // Back home we go.
