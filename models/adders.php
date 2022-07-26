@@ -1,10 +1,21 @@
 <?php
-// ***************!!EQUALIFY IS FOR EVERYONE!!***************
-
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * We get pages using functions in this document.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as effcient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 /**
- * Get Page Body
+ * Run Curl
  */
 function run_curl($site_url, $type = ''){
+
+    // This function creates the following array.
+    $output = array(
+        'url' => '',
+        'content' => ''
+    );
 
     // Setup cURL.
     $curl = curl_init($site_url);
@@ -32,17 +43,23 @@ function run_curl($site_url, $type = ''){
         );
 
     // Execute cURL.
-    $url_contents = curl_exec($curl);
+    $output['content'] = curl_exec($curl);
 
     // Fallback if no contents exist.
-    if($url_contents == false)
+    if($output['content'] == false)
         throw new Exception(
             'Contents of "'.$curled_url.'" cannot be loaded'
         );
     curl_close($curl);
 
+    // Let's save the address of the URL we curled so
+    // integrations can use it.
+    $output['url'] = curl_getinfo(
+        $curl, CURLINFO_EFFECTIVE_URL
+    );
+
     // We use the curled URL as the unique ID.
-    return $url_contents;
+    return $output;
 
 }
 
@@ -56,7 +73,7 @@ function single_page_adder($site_url){
     $curled_site = run_curl($site_url);
 
     // If cURL works, we can return the site URL.
-    return array($site_url);
+    return array($curled_site['url']);
 
 }
 
@@ -70,7 +87,9 @@ function wordpress_site_adder($site_url){
     $json_url = $site_url.$json_endpoints;
 
     // Get URL contents.
-    $curled_site = run_curl($json_url, 'wordpress');
+    $curled_site = run_curl(
+        $json_url, 'wordpress'
+    )['content'];
 
     // Create JSON.
     $wp_api_json = json_decode($curled_site, true);
@@ -97,7 +116,9 @@ function wordpress_site_adder($site_url){
 function xml_site_adder($site_url){
 
     // Get URL contents.
-    $curled_site = run_curl($site_url, 'xml');
+    $curled_site = run_curl(
+        $site_url, 'xml'
+    )['content'];
 
     // Valid XML files are only allowed!
     $xml_contents = $curled_site;

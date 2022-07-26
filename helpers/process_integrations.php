@@ -17,7 +17,12 @@ function process_integrations(array $sites_output){
     // The goal of this process is to setup this array.
     $integrations_output = array(
         'processed_sources' => array(),
-        'processed_urls'    => array(),
+        'processed_sites'   => $sites_output[
+            'processed_sites'
+        ],
+        'processed_urls'    => $sites_output[
+            'processed_urls'
+        ],
         'queued_alerts'     => array()
     );
 
@@ -48,10 +53,13 @@ function process_integrations(array $sites_output){
         $active_integrations
     );
     echo "\n> $active_integrations_count active integration";
-    if($active_integrations_count > 1 ){
+    if(
+        ($active_integrations_count > 1)
+        || ($active_integrations_count == 0)
+    ){
         echo 's';
     }
-    echo ':';
+    echo '.';
 
     // If there's no integrations ready to process, we
     // won't run the process.
@@ -71,7 +79,9 @@ function process_integrations(array $sites_output){
 
             // We'll run each integration against meta we 
             // setup in process_site.php
-            $scanable_pages = $sites_output;
+            $scanable_pages = $sites_output[
+                'processed_urls'
+            ];
 
             // No scanable pages means no need for the
             // integration process.

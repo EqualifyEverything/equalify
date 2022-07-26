@@ -16,8 +16,8 @@ if(!defined('__ROOT__'))
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/helpers/process_sites.php');
-require_once(__ROOT__.'/helpers/process_equalify.php');
 require_once(__ROOT__.'/helpers/process_integrations.php');
+require_once(__ROOT__.'/helpers/process_alerts.php');
 require_once(
     __ROOT__.'/helpers/process_integrations.php'
 );
@@ -42,19 +42,43 @@ function scan(){
         'alerts'
     );
         
-    // Now we'll start our first process.
-    $site_output = process_sites();
+    // Our first process.
+    $sites_output = process_sites();
 
-    // Time to run the integrations!
-    $integration_output = process_integrations($site_output);
+    // Our second process.
+    $integration_output = process_integrations($sites_output);
 
-    // Finally, we can equalify alerts.
-    process_alerts($integration_output);
+    // Our third process.
+    $alerts_output = process_alerts($integration_output);
 
-    // At the end of our processes, we should clear all
-    // the meta for the next scan and set the timestamp.
-    DataAccess::update_meta_value('scan_status', '');
-    DataAccess::update_meta_value('scanable_pages', '');
+    // We initate our processes by updating the sites we output.
+    if(!empty($alerts_output)){
+
+        // We're updating the scanned time of each site. 
+        $fields = array(
+            array(
+                'name' => 'scanned',
+                'value' => date('Y-m-d H:i:s')
+            )
+        );
+
+        // We find sites that match the URL.
+        $filters = array();
+        foreach ($alerts_output as $site){
+            array_push( $filters,
+                array(
+                    'name' => 'url',
+                    'value' => $site->url
+                )
+            );
+        }
+
+        // Let's update the site!
+        DataAccess::update_db_rows('sites', $fields, $filters, 'OR');
+
+    }
+
+    // At the end of our processes, set the scan time.
     DataAccess::update_meta_value(
         'last_scan_time',  date('Y-m-d H:i:s')
     );
@@ -66,7 +90,7 @@ function scan(){
     $added_alerts = number_format(
         $ending_alerts_count - $starting_alerts_count
     );
-    echo "\n\n\nEqualify logged $added_alerts new alerts in just 
+    echo "\n\nEqualify logged $added_alerts new alerts in just 
         $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";
     
 }
@@ -78,7 +102,6 @@ function cleanup(){
 
     // We need to clear all the meta when a scan stops.
     DataAccess::update_meta_value('scan_status', '');
-    DataAccess::update_meta_value('scanable_pages', '');
 
 }
 

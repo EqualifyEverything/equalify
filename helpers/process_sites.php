@@ -14,6 +14,12 @@
  */
 function process_sites(){
 
+    // The goal of this process is to setup this array.
+    $sites_output = array(
+        'processed_sites' => array(),
+        'processed_urls'    => array()
+    );
+
     // Let's log our process for the CLI.
     echo "\n\n\n> Processing sites...";
 
@@ -26,19 +32,6 @@ function process_sites(){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
     require_once(__ROOT__.'/models/adders.php');
-
-    // The main purpose of this process is to declare the 
-    // 'scanable_pages' meta, which may have been created.
-    $scanable_pages = unserialize(
-        DataAccess::get_meta_value('scanable_pages')
-    );
-    if(empty($scanable_pages)){
-
-        // This must be an array so we can properly us it
-        // again from the db.
-        $scanable_pages = array();
-
-    }
 
     // We only run this process on active sites.
     $filtered_to_active_sites = array(
@@ -66,8 +59,12 @@ function process_sites(){
         // Each site is processed individually.
         foreach($active_sites as $site){
 
-            // Log our progress.
+            // Log our progress for CLI.
             echo "\n>>> Processing \"$site->url\".";
+
+            // Every URL that is processed is added to
+            // our output.
+            array_push($sites_output['processed_sites'], $site);        
 
             // Processing a site means adding its 
             // site_pages as scanable_pages meta.
@@ -87,21 +84,18 @@ function process_sites(){
                 );
             }
             foreach ($site_pages as $page){
-                array_push($scanable_pages, $page);        
+                array_push($sites_output['processed_urls'], $page);        
             }
 
         }
 
-        // When we're done we push the scannable_pages
-        // to the DB.
-        DataAccess::update_meta_value( 'scanable_pages', 
-            serialize($scanable_pages)
-        );
-
-        // Finally, let's log our progress for CLIs.
-        $pages_count = count($scanable_pages);
+        // Let's log our progress for CLIs.
+        $pages_count = count($sites_output['processed_urls']);
         echo "\n> Found $pages_count scanable pages.";
         
     }
+
+    // Finally, we can return the values.
+    return $sites_output;
 
 }

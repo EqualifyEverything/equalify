@@ -81,7 +81,11 @@ function process_alerts( array $integration_output) {
 
             }
         }
-        return $a_array;
+
+        // We need to reset the array keys before we
+        // return them.
+        return array_values($a_array);
+
     }
 
     // New alerts that have existing alerts are removed.
@@ -134,17 +138,20 @@ function process_alerts( array $integration_output) {
         }
         if(!empty($filtered_by_ids)){
             DataAccess::update_db_rows(
-                'alerts', $fields_updated, $filterd_by_ids, 'OR'
+                'alerts', $fields_updated, $filtered_by_ids, 'OR'
             );    
         }
 
     }
 
-    // Finally, Let's log our process for the CLI.
+    // Let's log our process for the CLI.
     $alerts_updated = 
         count($equalified_alerts)+count($new_alerts);
     $alerts_processed = 
         count($queued_alerts)+count($existing_alerts);
     echo "\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n";
+
+    // Finally, we'll return a list of sites we processed.
+    return $integration_output['processed_sites'];
 
 }
