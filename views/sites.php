@@ -39,13 +39,25 @@ if( count($sites['content']) > 0 ):
                     if($status == 'archived'){
                         $bg_class = 'bg-dark';
                         $text = 'Archived';
+                        $show_spinner = false;
+                    }elseif(empty($site->last_scan)){
+                        $bg_class = 'bg-secondary';
+                        $text = 'Processing';
+                        $show_spinner = true;
                     }else{
                         $bg_class = 'bg-success';
                         $text = 'Active';
+                        $show_spinner = false;
                     }
                     ?>
 
                     <span class="badge mb-2 <?php echo $bg_class;?>">
+
+                        <?php
+                        if($show_spinner)
+                            echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                        ?>
+
                         <?php echo $text;?>
                     </span>
 
@@ -78,10 +90,6 @@ if( count($sites['content']) > 0 ):
                         $button_text = 'Activate';
                         $button_class = 'btn-outline-success';
                         $processing = false;
-                    }elseif(empty($site->last_scan)){
-                        $button_text = ' Processing';
-                        $button_class = 'btn-outline-dark disabled';
-                        $processing = true;
                     }else{
                         $button_text = 'Archive';
                         $button_class = 'btn-outline-secondary';

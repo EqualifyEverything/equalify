@@ -53,3 +53,7 @@ pre code{
     text-transform: uppercase;
     letter-spacing: .035em;
 }
+.badge .spinner-border-sm{
+    --bs-spinner-width: .7rem;
+    --bs-spinner-height: 0.7rem;
+}
