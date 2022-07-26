@@ -77,14 +77,20 @@ if( count($sites['content']) > 0 ):
                     if($status == 'archived'){
                         $button_text = 'Activate';
                         $button_class = 'btn-outline-success';
+                        $processing = false;
+                    }elseif(empty($site->last_scan)){
+                        $button_text = ' Processing';
+                        $button_class = 'btn-outline-dark disabled';
+                        $processing = true;
                     }else{
                         $button_text = 'Archive';
                         $button_class = 'btn-outline-secondary';
+                        $processing = false;
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
-                        <?php echo $button_text;?>
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
+                        <?php if($processing) echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; echo $button_text;?>
                     </a>
                 </div>
             </div>
