@@ -116,27 +116,6 @@ class DataAccess {
     }
     
     /**
-     * Add Site
-     */
-    public static function add_site($url, $type, $status){
-    
-        // SQL
-        $sql = 'INSERT INTO `sites` (`url`, `type`, `status`) VALUES';
-        $sql.= '(?, ?, ?, ?)';
-        $params = array($url, $type, $status);
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.'"');
-        
-        // Complete Query
-        return $result;
-    }
-
-    /**
      * Update Page Site Status 
      */
     public static function update_site_status($url, $new_status){
@@ -450,8 +429,11 @@ class DataAccess {
         $value_count = 0;
         $params = array();
         foreach ($data as $datum){
-            foreach($datum as $the_alert){
-                array_push($params, $the_alert);
+            foreach($datum as $value){
+                if(is_array($value)){
+                    $value = serialize($value);
+                }                
+                array_push($params, $value);
             }
         }
         
@@ -735,7 +717,7 @@ class DataAccess {
      * Create Sites Table
      */
     public static function create_sites_table(){
-    
+
         // SQL
         $sql = 
             'CREATE TABLE `sites` (
@@ -743,6 +725,7 @@ class DataAccess {
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
+                `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
         $params = array();

@@ -39,13 +39,25 @@ if( count($sites['content']) > 0 ):
                     if($status == 'archived'){
                         $bg_class = 'bg-dark';
                         $text = 'Archived';
+                        $show_spinner = false;
+                    }elseif(empty($site->scanned)){
+                        $bg_class = 'bg-secondary';
+                        $text = 'Processing';
+                        $show_spinner = true;
                     }else{
                         $bg_class = 'bg-success';
                         $text = 'Active';
+                        $show_spinner = false;
                     }
                     ?>
 
                     <span class="badge mb-2 <?php echo $bg_class;?>">
+
+                        <?php
+                        if($show_spinner)
+                            echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                        ?>
+
                         <?php echo $text;?>
                     </span>
 
@@ -77,14 +89,16 @@ if( count($sites['content']) > 0 ):
                     if($status == 'archived'){
                         $button_text = 'Activate';
                         $button_class = 'btn-outline-success';
+                        $processing = false;
                     }else{
                         $button_text = 'Archive';
                         $button_class = 'btn-outline-secondary';
+                        $processing = false;
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
-                        <?php echo $button_text;?>
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
+                        <?php if($processing) echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; echo $button_text;?>
                     </a>
                 </div>
             </div>

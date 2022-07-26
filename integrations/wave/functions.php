@@ -46,17 +46,13 @@ function wave_fields(){
 }
 
 /**
- * WAVE Scans
+ * WAVE Alerts
  */
-function wave_scans($url){
+function wave_alerts($url){
 
-    // We don't know where helpers are being called, so we
-    // have to set the directory if it isn't already set.
-    if(!defined('__ROOT__'))
-        define('__ROOT__', dirname(dirname(__FILE__)));
 
-    // We'll use the directory to include required files.
-    require_once(__ROOT__.'/helpers/add_alert.php');
+    // Our goal is to return alerts.
+    $wave_alerts = array();
 
     // Get WAVE data.
     $override_https = array(
@@ -80,14 +76,17 @@ function wave_scans($url){
     if($wave_errors >= 1){
 
         // Add alert.
-        $attributes = array(
-            'source'  => 'WAVE',
+        $alert = array(
+            'source'  => 'wave',
             'url'     => $url,
             'type'    => 'error',
             'message' => 'WCAG 2.1 page error found! See <a href="https://wave.webaim.org/report#/'.$url.'" target="_blank">WAVE report</a>.',
         );
-        add_alert( $attributes );
+        array_push($wave_alerts, $alert);
         
     }
+
+    // Finally, we can return the alerts.
+    return $wave_alerts;
 
 }

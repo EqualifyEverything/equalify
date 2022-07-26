@@ -20,4 +20,4 @@ if($old_status == 'archived'){
 }
 
 // Redirect
-header('Location: ../index.php?view=sites&status=success');
+header('Location: ../index.php?view=sites');
