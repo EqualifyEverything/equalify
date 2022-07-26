@@ -40,7 +40,7 @@ if( count($sites['content']) > 0 ):
                         $bg_class = 'bg-dark';
                         $text = 'Archived';
                         $show_spinner = false;
-                    }elseif(empty($site->last_scan)){
+                    }elseif(empty($site->scanned)){
                         $bg_class = 'bg-secondary';
                         $text = 'Processing';
                         $show_spinner = true;
