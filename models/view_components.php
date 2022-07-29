@@ -153,7 +153,7 @@ function the_integration_settings_button(
 
     // Only show button on active inteagrations
     if($integration_status == 'Active'){
-        echo '<a href="?view=integration_settings&uri='
+        echo '<a href="integration_settings&uri='
             .$integration_uri.'" class="btn btn-secondary">
             Settings</a>';
     }else{
@@ -208,12 +208,27 @@ function the_pagination($total_pages){
     // Define page number.
     $current_page_number = get_current_page_number();
 
-    // Defined current view
+    // Define current view.
     if(!empty($_GET['view'])){
-        $current_view = $_GET['view'];
+        $view_parameters = '?view='.$_GET['view'];
     }else{
-        $current_view = get_default_view();
+        $view_parameters = '?view='.get_default_view();
     }
+
+    // Define label.
+    if(!empty($_GET['label'])){
+        $label_parameters = '&label='.$_GET['label'];
+    }else{
+        $label_parameters = '';
+    }
+
+    // Define preset.
+    if(!empty($_GET['preset'])){
+        $preset_parameters = '&preset='.$_GET['preset'];
+    }else{
+        $preset_parameters = '';
+    }
+
 
     // Set active state as function so we don't have to keep
     // writing this condition.
@@ -235,10 +250,10 @@ function the_pagination($total_pages){
 <nav aria-label="Page Navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item <?php if($current_page_number <= 1){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo '?view='.$current_view.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
+            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo ''.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
         </li>
         <li class="page-item  <?php echo get_active_state($current_page_number, 1)?>">
-            <a class="page-link" href="?view=<?php echo $current_view;?>&current_page_number=1">1</a>
+            <a class="page-link" href="<?php echo $view_parameters.$label_parameters.$preset_parameters;?>&current_page_number=1">1</a>
         </li>
 
         <?php
@@ -252,25 +267,25 @@ function the_pagination($total_pages){
         // If there are more than 5 pages and current page number isn't
         // first, second, or last or if we're on the third page of 4...
         if(($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages) || ($total_pages == 4 && $current_page_number == 3))
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // If there are more than 3 pages and current page number isn't
         // first or last...
         if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
-            echo '<li class="page-item active"><a class="page-link" href="?view='.$current_view.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
+            echo '<li class="page-item active"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
 
         // If there are more than 5 pages and current page is the first or second or we're on the second page of fur..
         if(($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2)) || ($total_pages == 4 && $current_page_number == 2))
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // If there are more than 5 pages and current page is the last or second to last..
         if($total_pages > 5 && $current_page_number == $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // Show next page number if there are more than 5 pages and current
         // page number isn't first, second, second to last, or last...
         if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $total_pages != ($current_page_number+1) && $current_page_number != $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="?view='.$current_view.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // Show "..." if there are more than 3 pages and we're not on the page before,
         // the last display a disabled elipses so that the user knows to click 'next'.
@@ -279,10 +294,10 @@ function the_pagination($total_pages){
         ?>
 
         <li class="page-item <?php echo get_active_state($current_page_number, $total_pages)?>">
-            <a class="page-link" href="?view=<?php echo $current_view;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
+            <a class="page-link" href="<?php echo $view_parameters.$label_parameters.$preset_parameters;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
         </li>
         <li class="page-item <?php if($current_page_number >= $total_pages){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo '?view='.$current_view.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
+            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo ''.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
         </li>
     </ul>
 </nav>

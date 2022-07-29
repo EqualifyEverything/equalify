@@ -92,17 +92,10 @@ function scan(){
     );
     echo "\n\nEqualify logged $added_alerts new alerts in just 
         $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";
-    
-}
 
-/**
- * Cleanup
- */
-function cleanup(){
-
-    // We need to clear all the meta when a scan stops.
+    // Finally, let's clear the stan status.
     DataAccess::update_meta_value('scan_status', '');
-
+    
 }
 
 // Promised handle errors.
@@ -113,9 +106,8 @@ try {
 
 } catch (Exception $e) {
 
-    // When an error occurs, we have to clear scan
-    // variables that affect future scans.
-    cleanup(); 
+    // When an error occurs, we update the scan status.
+    DataAccess::update_meta_value('scan_status', 'Failed: '.$e->getMessage());
 
     // Let's log the erorr for CLI.
     echo "\nCaught exception: ",  $e->getMessage(), "\n";
@@ -125,7 +117,6 @@ try {
 
     // After a successful scan, we cleanup the db and
     // set a timestamp.
-    cleanup(); 
     DataAccess::update_meta_value(
         'last_scan_time',  date('Y-m-d H:i:s')
     );
