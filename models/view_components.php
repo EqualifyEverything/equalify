@@ -274,7 +274,7 @@ function the_pagination($total_pages){
         if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
             echo '<li class="page-item active"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
 
-        // If there are more than 5 pages and current page is the first or second or we're on the second page of fur..
+        // If there are more than 5 pages and current page is the first or second or we're on the second page of four..
         if(($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2)) || ($total_pages == 4 && $current_page_number == 2))
             echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
