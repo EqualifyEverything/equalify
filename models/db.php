@@ -70,69 +70,6 @@ class DataAccess {
     }
 
     /**
-     * Get Meta Value
-     */
-    public static function get_meta_value($meta_name){
-
-        // SQL
-        $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
-        $params = array($meta_name);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-
-        // Returns meta_value.
-        $data = $results->fetch_object();
-        if(empty($data)){
-            return false;
-        }else{
-            return $data->meta_value;
-        }
-
-    }
-
-    /**
-     * Is Unique Site
-     */
-    public static function is_unique_site($url){
-    
-        // Require unique URL
-        $sql = 'SELECT * FROM `sites` WHERE `url` = ?';
-    
-        // We don't consider a page with a '/' a unique url
-        // so we will also search for them.
-        // Possible injection point:
-        // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
-        $sql.= ' OR `url` = ?';
-    
-        $params = array($url, $url . '/');
-        $results = self::query($sql, $params, true);
-        if($results->num_rows > 0){
-            return false;
-        }else{
-            return true;
-        }
-    
-    }
-    
-    /**
-     * Update Page Site Status 
-     */
-    public static function update_site_status($url, $new_status){
-    
-        // SQL
-        $sql = 'UPDATE `sites` SET `status` = ? WHERE `url` = ?';
-        $params = array($new_status, $url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
-    }
-
-    /**
      * Get DB Rows
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
@@ -558,6 +495,69 @@ class DataAccess {
         // Result
         $data = $results->fetch_object()->TOTAL;
         return $data;
+
+    }
+
+    /**
+     * Is Unique Site
+     */
+    public static function is_unique_site($url){
+    
+        // Require unique URL
+        $sql = 'SELECT * FROM `sites` WHERE `url` = ?';
+    
+        // We don't consider a page with a '/' a unique url
+        // so we will also search for them.
+        // Possible injection point:
+        // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
+        $sql.= ' OR `url` = ?';
+    
+        $params = array($url, $url . '/');
+        $results = self::query($sql, $params, true);
+        if($results->num_rows > 0){
+            return false;
+        }else{
+            return true;
+        }
+    
+    }
+    
+    /**
+     * Update Page Site Status 
+     */
+    public static function update_site_status($url, $new_status){
+    
+        // SQL
+        $sql = 'UPDATE `sites` SET `status` = ? WHERE `url` = ?';
+        $params = array($new_status, $url);
+    
+        // Query
+        $result = self::query($sql, $params, false);
+    
+        // Result
+        if(!$result)
+            throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
+    }
+
+    /**
+     * Get Meta Value
+     */
+    public static function get_meta_value($meta_name){
+
+        // SQL
+        $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
+        $params = array($meta_name);
+    
+        // Query
+        $results = self::query($sql, $params, true);
+
+        // Returns meta_value.
+        $data = $results->fetch_object();
+        if(empty($data)){
+            return false;
+        }else{
+            return $data->meta_value;
+        }
 
     }
 
