@@ -57,3 +57,6 @@ pre code{
     --bs-spinner-width: .7rem;
     --bs-spinner-height: 0.7rem;
 }
+#terminal{
+    height: 600px;
+}
