@@ -17,12 +17,21 @@
             </ul>
         </div>
     </div>
-    <div id="terminal" class="bg-dark text-white">
-        <pre><code>
+    <div id="terminal" class="bg-dark text-white px-5">
+        <pre>
 
-            No scan is running.
+            <?php
+                $scan_log = DataAccess::get_meta_value(
+                    'scan_log'
+                );
+                if(empty($scan_log)){
+                    echo "\nNo scan is running.";
+                }else{
+                    print_r($scan_log);
+                }
+            ?>
             
-        </pre></code>
+        </pre>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">
         <div class="modal-dialog">
