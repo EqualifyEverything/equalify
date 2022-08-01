@@ -36,7 +36,7 @@ function scan(){
     // We'll log time and alert count because our goal is
     // to find as many alerts as possible in as short a
     // time as possible..
-    echo "\n\n\nLet's Equalify some sites!";
+    echo "\n\nLet's Equalify some sites!";
     $starting_time = microtime(true);
     $starting_alerts_count = DataAccess::count_db_rows(
         'alerts'
@@ -46,12 +46,14 @@ function scan(){
     $sites_output = process_sites();
 
     // Our second process.
-    $integration_output = process_integrations($sites_output);
+    $integration_output = process_integrations(
+        $sites_output
+    );
 
     // Our third process.
     $alerts_output = process_alerts($integration_output);
 
-    // We initate our processes by updating the sites we output.
+    // We initate our processes.
     if(!empty($alerts_output)){
 
         // We're updating the scanned time of each site. 
@@ -74,7 +76,9 @@ function scan(){
         }
 
         // Let's update the site!
-        DataAccess::update_db_rows('sites', $fields, $filters, 'OR');
+        DataAccess::update_db_rows(
+            'sites', $fields, $filters, 'OR'
+        );
 
     }
 
@@ -86,39 +90,58 @@ function scan(){
     // Log our progress..
     $ending_time = microtime(true);
     $exec_time = $ending_time - $starting_time;
-    $ending_alerts_count = DataAccess::count_db_rows('alerts');
+    $ending_alerts_count = DataAccess::count_db_rows(
+        'alerts'
+    );
     $added_alerts = number_format(
         $ending_alerts_count - $starting_alerts_count
     );
-    echo "\n\nEqualify logged $added_alerts new alerts in just 
-        $exec_time seconds.\n\n\nHow can Equalify do better?\n\n\n";
+    echo "\n\nEqualify logged $added_alerts in just";
+    echo " $exec_time seconds.";
+    echo "\n\nHow can Equalify do better?\n\n\n";
 
     // Finally, let's clear the stan status.
     DataAccess::update_meta_value('scan_status', '');
     
 }
 
-// Promised handle errors.
-try {
+// Only one scan runs at a time.
+if(
+    DataAccess::get_meta_value('scan_status')
+    != 'running'
+):
 
-    // Let's run the process.
-    scan();
+    // Promised handle errors.
+    try {
 
-} catch (Exception $e) {
+        // Initiate scan.
+        scan();
 
-    // When an error occurs, we update the scan status.
-    DataAccess::update_meta_value('scan_status', 'Failed: '.$e->getMessage());
+    } catch (Exception $e) {
 
-    // Let's log the erorr for CLI.
-    echo "\nCaught exception: ",  $e->getMessage(), "\n";
+        // When an error occurs, we update the scan status.
+        DataAccess::update_meta_value(
+            'scan_status', 'Failed: '.$e->getMessage()
+        );
+
+        // Let's log the erorr for CLI.
+        echo "\nCaught exception: ",  $e->getMessage(), "\n";
 
 
-} finally {
+    } finally {
 
-    // After a successful scan, we cleanup the db and
-    // set a timestamp.
-    DataAccess::update_meta_value(
-        'last_scan_time',  date('Y-m-d H:i:s')
-    );
+        // After a successful scan, we cleanup the db and
+        // set a timestamp.
+        DataAccess::update_meta_value(
+            'last_scan_time',  date('Y-m-d H:i:s')
+        );
 
-}
+    }
+
+// Fallback if a scan is running.
+else:
+
+    // Fallback.
+    echo "\n  A scan is running. Multiple scans can't run.\n\n";
+
+endif;

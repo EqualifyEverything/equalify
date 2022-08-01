@@ -12,17 +12,7 @@
     <div id="terminal" class="bg-dark text-white">
         <pre><code>
             
-            <?php
-            while (@ ob_end_flush()); // end all output buffers if any
-            $command = $GLOBALS['PHP_PATH'].
-            ' cli/scan.php';
-            $process = popen($command, 'r');
-            while (!feof($process))
-            {
-                echo fread($process, 4096);
-                @ flush();
-            }        
-            ?>
+            NOTHING TO SEE HERE
 
         <pre><code>
     </div>
