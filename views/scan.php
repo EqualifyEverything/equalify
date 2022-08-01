@@ -19,7 +19,9 @@
     </div>
     <div id="terminal" class="bg-dark text-white">
         <pre><code>
-            NOTHING TO SEE HERE
+
+            No scan is running.
+            
         </pre></code>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">

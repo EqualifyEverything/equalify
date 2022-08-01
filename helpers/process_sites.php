@@ -14,15 +14,6 @@
  */
 function process_sites(){
 
-    // The goal of this process is to setup this array.
-    $sites_output = array(
-        'processed_sites' => array(),
-        'processed_urls'    => array()
-    );
-
-    // Let's log our process for the CLI.
-    echo "\n\n\n> Processing sites...";
-
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
     if(!defined('__ROOT__'))
@@ -32,6 +23,16 @@ function process_sites(){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
     require_once(__ROOT__.'/models/adders.php');
+    require_once(__ROOT__.'/helpers/update_scan_log.php');
+
+    // The goal of this process is to setup this array.
+    $sites_output = array(
+        'processed_sites' => array(),
+        'processed_urls'    => array()
+    );
+
+    // Let's log our process for the CLI.
+    update_scan_log("\n\n\n> Processing sites...");
 
     // We only run this process on active sites.
     $filtered_to_active_sites = array(
@@ -60,14 +61,14 @@ function process_sites(){
         foreach($active_sites as $site){
 
             // Log our progress for CLI.
-            echo "\n>>> Processing \"$site->url\".";
+            update_scan_log("\n>>> Processing \"$site->url\".");
 
             // Every URL that is processed is added to
             // our output.
             array_push($sites_output['processed_sites'], $site);        
 
             // Processing a site means adding its 
-            // site_pages as scanable_pages meta.
+            // site_pages as scannable_pages meta.
             if($site->type == 'single_page'){
                 $site_pages = single_page_adder(
                     $site->url
@@ -91,7 +92,7 @@ function process_sites(){
 
         // Let's log our progress for CLIs.
         $pages_count = count($sites_output['processed_urls']);
-        echo "\n> Found $pages_count scanable pages.";
+        update_scan_log("\n> Found $pages_count scannable pages.");
         
     }
 

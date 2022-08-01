@@ -16,6 +16,7 @@ if(!defined('__ROOT__'))
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/helpers/process_sites.php');
+require_once(__ROOT__.'/helpers/update_scan_log.php');
 require_once(__ROOT__.'/helpers/process_integrations.php');
 require_once(__ROOT__.'/helpers/process_alerts.php');
 require_once(
@@ -36,7 +37,7 @@ function scan(){
     // We'll log time and alert count because our goal is
     // to find as many alerts as possible in as short a
     // time as possible..
-    echo "\n\nLet's Equalify some sites!";
+    update_scan_log("\n\nLet's Equalify some sites!");
     $starting_time = microtime(true);
     $starting_alerts_count = DataAccess::count_db_rows(
         'alerts'
@@ -96,12 +97,13 @@ function scan(){
     $added_alerts = number_format(
         $ending_alerts_count - $starting_alerts_count
     );
-    echo "\n\nEqualify logged $added_alerts in just";
-    echo " $exec_time seconds.";
-    echo "\n\nHow can Equalify do better?\n\n\n";
+    update_scan_log("\n\nEqualify added $added_alerts alerts ");
+    update_scan_log("in just $exec_time seconds.");
+    update_scan_log("\n\nHow can Equalify do better?\n\n\n");
 
-    // Finally, let's clear the stan status.
+    // Finally, let's clear the scan status and log.
     DataAccess::update_meta_value('scan_status', '');
+    DataAccess::update_meta_value('scan_log', '');
     
 }
 
@@ -125,7 +127,7 @@ if(
         );
 
         // Let's log the erorr for CLI.
-        echo "\nCaught exception: ",  $e->getMessage(), "\n";
+        update_scan_log("\nCaught exception: ",  $e->getMessage(), "\n");
 
 
     } finally {
@@ -142,6 +144,6 @@ if(
 else:
 
     // Fallback.
-    echo "\n  A scan is running. Multiple scans can't run.\n\n";
+    update_scan_log("\n  A scan is running. Multiple scans can't run.\n\n");
 
 endif;

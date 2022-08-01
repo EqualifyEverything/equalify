@@ -23,7 +23,7 @@ function process_alerts( array $integration_output) {
     $queued_alerts = $integration_output['queued_alerts'];
 
     // Let's log our process for the CLI.
-    echo "\n\n\n> Processing alerts...";
+    update_scan_log("\n\n\n> Processing alerts...");
 
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
@@ -149,7 +149,7 @@ function process_alerts( array $integration_output) {
         count($equalified_alerts)+count($new_alerts);
     $alerts_processed = 
         count($queued_alerts)+count($existing_alerts);
-    echo "\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n";
+    update_scan_log("\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n");
 
     // Finally, we'll return a list of sites we processed.
     return $integration_output['processed_sites'];

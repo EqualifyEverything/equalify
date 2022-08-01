@@ -612,13 +612,28 @@ class DataAccess {
 
     /**
      * Update Meta 
+     * @param string meta_name 
+     * @param string meta_value
+     * @param bool concatenate
      */
-    public static function update_meta_value($meta_name, $meta_value){
+    public static function update_meta_value(
+        $meta_name, $meta_value, $concatenate = false
+    ){
 
         // SQL
-        $sql = "UPDATE `meta` SET `meta_value` = ? WHERE `meta_name` = ?";
+        $sql = 'UPDATE `meta` SET `meta_value` = ';
+        
+        // Optional concatenation.
+        if($concatenate == true){
+            $sql.= 'concat(`meta_value`,?)';
+        }else{
+            $sql.= '?';
+        }
+        
+        // Finish SQL and params.
+        $sql.= ' WHERE `meta_name` = ?';
         $params = array($meta_value, $meta_name);
-
+        
         // Query
         $result = self::query($sql, $params, false);
 
@@ -691,18 +706,21 @@ class DataAccess {
             ("active_integrations", ?),
             ("scan_status", ?),
             ("scan_schedule", ?),
-            ("scanable_pages", ?),
+            ("scan_log", ?),
+            ("scannable_pages", ?),
             ("last_scan_time", ?);
         ';
         $default_active_integrations = serialize(array('little_forest'));
         $default_scan_status = '';
         $default_scan_schedule = 'manually';
-        $default_scanable_pages = serialize(array());
+        $default_scan_log = '';
+        $default_scannable_pages = serialize(array());
         $default_last_scan_time = '';
         $params = array(
             $default_active_integrations,
             $default_scan_status, $default_scan_schedule,
-            $default_scanable_pages, $default_last_scan_time
+            $default_scan_log, $default_scannable_pages, 
+            $default_last_scan_time
         );
 
         // Query 2

@@ -27,7 +27,7 @@ function process_integrations(array $sites_output){
     );
 
     // Let's log our process for the CLI.
-    echo "\n\n\n> Processing integrations...";
+    update_scan_log("\n\n\n> Processing integrations...");
 
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
@@ -52,14 +52,15 @@ function process_integrations(array $sites_output){
     $active_integrations_count = count(
         $active_integrations
     );
-    echo "\n> $active_integrations_count active integration";
+    $logged_progress = "\n> $active_integrations_count active integration";
     if(
         ($active_integrations_count > 1)
         || ($active_integrations_count == 0)
     ){
-        echo 's';
+        $logged_progress.='s';
     }
-    echo '.';
+    $logged_progress.='.';
+    update_scan_log($logged_progress);
 
     // If there's no integrations ready to process, we
     // won't run the process.
@@ -69,7 +70,7 @@ function process_integrations(array $sites_output){
         foreach ($active_integrations as $integration){
 
             // Let's log our progress and time for CLI.
-            echo "\n>>> Running \"$integration\".";
+            update_scan_log("\n>>> Running \"$integration\" against ");
             $time_pre = microtime(true);
 
             // Every integration file is added using a
@@ -79,17 +80,32 @@ function process_integrations(array $sites_output){
 
             // We'll run each integration against meta we 
             // setup in process_site.php
-            $scanable_pages = $sites_output[
+            $scannable_pages = $sites_output[
                 'processed_urls'
             ];
 
-            // No scanable pages means no need for the
+            // No scannable pages means no need for the
             // integration process.
-            if(!empty($scanable_pages)){
+            if(!empty($scannable_pages)){
+
+                // We'll use a count to change things
+                // within the loop.
+                $total_pages = count($scannable_pages);
+                $count = 0;
 
                 // Each page is run against the
                 // integration's functions.
-                foreach ($scanable_pages as $page){
+                foreach ($scannable_pages as $page){
+                    $count++;
+
+                    // Let's log the processed url.
+                    $log_message = '';
+                    if($total_pages != $count){
+                        $log_message.= "\"$page\", ";
+                    }else{
+                        $log_message.= "and \"$page\".";
+                    }
+                    update_scan_log($log_message);
                 
                     // Every integration uses the same 
                     // pattern to return alerts.
@@ -101,6 +117,7 @@ function process_integrations(array $sites_output){
                         )
                     ){
                         try {
+
 
                             // Let's see if new alerts are 
                             // created..
@@ -122,7 +139,7 @@ function process_integrations(array $sites_output){
 
                             }
 
-                            // We'll also add the processed URL.
+                            // Add urls to our output.
                             array_push(
                                 $integrations_output[
                                     'processed_urls'
@@ -134,7 +151,7 @@ function process_integrations(array $sites_output){
 
                             // Let's report that exception to
                             // CLI. 
-                            echo "\nERROR: $x->getMessage()";
+                            update_scan_log("\nERROR: $x->getMessage()");
 
                         }
                     }
@@ -146,7 +163,7 @@ function process_integrations(array $sites_output){
             // Log our progress.
             $time_post = microtime(true);
             $exec_time = $time_post - $time_pre;
-            echo "\n>>> Completed \"$integration\" in $exec_time seconds.";
+            update_scan_log("\n>>> Completed \"$integration\" in $exec_time seconds.");
 
         }
     }
