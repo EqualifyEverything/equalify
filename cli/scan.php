@@ -37,7 +37,7 @@ function scan(){
     // We'll log time and alert count because our goal is
     // to find as many alerts as possible in as short a
     // time as possible..
-    update_scan_log("\n\nLet's Equalify some sites!");
+    update_scan_log("\Equalify is running!");
     $starting_time = microtime(true);
     $starting_alerts_count = DataAccess::count_db_rows(
         'alerts'
