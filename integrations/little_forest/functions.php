@@ -29,13 +29,37 @@ function little_forest_alerts($url){
 
     // Decode JSON and count WCAG errors.
     $little_forest_json_decoded = json_decode($little_forest_json, true);
-    $little_forest_errors = $little_forest_json_decoded['Errors'];
-    $little_forest_notices = $little_forest_json_decoded['Notices'];
-    $little_forest_warnings = $little_forest_json_decoded['Warnings'];
-    if($little_forest_errors == NULL)
-        $little_forest_errors = 0;
 
-    // Prevent a bug that occurs because LF adds "0" when no notices or errors.
+    // Sometimes LF can't read the json.
+    if(empty($little_forest_json_decoded)){
+
+        // We'll set the attributes to empty.
+        $little_forest_errors = array();
+        $little_forest_notices = array();
+        $little_forest_warnings = array();
+
+        // And add an alert.
+        $alert = array(
+            'source'  => 'little_forest',
+            'url'     => $url,
+            'type'    => 'error',
+            'message' => 'Little Forest cannot reach the page.',
+            'meta'    => ''
+        );
+        array_push($little_forest_alerts, $alert);
+
+
+    }else{
+
+        // Correctly working JSON gets the following attributes.
+        $little_forest_errors = $little_forest_json_decoded['Errors'];
+        $little_forest_notices = $little_forest_json_decoded['Notices'];
+        $little_forest_warnings = $little_forest_json_decoded['Warnings'];
+    
+    }
+
+    // Prevent a bug that occurs because LF adds 
+    // "0" when no notices or errors.
     if($little_forest_errors == 0)
         $little_forest_errors = [];
     if($little_forest_warnings == 0)
