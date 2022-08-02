@@ -37,27 +37,18 @@ if( count($sites['content']) > 0 ):
                     // The Status Badge
                     $status = $site->status;
                     if($status == 'archived'){
-                        $bg_class = 'bg-dark';
+                        $extra_classes = 'bg-dark';
                         $text = 'Archived';
-                        $show_spinner = false;
                     }elseif(empty($site->scanned)){
-                        $bg_class = 'bg-secondary';
-                        $text = 'Processing';
-                        $show_spinner = true;
+                        $extra_classes = 'bg-warning text-dark';
+                        $text = 'Unscanned';
                     }else{
-                        $bg_class = 'bg-success';
+                        $extra_classes = 'bg-success';
                         $text = 'Active';
-                        $show_spinner = false;
                     }
                     ?>
 
-                    <span class="badge mb-2 <?php echo $bg_class;?>">
-
-                        <?php
-                        if($show_spinner)
-                            echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                        ?>
-
+                    <span class="badge mb-2 <?php echo $extra_classes;?>">
                         <?php echo $text;?>
                     </span>
 
