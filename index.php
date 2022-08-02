@@ -41,7 +41,7 @@ require_once 'install.php';
 
 // We also check to see if we can run the scan on every
 // page load.
-require_once 'scan.php';
+require_once 'scheduled_scan.php';
 
 ?>
 

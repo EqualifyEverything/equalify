@@ -39,7 +39,7 @@ if($scan_schedule != 'manually'):
     // When Equalify is istalled, scan_time is empty, so we 
     // know we can just run the scan then.
     if(empty($scan_time)){
-        run_scan();
+        include 'actions/run_scan.php';
 
     // If a scan time is set, we have to run further checks.
     }else{
@@ -57,23 +57,10 @@ if($scan_schedule != 'manually'):
 
             // All checks complete, let's trigger the scan.
             if(empty($scan_process))
-                run_scan();
+                include 'actions/run_scan.php';
                 
         }
 
     }
 
 endif;
-
-/**
- * Run Scan
- */
-function run_scan(){
-
-    // The scan runs in the background.
-    shell_exec(
-        $GLOBALS['PHP_PATH'].
-        ' cli/scan.php > /dev/null 2>/dev/null &'
-    );
-    
-}
