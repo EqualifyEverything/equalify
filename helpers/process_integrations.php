@@ -75,8 +75,8 @@ function process_integrations(array $sites_output){
 
             // Every integration file is added using a
             // standard pattern.
-            require_once 
-                'integrations/'.$integration.'/functions.php';
+            require_once (
+                __ROOT__.'/integrations/'.$integration.'/functions.php');
 
             // We'll run each integration against meta we 
             // setup in process_site.php

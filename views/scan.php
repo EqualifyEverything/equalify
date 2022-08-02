@@ -4,7 +4,7 @@
             <h1>Scan</h1>
         </div>
         <div class="btn-group">
-            <button type="button" class="btn btn-primary">Start Scan</button>
+            <button type="button" class="btn btn-primary" onclick="runScan()">Run Scan</button>
             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="visually-hidden">Toggle Dropdown</span>
             </button>
@@ -18,20 +18,7 @@
         </div>
     </div>
     <div id="terminal" class="bg-dark text-white px-5">
-        <pre>
-
-            <?php
-                $scan_log = DataAccess::get_meta_value(
-                    'scan_log'
-                );
-                if(empty($scan_log)){
-                    echo "\nNo scan is running.";
-                }else{
-                    print_r($scan_log);
-                }
-            ?>
-            
-        </pre>
+        <pre id="scan_log"></pre>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -76,4 +63,67 @@
     </div>
 </section>
 <script>
+
+    // Run the scan.
+    function runScan(){
+
+        // Trigger run_scan.php
+        const xhttp = new XMLHttpRequest();
+        xhttp.open('POST', 'actions/scan.php');
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhttp.send();
+
+        // Let's clear the scan log element to show
+        // we're doing something.
+        scanLog = document.getElementById('scan_log');
+        scanLog.innerHTML = "\nLoading...";
+
+        // Let's get the scan log after a second to 
+        // prepare.
+        let timer = setTimeout(
+            handleScanLogPromises, 500
+        );
+
+
+    }
+
+    // Get the scan log.
+    async function getScanLog(){
+        const response = await fetch('actions/get_scan_log.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Populate the scan log
+    async function populateScanLog(data) {
+        
+        // We populate #scan_log.
+        scanLog = document.getElementById('scan_log');
+
+        // Without data, we setup a fallback
+        if(data == ''){
+            scanLog.innerHTML = "\nNo scan is running.";
+
+        // With data, we setup html and repeat in 3 secs.
+        }else{
+            scanLog.innerHTML = data;
+            let timer = setTimeout(handleScanLogPromises, 2000);
+        }
+
+    }
+
+    // Scan log promises.
+    const handleScanLogPromises = () => {
+        getScanLog()
+        .then(populateScanLog)
+    }
+
+    // On load, trigger script.
+    window.addEventListener('load', handleScanLogPromises);
+
 </script>
