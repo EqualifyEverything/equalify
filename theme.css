@@ -58,7 +58,7 @@ pre code{
     --bs-spinner-height: 0.7rem;
 }
 #terminal{
-    height: 600px;
+    min-height: 600px;
 }
 #scan_log{
     white-space: pre-wrap;       /* Since CSS 2.1 */
