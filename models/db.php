@@ -24,8 +24,7 @@ class DataAccess {
                 $GLOBALS['DB_USERNAME'], 
                 $GLOBALS['DB_PASSWORD'], 
                 $GLOBALS['DB_NAME'],  
-                $GLOBALS['DB_PORT'],  
-                $GLOBALS['DB_SOCKET']);
+                $GLOBALS['DB_PORT']); 
             if(self::$conn->connect_error){
                 throw new Exception(
                     'Cannot connect to database: '
@@ -208,32 +207,6 @@ class DataAccess {
         }else{
             return true;
         }
-    
-    }
-
-    /**
-     * Update DB Column Data
-     */
-    public static function update_db_column_data(
-        $table, $fields, $data, $id
-    ){
-    
-        // SQL
-        $sql = 
-            'UPDATE `'.$db.'` SET `'.$column_name.'` 
-            = ? WHERE `id` = ?';
-        $params = array($data, $id);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception(
-                'Cannot update  "'.$table.'" - "'.$id.'" 
-                data "'.$data.'". for 
-                "'.$column_name.'"'
-            );
     
     }
 
@@ -536,7 +509,7 @@ class DataAccess {
     
         // Result
         if(!$result)
-            throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
+            throw new Exception('Cannot update "'.$url.'" site status to "'.$new_status.'"');
     }
 
     /**
@@ -603,7 +576,7 @@ class DataAccess {
     
         // Result
         if(!$result)
-            throw new Exception('Cannot delete meta using filters "'.$filters.'"');
+            throw new Exception('Cannot delete meta using "'.$meta_name.'"');
     
         // Complete Query
         return $result;
@@ -668,10 +641,6 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
         
     }
 
@@ -694,10 +663,6 @@ class DataAccess {
 
         // Query 1
         $result_1 = self::query($sql_1, $params, false);
-
-        // Fallback
-        if(!$result_1)
-            throw new Exception('Error creating table: "'.$result_1->error.'"');
 
         // Now, create the content in the meta table.
         $sql_2 = '
@@ -725,10 +690,6 @@ class DataAccess {
 
         // Query 2
         $result_2 = self::query($sql_2, $params, false);
-
-        // Fallback
-        if(!$result_2)
-            throw new Exception('Error creating table: "'.$result_2->error.'"');
         
     }
     
@@ -751,10 +712,6 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating sites table: "'.$result->error.'"');
         
     }
     

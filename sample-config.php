@@ -14,7 +14,6 @@ $GLOBALS['DB_USERNAME'] = 'root';
 $GLOBALS['DB_PASSWORD'] = 'root';
 $GLOBALS['DB_NAME'] = 'equalify';
 $GLOBALS['DB_PORT'] = '3306';
-$GLOBALS['DB_SOCKET'] = '/Applications/MAMP/tmp/mysql/mysql.sock';
 
 // Configure PHP path, which you can find by running 
 // `which php` in a terminal.
