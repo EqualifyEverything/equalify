@@ -81,7 +81,7 @@
         // Let's get the scan log after a second to 
         // prepare.
         let timer = setTimeout(
-            handleScanLogPromises, 500
+            handleScanPromises, 500
         );
 
 
@@ -90,18 +90,6 @@
     // Get the scan log.
     async function getScanLog(){
         const response = await fetch('actions/get_scan_log.php', {
-            method: 'GET', 
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-        return response.text();
-    }
-
-    // Get the scan status.
-    async function getScanStatus(){
-        const response = await fetch('actions/get_scan_status.php', {
             method: 'GET', 
             cache: 'no-cache',
             headers: {
@@ -133,6 +121,18 @@
 
     }
 
+    // Get the scan status.
+    async function getScanStatus(){
+        const response = await fetch('actions/get_scan_status.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
     // Update scan button.
     async function updateScanButton(data) {
         
@@ -149,24 +149,49 @@
         }else{
 
             // Disable the scan button.
-            scanButton.disabled = true
+            scanButton.disabled = true;
 
-            // Repeat process ever 2 seconds.
-            let timer = setTimeout(handleScanLogPromises, 2000);
+            // Hit promisses again after 2 seconds.
+            let timer = setTimeout(handleScanPromises, 2000);
 
         }
 
     }
 
+    // Get the alert count.
+    async function getAlertCount(){
+        const response = await fetch('actions/get_alert_count.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Update alert count.
+    async function updateAlertCount(data) {
+        
+        // We update #alert_count.
+        alertCount = document.getElementById('alert_count');
+
+        // Update alert count.
+        alertCount.innerHTML = data;
+
+    }
+
     // Scan log promises.
-    const handleScanLogPromises = () => {
+    const handleScanPromises = () => {
         getScanLog()
         .then(updateScanLog)
+        .then(getAlertCount)
+        .then(updateAlertCount)
         .then(getScanStatus)
         .then(updateScanButton)
     }
 
     // On load, trigger script.
-    window.addEventListener('load', handleScanLogPromises);
+    window.addEventListener('load', handleScanPromises);
 
 </script>
