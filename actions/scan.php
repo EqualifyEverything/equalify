@@ -40,11 +40,11 @@ function scan(){
     // We'll log time and alert count because our goal is
     // to find as many alerts as possible in as short a
     // time as possible..
-    update_scan_log("\nBegin scan:");
     $starting_time = microtime(true);
     $starting_alerts_count = DataAccess::count_db_rows(
         'alerts'
     );
+    update_scan_log("\nBegin scan on ".date('d/m/Y')." at ".date('h:i:s').".");
         
     // Our first process.
     $sites_output = process_sites();
@@ -102,7 +102,7 @@ function scan(){
     );
 
     update_scan_log("\n\nScan complete.");
-    update_scan_log("\n\nEqualify added $added_alerts alerts ");
+    update_scan_log("\n\n\nEqualify added $added_alerts alerts ");
     update_scan_log("in just $exec_time seconds.");
 
     // Finally, let's clear the scan status and log.
