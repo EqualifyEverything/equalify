@@ -28,6 +28,9 @@ require_once(
  */
 function scan(){
 
+    // Let's clear out any old log files.
+    DataAccess::update_meta_value('scan_log', '');
+
     // We keep track of the scan process in the DB to see
     // if the scan is running in other areas of our app.
     DataAccess::update_meta_value( 'scan_status', 
@@ -37,7 +40,7 @@ function scan(){
     // We'll log time and alert count because our goal is
     // to find as many alerts as possible in as short a
     // time as possible..
-    update_scan_log("\nEqualify is running!");
+    update_scan_log("\nBegin scan:");
     $starting_time = microtime(true);
     $starting_alerts_count = DataAccess::count_db_rows(
         'alerts'
@@ -97,13 +100,13 @@ function scan(){
     $added_alerts = number_format(
         $ending_alerts_count - $starting_alerts_count
     );
+
+    update_scan_log("\n\nScan complete.");
     update_scan_log("\n\nEqualify added $added_alerts alerts ");
     update_scan_log("in just $exec_time seconds.");
-    update_scan_log("\n\nHow can Equalify do better?\n\n\n");
 
     // Finally, let's clear the scan status and log.
     DataAccess::update_meta_value('scan_status', '');
-    DataAccess::update_meta_value('scan_log', '');
     
 }
 

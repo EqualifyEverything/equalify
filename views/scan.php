@@ -99,12 +99,23 @@
         return response.text();
     }
 
-    // Update HTML.
-    async function updateHTML(data) {
+    // Get the scan status.
+    async function getScanStatus(){
+        const response = await fetch('actions/get_scan_status.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Update scan log.
+    async function updateScanLog(data) {
         
-        // We update #scan_log and #
+        // We update #scan_log
         scanLog = document.getElementById('scan_log');
-        runScanButton = document.getElementById('run_scan');
 
         // Sometimes there's no data.
         if(data == ''){
@@ -112,17 +123,33 @@
             // Add a fallback message.
             scanLog.innerHTML = "\nNo scan is running.";
 
-            // Make sure the scan button is enabled.
-            runScanButton.disabled = false
-
         // With data, we setup html and repeat in 3 secs.
         }else{
 
             // Populate the scan log.
             scanLog.innerHTML = data;
 
+        }
+
+    }
+
+    // Update scan button.
+    async function updateScanButton(data) {
+        
+        // We update #run_scan
+        scanButton = document.getElementById('run_scan');
+
+        // Sometimes there's no data.
+        if(data == ''){
+
+            // Make sure the scan button is enabled.
+            scanButton.disabled = false
+
+        // With data, we setup html and repeat in 3 secs.
+        }else{
+
             // Disable the scan button.
-            runScanButton.disabled = true
+            scanButton.disabled = true
 
             // Repeat process ever 2 seconds.
             let timer = setTimeout(handleScanLogPromises, 2000);
@@ -134,7 +161,9 @@
     // Scan log promises.
     const handleScanLogPromises = () => {
         getScanLog()
-        .then(updateHTML)
+        .then(updateScanLog)
+        .then(getScanStatus)
+        .then(updateScanButton)
     }
 
     // On load, trigger script.
