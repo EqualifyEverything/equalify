@@ -155,7 +155,7 @@ foreach($label_meta as $k => $val) {
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo ucwords($alert->source);?></td>
+            <td><?php echo ucwords(str_replace('_', ' ', $alert->source));?></td>
             <td><?php echo $alert->url;?></td>
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
