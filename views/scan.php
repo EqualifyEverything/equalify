@@ -4,7 +4,7 @@
             <h1>Scan</h1>
         </div>
         <div class="btn-group">
-            <button type="button" class="btn btn-primary" onclick="runScan()">Run Scan</button>
+            <button id="run_scan" type="button" class="btn btn-primary" onclick="runScan()">Run Scan</button>
             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="visually-hidden">Toggle Dropdown</span>
             </button>
@@ -99,20 +99,34 @@
         return response.text();
     }
 
-    // Populate the scan log
-    async function populateScanLog(data) {
+    // Update HTML.
+    async function updateHTML(data) {
         
-        // We populate #scan_log.
+        // We update #scan_log and #
         scanLog = document.getElementById('scan_log');
+        runScanButton = document.getElementById('run_scan');
 
-        // Without data, we setup a fallback
+        // Sometimes there's no data.
         if(data == ''){
+
+            // Add a fallback message.
             scanLog.innerHTML = "\nNo scan is running.";
+
+            // Make sure the scan button is enabled.
+            runScanButton.disabled = false
 
         // With data, we setup html and repeat in 3 secs.
         }else{
+
+            // Populate the scan log.
             scanLog.innerHTML = data;
+
+            // Disable the scan button.
+            runScanButton.disabled = true
+
+            // Repeat process ever 2 seconds.
             let timer = setTimeout(handleScanLogPromises, 2000);
+
         }
 
     }
@@ -120,7 +134,7 @@
     // Scan log promises.
     const handleScanLogPromises = () => {
         getScanLog()
-        .then(populateScanLog)
+        .then(updateHTML)
     }
 
     // On load, trigger script.

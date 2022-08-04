@@ -153,7 +153,7 @@ function the_integration_settings_button(
 
     // Only show button on active inteagrations
     if($integration_status == 'Active'){
-        echo '<a href="integration_settings&uri='
+        echo '<a href="index.php?view=integration_settings&uri='
             .$integration_uri.'" class="btn btn-secondary">
             Settings</a>';
     }else{
