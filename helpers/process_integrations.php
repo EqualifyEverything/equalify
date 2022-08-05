@@ -159,7 +159,7 @@ function process_integrations(array $sites_output){
                             // CLI. 
                             $error_message = $x->getMessage();
                             update_scan_log(
-                                "\n>>> $error_message"
+                                "\n>>> $error_message\n"
                             );
 
                         }
