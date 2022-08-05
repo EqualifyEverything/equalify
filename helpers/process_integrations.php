@@ -52,7 +52,8 @@ function process_integrations(array $sites_output){
     $active_integrations_count = count(
         $active_integrations
     );
-    $logged_progress = "\n> $active_integrations_count active integration";
+    $logged_progress = 
+        "\n> $active_integrations_count active integration";
     if(
         ($active_integrations_count > 1)
         || ($active_integrations_count == 0)
@@ -70,13 +71,16 @@ function process_integrations(array $sites_output){
         foreach ($active_integrations as $integration){
 
             // Let's log our progress and time for CLI.
-            update_scan_log("\n>>> Running \"$integration\" against ");
+            update_scan_log(
+                "\n>>> Running \"$integration\" against "
+            );
             $time_pre = microtime(true);
 
             // Every integration file is added using a
             // standard pattern.
             require_once (
-                __ROOT__.'/integrations/'.$integration.'/functions.php');
+                __ROOT__.'/integrations/'.$integration
+                .'/functions.php');
 
             // We'll run each integration against meta we 
             // setup in process_site.php
@@ -153,7 +157,10 @@ function process_integrations(array $sites_output){
 
                             // Let's report that exception to
                             // CLI. 
-                            update_scan_log("\nERROR: $x->getMessage()");
+                            $error_message = $x->getMessage();
+                            update_scan_log(
+                                "\n>>> $error_message"
+                            );
 
                         }
                     }
@@ -165,7 +172,9 @@ function process_integrations(array $sites_output){
             // Log our progress.
             $time_post = microtime(true);
             $exec_time = $time_post - $time_pre;
-            update_scan_log("\n>>> Completed \"$integration\" in $exec_time seconds.");
+            update_scan_log(
+                "\n>>> Completed \"$integration\" in $exec_time seconds."
+            );
 
         }
     }
