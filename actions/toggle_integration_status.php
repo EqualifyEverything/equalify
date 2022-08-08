@@ -84,21 +84,21 @@ if($old_status == 'Active'){
         );
     }
 
-    // Archive alerts.
-    $filtered_to_integration = array(
+    // Now we can archive alerts.
+    $filters = array(
         array(
             'name' => 'source',
-            'value' => $integration_uri
+            'value' => $integration_uri 
         )
     );
     $updated_fields = array(
         array(
             'name' => 'archived',
-            'value' => true
+            'value' => 1
         )
     );
     DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filtered_to_integration
+        'alerts', $updated_fields, $filters
     );
 
 }elseif($old_status == 'Disabled'){
@@ -156,11 +156,11 @@ if($old_status == 'Active'){
         'active_integrations', $new_active_integrations
     );
 
-    // Archive alerts.
-    $filtered_to_integration = array(
+    // Now we can unarchive alerts.
+    $filters = array(
         array(
             'name' => 'source',
-            'value' => $integration_uri
+            'value' => $integration_uri 
         )
     );
     $updated_fields = array(
@@ -170,7 +170,7 @@ if($old_status == 'Active'){
         )
     );
     DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filtered_to_integration
+        'alerts', $updated_fields, $filters
     );
 
 }else{

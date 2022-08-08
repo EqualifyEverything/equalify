@@ -39,7 +39,7 @@ function process_sites(){
         )
     );
     $active_sites = DataAccess::get_db_rows( 'sites',
-        $filtered_to_active_sites
+        $filtered_to_active_sites, 1, 10000
     )['content'];
 
     // Log our progress for CLI.
