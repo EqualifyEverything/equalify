@@ -15,10 +15,8 @@
 function process_alerts( array $integration_output) {
 
     // From the previous process, we should have
-    // the following data.
-    $processed_sources = $integration_output[
-        'processed_sources'];
-    $processed_urls    = $integration_output[
+    // the following data that we'll use.
+    $processed_urls = $integration_output[
         'processed_urls'];
     $queued_alerts = $integration_output['queued_alerts'];
 
@@ -36,7 +34,12 @@ function process_alerts( array $integration_output) {
 
     // Now lets get our existing alerts, filtered to the
     // pages we're interested in.
-    $existing_alert_filters = [];
+    $existing_alert_filters = array(
+        array(
+            'name' => 'archived',
+            'value' => 1
+        )
+    );
     foreach ( $processed_urls as $url){
         array_push($existing_alert_filters, array(
             'name'     => 'url',
@@ -52,11 +55,16 @@ function process_alerts( array $integration_output) {
     // We'll need to prepare existing alerts to be compared.
     foreach($existing_alerts as $key => $existing_alert){
 
-        // Let's convert the array's objects to arrays.
-        $converted_alert = (array) $existing_alert;
-        array_push(
-            $existing_alerts, $converted_alert
-        );
+        // We should only add alerts that are not archived.
+        if($existing_alert->archived == NULL){
+
+            // Let's convert the array's objects to arrays.
+            $converted_alert = (array) $existing_alert;
+            array_push(
+                $existing_alerts, $converted_alert
+            );
+
+        }
         unset($existing_alerts[$key]);
 
     }

@@ -215,8 +215,9 @@ class DataAccess {
      * @param string table
      * @param array fields [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
-     * @param array filters [ array ( 
-     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=' ) ]
      * @param string operator 
      */
     public static function update_db_rows(
@@ -247,7 +248,13 @@ class DataAccess {
             $filters_sql = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
+                if(empty($filter['operator'])){
+                    $sub_operator = '=';
+                }else{
+                    $sub_operator = $filter['operator'];
+                }
+                $filters_sql.= '`'.$filter['name'].'` '.$sub_operator
+                    .' ?';
                 $params[] = $filter['value'];
                 if(++$filter_iteration != $filter_count)
                     $filters_sql.= ' '.$operator.' ';
@@ -496,23 +503,6 @@ class DataAccess {
     }
     
     /**
-     * Update Page Site Status 
-     */
-    public static function update_site_status($url, $new_status){
-    
-        // SQL
-        $sql = 'UPDATE `sites` SET `status` = ? WHERE `url` = ?';
-        $params = array($new_status, $url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update "'.$url.'" site status to "'.$new_status.'"');
-    }
-
-    /**
      * Get Meta Value
      */
     public static function get_meta_value($meta_name){
@@ -632,9 +622,11 @@ class DataAccess {
                 `status` varchar(200) NOT NULL DEFAULT "active",
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
+                `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
                 `meta` text,
+                `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
         $params = array();

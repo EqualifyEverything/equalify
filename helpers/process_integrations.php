@@ -17,12 +17,8 @@ function process_integrations(array $sites_output){
     // The goal of this process is to setup this array.
     $integrations_output = array(
         'processed_sources' => array(),
-        'processed_sites'   => $sites_output[
-            'processed_sites'
-        ],
-        'processed_urls'    => $sites_output[
-            'processed_urls'
-        ],
+        'processed_urls'    => array(),
+        'processed_sites'   => $sites_output,
         'queued_alerts'     => array()
     );
 
@@ -82,87 +78,98 @@ function process_integrations(array $sites_output){
                 __ROOT__.'/integrations/'.$integration
                 .'/functions.php');
 
-            // We'll run each integration against meta we 
-            // setup in process_site.php
-            $scannable_pages = $sites_output[
-                'processed_urls'
-            ];
+            // We'll run each integration against each
+            // site.
+            foreach (
+                $integrations_output['processed_sites']
+                as $site
+            ){
 
-            // No scannable pages means no need for the
-            // integration process.
-            if(!empty($scannable_pages)){
+                // setup in process_site.php
+                $scannable_pages = $site->urls;
 
-                // We'll use a count to change things
-                // within the loop.
-                $total_pages = count($scannable_pages);
-                $count = 0;
+                // No scannable pages means no need for the
+                // integration process.
+                if(!empty($scannable_pages)){
 
-                // Each page is run against the
-                // integration's functions.
-                foreach ($scannable_pages as $page){
-                    $count++;
+                    // We'll use a count to change things
+                    // within the loop.
+                    $total_pages = count($scannable_pages);
+                    $count = 0;
 
-                    // Let's log the processed url.
-                    $log_message = '';
-                    if($total_pages != $count){
-                        $log_message.= "\"$page\", ";
-                    }elseif($total_pages == 1){
-                        $log_message.= "\"$page\".";
-                    }else{
-                        $log_message.= "and \"$page\".";
-                    }
-                    update_scan_log($log_message);
-                
-                    // Every integration uses the same 
-                    // pattern to return alerts.
-                    $integration_alerts = 
-                        $integration.'_alerts';
-                    if(
-                        function_exists(
-                            $integration_alerts
-                        )
-                    ){
-                        try {
+                    // Each page is run against the
+                    // integration's functions.
+                    foreach ($scannable_pages as $page){
+                        $count++;
+
+                        // Let's log the processed url.
+                        $log_message = '';
+                        if($total_pages != $count){
+                            $log_message.= "\"$page\", ";
+                        }elseif($total_pages == 1){
+                            $log_message.= "\"$page\".";
+                        }else{
+                            $log_message.= "and \"$page\".";
+                        }
+                        update_scan_log($log_message);
+                    
+                        // Every integration uses the same 
+                        // pattern to return alerts.
+                        $integration_alerts = 
+                            $integration.'_alerts';
+                        if(
+                            function_exists(
+                                $integration_alerts
+                            )
+                        ){
+                            try {
 
 
-                            // Let's see if new alerts are 
-                            // created..
-                            $new_alerts = $integration_alerts(
-                                $page
-                            );
-                            if(!empty($new_alerts)){
+                                // Let's see if new alerts are 
+                                // created..
+                                $new_alerts = $integration_alerts(
+                                    $page
+                                );
+                                if(!empty($new_alerts)){
 
-                                // Add any new alerts into 
-                                // the array.
-                                foreach ($new_alerts as $alert){
-                                    array_push(
-                                        $integrations_output[
-                                            'queued_alerts'
-                                        ],
-                                        $alert
-                                    );
+                                    // Process the new alerts.
+                                    foreach ($new_alerts as $alert){
+
+                                        // Add the site to the alert.
+                                        $alert['site_id'] = $site->id;
+
+                                        // Add alert into the array.
+                                        array_push(
+                                            $integrations_output[
+                                                'queued_alerts'
+                                            ],
+                                            $alert
+                                        );
+
+                                    }
+
                                 }
 
+                                // Add urls to our output.
+                                array_push(
+                                    $integrations_output[
+                                        'processed_urls'
+                                    ],
+                                    $page
+                                );
+
+                            } catch (Exception $x) {
+
+                                // Let's report that exception to
+                                // CLI. 
+                                $error_message = $x->getMessage();
+                                update_scan_log(
+                                    "\n>>> $error_message\n"
+                                );
+
                             }
-
-                            // Add urls to our output.
-                            array_push(
-                                $integrations_output[
-                                    'processed_urls'
-                                ],
-                                $page
-                            );
-
-                        } catch (Exception $x) {
-
-                            // Let's report that exception to
-                            // CLI. 
-                            $error_message = $x->getMessage();
-                            update_scan_log(
-                                "\n>>> $error_message\n"
-                            );
-
                         }
+
                     }
 
                 }
