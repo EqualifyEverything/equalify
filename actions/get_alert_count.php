@@ -24,7 +24,7 @@ $filtered_to_active_status = array(
     ),
     array(
         'name' => 'archived',
-        'value' => NULL
+        'value' => 0
     )
 );
 echo DataAccess::count_db_rows(

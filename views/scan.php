@@ -121,6 +121,29 @@
 
     }
 
+    // Get the alert count.
+    async function getAlertCount(){
+        const response = await fetch('actions/get_alert_count.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Update alert count.
+    async function updateAlertCount(data) {
+        
+        // We update #alert_count.
+        alertCount = document.getElementById('alert_count');
+
+        // Update alert count.
+        alertCount.innerHTML = data;
+
+    }
+
     // Get the scan status.
     async function getScanStatus(){
         const response = await fetch('actions/get_scan_status.php', {
@@ -155,29 +178,6 @@
             let timer = setTimeout(handleScanPromises, 2000);
 
         }
-
-    }
-
-    // Get the alert count.
-    async function getAlertCount(){
-        const response = await fetch('actions/get_alert_count.php', {
-            method: 'GET', 
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-        return response.text();
-    }
-
-    // Update alert count.
-    async function updateAlertCount(data) {
-        
-        // We update #alert_count.
-        alertCount = document.getElementById('alert_count');
-
-        // Update alert count.
-        alertCount.innerHTML = data;
 
     }
 
