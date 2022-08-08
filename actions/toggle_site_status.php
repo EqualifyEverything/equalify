@@ -40,6 +40,23 @@ if($old_status == 'active'){
         'sites', $fields_to_update, $filtered_to_id
     );
 
+    // Now we can archive alerts.
+    $filters = array(
+        array(
+            'name' => 'site_id',
+            'value' => $site_id
+        )
+    );
+    $updated_fields = array(
+        array(
+            'name' => 'archived',
+            'value' => 1
+        )
+    );
+    DataAccess::update_db_rows(
+        'alerts', $updated_fields, $filters
+    );
+
 }
 if($old_status == 'archived'){
 
@@ -59,6 +76,24 @@ if($old_status == 'archived'){
     DataAccess::update_db_rows(
         'sites', $fields_to_update, $filtered_to_id
     );
+
+    // Now we can unarchive alerts.
+    $filters = array(
+        array(
+            'name' => 'site_id',
+            'value' => $site_id
+        )
+    );
+    $updated_fields = array(
+        array(
+            'name' => 'archived',
+            'value' => 0
+        )
+    );
+    DataAccess::update_db_rows(
+        'alerts', $updated_fields, $filters
+    );
+
 
 }
 
