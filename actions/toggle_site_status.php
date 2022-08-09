@@ -41,21 +41,7 @@ if($old_status == 'active'){
     );
 
     // Now we can archive alerts.
-    $filters = array(
-        array(
-            'name' => 'site_id',
-            'value' => $site_id
-        )
-    );
-    $updated_fields = array(
-        array(
-            'name' => 'archived',
-            'value' => 1
-        )
-    );
-    DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filters
-    );
+    update_alerts(1, $site_id);
 
 }
 if($old_status == 'archived'){
@@ -78,24 +64,66 @@ if($old_status == 'archived'){
     );
 
     // Now we can unarchive alerts.
-    $filters = array(
-        array(
-            'name' => 'site_id',
-            'value' => $site_id
-        )
-    );
-    $updated_fields = array(
-        array(
-            'name' => 'archived',
-            'value' => 0
-        )
-    );
-    DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filters
-    );
-
+    update_alerts(0, $site_id);
 
 }
 
+
 // Redirect
 header('Location: ../index.php?view=sites');
+
+/**
+ * Update Alerts
+ * @param string newstatus
+ * @param string site_id
+ */
+function update_alerts($new_status, $site_id) {
+
+    // Get active inteagartions.
+    $active_integrations = unserialize(
+        DataAccess::get_meta_value('active_integrations')
+    );
+
+
+    // Create active sites to alerts filter.
+    $integration_uris = NULL;
+    if(!empty($active_integrations)){
+        $integration_uris = array();
+        foreach ($active_integrations as $uri){
+            array_push(
+                $integration_uris,
+                array(
+                    'name' => 'source',
+                    'value' => $uri,
+                    'operator' => '=',
+                    'condition' => 'OR'
+                )
+            );
+        }
+    }
+
+    // Create filter to select alerts with the current 
+    // integration and active sites.
+    $alerts_filters = array(
+        array(
+            'name' => 'site_id',
+            'value' => $site_id 
+        ),
+        array(
+            'name' => 'source',
+            'value' => $integration_uris
+        )
+    );
+
+    // Now lets update fields.
+    $updated_fields = array(
+        array(
+            'name' => 'archived',
+            'value' => $new_status
+        )
+    );
+    DataAccess::update_db_rows(
+        'alerts', $updated_fields, $alerts_filters
+    );
+
+}

@@ -69,6 +69,106 @@ class DataAccess {
     }
 
     /**
+     * Filters helper.
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=', 'condition' => 'AND' ) ]
+     */
+    private static function filters($filters){
+
+        // Our goal is to output sql and params.
+        $output = array(
+            'sql' => '',
+            'params' => array()
+        );
+        
+        // Let's start a count so we can tell when our
+        // loop ends.
+        $filter_count = count($filters);
+
+        // We only need to prepare SQL if filters exist.
+        if($filter_count > 0){
+            
+            // We start a loop to setup our filters.
+            $output['sql'] = ' WHERE ';
+            $filter_iteration = 0;
+            foreach ($filters as $filter){
+
+                // The default condition 'AND'.
+                if(empty($filter['condition'])){
+                    $condition = 'AND';
+
+                // You can use other conditions like 'OR'.
+                }else{
+                    $condition = $filter['condition'];
+                }
+
+                // The default operator is '='.
+                if(empty($filter['operator'])){
+                    $operator = '=';
+
+                // You can use other operators like 'IS'.
+                }else{
+                    $operator = $filter['operator'];
+                }
+
+                // You can nest filters in filter values.
+                if(is_array($filter['value'])){
+
+                    // Start the sub filter SQL.
+                    $sub_filter_iteration = 0;
+                    $sub_filter_count = count($filter['value']);
+                    $output['sql'].= '(';
+
+                    // We only support one sub filter.
+                    foreach($filter['value'] as $sub_filter){
+
+                        // Like we did before, let's build the
+                        // sql and add to params.
+                        if(empty($sub_filter['condition'])){
+                            $sub_condition = 'AND';
+                        }else{
+                            $sub_condition = $sub_filter['condition'];
+                        }
+                        if(empty($sub_filter['operator'])){
+                            $sub_operator = '=';        
+                        }else{
+                            $sub_operator = $sub_filter['operator'];
+                        }
+                        $output['sql'].= '`'.$sub_filter['name'].'` '
+                        .$sub_operator.' ?';
+                        if(++$sub_filter_iteration != $sub_filter_count)
+                            $output['sql'].= ' '.$sub_condition.' ';
+                        $output['params'][] = $sub_filter['value'];
+                        
+                    }
+
+                    // End the sub filter SQL.
+                    $output['sql'].= ')';
+                    
+                }else{
+
+                    // If the filter doesn't have array, we can just
+                    // assemble it with existing content.
+                    $output['sql'].= '`'.$filter['name'].'` '.$operator
+                    .' ?';
+                    $output['params'][] = $filter['value'];
+
+                }
+
+                if(++$filter_iteration != $filter_count)
+                    $output['sql'].= ' '.$condition.' ';
+
+            }
+
+        }
+
+        // Let's put everything together.
+        return $output;
+
+    }
+
+    /**
      * Get DB Rows
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
@@ -92,43 +192,24 @@ class DataAccess {
     
         // Create 'content' SQL.
         $content_sql = 'SELECT * FROM `'.$table.'`';
-        $params = array();
 
         // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                if(empty($filter['operator'])){
-                    $sub_operator = '=';
-                }else{
-                    $sub_operator = $filter['operator'];
-                }
-                $filters_sql.= '`'.$filter['name'].'` '.$sub_operator
-                    .' ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' '.$operator.' ';
-        
-            }
-        }
+        $filters = self::filters($filters);
 
         // Add filters and page limit.
-        $total_pages_sql.= $filters_sql;
-        $content_sql.= $filters_sql.' LIMIT '.$page_offset
+        $total_pages_sql.= $filters['sql'];
+        $content_sql.= $filters['sql'].' LIMIT '.$page_offset
             .', '.$rows_per_page;
 
         // Run 'total_pages' SQL.
         $total_pages_result = self::query(
-            $total_pages_sql, $params, true
+            $total_pages_sql, $filters['params'], true
         );
         $total_pages_rows = $total_pages_result->fetch_array()[0];
         $total_pages = ceil($total_pages_rows / $rows_per_page);
     
         // Run 'content' SQL
-        $content_results = self::query($content_sql, $params, true);
+        $content_results = self::query($content_sql, $filters['params'], true);
         $content = [];
         if($content_results->num_rows > 0){
             while($row = $content_results->fetch_object()){
@@ -242,26 +323,13 @@ class DataAccess {
         $sql.= $field_sql;
 
         // Add optional filters.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                if(empty($filter['operator'])){
-                    $sub_operator = '=';
-                }else{
-                    $sub_operator = $filter['operator'];
-                }
-                $filters_sql.= '`'.$filter['name'].'` '.$sub_operator
-                    .' ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' '.$operator.' ';
-        
-            }
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
+
+        //Add filters parameters.
+        foreach ($filters['params'] as $param){
+            $params[] = $param;
         }
-        $sql.= $filters_sql;
 
         // Query
         $results = self::query($sql, $params, false);
@@ -404,7 +472,6 @@ class DataAccess {
     /**
      * Delete DB Entry
      * @param string table
-
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      */
@@ -413,28 +480,12 @@ class DataAccess {
         // SQL
         $sql = 'DELETE FROM `'.$table.'`';
 
-        // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                if(empty($filter['operator'])){
-                    $operator = '=';
-                }else{
-                    $operator = $filter['operator'];
-                }
-                $sql.= '`'.$filter['name'].'` '.$operator
-                    .' ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-    
+        // Add optional filters.
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
+
         // Query
-        $result = self::query($sql, $params, false);
+        $result = self::query($sql, $filters['params'], false);
     
         // Complete Query
         return $result;
@@ -455,22 +506,12 @@ class DataAccess {
         $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$table.'`';
         $params = array();
 
-        // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
+        // Add optional filters.
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
 
         // Query
-        $results = self::query($sql, $params, true);
+        $results = self::query($sql, $filters['params'], true);
 
         // Result
         $data = $results->fetch_object()->TOTAL;

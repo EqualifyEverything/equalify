@@ -85,21 +85,8 @@ if($old_status == 'Active'){
     }
 
     // Now we can archive alerts.
-    $filters = array(
-        array(
-            'name' => 'source',
-            'value' => $integration_uri 
-        )
-    );
-    $updated_fields = array(
-        array(
-            'name' => 'archived',
-            'value' => 1
-        )
-    );
-    DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filters
-    );
+    update_alerts(1, $integration_uri);
+
 
 }elseif($old_status == 'Disabled'){
 
@@ -157,21 +144,7 @@ if($old_status == 'Active'){
     );
 
     // Now we can unarchive alerts.
-    $filters = array(
-        array(
-            'name' => 'source',
-            'value' => $integration_uri 
-        )
-    );
-    $updated_fields = array(
-        array(
-            'name' => 'archived',
-            'value' => 0
-        )
-    );
-    DataAccess::update_db_rows(
-        'alerts', $updated_fields, $filters
-    );
+    update_alerts(0, $integration_uri);
 
 }else{
     throw new Exception(
@@ -183,3 +156,64 @@ if($old_status == 'Active'){
 header(
     'Location: ../index.php?view=integrations&id='.$integration_uri
 );
+
+/**
+ * Update Alerts
+ * @param string newstatus
+ * @param string integration_uri
+ */
+function update_alerts($new_status, $integration_uri) {
+
+    // Get active sites.
+    $sites_filter = array(
+        array(
+            'name' => 'status',
+            'value' => 'active'
+        )
+    );
+    $active_sites = DataAccess::get_db_rows(
+        'sites', $sites_filter, 1, 10000
+    );
+
+    // Create active sites to alerts filter.
+    $site_ids = NULL;
+    if(!empty($active_sites['content'])){
+        $site_ids = array();
+        foreach ($active_sites['content'] as $site){
+            array_push(
+                $site_ids,
+                array(
+                    'name' => 'site_id',
+                    'value' => $site->id,
+                    'operator' => '=',
+                    'condition' => 'OR'
+                )
+            );
+        }
+    }
+
+    // Create filter to select alerts with the current 
+    // integration and active sites.
+    $alerts_filters = array(
+        array(
+            'name' => 'source',
+            'value' => $integration_uri 
+        ),
+        array(
+            'name' => 'site_id',
+            'value' => $site_ids
+        )
+    );
+
+    // Now lets update fields.
+    $updated_fields = array(
+        array(
+            'name' => 'archived',
+            'value' => $new_status
+        )
+    );
+    DataAccess::update_db_rows(
+        'alerts', $updated_fields, $alerts_filters
+    );
+
+}
