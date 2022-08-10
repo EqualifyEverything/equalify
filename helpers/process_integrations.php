@@ -106,7 +106,7 @@ function process_integrations(array $sites_output){
                         $log_message = '';
                         if($total_pages != $count){
                             $log_message.= "\"$page\", ";
-                        }elseif($total_pages == 1){
+                        }elseif($total_pages === 1){
                             $log_message.= "\"$page\".";
                         }else{
                             $log_message.= "and \"$page\".";

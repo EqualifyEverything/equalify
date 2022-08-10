@@ -34,20 +34,26 @@ function process_alerts( array $integration_output) {
 
     // Now lets get our existing alerts, filtered to the
     // pages we're interested in.
-    $existing_alert_filters = array(
-        array(
-            'name' => 'archived',
-            'value' => 1
-        )
-    );
+    $urls_to_filter = array();
     foreach ( $processed_urls as $url){
-        array_push($existing_alert_filters, array(
+        array_push($urls_to_filter, array(
             'name'     => 'url',
-            'value'    => $url
+            'value'    => $url,
+            'condition'=> 'OR'
         ));
     };
+    $existing_alert_filters = array(
+        array(
+            'name'  => 'archived',
+            'value' => 0
+        ),
+        array(
+            'name'  => 'url',
+            'value' => $urls_to_filter
+        )
+    );
     $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 10000, 'OR'
+        'alerts', $existing_alert_filters, 1, 100000, 'OR'
     )['content'];
     if(empty($existing_alerts))
         $existing_alerts = array();
@@ -55,19 +61,15 @@ function process_alerts( array $integration_output) {
     // We'll need to prepare existing alerts to be compared.
     foreach($existing_alerts as $key => $existing_alert){
 
-        // We should only add alerts that are not archived.
-        if($existing_alert->archived == NULL){
-
-            // Let's convert the array's objects to arrays.
-            $converted_alert = (array) $existing_alert;
-            array_push(
-                $existing_alerts, $converted_alert
-            );
-
-        }
+        // Let's convert the array's objects to arrays.
+        $converted_alert = (array) $existing_alert;
+        array_push(
+            $existing_alerts, $converted_alert
+        );
         unset($existing_alerts[$key]);
 
     }
+    echo "\n** ".count($existing_alerts);
 
     // We'll need to remove duplicates from alerts.
     function remove_duplicates ($a_array, $b_array){
