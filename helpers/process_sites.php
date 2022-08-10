@@ -98,6 +98,12 @@ function process_sites(){
 
         }
 
+        // Add pages count to the pages scanned meta.
+        $existing_pages_scanned = DataAccess::get_meta_value('pages_scanned');
+        DataAccess::update_meta_value(
+            'pages_scanned', $pages_count+$existing_pages_scanned
+        );
+        
         // Let's log our progress for CLIs.
         update_scan_log("\n> Found $pages_count scannable pages.");
         

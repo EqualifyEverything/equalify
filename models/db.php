@@ -706,6 +706,7 @@ class DataAccess {
             ("scan_schedule", ?),
             ("scan_log", ?),
             ("scannable_pages", ?),
+            ("pages_scanned", ?),
             ("last_scan_time", ?);
         ';
         $default_active_integrations = serialize(array('little_forest'));
@@ -714,11 +715,12 @@ class DataAccess {
         $default_scan_log = '';
         $default_scannable_pages = serialize(array());
         $default_last_scan_time = '';
+        $default_pages_scanned = 0;
         $params = array(
             $default_active_integrations,
             $default_scan_status, $default_scan_schedule,
             $default_scan_log, $default_scannable_pages, 
-            $default_last_scan_time
+            $default_pages_scanned, $default_last_scan_time
         );
 
         // Query 2
