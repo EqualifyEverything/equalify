@@ -84,7 +84,8 @@ function single_page_adder($site_url){
         $site_url = 'https://' . ltrim($site_url, '/');
     }
 
-    $client = new Client();
+    $options = ['verify' => false];
+    $client = new Client($options);
     $response = $client->get($site_url);
 
     // This is primarily a check that the URL is accessible.
@@ -101,7 +102,10 @@ function single_page_adder($site_url){
  */
 function wordpress_site_adder($site_url){
     // Instantiate Guzzle client - WP API uses JSON
-    $options = ['headers' => ['Accept' => 'application/json']];
+    $options = [
+        'headers' => ['Accept' => 'application/json'],
+        'verify' => false,
+    ];
     $client = new Client($options);
 
     // WP API JSON endpoint is always the same
@@ -132,7 +136,10 @@ function wordpress_site_adder($site_url){
  */
 function xml_site_adder($site_url){
     // Instantiate Guzzle client to accept XML
-    $options = ['headers' => ['Accept' => 'application/xml']];
+    $options = [
+        'headers' => ['Accept' => 'application/xml'],
+        'verify' => false,
+    ];
     $client = new Client($options);
 
     // Valid XML files are only allowed!
