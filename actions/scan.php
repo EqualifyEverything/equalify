@@ -108,7 +108,11 @@ function scan(){
     // Set the amount of scans to date.
     $pages_scanned = DataAccess::get_meta_value('pages_scanned');
     update_scan_log("\n\nTo date, Equalify has scanned $pages_scanned pages.");
-    
+    $count_to_beta = 1000000-$pages_scanned;
+    update_scan_log(
+        "\n\n".number_format($count_to_beta)." more pages before we exit Beta!"
+    );
+
     // Finally, let's clear the scan status and log.
     DataAccess::update_meta_value('scan_status', '');
     
