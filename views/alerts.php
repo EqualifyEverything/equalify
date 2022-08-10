@@ -40,7 +40,7 @@ if(!empty($_GET['label'])){
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'All Alerts'
+                    'value' => 'All Active Alerts'
                 ), array(
                     'name' => 'archived',
                     'value' => 0

@@ -48,7 +48,7 @@ function run_curl($site_url, $type = ''){
     // Fallback if no contents exist.
     if($output['content'] == false)
         throw new Exception(
-            'Contents of "'.$curled_url.'" cannot be loaded'
+            'Contents of "'.$site_url.'" cannot be loaded'
         );
     curl_close($curl);
 
