@@ -27,6 +27,6 @@ $filtered_to_active_status = array(
         'value' => 0
     )
 );
-echo DataAccess::count_db_rows(
+echo number_format(DataAccess::count_db_rows(
     'alerts', $filtered_to_active_status
-);
+));

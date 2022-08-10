@@ -97,9 +97,9 @@ require_once 'scheduled_scan.php';
                                         'value' => 0
                                     )
                                 );
-                                echo DataAccess::count_db_rows(
+                                echo number_format(DataAccess::count_db_rows(
                                     'alerts', $filtered_to_active_status
-                                );
+                                ));
                                 ?>
                             
                             </span>
