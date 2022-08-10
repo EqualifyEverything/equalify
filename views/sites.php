@@ -88,7 +88,7 @@ if( count($sites['content']) > 0 ):
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?site=<?php echo $site->url;?>&old_status=<?php echo $status;?>">
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?id=<?php echo $site->id;?>&old_status=<?php echo $status;?>">
                         <?php if($processing) echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; echo $button_text;?>
                     </a>
                 </div>

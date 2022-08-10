@@ -91,6 +91,10 @@ require_once 'scheduled_scan.php';
                                     array(
                                         'name' => 'status',
                                         'value' => 'active'
+                                    ),
+                                    array(
+                                        'name' => 'archived',
+                                        'value' => 0
                                     )
                                 );
                                 echo DataAccess::count_db_rows(
@@ -154,6 +158,12 @@ require_once 'scheduled_scan.php';
                         <?php
                         // We'll get some data to make the label.
                         $label_meta = unserialize($label->meta_value);
+
+                        // No archived alerts are shown in labels.
+                        array_push($label_meta, array(
+                            'name' => 'archived',
+                            'value' => 0
+                        ));
 
                         // Let's extract the "title" meta, so we can use it 
                         // later and so we can use any label's meta_values to

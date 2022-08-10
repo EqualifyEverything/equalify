@@ -26,10 +26,7 @@ function process_sites(){
     require_once(__ROOT__.'/helpers/update_scan_log.php');
 
     // The goal of this process is to setup this array.
-    $sites_output = array(
-        'processed_sites' => array(),
-        'processed_urls'    => array()
-    );
+    $sites_output = array();
 
     // Let's log our process for the CLI.
     update_scan_log("\n\n\n> Processing sites...");
@@ -42,7 +39,7 @@ function process_sites(){
         )
     );
     $active_sites = DataAccess::get_db_rows( 'sites',
-        $filtered_to_active_sites
+        $filtered_to_active_sites, 1, 10000
     )['content'];
 
     // Log our progress for CLI.
@@ -57,15 +54,21 @@ function process_sites(){
     // process.
     if(!empty($active_sites)){
 
+        // Pages count is used for logging.
+        $pages_count = 0;
+
         // Each site is processed individually.
         foreach($active_sites as $site){
 
             // Log our progress for CLI.
             update_scan_log("\n>>> Processing \"$site->url\".");
 
+            // Let's add a 'urls' array to our sites.
+            $site->urls = array();
+
             // Every URL that is processed is added to
             // our output.
-            array_push($sites_output['processed_sites'], $site);        
+            $sites_output[$site->id] = $site;        
 
             // Processing a site means adding its 
             // site_pages as scannable_pages meta.
@@ -85,13 +88,23 @@ function process_sites(){
                 );
             }
             foreach ($site_pages as $page){
-                array_push($sites_output['processed_urls'], $page);        
+                array_push( 
+                    $sites_output[$site->id]->urls, $page
+                );
             }
+
+            // We'll save the number of pages.
+            $pages_count = $pages_count+count($site->urls);
 
         }
 
+        // Add pages count to the pages scanned meta.
+        $existing_pages_scanned = DataAccess::get_meta_value('pages_scanned');
+        DataAccess::update_meta_value(
+            'pages_scanned', $pages_count+$existing_pages_scanned
+        );
+        
         // Let's log our progress for CLIs.
-        $pages_count = count($sites_output['processed_urls']);
         update_scan_log("\n> Found $pages_count scannable pages.");
         
     }

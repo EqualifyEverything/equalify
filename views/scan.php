@@ -18,7 +18,7 @@
         </div>
     </div>
     <div id="terminal" class="bg-dark text-white px-5">
-        <pre id="scan_log"></pre>
+        <pre id="scan_log" class="pt-3 pb-5"></pre>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -81,7 +81,7 @@
         // Let's get the scan log after a second to 
         // prepare.
         let timer = setTimeout(
-            handleScanLogPromises, 500
+            handleScanPromises, 500
         );
 
 
@@ -99,12 +99,11 @@
         return response.text();
     }
 
-    // Update HTML.
-    async function updateHTML(data) {
+    // Update scan log.
+    async function updateScanLog(data) {
         
-        // We update #scan_log and #
+        // We update #scan_log
         scanLog = document.getElementById('scan_log');
-        runScanButton = document.getElementById('run_scan');
 
         // Sometimes there's no data.
         if(data == ''){
@@ -112,32 +111,87 @@
             // Add a fallback message.
             scanLog.innerHTML = "\nNo scan is running.";
 
-            // Make sure the scan button is enabled.
-            runScanButton.disabled = false
-
         // With data, we setup html and repeat in 3 secs.
         }else{
 
             // Populate the scan log.
             scanLog.innerHTML = data;
 
-            // Disable the scan button.
-            runScanButton.disabled = true
+        }
 
-            // Repeat process ever 2 seconds.
-            let timer = setTimeout(handleScanLogPromises, 2000);
+    }
+
+    // Get the alert count.
+    async function getAlertCount(){
+        const response = await fetch('actions/get_alert_count.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Update alert count.
+    async function updateAlertCount(data) {
+        
+        // We update #alert_count.
+        alertCount = document.getElementById('alert_count');
+
+        // Update alert count.
+        alertCount.innerHTML = data;
+
+    }
+
+    // Get the scan status.
+    async function getScanStatus(){
+        const response = await fetch('actions/get_scan_status.php', {
+            method: 'GET', 
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+        return response.text();
+    }
+
+    // Update scan button.
+    async function updateScanButton(data) {
+        
+        // We update #run_scan
+        scanButton = document.getElementById('run_scan');
+
+        // Sometimes there's no data.
+        if(data == ''){
+
+            // Make sure the scan button is enabled.
+            scanButton.disabled = false
+
+        // With data, we setup html and repeat in 3 secs.
+        }else{
+
+            // Disable the scan button.
+            scanButton.disabled = true;
+
+            // Hit promisses again after 2 seconds.
+            let timer = setTimeout(handleScanPromises, 2000);
 
         }
 
     }
 
     // Scan log promises.
-    const handleScanLogPromises = () => {
+    const handleScanPromises = () => {
         getScanLog()
-        .then(updateHTML)
+        .then(updateScanLog)
+        .then(getAlertCount)
+        .then(updateAlertCount)
+        .then(getScanStatus)
+        .then(updateScanButton)
     }
 
     // On load, trigger script.
-    window.addEventListener('load', handleScanLogPromises);
+    window.addEventListener('load', handleScanPromises);
 
 </script>

@@ -24,6 +24,12 @@ if(!empty($_GET['label'])){
     // We need to unserialize the meta from the label.
     $label_meta = unserialize($label->meta_value);
 
+    // No archived alerts are shown in labels.
+    array_push($label_meta, array(
+        'name' => 'archived',
+        'value' => 0
+    ));
+
 // We also have special presets
 }elseif(!empty($_GET['preset'])){
 
@@ -35,6 +41,9 @@ if(!empty($_GET['label'])){
                 array(
                     'name' => 'title',
                     'value' => 'All Alerts'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
                 )
             )
         );
@@ -52,6 +61,9 @@ if(!empty($_GET['label'])){
                 array(
                     'name' => 'status',
                     'value' => 'ignored'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
                 )
             )
         );
@@ -70,6 +82,9 @@ if(!empty($_GET['label'])){
                 array(
                     'name' => 'status',
                     'value' => 'equalified'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
                 )
             )
         );
@@ -90,6 +105,9 @@ if(!empty($_GET['label'])){
             array(
                 'name' => 'status',
                 'value' => 'active'
+            ), array(
+                'name' => 'archived',
+                'value' => 0
             )
         )
     );
@@ -155,7 +173,7 @@ foreach($label_meta as $k => $val) {
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo ucwords($alert->source);?></td>
+            <td><?php echo ucwords(str_replace('_', ' ', $alert->source));?></td>
             <td><?php echo $alert->url;?></td>
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
@@ -163,7 +181,7 @@ foreach($label_meta as $k => $val) {
 
                 <?php
                 // Active alerts can be ignored.
-                if( $alert->status == 'active' ){
+                if( $alert->status == 'active' && $alert->archived != 1 ){
                 ?>
 
                 <a href="actions/ignore_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">

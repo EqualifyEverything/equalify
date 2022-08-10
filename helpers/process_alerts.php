@@ -15,10 +15,8 @@
 function process_alerts( array $integration_output) {
 
     // From the previous process, we should have
-    // the following data.
-    $processed_sources = $integration_output[
-        'processed_sources'];
-    $processed_urls    = $integration_output[
+    // the following data that we'll use.
+    $processed_urls = $integration_output[
         'processed_urls'];
     $queued_alerts = $integration_output['queued_alerts'];
 
@@ -36,15 +34,26 @@ function process_alerts( array $integration_output) {
 
     // Now lets get our existing alerts, filtered to the
     // pages we're interested in.
-    $existing_alert_filters = [];
+    $urls_to_filter = array();
     foreach ( $processed_urls as $url){
-        array_push($existing_alert_filters, array(
+        array_push($urls_to_filter, array(
             'name'     => 'url',
-            'value'    => $url
+            'value'    => $url,
+            'condition'=> 'OR'
         ));
     };
+    $existing_alert_filters = array(
+        array(
+            'name'  => 'archived',
+            'value' => 0
+        ),
+        array(
+            'name'  => 'url',
+            'value' => $urls_to_filter
+        )
+    );
     $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 10000, 'OR'
+        'alerts', $existing_alert_filters, 1, 100000, 'OR'
     )['content'];
     if(empty($existing_alerts))
         $existing_alerts = array();
@@ -60,6 +69,7 @@ function process_alerts( array $integration_output) {
         unset($existing_alerts[$key]);
 
     }
+    echo "\n** ".count($existing_alerts);
 
     // We'll need to remove duplicates from alerts.
     function remove_duplicates ($a_array, $b_array){
