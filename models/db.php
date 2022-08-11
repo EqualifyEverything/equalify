@@ -173,15 +173,14 @@ class DataAccess {
      * Get DB Rows
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
-     * 'operator' => '=' ) ]
+     * 'operator' => '=', 'condition' => 'AND' ) ]
      * @param string page
      * @param string rows_per_page
      * @param string operator
      */
     public static function get_db_rows(
         $table, $filters = [], $page = 1, 
-        $rows_per_page = self::ITEMS_PER_PAGE,
-        $operator = 'AND'
+        $rows_per_page = self::ITEMS_PER_PAGE
     ){
 
         // Set rows per page.
@@ -518,30 +517,6 @@ class DataAccess {
         $data = $results->fetch_object()->TOTAL;
         return $data;
 
-    }
-
-    /**
-     * Is Unique Site
-     */
-    public static function is_unique_site($url){
-    
-        // Require unique URL
-        $sql = 'SELECT * FROM `sites` WHERE `url` = ?';
-    
-        // We don't consider a page with a '/' a unique url
-        // so we will also search for them.
-        // Possible injection point:
-        // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
-        $sql.= ' OR `url` = ?';
-    
-        $params = array($url, $url . '/');
-        $results = self::query($sql, $params, true);
-        if($results->num_rows > 0){
-            return false;
-        }else{
-            return true;
-        }
-    
     }
     
     /**
