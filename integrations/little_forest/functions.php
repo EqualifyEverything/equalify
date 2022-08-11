@@ -4,28 +4,26 @@
  * Description: Counts WCAG 2.1 errors and links to page reports.
  */
 
+ /**
+  * Maps site URLs to Little Forest URLs for processing.
+  */
+function little_forest_urls($page_url) {
+    return 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$page_url.'&level=WCAG2AA&cache=false';
+}
+
 /**
  * Little Forest Alerts
  * @param string url
  */
-function little_forest_alerts($url){
+function little_forest_alerts($response_body, $page_url){
 
     // Our goal is to return alerts.
-    $little_forest_alerts = array();
-
-    // Get Little Forest data.
-    $override_https = array(
-        "ssl"=>array(
-            "verify_peer"=> false,
-            "verify_peer_name"=> false,
-        )
-    );
-    $little_forest_url = 'https://inspector.littleforest.co.uk/InspectorWS/Accessibility?url='.$url.'&level=WCAG2AA&cache=false';
-    $little_forest_json = file_get_contents($little_forest_url, false, stream_context_create($override_https));
+    $little_forest_alerts = [];
+    $little_forest_json = $response_body; 
 
     // Fallback if LF scan doesn't work.
     if(strpos($little_forest_json, 'NoSuchFileException'))
-        throw new Exception('Little Forest error related to page "'.$little_forest_url.'"');
+        throw new Exception('Little Forest error related to page "'.$page_url.'"');
 
     // Decode JSON and count WCAG errors.
     $little_forest_json_decoded = json_decode($little_forest_json, true);
@@ -41,7 +39,7 @@ function little_forest_alerts($url){
         // And add an alert.
         $alert = array(
             'source'  => 'little_forest',
-            'url'     => $url,
+            'url'     => $page_url,
             'type'    => 'error',
             'message' => 'Little Forest cannot reach the page.',
             'meta'    => ''
@@ -58,107 +56,58 @@ function little_forest_alerts($url){
     
     }
 
-    // Prevent a bug that occurs because LF adds 
-    // "0" when no notices or errors.
+    // Prevent a bug that occurs because LF adds "0" when no notices or errors.
     if($little_forest_errors == 0)
         $little_forest_errors = [];
     if($little_forest_warnings == 0)
         $little_forest_warnings = [];
+    if($little_forest_notices == 0)
+        $little_forest_notices = [];
 
-    // Add errors.
-    if(count($little_forest_errors) >= 1){
-        foreach($little_forest_errors as $error){
-
-            // Create Meta
-            $meta = array(
-                'guideline' => $error['Guideline'],
-                'tag'       =>  $error['Tag']
-            );
-
-            // Create message.
-            if(!empty($error['Code']) && $error['Code'] != 'null'){
-                $code = htmlentities('[code]'.$error['Code'].'[/code]');
-                $message = $code.$error['Message'];
-            }else{
-                $message = $error['Message'];
-            }
-
-            // Push alert to returnable array.
-            $alert = array(
-                'source'  => 'little_forest',
-                'url'     => $url,
-                'type'    => 'error',
-                'message' => $message,
-                'meta'    => $meta
-            );
-            array_push($little_forest_alerts, $alert);
-
-        }
+    // Add errors, warnings, and notices
+    foreach ($little_forest_errors as $error) {
+        $alert = build_alert($error, 'error', $page_url);
+        $little_forest_alerts[] = $alert;
     }
 
-    // Add notices.
-    if(count($little_forest_notices) >= 1){
-        foreach($little_forest_notices as $notice){
-
-            // Create Meta
-            $meta = array(
-                'guideline' => $notice['Guideline'],
-                'tag'       => $notice['Tag']
-            );
-
-            // Create message.
-            if(!empty($notice['Code']) && $notice['Code'] != 'null'){
-                $code = htmlentities('[code]'.$notice['Code'].'[/code]');
-                $message = $code.$notice['Message'];
-            }else{
-                $message = $notice['Message'];
-            }
-
-            // Push alert to returnable array.
-            $alert = array(
-                'source'  => 'little_forest',
-                'url'     => $url,
-                'type'    => 'notice',
-                'message' => $message,
-                'meta'    => $meta
-            );
-            array_push($little_forest_alerts, $alert);
-
-        }
+    foreach ($little_forest_warnings as $warning) {
+        $alert = build_alert($warning, 'warning', $page_url);
+        $little_forest_alerts[] = $alert;
     }
 
-    // Add warnings.
-    if(count($little_forest_warnings) >= 1){
-        foreach($little_forest_warnings as $warning){
-
-            // Create Meta
-            $meta = array(
-                'guideline' => $warning['Guideline'],
-                'tag'       => $warning['Tag']
-            );
-
-            // Create message.
-            if(!empty($warning['Code']) && $warning['Code'] != 'null'){
-                $code = htmlentities('[code]'.$warning['Code'].'[/code]');
-                $message = $code.$warning['Message'];
-            }else{
-                $message = $warning['Message'];
-            }
-
-            // Push alert to returnable array.
-            $alert = array(
-                'source'  => 'little_forest',
-                'url'     => $url,
-                'type'    => 'warning',
-                'message' => $message,
-                'meta'    => $meta
-            );
-            array_push($little_forest_alerts, $alert);
-
-        }
+    foreach ($little_forest_notices as $notice) {
+        $alert = build_alert($notice, 'notice', $page_url);
+        $little_forest_alerts[] = $alert;
     }
 
     // Return alerts.
     return $little_forest_alerts;
 
+}
+
+function build_alert($alert, string $type, string $url) {
+    // Create Meta
+    $meta = array(
+        'guideline' => $alert['Guideline'],
+        'tag'       => $alert['Tag']
+    );
+
+    // Create message.
+    if(!empty($alert['Code']) && $alert['Code'] != 'null'){
+        $code = htmlentities('[code]'.$alert['Code'].'[/code]');
+        $message = $code.$alert['Message'];
+    }else{
+        $message = $alert['Message'];
+    }
+
+    // Push alert to returnable array.
+    $alert = array(
+        'source'  => 'little_forest',
+        'url'     => $url,
+        'type'    => $type,
+        'message' => $message,
+        'meta'    => $meta
+    );
+
+    return $alert;
 }
