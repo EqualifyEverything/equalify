@@ -298,11 +298,11 @@ class DataAccess {
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=', 'condition' => 'AND' ) ]
      * 'operator' => '=' ) ]
-     * @param string operator 
      */
     public static function update_db_rows(
-        $table, $fields, $filters = [], $operator = 'AND'
+        $table, $fields, $filters = []
     ){
 
         // Prepare the SQL.

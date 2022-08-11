@@ -103,11 +103,21 @@ function process_alerts( array $integration_output) {
         $queued_alerts, $existing_alerts
     );
 
-    // Let's add the new alerts.
+
+    // Let's add alerts.
     if(!empty($new_alerts)){
-        DataAccess::add_db_rows(
-            'alerts', $new_alerts
-        );
+
+        // Let's preserve $new_alerts to use elsewhere.
+        $chunking_alerts = $new_alerts;
+
+        // We add 1000 alerts at a time.
+        $chunked_array = array_chunk($chunking_alerts, 1000);
+        foreach($chunked_array as $alert_chunk){
+            DataAccess::add_db_rows(
+                'alerts', $alert_chunk
+            );
+        }
+
     }
 
     // Equalified alerts are existing alerts that don't
