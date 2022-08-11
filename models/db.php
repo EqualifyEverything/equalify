@@ -10,6 +10,7 @@
 **********************************************************/
 
 class DataAccess {
+    
     // Set the records per page.
     private const ITEMS_PER_PAGE = 10;
 
