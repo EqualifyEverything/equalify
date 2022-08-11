@@ -111,7 +111,7 @@ function process_alerts( array $integration_output) {
         $chunking_alerts = $new_alerts;
 
         // We add 1000 alerts at a time.
-        $chunked_array = array_chunk($chunking_alerts, 1000);
+        $chunked_array = array_chunk($chunking_alerts, 2000);
         foreach($chunked_array as $alert_chunk){
             DataAccess::add_db_rows(
                 'alerts', $alert_chunk
@@ -157,9 +157,15 @@ function process_alerts( array $integration_output) {
             ));
         }
         if(!empty($filtered_by_ids)){
-            DataAccess::update_db_rows(
-                'alerts', $fields_updated, $filtered_by_ids, 'OR'
-            );    
+
+            // We add 1000 alerts at a time.
+            $chunked_array = array_chunk($filtered_by_ids, 2000);
+            foreach($chunked_array as $alert_chunk){
+                DataAccess::update_db_rows(
+                    'alerts', $fields_updated, $alert_chunk, 'OR'
+                );
+            }
+            
         }
 
     }
