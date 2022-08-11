@@ -102,8 +102,7 @@ function scan(){
     );
 
     update_scan_log("\n\nScan complete.");
-    update_scan_log("\n\n\nEqualify added $added_alerts alerts ");
-    update_scan_log("in just $exec_time seconds.");
+    update_scan_log("\n\n\nEqualify scan took just $exec_time seconds.");
 
     // Set the amount of scans to date.
     $pages_scanned = DataAccess::get_meta_value('pages_scanned');
