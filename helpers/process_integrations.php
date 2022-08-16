@@ -59,87 +59,88 @@ function process_integrations(array $sites_output){
     $logged_progress.='.';
     update_scan_log($logged_progress);
 
-    // If there's no integrations ready to process, we
-    // won't run the process.
-    if(!empty($active_integrations)){
+    // If there's no integrations ready to process, 
+    // we won't run the process.
+    if (empty($active_integrations)) {
+        return $integrations_output;
+    }
 
-        // Now we run each integration.
-        foreach ($active_integrations as $integration){
+    // Now we run each integration.
+    foreach ($active_integrations as $integration){
 
-            // Every integration file is added using a standard pattern.
-            require_once (
-                __ROOT__.'/integrations/'.$integration.'/functions.php'
-            );
+        // Every integration file is added using a standard pattern.
+        require_once (
+            __ROOT__.'/integrations/'.$integration.'/functions.php'
+        );
 
-            // (NOTE: A more robust integration interface might use a request generator
-            // function instead of a simple URL mapping; current integrations
-            // don't need this and just GET with Guzzle's default headers.)
+        // (NOTE: A more robust integration interface might use a request generator
+        // function instead of a simple URL mapping; current integrations
+        // don't need this and just GET with Guzzle's default headers.)
 
-            // Every integration needs to define two functions:
-            // One to map site URLs to integration request URLs
-            $integration_urls = $integration.'_urls';
-            // Another to map integration responses to an array of Equalify alerts
-            $integration_alerts = $integration.'_alerts';
-            
-            // Skip the integration if we fail to find either.
-            if (!function_exists($integration_urls)) {
-                update_scan_log(
-                    "\n>>> ERROR: URL mapping function for Integration " . 
-                    "'$integration' not found.\n"
-                );
-                continue;
-            }
-            if (!function_exists($integration_alerts)) {
-                update_scan_log(
-                    "\n>>> ERROR: Alerts function for Integration " . 
-                    "'$integration' not found.\n"
-                );
-                continue;
-            }
-
-            // Let's log our progress and time for CLI.
+        // Every integration needs to define two functions:
+        // One to map site URLs to integration request URLs
+        $integration_urls = $integration.'_urls';
+        // Another to map integration responses to an array of Equalify alerts
+        $integration_alerts = $integration.'_alerts';
+        
+        // Skip the integration if we fail to find either.
+        if (!function_exists($integration_urls)) {
             update_scan_log(
-                "\n>>> Running \"$integration\" against pages: \n"
+                "\n>>> ERROR: URL mapping function for Integration " . 
+                "'$integration' not found.\n"
             );
-            $time_pre = microtime(true);
-
-            // We'll run each integration against each site.
-            foreach ($integrations_output['processed_sites'] as $site) {
-
-                // setup in process_site.php
-                $scannable_pages = $site->urls;
-
-                // No scannable pages means no need to run the integration.
-                if (empty($scannable_pages)) {
-                    continue;
-                }
-                
-                $pool = build_integration_connection_pool(
-                    $site,
-                    $scannable_pages,
-                    $integration_urls,
-                    $integration_alerts, 
-                    $integrations_output
-                );
-
-                // Initiate the transfers and create a promise
-                $integration_run = $pool->promise();
-
-                // Force the pool of requests to complete.
-                $integration_run->wait();
-
-                // Add urls to our output.
-                $integrations_output['processed_urls'] += $scannable_pages;
-            }
-
-            // Log our progress.
-            $time_post = microtime(true);
-            $exec_time = $time_post - $time_pre;
-            update_scan_log(
-                "\n>>> Completed \"$integration\" in $exec_time seconds."
-            );
-
+            continue;
         }
+        if (!function_exists($integration_alerts)) {
+            update_scan_log(
+                "\n>>> ERROR: Alerts function for Integration " . 
+                "'$integration' not found.\n"
+            );
+            continue;
+        }
+
+        // Let's log our progress and time for CLI.
+        update_scan_log(
+            "\n>>> Running \"$integration\" against pages: \n"
+        );
+        $time_pre = microtime(true);
+
+        // We'll run each integration against each site.
+        foreach ($integrations_output['processed_sites'] as $site) {
+
+            // setup in process_site.php
+            $scannable_pages = $site->urls;
+
+            // No scannable pages means no need to run the integration.
+            if (empty($scannable_pages)) {
+                continue;
+            }
+            
+            $pool = build_integration_connection_pool(
+                $site,
+                $scannable_pages,
+                $integration_urls,
+                $integration_alerts, 
+                $integrations_output
+            );
+
+            // Initiate the transfers and create a promise
+            $integration_run = $pool->promise();
+
+            // Force the pool of requests to complete.
+            $integration_run->wait();
+
+            // Add urls to our output.
+            $integrations_output['processed_urls'] += $scannable_pages;
+        }
+
+        // Log our progress.
+        $time_post = microtime(true);
+        $exec_time = $time_post - $time_pre;
+        update_scan_log(
+            "\n>>> Completed \"$integration\" in $exec_time seconds."
+        );
+
     }
 
     // Finally, we return our hard work.
@@ -149,7 +150,9 @@ function process_integrations(array $sites_output){
 
 /**
  * Integrations are expected to provide:
- * - a function that operates on a single URL.
+ * - a function that maps site URLs to integration URLs.
+ * - a function that maps integration outputs to Equalify's output model
+ * 
  * This function adapts the integration function to work with a connection pool 
  * so we can make concurrent requests.
  * 
