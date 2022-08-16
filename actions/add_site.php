@@ -21,7 +21,30 @@ if( $type == false)
     );
 
 // We also need to see if the site is of a unique URL.
-if(DataAccess::is_unique_site($url) == false)
+$filters = array(
+    array(
+        'name'  => 'url',
+        'value' => $url,
+        'condition' => 'OR'
+    ),
+    array(
+        'name'  => 'url',
+        'value' => $url.'/',
+        'condition' => 'OR'
+    ),
+    array(
+        'name'  => 'url',
+        'value' => 'https://'.$url.'/',
+        'condition' => 'OR'
+    ),
+    array(
+        'name'  => 'url',
+        'value' => 'http://'.$url.'/',
+        'condition' => 'OR'
+    )
+);
+$sites_with_url = DataAccess::get_db_rows('sites', $filters)['content'];
+if( !empty($sites_with_url) )
     throw new Exception('"'.$url.'" already exists');
 
 // Static pages are treated as sites in themselves.
