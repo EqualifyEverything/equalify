@@ -1,3 +1,4 @@
+<pre>
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * This document composes the label customerizer view.
@@ -13,6 +14,8 @@ $name   = '';
 $title = 'Untitled';
 $status = '';
 $type   = '';
+$guidelines   = '';
+$tags   = '';
 
 // We use this view to customize labels if a id is 
 // provided, otherwise we create a new label.
@@ -33,11 +36,34 @@ if(!empty($_GET['name'])){
             $type = $label['value'];
         if($label['name'] == 'status') 
             $status = $label['value'];
+        if($label['name'] == 'guideline'){
+            $raw_guidelines = $label['value'];
+            $guidelines = '';
+            $count = 0;
+            foreach($raw_guidelines as $guideline){
+                $guidelines.= $guideline['value'];
+                $count++;
+                if($count != count($raw_guidelines))
+                    $guidelines.= ', ';
+            }
+        } 
+        if($label['name'] == 'tag'){
+            $raw_tags = $label['value'];
+            $tags = '';
+            $count = 0;
+            foreach($raw_tags as $tag){
+                $tags.= $tag['value'];
+                $count++;
+                if($count != count($raw_tags))
+                    $tags.= ', ';
+            }
+        } 
     }
 
 }
 
 ?>
+</pre>
 
 <section>
     <div class="mb-3 pb-4 border-bottom">
@@ -120,6 +146,16 @@ if(!empty($_GET['name'])){
         
             </select>
         </div>
+        <div class="mb-3">
+            <label for="guidelinesInput" class="form-label fw-semibold">WCAG Guidelines</label>            
+            <input type="text" id="guidelinesInput" class="form-control" value="<?php echo $guidelines;?>" name="guidelines" aria-describedby="guidelinesHelp" placeholder="0.3, 1.1, 3.3">
+            <div id="guidelinesHelp" class="form-text">Use a <a href="https://www.w3.org/TR/WCAG21/" target="_blank">WCAG 2.1</a> guideline number. Multiple guidlines must be seperated by commas.</div>
+        </div>
+        <div class="mb-3">
+            <label for="tagsInput" class="form-label fw-semibold">HTML Tags</label>
+            <input type="text" id="tagsInput" class="form-control" value="<?php echo $tags;?>" name="tags" aria-describedby="tagsHelp" placeholder="a, strong, div">
+            <div id="tagsHelp" class="form-text">Add any <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element" target="_blank">HTML tag</a>. Multiple tags must be seperated by commas.</div>
+        </div>
         <hr>
         <div class="mb-3">
             <label for="labelTitleInput" class="form-label fw-semibold">Label Name</label>
@@ -136,7 +172,9 @@ if(!empty($_GET['name'])){
         <input type="hidden" name="name" value="<?php echo $name;?>">
     </form>
 </section>
+
 <script>
+
 // Change label title text as you type.
 const labelName = document.getElementById('labelName');
 const labelNameInput = document.getElementById('labelNameInput');

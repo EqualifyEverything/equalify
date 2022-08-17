@@ -34,6 +34,30 @@ if(!empty($_POST['type'])){
         )
     );
 }
+if(!empty($_POST['guidelines'])){
+    $guidelines = submeta(
+        $_POST['guidelines'], 'guideline'
+    );
+    array_push(
+        $updated_meta,
+        array(
+            'name' => 'guideline',
+            'value' =>  $guidelines
+        )
+    );
+}
+if(!empty($_POST['tags'])){
+    $tags = submeta(
+        $_POST['tags'], 'tag'
+    );
+    array_push(
+        $updated_meta,
+        array(
+            'name' => 'tag',
+            'value' =>  $tags
+        )
+    );
+}
 if(!empty($_POST['title'])){
     array_push(
         $updated_meta,
@@ -93,4 +117,37 @@ if(empty($_POST['name'])){
 
 // When done, we can checkout the saved label.
 header('Location: ../index.php?view=alerts&status=success&label='.$name);
+
+/**
+ * Prepare Meta.
+ * @param string input
+ * @param string name
+ */
+function submeta($input, $name){
+
+    // Our string can't use spaces.
+    str_replace(
+        ' ', '', $input
+    );
+
+    // Now lets create an array.
+    $items = explode(',', $input);
+
+    // We turn the array into a subfilter.
+    $subfilter = array();
+    foreach($items  as $item){
+        array_push(
+            $subfilter,
+            array(
+                'name' => $name,
+                'value' => $item,
+                'condition' => 'OR'
+            )
+        );
+    }
+
+    // Let's return the subfilter.
+    return $subfilter;
+
+}
 ?>
