@@ -6,15 +6,24 @@ That statistic is unacceptable.
 
 Everyone should have access to online information.
 
-## How will Equalify increase accessibility?
+## Support Equalify
+
+⭐ Star the repo to show your support.
+
+⬇️ [Download](https://github.com/bbertucc/equalify#download-and-use) Equalify or [try our managed service](https://equalify.app/).
+
+🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
+
+## How will Equalify increase content accessibility?
 
 Equalify creates deep integrations with services that run your website. 
 
-Imagine: You solve A11Y issues at their source - be that source the server or a CMS. 
+Imagine: You solve WCAG issues at their source - be that source the server or a CMS.
 
 Equalify will become your WebOps hub, designed to solve any accessibility issue. 
 
-<img width="1510" alt="Screen Shot 2022-04-13 at 1 20 11 PM" src="https://user-images.githubusercontent.com/46652/163245142-f9844463-ba06-466e-aac1-92e069d07994.png">
+<img width="1357" alt="Screen Shot of Equalify's integrations page." src="https://user-images.githubusercontent.com/46652/173918177-be624a4f-c4eb-4eb8-91d4-0fb040d8fdc7.png">
+
 
 ## What does Equalify currently do?
 
@@ -30,28 +39,24 @@ After all your pages are added, click "Scan" and Equalify reports WCAG errors as
 
 The goal: **Equalify every website.**
 
-<img width="1336" alt="Screen Shot 2022-04-14 at 2 00 57 PM" src="https://user-images.githubusercontent.com/46652/163458795-b3d08005-0910-4f3d-b0a0-3aa5ea829a7c.png">
+<img width="1357" alt="Screen shot of Equalify's alerts page." src="https://user-images.githubusercontent.com/46652/173917980-0285437a-c584-4b34-b398-3446c1a171b1.png">
 
-## To Start
+## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Change `sample-config.php` to `config.php` and update info.
-3. Upload/run on a Linux server (PHP 8 + MySQL required).
-4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
+3. Run `composer install` to install Composer dependencies.
+4. Upload/run on a Linux server (PHP 8 + MySQL required).
+5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
+6. Checkout our [demo video](https://www.youtube.com/watch?v=yrsG32G3I0g) for usage tips.
+7. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
-## Reccomended Server
-**Equalify is for everyone!**
-
-We test all operations on a Unix server with 1GB of Memory and 1 shared CPU. Our LEMP stack includes Nginx (1.17.10), MySQL (8.0.21) and PHP (8.0) with XML, xmlreader, and xmlrpc installed.
-
-Making sure all of our functions work on that basic server helps us ensure that Equalify is for everyone.
+Not a technical user? Use Equalify now at [equalify.app](https://equalify.app/).
 
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. & Grace- You are the 🔥 behind everything I do.
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brain trust behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. We also use the [wc-as-json repo](https://github.com/tenon-io/wcag-as-json).
 
 This project is Open Source to inspire new collaborations.
 
 Together, **we can equalify the internet**.
 
 -[@bbertucc](https://github.com/bbertucc)
-
-PS: For more information on the notions behind Equalify, see my [Ethical Business Notion page](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). 
