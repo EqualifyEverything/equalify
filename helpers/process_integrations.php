@@ -7,6 +7,13 @@
  * be designed to be as effcient as possible so that 
  * Equalify works for everyone.
 **********************************************************/
+require_once '../vendor/autoload.php';
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Process Integrations
@@ -39,154 +46,190 @@ function process_integrations(array $sites_output){
         DataAccess::get_meta_value('active_integrations')
     );
 
-    // Let's add these active integrations to our output
-    // array.
-    $integrations_output['processed_sources'] = 
-        $active_integrations;
+    // Let's add these active integrations to our output array.
+    $integrations_output['processed_sources'] = $active_integrations;
 
     // We'll also log our progress for CLIs.
-    $active_integrations_count = count(
-        $active_integrations
-    );
-    $logged_progress = 
-        "\n> $active_integrations_count active integration";
-    if(
-        ($active_integrations_count > 1)
-        || ($active_integrations_count == 0)
-    ){
+    $active_integrations_count = count($active_integrations);
+
+    $logged_progress = "\n> $active_integrations_count active integration";
+    if ($active_integrations_count !== 1) {
         $logged_progress.='s';
     }
     $logged_progress.='.';
     update_scan_log($logged_progress);
 
-    // If there's no integrations ready to process, we
-    // won't run the process.
-    if(!empty($active_integrations)){
+    // If there's no integrations ready to process, 
+    // we won't run the process.
+    if (empty($active_integrations)) {
+        return $integrations_output;
+    }
 
-        // Now we run each integration.
-        foreach ($active_integrations as $integration){
+    // Now we run each integration.
+    foreach ($active_integrations as $integration){
 
-            // Let's log our progress and time for CLI.
+        // Every integration file is added using a standard pattern.
+        require_once (
+            __ROOT__.'/integrations/'.$integration.'/functions.php'
+        );
+
+        // (NOTE: A more robust integration interface might use a request generator
+        // function instead of a simple URL mapping; current integrations
+        // don't need this and just GET with Guzzle's default headers.)
+
+        // Every integration needs to define two functions:
+        // One to map site URLs to integration request URLs
+        $integration_urls = $integration.'_urls';
+        // Another to map integration responses to an array of Equalify alerts
+        $integration_alerts = $integration.'_alerts';
+        
+        // Skip the integration if we fail to find either.
+        if (!function_exists($integration_urls)) {
             update_scan_log(
-                "\n>>> Running \"$integration\" against "
+                "\n>>> ERROR: URL mapping function for Integration " . 
+                "'$integration' not found.\n"
             );
-            $time_pre = microtime(true);
-
-            // Every integration file is added using a
-            // standard pattern.
-            require_once (
-                __ROOT__.'/integrations/'.$integration
-                .'/functions.php');
-
-            // We'll run each integration against each
-            // site.
-            foreach (
-                $integrations_output['processed_sites']
-                as $site
-            ){
-
-                // setup in process_site.php
-                $scannable_pages = $site->urls;
-
-                // No scannable pages means no need for the
-                // integration process.
-                if(!empty($scannable_pages)){
-
-                    // We'll use a count to change things
-                    // within the loop.
-                    $total_pages = count($scannable_pages);
-                    $count = 0;
-
-                    // Each page is run against the
-                    // integration's functions.
-                    foreach ($scannable_pages as $page){
-                        $count++;
-
-                        // Let's log the processed url.
-                        $log_message = '';
-                        if($total_pages != $count){
-                            $log_message.= "\"$page\", ";
-                        }elseif($total_pages === 1){
-                            $log_message.= "\"$page\". ";
-                        }else{
-                            $log_message.= "and \"$page\". ";
-                        }
-                        update_scan_log($log_message);
-                    
-                        // Every integration uses the same 
-                        // pattern to return alerts.
-                        $integration_alerts = 
-                            $integration.'_alerts';
-                        if(
-                            function_exists(
-                                $integration_alerts
-                            )
-                        ){
-                            try {
-
-
-                                // Let's see if new alerts are 
-                                // created..
-                                $new_alerts = $integration_alerts(
-                                    $page
-                                );
-                                if(!empty($new_alerts)){
-
-                                    // Process the new alerts.
-                                    foreach ($new_alerts as $alert){
-
-                                        // Add the site to the alert.
-                                        $alert['site_id'] = $site->id;
-
-                                        // Add alert into the array.
-                                        array_push(
-                                            $integrations_output[
-                                                'queued_alerts'
-                                            ],
-                                            $alert
-                                        );
-
-                                    }
-
-                                }
-
-                                // Add urls to our output.
-                                array_push(
-                                    $integrations_output[
-                                        'processed_urls'
-                                    ],
-                                    $page
-                                );
-
-                            } catch (Exception $x) {
-
-                                // Let's report that exception to
-                                // CLI. 
-                                $error_message = $x->getMessage();
-                                update_scan_log(
-                                    "\n>>> $error_message\n"
-                                );
-
-                            }
-                        }
-
-                    }
-
-                }
-
-            }
-
-            // Log our progress.
-            $time_post = microtime(true);
-            $exec_time = $time_post - $time_pre;
-            update_scan_log(
-                "\n>>> Completed \"$integration\" in $exec_time seconds."
-            );
-
+            continue;
         }
+        if (!function_exists($integration_alerts)) {
+            update_scan_log(
+                "\n>>> ERROR: Alerts function for Integration " . 
+                "'$integration' not found.\n"
+            );
+            continue;
+        }
+
+        // Let's log our progress and time for CLI.
+        update_scan_log(
+            "\n>>> Running \"$integration\" against pages: \n"
+        );
+        $time_pre = microtime(true);
+
+        // We'll run each integration against each site.
+        foreach ($integrations_output['processed_sites'] as $site) {
+
+            // setup in process_site.php
+            $scannable_pages = $site->urls;
+
+            // No scannable pages means no need to run the integration.
+            if (empty($scannable_pages)) {
+                continue;
+            }
+            
+            $pool = build_integration_connection_pool(
+                $site,
+                $scannable_pages,
+                $integration_urls,
+                $integration_alerts, 
+                $integrations_output
+            );
+
+            // Initiate the transfers and create a promise
+            $integration_run = $pool->promise();
+
+            // Force the pool of requests to complete.
+            $integration_run->wait();
+
+            // Add urls to our output.
+            $integrations_output['processed_urls'] += $scannable_pages;
+        }
+
+        // Log our progress.
+        $time_post = microtime(true);
+        $exec_time = $time_post - $time_pre;
+        update_scan_log(
+            "\n>>> Completed \"$integration\" in $exec_time seconds."
+        );
+
     }
 
     // Finally, we return our hard work.
     return $integrations_output;
+
+}
+
+/**
+ * Integrations are expected to provide:
+ * - a function that maps site URLs to integration URLs.
+ * - a function that maps integration outputs to Equalify's output model
+ * 
+ * This function adapts the integration function to work with a connection pool 
+ * so we can make concurrent requests.
+ * 
+ * Returns a connection pool for a Guzzle client that will:
+ * - run the integration function on each page 
+ * - update the $output variable
+ * - report successes and failures to the scan log
+ */
+function build_integration_connection_pool(
+    $site,
+    array $page_urls, 
+    callable $integration_urls,
+    callable $integration_alerts,
+    array &$output
+) {
+    // No SSL verification for now
+    $client = new Client(['verify' => false]);
+
+    // NOTE: need to batch DB inserts, because this happened:
+    // Failed: Prepared statement contains too many placeholders
+    // ^ and that was with alerts from 100 pages
+    // for comparison: pantheon had ~3k alerts from 10 pages
+    
+    // Makes sense to stop the pool and bulk insert before that
+    // anyway to keep memory usage low (and give the integration
+    // servers a bit of time to catch their breath).
+    
+    
+    // Request generator
+    $requests = function ($page_urls) use ($integration_urls) {
+        // NOTE: for testing, keeping a low maximum
+        $limit = 10;
+        $current = 0;
+
+        foreach ($page_urls as $page_url) {
+            // Map site URL to integration-specific URL
+            $integration_url = $integration_urls($page_url);
+            $request = new Request('GET', $integration_url);
+            // Yielding a key->value pair lets us specify the index for callbacks.
+            // Using the original site's URL as the index here for logging purposes.
+            yield $page_url => $request; 
+            
+            $current++;
+            if ($current >= $limit) break;
+        }
+    };
+
+    // Happy path: run the integration, log the index, and update the output
+    $on_fulfilled = function (Response $response, $page_url) use ($site, $integration_alerts, &$output) {
+        try {
+            // Update log with URL
+            update_scan_log("'$page_url'\n");
+            // process any new alerts
+            $new_alerts = $integration_alerts($response->getBody(), $page_url);
+            if (!empty($new_alerts)) {
+                foreach ($new_alerts as $alert) {
+                    $alert['site_id'] = $site->id;
+                    $output['queued_alerts'][] = $alert;
+                }
+            }
+        } catch (Exception $x) {
+            // Let's report that exception. 
+            $error_message = $x->getMessage();
+            update_scan_log("\n>>> $error_message\n");
+        }
+    };
+
+    // Sad path: log the transfer error
+    $on_rejected = function (RequestException $reason, $page_url) {
+        $error_message = "Error for $page_url: " . $reason->getHandlerContext();
+        update_scan_log("\n>>> $error_message\n");
+    };
+
+    return new Pool($client, $requests($page_urls), [
+        'concurrency' => 20, // NOTE: Might want this to be a config value
+        'fulfilled' => $on_fulfilled,
+        'rejected' => $on_rejected,
+    ]);
 
 }
