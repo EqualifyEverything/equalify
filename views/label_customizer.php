@@ -1,4 +1,3 @@
-<pre>
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * This document composes the label customerizer view.
@@ -62,8 +61,6 @@ if(!empty($_GET['name'])){
 
 }
 ?>
-
-</pre>
 
 <section>
     <div class="mb-3 pb-4 border-bottom">
