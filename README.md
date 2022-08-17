@@ -39,8 +39,7 @@ After all your pages are added, click "Scan" and Equalify reports WCAG errors as
 
 The goal: **Equalify every website.**
 
-<img width="1375" alt="A screenshot of Equalify's Alerts page." src="[https://user-images.githubusercontent.com/46652/185225047-9c1c2e0f-4c4d-490b-a253-f3172710f1b0.png](https://user-images.githubusercontent.com/46652/185225087-f4d4c48f-c00a-4c53-8587-9ddd1c0c7d2c.png)">
-
+![equalify-screenshot-1](https://user-images.githubusercontent.com/46652/185225467-de1114fc-8f96-4b41-8365-897de3b55d5f.png)
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
