@@ -55,7 +55,7 @@ Not a technical user? Use Equalify now at [equalify.app](https://equalify.app/).
 ## Special Thanks
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brain trust behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. We also use the [wc-as-json repo](https://github.com/tenon-io/wcag-as-json).
 
-This project is Open Source to inspire new collaborations.
+This project is Open Source under [AGPL](https://github.com/bbertucc/equalify/blob/mvp-1.2/LICENSE) to inspire new collaborations.
 
 Together, **we can equalify the internet**.
 
