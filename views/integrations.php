@@ -77,6 +77,6 @@
         Need another integration?
     </h2>
     <p>
-        Request new integrations via <a href="https://github.com/bbertucc/equalify/issues" target="_blank">Equalify's GitHub Issues</a>.
+        Request new integrations via <a href="https://github.com/bbertucc/equalify/issues" target="_blank">Equalify's GitHub repo</a>.
     </p>
 </section>

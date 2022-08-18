@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: Little Forest
- * Description: Counts WCAG 2.1 errors and links to page reports.
+ * Description: Reports WCAG 2.1 page alerts.
  */
 
  /**

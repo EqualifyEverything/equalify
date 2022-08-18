@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: WAVE
- * Description: Counts WCAG 2.1 errors and links to page reports.
+ * Description: Links to WCAG 2.1 page reports.
  */
 
 /**
