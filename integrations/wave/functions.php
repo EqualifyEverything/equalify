@@ -81,7 +81,8 @@ function wave_alerts($url){
             'url'     => $url,
             'type'    => 'error',
             'message' => 'WCAG 2.1 page error found! See <a href="https://wave.webaim.org/report#/'.$url.'" target="_blank">WAVE report</a>.',
-            'meta'    => ''
+            'tag'    => '',
+            'guideline' => ''
         );
         array_push($wave_alerts, $alert);
         

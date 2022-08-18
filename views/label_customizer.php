@@ -35,7 +35,7 @@ if(!empty($_GET['name'])){
             $type = $label['value'];
         if($label['name'] == 'status') 
             $status = $label['value'];
-        if($label['name'] == 'guideline'){
+        if($label['name'] == 'guidelines'){
             $raw_guidelines = $label['value'];
             $guidelines = '';
             $count = 0;
@@ -46,7 +46,7 @@ if(!empty($_GET['name'])){
                     $guidelines.= ', ';
             }
         } 
-        if($label['name'] == 'tag'){
+        if($label['name'] == 'tags'){
             $raw_tags = $label['value'];
             $tags = '';
             $count = 0;

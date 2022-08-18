@@ -42,7 +42,8 @@ function little_forest_alerts($response_body, $page_url){
             'url'     => $page_url,
             'type'    => 'error',
             'message' => 'Little Forest cannot reach the page.',
-            'meta'    => ''
+            'guideline' => '',
+            'tag'       => ''
         );
         array_push($little_forest_alerts, $alert);
 
@@ -86,11 +87,22 @@ function little_forest_alerts($response_body, $page_url){
 }
 
 function build_alert($alert, string $type, string $url) {
-    // Create Meta
-    $meta = array(
-        'guideline' => $alert['Guideline'],
-        'tag'       => $alert['Tag']
-    );
+
+    // Prepare guideline.
+    $guideline = '';
+    if(!empty($alert['Guideline'])){
+        $pattern = "/(?:[^.]+\.){3}([^.]+).*/";
+        $search = preg_match(
+            $pattern, $alert['Guideline'], $guideline
+        );
+        if(!empty($search))
+            $guideline = str_replace('_', '.', $guideline[1]);
+    }
+
+    // Setup tag.
+    $tag = '';
+    if(!empty($alert['Tag']) && $alert['Tag'] !== 'null')
+        $tag = $alert['Tag'];
 
     // Create message.
     if(!empty($alert['Code']) && $alert['Code'] != 'null'){
@@ -106,7 +118,8 @@ function build_alert($alert, string $type, string $url) {
         'url'     => $url,
         'type'    => $type,
         'message' => $message,
-        'meta'    => $meta
+        'guideline' => $guideline,
+        'tag'       => $tag
     );
 
     return $alert;
