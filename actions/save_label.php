@@ -50,9 +50,9 @@ if(!empty($_POST['guidelines'])){
     );
 }
 if(!empty($_POST['tags'])){
-    $tags_data = str_replace(
+    $tags_data = str_replace('<', '', str_replace('>', '', str_replace(
         ' ', '', $_POST['tags']
-    );
+    )));
     $tags = submeta(
         $tags_data, 'tag'
     );
@@ -69,7 +69,7 @@ if(!empty($_POST['title'])){
         $updated_meta,
         array(
             'name' => 'title',
-            'value' => $_POST['title']
+            'value' => strip_tags($_POST['title'])
         )
     );
 }
