@@ -18,7 +18,9 @@ function process_alerts( array $integration_output) {
     // the following data that we'll use.
     $processed_urls = $integration_output[
         'processed_urls'];
-    $queued_alerts = $integration_output['queued_alerts'];
+    $queued_alerts = DataAccess::get_db_rows(
+        'queued_alerts', [], 1, 9999999
+    );
 
     // Let's log our process for the CLI.
     update_scan_log("\n\n\n> Processing alerts...");
@@ -58,124 +60,21 @@ function process_alerts( array $integration_output) {
     if(empty($existing_alerts))
         $existing_alerts = array();
 
-    // We'll need to prepare existing alerts to be compared.
-    foreach($existing_alerts as $key => $existing_alert){
+    // Let's find equalified alerts.
+        // Equalified alerts are existing alerts for the site that haven't been queued.
+            // Let's mark the status of these alerts "Equalified".
 
-        // Let's convert the array's objects to arrays.
-        $converted_alert = (array) $existing_alert;
-        array_push(
-            $existing_alerts, $converted_alert
-        );
-        unset($existing_alerts[$key]);
-
-    }
-    echo "\n** ".count($existing_alerts);
-
-    // We'll need to remove duplicates from alerts.
-    function remove_duplicates ($a_array, $b_array){
-        foreach($a_array as $key => $a){
-            foreach($b_array as $b){
-
-                // The source, url, type, and message
-                // is compared.
-                $url_equal = $a['url'] === $b['url'];
-                $message_equal = $a['message'] === $b['message'];
-                $type_equal = $a['type'] === $b['type'];
-                $source_equal = $a['source'] === $b['source'];
-                if (
-                    $url_equal && $message_equal
-                    && $type_equal && $source_equal
-                ) {
-                    unset($a_array[$key]);
-                }
-
-            }
-        }
-
-        // We need to reset the array keys before we
-        // return them.
-        return array_values($a_array);
-
-    }
-
-    // New alerts that have existing alerts are removed.
-    $new_alerts = remove_duplicates(
-        $queued_alerts, $existing_alerts
-    );
-
-
-    // Let's add alerts.
-    if(!empty($new_alerts)){
-
-        // Let's preserve $new_alerts to use elsewhere.
-        $chunking_alerts = $new_alerts;
-
-        // We add 1000 alerts at a time.
-        $chunked_array = array_chunk($chunking_alerts, 2000);
-        foreach($chunked_array as $alert_chunk){
-            DataAccess::add_db_rows(
-                'alerts', $alert_chunk
-            );
-        }
-
-    }
-
-    // Equalified alerts are existing alerts that don't
-    // have new alert duplicates.
-    $equalified_alerts = remove_duplicates(
-        $existing_alerts, $queued_alerts
-    );
-
-
-    // Let's deal with equalified alerts.
-    if(!empty($equalified_alerts)){
-
-        // We must remove alerts that have already been
-        // equalified.
-        foreach($equalified_alerts as $key => $alert){
-            if (
-                $alert['status'] == 'equalified'
-            ) {
-                unset($equalified_alerts[$key]);
-            }
-        }
-
-        // We'll update their status to 'equalified'.
-        $fields_updated = array(
-            array(
-                'name'  => 'status',
-                'value' => 'equalified'
-            )
-        );
-
-        // Let's build a way to filter by IDs.
-        $filtered_by_ids = [];
-        foreach($equalified_alerts as $alert){
-            array_push($filtered_by_ids, array(
-                'name' => 'id',
-                'value'=> $alert['id']
-            ));
-        }
-        if(!empty($filtered_by_ids)){
-
-            // We add 1000 alerts at a time.
-            $chunked_array = array_chunk($filtered_by_ids, 2000);
-            foreach($chunked_array as $alert_chunk){
-                DataAccess::update_db_rows(
-                    'alerts', $fields_updated, $alert_chunk, 'OR'
-                );
-            }
-            
-        }
-
-    }
+    // Let's add new alerts.
+        // New alerts are queued alerts that don't exist in the alerts db.
+            // We are comparing the url, message, site_id, type, and source.
+                // We add new alerts to the alerts table.
 
     // Let's log our process for the CLI.
-    $alerts_updated = 
-        count($equalified_alerts)+count($new_alerts);
-    $alerts_processed = 
-        count($queued_alerts)+count($existing_alerts);
-    update_scan_log("\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n");
+    // $alerts_updated = 
+    //     count($equalified_alerts)+count($new_alerts);
+    // $alerts_processed = 
+    //     count($queued_alerts)+count($existing_alerts);
+    // update_scan_log("\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n");
 
     // Finally, we'll return a list of sites we processed.
     return $integration_output['processed_sites'];

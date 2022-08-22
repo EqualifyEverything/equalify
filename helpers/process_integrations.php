@@ -25,8 +25,7 @@ function process_integrations(array $sites_output){
     $integrations_output = array(
         'processed_sources' => array(),
         'processed_urls'    => array(),
-        'processed_sites'   => $sites_output,
-        'queued_alerts'     => array()
+        'processed_sites'   => $sites_output
     );
 
     // Let's log our process for the CLI.
@@ -168,6 +167,7 @@ function build_integration_connection_pool(
     callable $integration_alerts,
     array &$output
 ) {
+
     // No SSL verification for now
     $client = new Client(['verify' => false]);
 
@@ -180,17 +180,19 @@ function build_integration_connection_pool(
     // anyway to keep memory usage low (and give the integration
     // servers a bit of time to catch their breath).
     
-    
     // Request generator
     $requests = function ($page_urls) use ($integration_urls) {
+
         // NOTE: for testing, keeping a low maximum
         $limit = 10;
         $current = 0;
 
         foreach ($page_urls as $page_url) {
+
             // Map site URL to integration-specific URL
             $integration_url = $integration_urls($page_url);
             $request = new Request('GET', $integration_url);
+
             // Yielding a key->value pair lets us specify the index for callbacks.
             // Using the original site's URL as the index here for logging purposes.
             yield $page_url => $request; 
@@ -203,20 +205,34 @@ function build_integration_connection_pool(
     // Happy path: run the integration, log the index, and update the output
     $on_fulfilled = function (Response $response, $page_url) use ($site, $integration_alerts, &$output) {
         try {
+
             // Update log with URL
             update_scan_log("'$page_url'\n");
-            // process any new alerts
-            $new_alerts = $integration_alerts($response->getBody(), $page_url);
+
+            // Process any new alerts.
+            $new_alerts = $integration_alerts(
+                $response->getBody(), $page_url
+            );
             if (!empty($new_alerts)) {
-                foreach ($new_alerts as $alert) {
+                
+                // We need to add the site ID to all the alerts.
+                foreach ($new_alerts as &$alert) {
                     $alert['site_id'] = $site->id;
-                    $output['queued_alerts'][] = $alert;
                 }
+
+                // Now let's queue the alerts.
+                DataAccess::add_db_rows(
+                    'queued_alerts', $new_alerts
+                );
+            
             }
+
         } catch (Exception $x) {
+
             // Let's report that exception. 
             $error_message = $x->getMessage();
             update_scan_log("\n>>> $error_message\n");
+
         }
     };
 

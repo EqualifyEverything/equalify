@@ -179,7 +179,7 @@ class DataAccess {
      * @param string operator
      */
     public static function get_db_rows(
-        $table, $filters = [], $page = 1, 
+        $table, array $filters = [], $page = 1, 
         $rows_per_page = self::ITEMS_PER_PAGE
     ){
 
@@ -426,7 +426,7 @@ class DataAccess {
         $sql = 'INSERT INTO `'.$table.'` ('.$field_names
             .') VALUES '.$values.';';
 
-        // Let's esecute the query
+        // Let's execute the query
         $result = self::query($sql, $params, true);
         
         // And complete the query.
@@ -470,12 +470,12 @@ class DataAccess {
     }
 
     /**
-     * Delete DB Entry
+     * Delete DB Entries
      * @param string table
      * @param array filters [ array ( 
      * 'name' => $name, 'value' => $value, 'page' => $page) ]
      */
-    public static function delete_db_entry($table, $filters){
+    public static function delete_db_entries($table, array $filters = array()){
     
         // SQL
         $sql = 'DELETE FROM `'.$table.'`';
@@ -634,6 +634,34 @@ class DataAccess {
         // SQL
         $sql = 
             'CREATE TABLE `alerts` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `status` varchar(200) NOT NULL DEFAULT "active",
+                `type` varchar(200) NOT NULL,
+                `source` varchar(200) NOT NULL,
+                `site_id` bigint(20) NOT NULL,
+                `url` text,
+                `message` text,
+                `tag` varchar(200),
+                `guideline` varchar(200),
+                `archived` BOOLEAN NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
+        
+    }
+
+    /**
+     * Create Queued Alerts Table
+     */
+    public static function create_queued_alerts_table(){
+    
+        // SQL
+        $sql = 
+            'CREATE TABLE `queued_alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `status` varchar(200) NOT NULL DEFAULT "active",

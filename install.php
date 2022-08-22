@@ -10,6 +10,8 @@
 // All the tables are created with this action.
 if(DataAccess::table_exists('alerts') == false)
     DataAccess::create_alerts_table();
+if(DataAccess::table_exists('queued_alerts') == false)
+    DataAccess::create_queued_alerts_table();
 if(DataAccess::table_exists('sites') == false)
     DataAccess::create_sites_table();
 if(DataAccess::table_exists('meta') == false)
