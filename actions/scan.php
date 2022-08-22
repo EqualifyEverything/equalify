@@ -57,7 +57,7 @@ function scan(){
     // Our third process.
     $alerts_output = process_alerts($integration_output);
 
-    // We initate our processes.
+    // We initiate our processes.
     if(!empty($alerts_output)){
 
         // We're updating the scanned time of each site. 

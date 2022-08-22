@@ -103,9 +103,18 @@ function process_sites(){
         DataAccess::update_meta_value(
             'pages_scanned', $pages_count+$existing_pages_scanned
         );
+
+        // Update log for CLI.
+        $formatted_pages_count = number_format($pages_count);
+        update_scan_log("\n> Found $formatted_pages_count scannable pages.");
         
-        // Let's log our progress for CLIs.
-        update_scan_log("\n> Found $pages_count scannable pages.");
+        // Restrict the amount of pages.
+        if($pages_count > $GLOBALS['page_limit']){
+            $page_limit = number_format($GLOBALS['page_limit']);
+            update_scan_log("\n> You have too many pages! Equalify allows up to $page_limit pages. Archive sites or delete pages from WordPress/XML.");
+            DataAccess::update_meta_value('scan_status', '');
+            die;
+        }
         
     }
 

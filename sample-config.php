@@ -18,3 +18,6 @@ $GLOBALS['DB_PORT'] = '3306';
 // Configure PHP path, which you can find by running 
 // `which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
+
+// Additional options.
+$GLOBALS['page_limit'] = '3333';
