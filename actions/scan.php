@@ -135,10 +135,10 @@ if(
 
         // When an error occurs, we update the scan status.
         DataAccess::update_meta_value(
-            'scan_status', 'Failed: '.$e->getMessage()
+            'scan_status', ''
         );
 
-        // Let's log the erorr for CLI.
+        // Let's log the error for CLI.
         update_scan_log("\nCaught exception: ",  $e->getMessage(), "\n");
 
 
