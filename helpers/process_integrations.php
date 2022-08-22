@@ -183,8 +183,8 @@ function build_integration_connection_pool(
     // Request generator
     $requests = function ($page_urls) use ($integration_urls) {
 
-        // NOTE: for testing, keeping a low maximum
-        $limit = 10;
+        // NOTE: for testing, keep a low maximum.
+        $limit = $GLOBALS['page_limit'];
         $current = 0;
 
         foreach ($page_urls as $page_url) {
