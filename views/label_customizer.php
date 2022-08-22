@@ -3,7 +3,7 @@
  * This document composes the label customerizer view.
  * 
  * As always, we must remember that every function should 
- * be designed to be as effcient as possible so that 
+ * be designed to be as efficient as possible so that 
  * Equalify works for everyone.
 **********************************************************/
 

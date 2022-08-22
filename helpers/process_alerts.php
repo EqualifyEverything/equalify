@@ -4,7 +4,7 @@
  * This doc deals with the alerts in a process.
  * 
  * As always, we must remember that every function should 
- * be designed to be as effcient as possible so that 
+ * be designed to be as efficient as possible so that 
  * Equalify works for everyone.
 **********************************************************/
 
@@ -127,7 +127,7 @@ function process_alerts( array $integration_output) {
     );
 
 
-    // Let's deal with equalifed alerts.
+    // Let's deal with equalified alerts.
     if(!empty($equalified_alerts)){
 
         // We must remove alerts that have already been
