@@ -63,11 +63,29 @@ function process_alerts( array $integration_output) {
     // Let's find equalified alerts.
         // Equalified alerts are existing alerts for the site that haven't been queued.
             // Let's mark the status of these alerts "Equalified".
+// SELECT DISTINCT alerts.id
+// FROM alerts
+// LEFT JOIN queued_alerts
+// ON alerts.url=queued_alerts.url
+// AND alerts.message=queued_alerts.message
+// AND alerts.site_id=queued_alerts.site_id
+// AND alerts.type=queued_alerts.type
+// AND alerts.source=queued_alerts.source
+// WHERE queued_alerts.id IS NULL
 
     // Let's add new alerts.
         // New alerts are queued alerts that don't exist in the alerts db.
             // We are comparing the url, message, site_id, type, and source.
                 // We add new alerts to the alerts table.
+// SELECT DISTINCT queued_alerts.id
+// FROM queued_alerts
+// LEFT JOIN alerts
+// ON alerts.url=queued_alerts.url
+// AND alerts.message=queued_alerts.message
+// AND alerts.site_id=queued_alerts.site_id
+// AND alerts.type=queued_alerts.type
+// AND alerts.source=queued_alerts.source
+// WHERE alerts.id IS NULL
 
     // Let's log our process for the CLI.
     // $alerts_updated = 
