@@ -18,12 +18,10 @@ function process_alerts( array $integration_output) {
     // the following data that we'll use.
     $processed_urls = $integration_output[
         'processed_urls'];
-    $queued_alerts = DataAccess::get_db_rows(
-        'queued_alerts', [], 1, 9999999
-    );
 
     // Let's log our process for the CLI.
     update_scan_log("\n\n\n> Processing alerts...");
+    $time_pre = microtime(true);
 
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
@@ -61,38 +59,86 @@ function process_alerts( array $integration_output) {
         $existing_alerts = array();
 
     // Let's find equalified alerts.
-        // Equalified alerts are existing alerts for the site that haven't been queued.
-            // Let's mark the status of these alerts "Equalified".
-// SELECT DISTINCT alerts.id
-// FROM alerts
-// LEFT JOIN queued_alerts
-// ON alerts.url=queued_alerts.url
-// AND alerts.message=queued_alerts.message
-// AND alerts.site_id=queued_alerts.site_id
-// AND alerts.type=queued_alerts.type
-// AND alerts.source=queued_alerts.source
-// WHERE queued_alerts.id IS NULL
+    $equalified_alerts =  DataAccess::get_joined_db(
+        'equalified_alerts'
+    );
 
-    // Let's add new alerts.
-        // New alerts are queued alerts that don't exist in the alerts db.
-            // We are comparing the url, message, site_id, type, and source.
-                // We add new alerts to the alerts table.
-// SELECT DISTINCT queued_alerts.id
-// FROM queued_alerts
-// LEFT JOIN alerts
-// ON alerts.url=queued_alerts.url
-// AND alerts.message=queued_alerts.message
-// AND alerts.site_id=queued_alerts.site_id
-// AND alerts.type=queued_alerts.type
-// AND alerts.source=queued_alerts.source
-// WHERE alerts.id IS NULL
+    // Let's mark the status of these alerts "Equalified".
+    if(!empty($equalified_alerts)){
 
-    // Let's log our process for the CLI.
-    // $alerts_updated = 
-    //     count($equalified_alerts)+count($new_alerts);
-    // $alerts_processed = 
-    //     count($queued_alerts)+count($existing_alerts);
-    // update_scan_log("\n>>> Updated $alerts_updated of $alerts_processed processed alerts.\n");
+        // We need to create filters to equalify.
+        $filters = [];
+        foreach($equalified_alerts as $alert){
+            $new_filter = array(
+                'name' => 'id',
+                'value' => $alert->id
+            );
+            array_push($filters, $new_filter);
+        };
+
+        // Now lets update the rows in alerts.
+        $fields = array(
+            array(
+                'name' => 'status',
+                'value' => 'equalified'
+            )
+        );
+        DataAccess::update_db_rows(
+            'alerts', $fields, $filters
+        );
+
+        // And lets remove equalified alerts from the queue.
+        DataAccess::delete_db_entries(
+            'queued_alerts', $filters
+        );
+
+    };
+
+    // Let's find new alerts from queued alerts.
+    $new_alerts =  DataAccess::get_joined_db(
+        'new_alerts'
+    );
+
+    // Let's move new alerts into the alerts table.
+    if(!empty($new_alerts)){
+
+        // We need to update fields to add.
+        $rows = [];
+        foreach($new_alerts as $alert){
+            $new_row = array(
+                'url'       => $alert->url,
+                'message'   => $alert->message,
+                'type'      => $alert->type,
+                'status'    => $alert->status,
+                'guideline' => $alert->guideline,
+                'tag'       => $alert->tag,
+                'site_id'   => $alert->site_id,
+                'source'    => $alert->source
+            );
+            array_push($rows, $new_row);
+        };
+
+        // Now lets update the rows in alerts.
+        DataAccess::add_db_rows(
+            'alerts', $rows
+        );
+
+    };
+
+    // Finally, we clear the queued alerts table.
+    DataAccess::delete_db_entries('queued_alerts');
+    
+    // Let's log the total alerts.
+    $equalified_count = number_format(count($equalified_alerts));
+    $new_count = number_format(count($new_alerts));
+    update_scan_log("\n>>> $equalified_count alert(s) equalified and $new_count new alert(s).");
+
+    // Let's also log the time it took.
+    $time_post = microtime(true);
+    $exec_time = $time_post - $time_pre;
+    update_scan_log(
+        "\n>>> Completed process in $exec_time seconds\n"
+    );
 
     // Finally, we'll return a list of sites we processed.
     return $integration_output['processed_sites'];

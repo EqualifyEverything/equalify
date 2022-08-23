@@ -31,9 +31,6 @@ function scan(){
     // Let's clear out any old log files.
     DataAccess::update_meta_value('scan_log', '');
 
-    // Let's also clear the queued alerts table.
-    DataAccess::delete_db_entries('queued_alerts');
-
     // We keep track of the scan process in the DB to see
     // if the scan is running in other areas of our app.
     DataAccess::update_meta_value( 'scan_status', 

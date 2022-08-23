@@ -246,6 +246,53 @@ class DataAccess {
             throw new Exception('Cannot add "'.$column_name.'" to "'.$table.'" with type "'.$column_type.'"');
     
     }
+
+    /**
+     * Get Joined DB
+     * @param string requesting
+     */
+    public static function get_joined_db(
+        $requesting){
+
+        // Set conditions based on type.
+        if($requesting == 'equalified_alerts'){
+            $table1 = 'alerts';
+            $table2 = 'queued_alerts';
+            $selected_columns = "DISTINCT $table1.id";
+        }elseif($requesting == 'new_alerts'){
+            $table1 = 'queued_alerts';
+            $table2 = 'alerts';
+            $selected_columns = "DISTINCT $table1.id, ";
+            $selected_columns.= "$table1.url, $table1.message, ";
+            $selected_columns.= "$table1.type, $table1.status, ";
+            $selected_columns.= "$table1.guideline, $table1.tag, ";
+            $selected_columns.= "$table1.site_id, $table1.source ";
+        }
+    
+        // SQL.
+        $sql = "SELECT $selected_columns FROM $table1 ";
+        $sql.= "LEFT JOIN $table2 ";
+        $sql.= "ON $table1.url=$table2.url ";
+        $sql.= "AND $table1.message=$table2.message ";
+        $sql.= "AND $table1.site_id=$table2.site_id ";
+        $sql.= "AND $table1.type=$table2.type ";
+        $sql.= "AND $table1.source=$table2.source ";
+        $sql.= "WHERE $table2.id IS NULL ";
+        $params = array();
+    
+        // Query
+        $result = self::query($sql, $params, true);
+    
+        // Result
+        $content = [];
+        if($result->num_rows > 0){
+            while($row = $result->fetch_object()){
+                $content[] = $row;
+            }
+        }
+        return $content;
+
+    }
     
     /**
      * Add DB Column
@@ -392,7 +439,7 @@ class DataAccess {
     ){
         
         // Let's first format the field names. Note:
-        // these fieldnames should be represented in the
+        // these field names should be represented in the
         // first set of rows as they are in the last.
         $field_names = implode(', ',array_keys($data[0]));  
         

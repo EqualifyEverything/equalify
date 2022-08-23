@@ -137,7 +137,7 @@ function process_integrations(array $sites_output){
         $time_post = microtime(true);
         $exec_time = $time_post - $time_pre;
         update_scan_log(
-            "\n>>> Completed \"$integration\" in $exec_time seconds."
+            ">>> Completed \"$integration\" in $exec_time seconds."
         );
 
     }
