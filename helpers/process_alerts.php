@@ -18,10 +18,6 @@ function process_alerts( array $integration_output) {
     update_scan_log("\n\n\n> Processing alerts...");
     $time_pre = microtime(true);
 
-    // Without pages to process, we can't run integrations.
-    if(empty($integration_output))
-        kill_scan("You have no pages to process.");
-
     // From the previous process, we should have
     // the following data that we'll use.
     $processed_urls = $integration_output[
@@ -47,7 +43,6 @@ function process_alerts( array $integration_output) {
             'condition'=> 'OR'
         ));
     };
-
     $existing_alert_filters = array(
         array(
             'name'  => 'archived',
