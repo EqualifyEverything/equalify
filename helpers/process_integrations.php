@@ -244,7 +244,7 @@ function build_integration_connection_pool(
     };
 
     return new Pool($client, $requests($page_urls), [
-        'concurrency' => 20, // NOTE: Might want this to be a config value
+        'concurrency' => $GLOBALS['concurrent_requests'],
         'fulfilled' => $on_fulfilled,
         'rejected' => $on_rejected,
     ]);
