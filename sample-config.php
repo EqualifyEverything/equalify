@@ -20,4 +20,4 @@ $GLOBALS['DB_PORT'] = '3306';
 $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
 
 // Additional options.
-$GLOBALS['page_limit'] = '3333';
+$GLOBALS['page_limit'] = '111';

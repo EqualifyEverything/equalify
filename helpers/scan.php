@@ -41,7 +41,9 @@ function update_scan_log($message){
 function kill_scan($message){
 
     // Lets update the scan log
-    update_scan_log("\nScan stopped. $message");
+    update_scan_log(
+        "\n\n|======================|\n|     SCAN STOPPED     |\n|======================|\n\n$message"
+    );
 
     // We're also going to update the scan status.
     DataAccess::update_meta_value(

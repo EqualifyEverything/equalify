@@ -111,9 +111,7 @@ function process_sites(){
         // Restrict the amount of pages.
         if($pages_count > $GLOBALS['page_limit']){
             $page_limit = number_format($GLOBALS['page_limit']);
-            update_scan_log("\n> You have too many pages! Equalify allows up to $page_limit pages. Archive sites or delete pages from WordPress/XML.");
-            DataAccess::update_meta_value('scan_status', '');
-            die;
+            kill_scan("You have too many pages.\n\nEqualify allows up to $page_limit pages.\n\nArchive sites or delete pages from WordPress/XML.");
         }
         
     }
