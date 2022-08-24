@@ -100,9 +100,20 @@ function xml_site_adder($site_url){
 
     // Push JSON to pages array.
     $pages = [];
-    foreach ($json_entries['url'] as $page):
-        array_push($pages, $page['loc']);
-    endforeach;
+    if(array_key_exists('url', $json_entries)){
+
+        // This gets around a weird bug where json_decode
+        // doesn't wrap single entry xmls into an array.
+        if(!empty($json_entries['url']['loc'])){
+            $json_entries['url'] = [$json_entries['url']];
+        }
+
+        // Now we can prepare our output
+        foreach ($json_entries['url'] as $page):
+            array_push($pages, $page['loc']);
+        endforeach;
+
+    }
 
     // Prepare contents and return them.
     return $pages;

@@ -21,6 +21,10 @@ use GuzzleHttp\Psr7\Response;
  */
 function process_integrations(array $sites_output){
 
+    // Without pages to process, we can't run integrations.
+    if(empty($sites_output))
+        kill_scan("You have no pages to process.");
+    
     // The goal of this process is to setup this array.
     $integrations_output = array(
         'processed_sources' => array(),

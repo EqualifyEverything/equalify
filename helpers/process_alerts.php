@@ -14,14 +14,19 @@
  */
 function process_alerts( array $integration_output) {
 
-    // From the previous process, we should have
-    // the following data that we'll use.
-    $processed_urls = $integration_output[
-        'processed_urls'];
-
     // Let's log our process for the CLI.
     update_scan_log("\n\n\n> Processing alerts...");
     $time_pre = microtime(true);
+
+    // Without pages to process, we can't run integrations.
+    if(empty($integration_output))
+        kill_scan("You have no pages to process.");
+
+    // From the previous process, we should have
+    // the following data that we'll use.
+    $processed_urls = $integration_output[
+        'processed_urls'
+    ];
 
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
@@ -42,6 +47,7 @@ function process_alerts( array $integration_output) {
             'condition'=> 'OR'
         ));
     };
+
     $existing_alert_filters = array(
         array(
             'name'  => 'archived',

@@ -87,16 +87,27 @@ function process_sites(){
                     $site->url
                 );
             }
-            foreach ($site_pages as $page){
-                array_push( 
-                    $sites_output[$site->id]->urls, $page
-                );
+
+            // Finally, we'll save the output if there
+            // are pages or destroy it if there are not.
+            if(!empty($site_pages)){
+                foreach ($site_pages as $page){
+                    array_push( 
+                        $sites_output[$site->id]->urls, $page
+                    );
+                }
+            }else{
+                unset($sites_output[$site->id]);
             }
 
             // We'll save the number of pages.
             $pages_count = $pages_count+count($site->urls);
 
         }
+
+        // Without any pages, we can kill the scan.
+        if($pages_count === 0)
+            kill_scan("Your sites have no pages to scan.");
 
         // Add pages count to the pages scanned meta.
         $existing_pages_scanned = DataAccess::get_meta_value('pages_scanned');
@@ -114,6 +125,9 @@ function process_sites(){
             kill_scan("You have too many pages.\n\nEqualify allows up to $page_limit pages.\n\nArchive sites or delete pages from WordPress/XML.");
         }
         
+    // Without active sites, we kill the scan.
+    }else{
+        kill_scan('At least one site needs to be active to run a scan.');
     }
 
     // Finally, we can return the values.
