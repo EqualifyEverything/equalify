@@ -53,7 +53,7 @@ function process_alerts( array $integration_output) {
         )
     );
     $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 100000, 'OR'
+        'alerts', $existing_alert_filters, 1, 1000000, 'OR'
     )['content'];
     if(empty($existing_alerts))
         $existing_alerts = array();
