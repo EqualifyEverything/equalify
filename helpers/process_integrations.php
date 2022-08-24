@@ -147,6 +147,11 @@ function process_integrations(array $sites_output){
 
     }
 
+    // We can kill the process if no urls were processed
+    // because we'll have nothing to add alerts for.
+    if(empty($integrations_output['processed_urls']))
+        kill_scan("Integrations processed no urls.");
+
     // Finally, we return our hard work.
     return $integrations_output;
 
@@ -229,7 +234,7 @@ function build_integration_connection_pool(
                 DataAccess::add_db_rows(
                     'queued_alerts', $new_alerts
                 );
-            
+                
             }
 
         } catch (Exception $x) {

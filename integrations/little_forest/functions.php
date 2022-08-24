@@ -5,6 +5,7 @@
  */
 
  /**
+  * Little Forrest URLs
   * Maps site URLs to Little Forest URLs for processing.
   */
 function little_forest_urls($page_url) {
@@ -13,7 +14,8 @@ function little_forest_urls($page_url) {
 
 /**
  * Little Forest Alerts
- * @param string url
+ * @param string response_body
+ * @param string page_url
  */
 function little_forest_alerts($response_body, $page_url){
 
@@ -67,17 +69,17 @@ function little_forest_alerts($response_body, $page_url){
 
     // Add errors, warnings, and notices
     foreach ($little_forest_errors as $error) {
-        $alert = build_alert($error, 'error', $page_url);
+        $alert = build_alert($error, 'error', $page_url, 'little_forrest');
         $little_forest_alerts[] = $alert;
     }
 
     foreach ($little_forest_warnings as $warning) {
-        $alert = build_alert($warning, 'warning', $page_url);
+        $alert = build_alert($warning, 'warning', $page_url, 'little_forrest');
         $little_forest_alerts[] = $alert;
     }
 
     foreach ($little_forest_notices as $notice) {
-        $alert = build_alert($notice, 'notice', $page_url);
+        $alert = build_alert($notice, 'notice', $page_url, 'little_forrest');
         $little_forest_alerts[] = $alert;
     }
 
@@ -86,7 +88,7 @@ function little_forest_alerts($response_body, $page_url){
 
 }
 
-function build_alert($alert, string $type, string $url) {
+function build_alert($alert, string $type, string $url, string $source) {
 
     // Prepare guideline.
     $guideline = '';
@@ -114,7 +116,7 @@ function build_alert($alert, string $type, string $url) {
 
     // Push alert to returnable array.
     $alert = array(
-        'source'  => 'little_forest',
+        'source'  => $source,
         'url'     => $url,
         'type'    => $type,
         'message' => $message,
@@ -123,4 +125,5 @@ function build_alert($alert, string $type, string $url) {
     );
 
     return $alert;
+
 }
