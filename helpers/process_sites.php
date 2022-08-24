@@ -23,7 +23,7 @@ function process_sites(){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
     require_once(__ROOT__.'/models/adders.php');
-    require_once(__ROOT__.'/helpers/update_scan_log.php');
+    require_once(__ROOT__.'/helpers/scan.php');
 
     // The goal of this process is to setup this array.
     $sites_output = array();

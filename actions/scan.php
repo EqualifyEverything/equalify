@@ -16,7 +16,7 @@ if(!defined('__ROOT__'))
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/helpers/process_sites.php');
-require_once(__ROOT__.'/helpers/update_scan_log.php');
+require_once(__ROOT__.'/helpers/scan.php');
 require_once(__ROOT__.'/helpers/process_integrations.php');
 require_once(__ROOT__.'/helpers/process_alerts.php');
 require_once(
@@ -47,15 +47,31 @@ function scan(){
     update_scan_log("\nBegin scan on ".date('d/m/Y')." at ".date('h:i:s').".");
         
     // Our first process.
-    $sites_output = process_sites();
+    try {
+        $sites_output = process_sites();
+    }
+    catch(Exception $error) {
+        kill_scan($error->getMessage());
+    }
 
     // Our second process.
-    $integration_output = process_integrations(
-        $sites_output
-    );
+    try {
+        $integration_output = process_integrations(
+            $sites_output
+        );
+    }
+    catch(Exception $error) {
+        kill_scan($error->getMessage());
+    }
 
     // Our third process.
-    $alerts_output = process_alerts($integration_output);
+    try {
+        $alerts_output = process_alerts($integration_output);
+    }
+    catch(Exception $error) {
+        kill_scan($error->getMessage());
+
+    }
 
     // We initiate our processes.
     if(!empty($alerts_output)){
@@ -133,14 +149,8 @@ if(
 
     } catch (Exception $e) {
 
-        // When an error occurs, we update the scan status.
-        DataAccess::update_meta_value(
-            'scan_status', ''
-        );
-
-        // Let's log the error for CLI.
-        update_scan_log("\nCaught exception: ",  $e->getMessage(), "\n");
-
+        // Kill the scan.
+        kill_scan($error->getMessage());
 
     } finally {
 

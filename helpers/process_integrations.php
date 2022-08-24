@@ -100,7 +100,7 @@ function process_integrations(array $sites_output){
 
         // Let's log our progress and time for CLI.
         update_scan_log(
-            "\n>>> Running \"$integration\" against pages: \n"
+            "\n>>> Running \"$integration\" against pages - this can take a while.\n"
         );
         $time_pre = microtime(true);
 
@@ -123,7 +123,7 @@ function process_integrations(array $sites_output){
                 $integrations_output
             );
 
-            // Initiate the transfers and create a promise
+            // Initiate the transfers and create a promise.
             $integration_run = $pool->promise();
 
             // Force the pool of requests to complete.
@@ -131,6 +131,7 @@ function process_integrations(array $sites_output){
 
             // Add urls to our output.
             $integrations_output['processed_urls'] += $scannable_pages;
+
         }
 
         // Log our progress.
@@ -207,7 +208,7 @@ function build_integration_connection_pool(
         try {
 
             // Update log with URL
-            update_scan_log("'$page_url'\n");
+            // update_scan_log("'$page_url'\n");
 
             // Process any new alerts.
             $new_alerts = $integration_alerts(
