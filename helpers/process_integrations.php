@@ -248,7 +248,8 @@ function build_integration_connection_pool(
     };
 
     return new Pool($client, $requests($page_urls), [
-        'concurrency' => $GLOBALS['concurrent_requests'],
+        'concurrency' => $GLOBALS['scan_concurrency'],
+        'timeout' => $GLOBALS['scan_timeout'],
         'fulfilled' => $on_fulfilled,
         'rejected' => $on_rejected,
     ]);

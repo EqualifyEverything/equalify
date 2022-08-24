@@ -21,4 +21,5 @@ $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
 
 // Additional options.
 $GLOBALS['page_limit'] = '111';
-$GLOBALS['concurrent_requests'] = '5';
+$GLOBALS['scan_concurrency'] = '6';
+$GLOBALS['scan_timeout'] = '33';
