@@ -42,7 +42,7 @@ function kill_scan($message){
 
     // Lets update the scan log
     update_scan_log(
-        "\n\n|======================|\n|     SCAN STOPPED     |\n|======================|\n\n$message"
+        "\n\n|=========================================|\n|               SCAN STOPPED              |\n|=========================================|\n\n$message"
     );
 
     // We're also going to update the scan status.
