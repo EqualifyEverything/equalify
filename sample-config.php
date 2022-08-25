@@ -19,6 +19,9 @@ $GLOBALS['DB_PORT'] = '3306';
 // `which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
 
+// Scanner settings.
+$GLOBALS['wave_key'] = '';
+
 // Additional options.
 $GLOBALS['page_limit'] = '111';
 $GLOBALS['scan_concurrency'] = '6';

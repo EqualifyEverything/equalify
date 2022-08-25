@@ -7,6 +7,10 @@
  * Equalify works for everyone.
 **********************************************************/
 
+// Wave key is required for activation.
+if(empty($GLOBALS['wave_key']))
+    throw new Exception('WAVE key is missing from config.php');
+
 // All the tables are created with this action.
 if(DataAccess::table_exists('alerts') == false)
     DataAccess::create_alerts_table();

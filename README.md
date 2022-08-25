@@ -10,7 +10,7 @@ Everyone should have access to online information.
 
 ⭐ Star the repo to show your support.
 
-⬇️ [Download](https://github.com/bbertucc/equalify#download-and-use) Equalify or [try our managed service](https://equalify.app/).
+⬇️ Try our [managed service](https://equalify.app/).
 
 🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
 
