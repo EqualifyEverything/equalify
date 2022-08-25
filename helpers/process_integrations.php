@@ -217,7 +217,7 @@ function build_integration_connection_pool(
         try {
 
             // Update log with URL
-            update_scan_log("'$page_url'\n");
+            update_scan_log("- $page_url\n");
 
             // Process any new alerts.
             $new_alerts = $integration_alerts(

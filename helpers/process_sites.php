@@ -61,7 +61,7 @@ function process_sites(){
         foreach($active_sites as $site){
 
             // Log our progress for CLI.
-            update_scan_log("\n>>> Processing \"$site->url\".");
+            update_scan_log("\n- $site->url");
 
             // Let's add a 'urls' array to our sites.
             $site->urls = array();
