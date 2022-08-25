@@ -34,36 +34,6 @@ if(!empty($_POST['type'])){
         )
     );
 }
-if(!empty($_POST['guidelines'])){
-    $guidelines_data = str_replace(
-        ' ', '', $_POST['guidelines']
-    );
-    $guidelines = submeta(
-        $guidelines_data, 'guideline'
-    );
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'guidelines',
-            'value' =>  $guidelines
-        )
-    );
-}
-if(!empty($_POST['tags'])){
-    $tags_data = str_replace('<', '', str_replace('>', '', str_replace(
-        ' ', '', $_POST['tags']
-    )));
-    $tags = submeta(
-        $tags_data, 'tag'
-    );
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'tags',
-            'value' =>  $tags
-        )
-    );
-}
 if(!empty($_POST['title'])){
     array_push(
         $updated_meta,

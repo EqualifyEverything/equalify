@@ -111,8 +111,6 @@ function process_alerts( array $integration_output) {
                 'message'   => $alert->message,
                 'type'      => $alert->type,
                 'status'    => $alert->status,
-                'guideline' => $alert->guideline,
-                'tag'       => $alert->tag,
                 'site_id'   => $alert->site_id,
                 'source'    => $alert->source
             );

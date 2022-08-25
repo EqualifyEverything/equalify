@@ -265,7 +265,6 @@ class DataAccess {
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
             $selected_columns.= "$table1.type, $table1.status, ";
-            $selected_columns.= "$table1.guideline, $table1.tag, ";
             $selected_columns.= "$table1.site_id, $table1.source ";
         }
     
@@ -689,8 +688,6 @@ class DataAccess {
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
-                `tag` varchar(200),
-                `guideline` varchar(200),
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
@@ -717,8 +714,6 @@ class DataAccess {
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
-                `tag` varchar(200),
-                `guideline` varchar(200),
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';

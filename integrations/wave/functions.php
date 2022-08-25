@@ -85,8 +85,6 @@ function wave_alerts($response_body, $page_url){
             'url'     => $page_url,
             'type'    => 'error',
             'message' => 'WAVE cannot reach the page.',
-            'guideline' => '',
-            'tag'       => ''
         );
         array_push($wave_contrast_errors, $alert);
 
@@ -110,8 +108,6 @@ function wave_alerts($response_body, $page_url){
     // Add alerts.
     $alert['source'] = 'wave';
     $alert['url'] = $page_url;
-    $alert['guideline'] = '';
-    $alert['tag'] = '';
     if(!empty($wave_errors) && ($wave_errors['count'] !== 0)) {
         $alert['message'] = $wave_errors['count'].' page errors found! See <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE report</a>.';
         $alert['type'] = 'error';
