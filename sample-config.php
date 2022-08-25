@@ -23,6 +23,6 @@ $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
 $GLOBALS['wave_key'] = '';
 
 // Additional options.
-$GLOBALS['page_limit'] = '111';
+$GLOBALS['page_limit'] = '1111';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';
