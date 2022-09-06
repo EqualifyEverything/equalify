@@ -1,16 +1,19 @@
 # Equalify the web!
 
-**96.8% of homepages are inaccessible**, according to [WebAIM](https://webaim.org/projects/million/).
+**96.8% of homepages have WCAG conformance failures,** according to [WebAIM](https://webaim.org/projects/million/).
 
-That statistic is unacceptable.
+The internet must become more accessible!
 
-Everyone should have access to online information.
+To improve content accessibility, Equalify aims to:
+1. **Reduce the cost** of full site, multi-page scans.
+2. **Improve automation** that simplifies WCAG issue resolution.
+3. **Promote transparency** to make tools and standards better.
 
 ## Support Equalify
 
 ⭐ Star the repo to show your support.
 
-⬇️ Try our [managed service](https://equalify.app/).
+🌸 Try our managed service [equalify.app](https://equalify.app/).
 
 🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
 
@@ -22,24 +25,17 @@ Imagine: You solve WCAG issues at their source - be that source the server or a 
 
 Equalify will become your WebOps hub, designed to solve any accessibility issue. 
 
-<img width="1357" alt="Screen Shot of Equalify's integrations page." src="https://user-images.githubusercontent.com/46652/173918177-be624a4f-c4eb-4eb8-91d4-0fb040d8fdc7.png">
-
+![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
 
 ## What does Equalify currently do?
 
-The app currently scans pages for WCAG errors.
+The app currently scans websites for WCAG errors.
 
-Equalify supports [Little Forest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
+Imports pages from XML sitemaps, the WordPress API, and single URLs. Equalify then crawls all your pages for WCAG 2.1 errors using the popular [WAVE scan](https://wave.webaim.org/).
 
-After selecting an integration, import any site.
+Every alert is reported on a filterabel dashboard.
 
-The app imports pages from XML sitemaps, the WordPress API, and single URLs.
-
-After all your pages are added, click "Scan" and Equalify reports WCAG errors as they are found.
-
-The goal: **Equalify every website.**
-
-<img width="1357" alt="Screen shot of Equalify's alerts page." src="https://user-images.githubusercontent.com/46652/173917980-0285437a-c584-4b34-b398-3446c1a171b1.png">
+![equalify-alerts](https://user-images.githubusercontent.com/46652/188710908-9bfb7da8-68ff-490c-8d6b-f9ce1f38d4c8.png)
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
