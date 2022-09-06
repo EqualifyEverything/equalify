@@ -7,7 +7,7 @@ The internet must become more accessible!
 To improve content accessibility, Equalify aims to:
 1. **Reduce the cost** of full site, multi-page scans.
 2. **Improve automation** that simplifies WCAG issue resolution.
-3. **Promote transparency** to make tools and standards better.
+3. **Promote transparency** to improve A11Y tools and standards.
 
 ## Support Equalify
 
