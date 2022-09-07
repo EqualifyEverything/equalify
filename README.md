@@ -8,7 +8,7 @@ The internet must become more accessible!
 
 ⭐ Star the repo to show your support.
 
-🌸 Try our managed service [equalify.app](https://equalify.app/).
+🌸 Try our managed service, [equalify.app](https://equalify.app/).
 
 🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
 
