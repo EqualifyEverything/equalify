@@ -12,18 +12,16 @@ The internet must become more accessible!
 
 🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
 
+🎩 [Donate](https://equalify.app/donate/) to Equalify.
+
 ## How will Equalify increase content accessibility?
 
-To improve content accessibility, Equalify aims to:
-1. **Reduce the cost** of full site, multi-page scans.
-2. **Improve automation** that simplifies WCAG issue resolution.
-3. **Promote transparency** to improve A11Y tools and standards.
+Equalify aims to:
+1. **Promote transparency** with a Open Source A11Y platform (✅ Done!).
+2. **Reduce the cost** of multi-page website scans (ongoing).
+3. **Improve automation** to simplify WCAG issue resolution (2023). 
 
-Moreover, Equalify creates deep integrations with services that run your website. 
-
-_Imagine: You solve WCAG issues at their source - be that source the server or a CMS._
-
-Equalify will become your WebOps hub, designed to solve any accessibility issue. 
+We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
 ![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
 
@@ -31,7 +29,7 @@ Equalify will become your WebOps hub, designed to solve any accessibility issue.
 
 The app currently scans websites for WCAG errors.
 
-You can import pages from XML sitemaps, WordPress, and single URLs. Equalify then crawls all your pages for WCAG 2.1 errors using the popular [WAVE scan](https://wave.webaim.org/).
+You can import pages from WordPress, XML sitemaps, and single URLs. Equalify then crawls all your pages for WCAG 2.1 errors using the popular [WAVE scan](https://wave.webaim.org/).
 
 Every alert is reported on a filterable dashboard.
 
@@ -44,7 +42,7 @@ Every alert is reported on a filterable dashboard.
 4. Upload/run on a Linux server (PHP 8 + MySQL required).
 5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
-Not a technical user? Use Equalify now at [equalify.app](https://equalify.app/).
+**Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
 
 ## Special Thanks
 A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
