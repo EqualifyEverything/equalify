@@ -6,13 +6,13 @@ The internet must become more accessible!
 
 ## Support Equalify
 
-⭐ Star the repo to show your support.
+⭐ **Star the repo** to show your support.
 
-🌸 Try our managed service, [equalify.app](https://equalify.app/).
+🌸 **Try our managed service**, [equalify.app](https://equalify.app/).
 
-🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
+🛠️ **Contribute a pull request** or [new issue](https://github.com/bbertucc/equalify/issues).
 
-🎩 [Donate](https://equalify.app/donate/) to Equalify.
+🎩 **[Donate](https://equalify.app/donate/)** to Equalify.
 
 ## How will Equalify increase content accessibility?
 
