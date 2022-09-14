@@ -1,5 +1,16 @@
 <?php
+
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document contains all the integrations with the 
+ * app's MySQL database.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 class DataAccess {
+    
     // Set the records per page.
     private const ITEMS_PER_PAGE = 10;
 
@@ -9,9 +20,17 @@ class DataAccess {
         if (self::$conn) {
             return self::$conn;
         } else {
-            self::$conn = new mysqli($GLOBALS['DB_HOST'], $GLOBALS['DB_USERNAME'], $GLOBALS['DB_PASSWORD'], $GLOBALS['DB_NAME']);
+            self::$conn = new mysqli(
+                $GLOBALS['DB_HOST'], 
+                $GLOBALS['DB_USERNAME'], 
+                $GLOBALS['DB_PASSWORD'], 
+                $GLOBALS['DB_NAME'],  
+                $GLOBALS['DB_PORT']); 
             if(self::$conn->connect_error){
-                throw new Exception('Cannot connect to database: ' . self::$conn->connect_error);
+                throw new Exception(
+                    'Cannot connect to database: '
+                    .self::$conn->connect_error
+                );
             }
             return self::$conn;
         }
@@ -25,16 +44,22 @@ class DataAccess {
      * @param boolean $return If we're expecting a result.
      * @return mysqli_result|boolean
      */
-    private static function query($sql, $params, $return) {
+    private static function query($sql, $params, $return) 
+    {
         $connection = self::connect();
         if (empty($params)) {
             $results = $connection->query($sql);
         } else {
             $statement = $connection->prepare($sql);
             if ($statement === false) {
-                throw new Exception('Unable to prepare SQL: ' . $connection->error);
+                throw new Exception(
+                    'Unable to prepare SQL: '
+                    .$connection->error
+                );
             }
-            $statement->bind_param(str_repeat('s', count($params)), ...$params);
+            $statement->bind_param(str_repeat(
+                's', count($params)
+            ), ...$params);
             $results = $statement->execute();
             if ($return) {
                 $results = $statement->get_result();
@@ -45,204 +70,146 @@ class DataAccess {
     }
 
     /**
-     * Get All Pages
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
+     * Filters helper.
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=', 'condition' => 'AND' ) ]
      */
-    public static function get_pages($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `pages`';
-        $params = array();
-    
-        // Add optional filters
+    private static function filters($filters){
+
+        // Our goal is to output sql and params.
+        $output = array(
+            'sql' => '',
+            'params' => array()
+        );
+        
+        // Let's start a count so we can tell when our
+        // loop ends.
         $filter_count = count($filters);
+
+        // We only need to prepare SQL if filters exist.
         if($filter_count > 0){
-            $sql.= 'WHERE ';
-    
+            
+            // We start a loop to setup our filters.
+            $output['sql'] = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
+
+                // The default condition 'AND'.
+                if(empty($filter['condition'])){
+                    $condition = 'AND';
+
+                // You can use other conditions like 'OR'.
+                }else{
+                    $condition = $filter['condition'];
+                }
+
+                // The default operator is '='.
+                if(empty($filter['operator'])){
+                    $operator = '=';
+
+                // You can use other operators like 'IS'.
+                }else{
+                    $operator = $filter['operator'];
+                }
+
+                // You can nest filters in filter values.
+                if(is_array($filter['value'])){
+
+                    // Start the sub filter SQL.
+                    $sub_filter_iteration = 0;
+                    $sub_filter_count = count($filter['value']);
+                    $output['sql'].= '(';
+
+                    // We only support one sub filter.
+                    foreach($filter['value'] as $sub_filter){
+
+                        // Like we did before, let's build the
+                        // sql and add to params.
+                        if(empty($sub_filter['condition'])){
+                            $sub_condition = 'AND';
+                        }else{
+                            $sub_condition = $sub_filter['condition'];
+                        }
+                        if(empty($sub_filter['operator'])){
+                            $sub_operator = '=';        
+                        }else{
+                            $sub_operator = $sub_filter['operator'];
+                        }
+                        $output['sql'].= '`'.$sub_filter['name'].'` '
+                        .$sub_operator.' ?';
+                        if(++$sub_filter_iteration != $sub_filter_count)
+                            $output['sql'].= ' '.$sub_condition.' ';
+                        $output['params'][] = $sub_filter['value'];
+                        
+                    }
+
+                    // End the sub filter SQL.
+                    $output['sql'].= ')';
+                    
+                }else{
+
+                    // If the filter doesn't have array, we can just
+                    // assemble it with existing content.
+                    $output['sql'].= '`'.$filter['name'].'` '.$operator
+                    .' ?';
+                    $output['params'][] = $filter['value'];
+
+                }
+
                 if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
+                    $output['sql'].= ' '.$condition.' ';
+
             }
+
         }
-        $sql.= ';';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-    
-        // We're adding a condition so that we don't loop
-        // when there is nothing to return.
-        if($results->num_rows == 0){
-            return NULL;
-        }else{
-            return $data;
-        }
+
+        // Let's put everything together.
+        return $output;
+
     }
 
     /**
-     * Get Sites
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_sites($filters = []){
-    
-        // SQL
-        $sql = 'SELECT DISTINCT `site` FROM `pages`';
-        $params = array();
-
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ' ORDER BY `site`;';
-
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                array_push($data, $row->site);
-            }
-        }
-        return $data;
-    
-    }
-    
-    /**
-     * Get Scans
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_scans($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `scans`';
-        $params = array();
-        
-
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ' ORDER BY STR_TO_DATE(`time`,"%Y-%m-%d %H:%i:%s") DESC;';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * Get Next Scan
-     */
-    public static function get_next_scan(){
-    
-        // SQL
-        $sql = 'SELECT * FROM `scans` WHERE status = "queued" ORDER BY `time` ASC LIMIT 1';
-        $params = array();
-    
-        // Query
-        $results = self::query($sql, $params, false);
-    
-        // Results
-        $data = $results->fetch_object();
-        if($data == NULL || empty($data)){
-
-            // Returns "false" if no data exists.
-            return NULL;
-
-        }else{
-
-            // Returns meta_value.
-            return $data;
-
-        }
-    
-    }
-
-    /**
-     * Get Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
+     * Get DB Rows
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=', 'condition' => 'AND' ) ]
      * @param string page
+     * @param string rows_per_page
+     * @param string operator
      */
-    public static function get_alerts($filters = [], $page = 1){
+    public static function get_db_rows(
+        $table, array $filters = [], $page = 1, 
+        $rows_per_page = self::ITEMS_PER_PAGE
+    ){
 
-        // Set alerts per page.
-        $alerts_per_page = self::ITEMS_PER_PAGE;
-        $page_offset = ($page-1) * $alerts_per_page;
+        // Set rows per page.
+        $page_offset = ($page-1) * $rows_per_page;
 
         // Create 'total_pages' SQL.
-        $total_pages_sql = "SELECT COUNT(*) FROM `alerts`";
-
+        $total_pages_sql = 'SELECT COUNT(*) FROM 
+            `'.$table.'`';
+    
         // Create 'content' SQL.
-        $content_sql = "SELECT * FROM `alerts`";
-        $params = array();
+        $content_sql = 'SELECT * FROM `'.$table.'`';
 
         // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
-        
-            }
-        }
+        $filters = self::filters($filters);
 
         // Add filters and page limit.
-        $total_pages_sql.= $filters_sql;
-        $content_sql.= $filters_sql.' LIMIT '.$page_offset.', '.$alerts_per_page;
+        $total_pages_sql.= $filters['sql'];
+        $content_sql.= $filters['sql'].' LIMIT '.$page_offset
+            .', '.$rows_per_page;
 
         // Run 'total_pages' SQL.
-        $total_pages_result = self::query($total_pages_sql, $params, true);
+        $total_pages_result = self::query(
+            $total_pages_sql, $filters['params'], true
+        );
         $total_pages_rows = $total_pages_result->fetch_array()[0];
-        $total_pages = ceil($total_pages_rows / $alerts_per_page);
+        $total_pages = ceil($total_pages_rows / $rows_per_page);
     
         // Run 'content' SQL
-        $content_results = self::query($content_sql, $params, true);
+        $content_results = self::query($content_sql, $filters['params'], true);
         $content = [];
         if($content_results->num_rows > 0){
             while($row = $content_results->fetch_object()){
@@ -252,472 +219,19 @@ class DataAccess {
     
         // Create and return data.
         $data = [
-            'total_alerts' => $total_pages_rows,
+            'total_rows' => $total_pages_rows,
             'total_pages' => $total_pages,
             'content' => $content
         ];
         return $data;
-
-    }
-
-    /**
-     * Count Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value, 'page' => $page) ]
-     * @param string page
-     */
-    public static function count_alerts($filters = []){
-
-        // SQL
-        $sql = 'SELECT COUNT(*) AS TOTAL FROM `alerts`';
-        $params = array();
-
-        // Add optional filters to content and total_pages.
-        $filter_count = count($filters);
-        $filters_sql = '';
-        if($filter_count > 0){
-            $filters_sql = ' WHERE ';
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $filters_sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $filters_sql.= ' AND ';
-        
-            }
-        }
-        $sql.= $filters_sql;
-
-
-        // Query
-        $results = self::query($sql, $params, true);
-
-        // Result
-        $data = $results->fetch_object()->TOTAL;
-        return $data;
-
-    }
-
-    /**
-     * Get Alerts By Site
-     */
-    public static function get_alerts_by_site($site){
-    
-        // SQL
-        $sql = 'SELECT * FROM `alerts` WHERE `site` = ?';
-        $params = array($site);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-
-        // Close
-        $results->close();
-    
-    }
-
-    /**
-     * Get Meta
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function get_meta($filters = []){
-    
-        // SQL
-        $sql = 'SELECT * FROM `meta`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    }
-    
-    /**
-     * Get Meta Value
-     */
-    public static function get_meta_value($meta_name){
-
-        // SQL
-        $sql = 'SELECT * FROM `meta` WHERE `meta_name` = ?';
-        $params = array($meta_name);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-
-        // Results
-        $data = $results->fetch_object();
-        if($data == NULL){
-
-            // Returns "false" if no data exists.
-            return false; 
-
-        }else{
-
-            // Returns meta_value.
-            return $data->meta_value;
-
-        }
-    
-    }
-    
-    /**
-     * Get Page
-     */
-    public static function get_page($id){
-    
-        // SQL
-        $sql = 'SELECT * FROM pages WHERE id = ?';
-        $params = array($id);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object();
-        return $data;
-        
-    }
-
-    /**
-     * Get Page Site
-     */
-    public static function get_page_site($url){
-    
-        // SQL
-        $sql = 'SELECT `site` FROM `pages` WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->site;
-        return $data;
-        
-    }
-    
-    /**
-     * Get Page ID
-     */
-    public static function get_page_id($url){
-    
-        // SQL
-        $sql = 'SELECT `id` FROM `pages` WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->id;
-        return $data;
-        
-    }
-    
-    /**
-     * Get Site Status
-     */
-    public static function get_site_status($site){
-    
-        // SQL
-        $sql = 'SELECT `status` FROM `pages` WHERE `site` = ?';
-        $params = array($site);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->status;
-        return $data;
-        
-    }
-
-    /**
-     * Get Site Type
-     */
-    public static function get_site_type($site){
-    
-        // SQL
-        $sql = 'SELECT `type` FROM `pages` WHERE `site` = ?';
-        $params = array($site);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = $results->fetch_object()->type;
-        return $data;
-        
-    }
-    
-    /**
-     * Get Column Names
-     */
-    public static function get_column_names($table){
-    
-        // SQL
-        $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS ';
-        $sql.= 'WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?';
-        $params = array($table, $GLOBALS['DB_NAME']);
-    
-        // Query
-        $results = self::query($sql, $params, true);
-    
-        // Result
-        $data = [];
-        if($results->num_rows > 0){
-            while($row = $results->fetch_object()){
-                $data[] = $row;
-            }
-        }
-        return $data;
-    
-    }
-    
-    
-    /**
-     * Is Unique Site
-     */
-    public static function is_unique_site($site_url){
-    
-        // Require unique URL
-        $sql = 'SELECT * FROM `pages` WHERE `site` = ?';
-    
-        // We don't consider a page with a '/' a unique url
-        // so we will also search for them.
-        // Possible injection point:
-        // INSERT INTO `equalify`.`meta` (`usage`, `wave_key`) VALUES ('1', 'c');
-        $sql.= ' OR `site` = ?';
-    
-        $params = array($site_url, $site_url . '/');
-        $results = self::query($sql, $params, true);
-        if($results->num_rows > 0){
-            return false;
-        }else{
-            return true;
-        }
-    
-    }
-    
-    /**
-     * Add Page
-     */
-    public static function add_page($url, $type, $status, $site){
-    
-        // SQL
-        $sql = 'INSERT INTO `pages` (`url`, `type`, `status`, `site`) VALUES';
-        $sql.= '(?, ?, ?, ?)';
-        $params = array($url, $type, $status, $site);
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert page with values "'.$url.',"'.$url.',"'.$type.',"'.$status.',"'.$site.'"');
-        
-        // Complete Query
-        return $result;
-    }
-    
-    /**
-     * Add Pages 
-     */
-    public static function add_pages($pages_records){
-    
-        // SQL
-        $sql = 'INSERT INTO `pages` (`site`, `url`, `status`, `type`) VALUES';
-        
-        // Insert Each Record
-        $record_count = count($pages_records);
-        $record_iteration = 0;
-        $params = array();
-        foreach ($pages_records as $record){
-    
-            // SQL
-            $sql.= "(?, ?, ?, ?)";
-            $params[] = $record['site'];
-            $params[] = $record['url'];
-            $params[] = $record['status'];
-            $params[] = $record['type'];
-
-            if(++$record_iteration != $record_count)
-                $sql.= ",";
-    
-        }
-        $sql.= ";";
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert page records "'.$pages_records.'"');
-    
-    }
-
-    /**
-     * Delete Pages
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
-     */
-    public static function delete_pages($filters = []){
-    
-        // SQL
-        $sql = 'DELETE FROM `pages`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= 'WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
-            }
-        }
-        $sql.= ';';
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
-    
-    }
-    
-    /**
-     * Add Scan
-     */
-    public static function add_scan($status, $time){
-    
-        // SQL
-        $sql = 'INSERT INTO `scans` (`status`, `time`) VALUES';
-        $sql.= '(?, ?)';
-        $params = array($status, $time);
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        //Fallback
-        if(!$result)
-            throw new Exception('Cannot insert scan with status "'.$status.'" and time "'.$time.'"');
-        
-        // Complete Query
-        return $result;
-        
-    }
-
-    /**
-     * Update Scan Status 
-     */
-    public static function update_scan_status($scan_id, $new_status){
-    
-        // SQL
-        $sql = 'UPDATE `scans` SET `status` = ? WHERE `id` = ?';
-        $params = array($new_status, $scan_id);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update scan id "'.$scan_id.'" to new status "'.$new_status.'"');
-    
-    }
-    
-    /**
-     * Update Page Scanned Time 
-     */
-    public static function update_page_scanned_time($url){
-    
-        // SQL
-        $sql = 'UPDATE `pages` SET `scanned` = CURRENT_TIMESTAMP() WHERE `url` = ?';
-        $params = array($url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update scan time for scan with url "'.$url.'"');
-    
-    }
-    
-    /**
-     * Update Page Site Status 
-     */
-    public static function update_site_status($site, $new_status){
-    
-        // SQL
-        $sql = 'UPDATE `pages` SET `status` = ? WHERE `site` = ?';
-        $params = array($new_status, $site);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update "'.$site.'" site status to "'.$new_status.'"');
-    }
-    
-    /**
-     * Update Page Data 
-     */
-    public static function update_page_data($url, $column, $value){
-    
-        // SQL
-        $sql = 'UPDATE `pages` SET `'.$column.'` = ? WHERE `url` = ?';
-        $params = array($value, $url);
-    
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot update data column "'.$column.'" to "'.$value.'" for page "'.$url.'"');
     
     }
     
     /**
      * Add DB Column
      */
-    public static function add_db_column($table, $column_name, $column_type){
+    public static function add_db_column(
+        $table, $column_name, $column_type){
     
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
@@ -732,11 +246,58 @@ class DataAccess {
             throw new Exception('Cannot add "'.$column_name.'" to "'.$table.'" with type "'.$column_type.'"');
     
     }
+
+    /**
+     * Get Joined DB
+     * @param string requesting
+     */
+    public static function get_joined_db(
+        $requesting){
+
+        // Set conditions based on type.
+        if($requesting == 'equalified_alerts'){
+            $table1 = 'alerts';
+            $table2 = 'queued_alerts';
+            $selected_columns = "DISTINCT $table1.id";
+        }elseif($requesting == 'new_alerts'){
+            $table1 = 'queued_alerts';
+            $table2 = 'alerts';
+            $selected_columns = "DISTINCT $table1.id, ";
+            $selected_columns.= "$table1.url, $table1.message, ";
+            $selected_columns.= "$table1.type, $table1.status, ";
+            $selected_columns.= "$table1.site_id, $table1.source ";
+        }
+    
+        // SQL.
+        $sql = "SELECT $selected_columns FROM $table1 ";
+        $sql.= "LEFT JOIN $table2 ";
+        $sql.= "ON $table1.url=$table2.url ";
+        $sql.= "AND $table1.message=$table2.message ";
+        $sql.= "AND $table1.site_id=$table2.site_id ";
+        $sql.= "AND $table1.type=$table2.type ";
+        $sql.= "AND $table1.source=$table2.source ";
+        $sql.= "WHERE $table2.id IS NULL ";
+        $params = array();
+    
+        // Query
+        $result = self::query($sql, $params, true);
+    
+        // Result
+        $content = [];
+        if($result->num_rows > 0){
+            while($row = $result->fetch_object()){
+                $content[] = $row;
+            }
+        }
+        return $content;
+
+    }
     
     /**
      * Add DB Column
      */
-    public static function delete_db_column($table, $column_name){
+    public static function delete_db_column(
+        $table, $column_name){
     
         // SQL.
         $sql = 'ALTER TABLE `'.$table.'` ';
@@ -755,10 +316,13 @@ class DataAccess {
     /**
      * DB Column Exists
      */
-    public static function db_column_exists($table, $column_name){
+    public static function db_column_exists(
+        $table, $column_name
+    ){
     
         // SQL.
-        $sql = 'SELECT '.$column_name.' FROM `'.$table.'` ';
+        $sql = 'SELECT '.$column_name.' FROM `
+            '.$table.'` ';
         $params = array();
     
         // Query
@@ -772,74 +336,91 @@ class DataAccess {
         }
     
     }
-    
+
     /**
-     * Delete Alerts
-     * @param array filters [ array ('name' => $name, 'value' => $value) ]
+     * Update DB Rows
+     * @param string table
+     * @param array fields [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     * @param array filters  
+     * [ array ('name' => $name, 'value' => $value, 
+     * 'operator' => '=', 'condition' => 'AND' ) ]
+     * 'operator' => '=' ) ]
      */
-    public static function delete_alerts($filters = []){
-    
-        // SQL
-        $sql = 'DELETE FROM `alerts`';
-        $params = array();
-    
-        // Add optional filters
-        $filter_count = count($filters);
-        if($filter_count > 0){
-            $sql.= ' WHERE ';
-    
-            $filter_iteration = 0;
-            foreach ($filters as $filter){
-                $sql.= '`'.$filter['name'].'` = ?';
-                $params[] = $filter['value'];
-                if(++$filter_iteration != $filter_count)
-                    $sql.= ' AND ';
-        
+    public static function update_db_rows(
+        $table, $fields, $filters = []
+    ){
+
+        // Prepare the SQL.
+        $sql = 'UPDATE `'.$table.'` SET ';
+
+        // Add fields that we're updating.
+        $field_count = count($fields);
+        $field_sql = '';
+        if($field_count > 0){
+            $field_iteration = 0;
+            foreach ($fields as $field){
+                $field_sql.= '`'.$field['name'].'` = ?';
+                $params[] = $field['value'];
+                if(++$field_iteration != $field_count)
+                    $field_sql.= ', ';
             }
         }
-        $sql.= ';';
-    
+        $sql.= $field_sql;
+
+        // Add optional filters.
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
+
+        //Add filters parameters.
+        foreach ($filters['params'] as $param){
+            $params[] = $param;
+        }
+
         // Query
-        $result = self::query($sql, $params, false);
-    
-        // Result
-        if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
-    
+        $results = self::query($sql, $params, false);
+
     }
     
     /**
-     * Add Alert
+     * Add DB Entry
+     * @param string table
+     * @param array fields  
+     * [ array('name' => $name, 'value' => $value) ]
      */
-    public static function add_alert($source, $url, $site, $integration_uri = NULL, $type = 'error', $message = NULL, $meta = NULL){
+    public static function add_db_entry($table, array $fields)
+    {
         
-        // Sanitize items.
-        $message = htmlspecialchars($message, ENT_NOQUOTES);
-        if(is_array($meta)){
-            $meta = htmlspecialchars(serialize($meta), ENT_NOQUOTES);
+        // We're going to use the field count a few times,
+        // so let's create the variable first.
+        $field_count = count($fields);
+
+        // Let's reformat fields into something easier for
+        // MySQL to deal with.
+        $field_names = ''; 
+        $field_values = array();
+        if(!empty($fields)){
+            $counter = 0; 
+            foreach($fields as $field){
+                $counter++;
+                $field_names.= '`'.$field['name'].'`';
+                if($counter !== $field_count)
+                    $field_names.= ', ';
+                array_push($field_values, $field['value']);
+            }
         }
 
-        // Require certain alert types.
-        $allowed_types = array('error', 'warning', 'notice');
-        if(!in_array($type, $allowed_types))
-            throw new Exception('Alert type, "'.$type.'," is not allowed');
-
-        // Require certain alert sources.
-        $allowed_sources = array('system', 'page');
-        if(!in_array($source, $allowed_sources))
-            throw new Exception('Alert source, "'.$source.'," is not allowed');
-
-        // SQL
-        $sql = 'INSERT INTO `alerts` (`source`, `url`, `site`, `integration_uri`, `type`, `message`, `meta`) VALUES';
-        $sql.= '(?, ?, ?, ?, ?, ?, ?)';
-        $params = array($source, $url, $site, $integration_uri, $type, $message, $meta);
+        // Prepare the SQL.
+        $sql = 'INSERT INTO `'.$table.'` ('.$field_names.') ';
+        $sql.= 'VALUES ('.str_repeat('?, ', $field_count).')';
+        $sql = str_replace(', )', ')', $sql);
         
         // Query
-        $result = self::query($sql, $params, false);
-    
+        $result = self::query($sql, $field_values, false);
+
         // Fallback
         if(!$result)
-            throw new Exception('Cannot insert alert with the variables "'.$source.'", "'.$url.'", "'.$site.'", "'.$integration_uri.'", "'.$type.'", "'.$message.'", and "'.$meta.'"');
+            throw new Exception('Cannot add DB entry');
         
         // Complete Query
         return $result;
@@ -847,9 +428,171 @@ class DataAccess {
     }
 
     /**
+     * Add DB Rows
+     * @param string table
+     * @param array data  
+     * [ array($field => $value, ...) ]
+     */
+    public static function add_db_rows(
+        $table, array $data
+    ){
+        
+        // Let's first format the field names. Note:
+        // these field names should be represented in the
+        // first set of rows as they are in the last.
+        $field_names = implode(', ',array_keys($data[0]));  
+        
+        // Now we format the unprepared values.
+        $values = '';
+        $value_count = 0;
+        foreach ($data as $datum){
+            $value_count++;    
+            $values.= '('.str_repeat('?, ', count(
+                $datum
+            ));
+            $values = substr($values, 0, -2);
+            $values.= ')';
+            if($value_count !== count($data))
+                $values.= ', ';
+        }
+        
+        // All the values need to go into their own params.
+        $value_count = 0;
+        $params = array();
+        foreach ($data as $datum){
+            foreach($datum as $value){
+                if(is_array($value)){
+                    $value = serialize($value);
+                }                
+                array_push($params, $value);
+            }
+        }
+        
+        // Time to prepare the SQL!
+        $sql = 'INSERT INTO `'.$table.'` ('.$field_names
+            .') VALUES '.$values.';';
+
+        // Let's execute the query
+        $result = self::query($sql, $params, true);
+        
+        // And complete the query.
+        return $result;
+
+    }
+
+    /**
+     * Update DB Entry
+     * @param string table
+     * @param string id
+     * @param array fields  
+     * [ array('name' => $name, 'value' => $value) ]
+     */
+    public static function update_db_entry($table, $id, array $fields)
+    {
+
+        // Prepare the UPDATE SQL.
+        $sql = 'UPDATE `'.$table.'` SET ';
+        $field_count = count($fields);
+        $params = array();
+        $counter = 0;
+        foreach($fields as $field){
+            $counter++;
+            $sql.= $field['name'].' = ?';
+            if($counter !== $field_count)
+                $sql.= ', ';
+            $params[] = $field['value'];
+        }
+
+        // Finish up the SQL.
+        $sql.= ' WHERE id = ?';
+        $params[] = $id;
+
+        // Query
+        $result = self::query($sql, $params, true);
+        
+        // Complete Query
+        return $result;
+        
+    }
+
+    /**
+     * Delete DB Entries
+     * @param string table
+     * @param array filters [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     */
+    public static function delete_db_entries($table, array $filters = array()){
+    
+        // SQL
+        $sql = 'DELETE FROM `'.$table.'`';
+
+        // Add optional filters.
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
+
+        // Query
+        $result = self::query($sql, $filters['params'], false);
+    
+        // Complete Query
+        return $result;
+
+    }
+
+    /**
+     * Count DB rows
+     * @param string table
+     * @param array filters [ array ( 
+     * 'name' => $name, 'value' => $value, 'page' => $page) ]
+     */
+    public static function count_db_rows(
+        $table, $filters = []
+    ){
+
+        // SQL
+        $sql = 'SELECT COUNT(*) AS TOTAL FROM `'.$table.'`';
+        $params = array();
+
+        // Add optional filters.
+        $filters = self::filters($filters);
+        $sql.= $filters['sql'];
+
+        // Query
+        $results = self::query($sql, $filters['params'], true);
+
+        // Result
+        $data = $results->fetch_object()->TOTAL;
+        return $data;
+
+    }
+    
+    /**
+     * Get Meta Value
+     */
+    public static function get_meta_value($meta_name){
+
+        // SQL
+        $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
+        $params = array($meta_name);
+    
+        // Query
+        $results = self::query($sql, $params, true);
+
+        // Returns meta_value.
+        $data = $results->fetch_object();
+        if(empty($data)){
+            return false;
+        }else{
+            return $data->meta_value;
+        }
+
+    }
+
+    /**
      * Add Meta
      */
-    public static function add_meta($meta_name, $meta_value = NULL){
+    public static function add_meta(
+        $meta_name, $meta_value = NULL
+    ){
     
         // Serialize meta_value.
         if(is_array($meta_value)){
@@ -862,7 +605,8 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
-    
+        print_r($sql);
+
         // Fallback
         if(!$result)
             throw new Exception('Cannot add meta field "'.$meta_name.'" and value "'.$meta_value.'"');
@@ -885,7 +629,7 @@ class DataAccess {
     
         // Result
         if(!$result)
-            throw new Exception('Cannot delete alert using filters "'.$filters.'"');
+            throw new Exception('Cannot delete meta using "'.$meta_name.'"');
     
         // Complete Query
         return $result;
@@ -894,13 +638,28 @@ class DataAccess {
 
     /**
      * Update Meta 
+     * @param string meta_name 
+     * @param string meta_value
+     * @param bool concatenate
      */
-    public static function update_meta_value($meta_name, $meta_value){
+    public static function update_meta_value(
+        $meta_name, $meta_value, $concatenate = false
+    ){
 
         // SQL
-        $sql = "UPDATE `meta` SET `meta_value` = ? WHERE `meta_name` = ?";
+        $sql = 'UPDATE `meta` SET `meta_value` = ';
+        
+        // Optional concatenation.
+        if($concatenate == true){
+            $sql.= 'concat(`meta_value`,?)';
+        }else{
+            $sql.= '?';
+        }
+        
+        // Finish SQL and params.
+        $sql.= ' WHERE `meta_name` = ?';
         $params = array($meta_value, $meta_name);
-
+        
         // Query
         $result = self::query($sql, $params, false);
 
@@ -923,23 +682,45 @@ class DataAccess {
             'CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `status` varchar(200) NOT NULL DEFAULT "active",
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
+                `site_id` bigint(20) NOT NULL,
                 `url` text,
-                `site` text,
-                `integration_uri` varchar(200) DEFAULT NULL,
                 `message` text,
-                `meta` text,
+                `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
         $params = array();
         
         // Query
         $result = self::query($sql, $params, false);
+        
+    }
+
+    /**
+     * Create Queued Alerts Table
+     */
+    public static function create_queued_alerts_table(){
     
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
+        // SQL
+        $sql = 
+            'CREATE TABLE `queued_alerts` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `status` varchar(200) NOT NULL DEFAULT "active",
+                `type` varchar(200) NOT NULL,
+                `source` varchar(200) NOT NULL,
+                `site_id` bigint(20) NOT NULL,
+                `url` text,
+                `message` text,
+                `archived` BOOLEAN NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
         
     }
 
@@ -948,7 +729,7 @@ class DataAccess {
      */
     public static function create_meta_table(){
     
-        // SQL
+        // First, create the meta table
         $sql_1 = 
         'CREATE TABLE `meta` (
             `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -961,65 +742,60 @@ class DataAccess {
         $params = array();
 
         // Query 1
-        $result = self::query($sql_1, $params, false);
+        $result_1 = self::query($sql_1, $params, false);
 
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
+        // Now, create the content in the meta table.
+        $sql_2 = '
+            INSERT INTO `meta` (meta_name, meta_value)
+            VALUES 
+            ("active_integrations", ?),
+            ("wave_key", ?),
+            ("scan_status", ?),
+            ("scan_schedule", ?),
+            ("scan_log", ?),
+            ("scannable_pages", ?),
+            ("pages_scanned", ?),
+            ("last_scan_time", ?);
+        ';
+        $default_active_integrations = serialize(array('wave'));
+        $default_wave_key = $GLOBALS['wave_key'];
+        $default_scan_status = '';
+        $default_scan_schedule = 'manually';
+        $default_scan_log = '';
+        $default_scannable_pages = serialize(array());
+        $default_last_scan_time = '';
+        $default_pages_scanned = 0;
+        $params = array(
+            $default_active_integrations, $default_wave_key,
+            $default_scan_status, $default_scan_schedule,
+            $default_scan_log, $default_scannable_pages, 
+            $default_pages_scanned, $default_last_scan_time
+        );
 
-        // Little Forrest is activated here.
-        self::add_meta('active_integrations', serialize(['little_forrest']));
+        // Query 2
+        $result_2 = self::query($sql_2, $params, false);
+        
     }
     
     /**
-     * Create Pages Table
+     * Create Sites Table
      */
-    public static function create_pages_table(){
-    
-        // SQL 
+    public static function create_sites_table(){
+
+        // SQL
         $sql = 
-            'CREATE TABLE `pages` (
+            'CREATE TABLE `sites` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
-                `site` text COLLATE utf8mb4_bin,
-                `scanned` timestamp NULL DEFAULT NULL,
-                `little_forrest_wcag_2_1_errors` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "0", -- Little Forrest is activated here.
+                `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
                 PRIMARY KEY (`id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
         $params = array();
         
         // Query
         $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
-        
-    }
-    
-    /**
-     * Create Scans Table
-     */
-    public static function create_scans_table(){
-    
-        // SQL
-        $sql = 
-            'CREATE TABLE `scans` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NULL DEFAULT NULL,
-                `status` varchar(20) NOT NULL,
-                PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;';
-        $params = array();
-        
-        // Query
-        $result = self::query($sql, $params, false);
-    
-        // Fallback
-        if(!$result)
-            throw new Exception('Error creating table: "'.$result->error.'"');
         
     }
     

@@ -1,69 +1,39 @@
 <?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * We get pages using functions in this document.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 
-/**
- * Get Page Body
- */
-function run_curl($site_url, $type = ''){
-    $curl = curl_init($site_url);
-    curl_setopt($curl, CURLOPT_URL, $site_url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-    curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-    curl_setopt($curl, CURLOPT_USERAGENT, 'Equalify');
-
-    // Restrict CURL to the type of what you want to add.
-    if($type == 'wordpress')
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json'));
-    if($type == 'xml')
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
-
-    // Execute CURL
-    $url_contents = curl_exec($curl);
-
-    // The curled URL is the URL we use as an ID.
-    $curled_url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-
-    // We don't include added enpoints to the URL.
-    $json_endpoints = '/wp-json/wp/v2/pages?per_page=100';
-    $curled_url = str_replace($json_endpoints, '', $curled_url);
-
-    // Make sure URL is unique to minimize scans. 
-    if(!DataAccess::is_unique_site($curled_url))
-        throw new Exception('"'.$curled_url.'" already exists');
-
-    // Fallback if no contents exist.
-    if($url_contents == false)
-        throw new Exception('Contents of "'.$curled_url.'" cannot be loaded');
-    curl_close($curl);
-
-    // We use the curled URL as the unique ID.
-    return array(
-        'url' => $curled_url,
-        'contents' => $url_contents
-    );
-
-}
+// Lets get Composer dependencies.
+require_once '../vendor/autoload.php';
+use GuzzleHttp\Client;
 
 /**
  * Single Page Adder
  */
 function single_page_adder($site_url){
 
-    // Get URL contents so we can make sure URL
-    // can be scanned.
-    $curled_site = run_curl($site_url);
+    // Ensure protocol is set; if not, default to https.
+    $parsed_url = parse_url($site_url);  
+    if (empty($parsed_url['scheme'])) {
+        $site_url = 'https://' . ltrim($site_url, '/');
+    }
 
-    // Site URL changes to the curled URL.
-    $site_url = $curled_site['url'];
+    $options = ['verify' => false];
+    $client = new Client($options);
+    $response = $client->get($site_url);
 
-    // Single pages are saved with the following pramenters
-    $type = 'single_page';
-    $status = 'active';
-    $site = $curled_site['url'];
-    DataAccess::add_page($site_url, $type, $status, $site);
+    // This is primarily a check that the URL is 
+    // accessible. If site has any content, we return the 
+    // site URL in an array.
+    if ($response->getBody()) {
+        return [$site_url];
+    } else {
+        throw new Exception("$site_url returned no content");
+    }
 
 }
 
@@ -71,105 +41,81 @@ function single_page_adder($site_url){
  * WordPress Pages Adder
  */
 function wordpress_site_adder($site_url){
+    
+    // Instantiate Guzzle client - WP API uses JSON.
+    $options = [
+        'headers' => ['Accept' => 'application/json'],
+        'verify' => false,
+    ];
+    $client = new Client($options);
 
-    // Add WP JSON URL endpoints for request.
-    $json_endpoints = '/wp-json/wp/v2/pages?per_page=100';
-    $json_url = $site_url.$json_endpoints;
+    // The WP API JSON endpoint is always the same.
+    $wp_json_endpoint = '/wp-json/wp/v2/pages?per_page=100';
+    $url = $site_url . $wp_json_endpoint;
 
-    // Get URL contents.
-    $curled_site = run_curl($json_url, 'wordpress');
+    $wp_api_json = json_decode(
+        $client->get($url)->getBody(), true
+    );
 
-    // Create JSON.
-    $wp_api_json = json_decode($curled_site['contents'], true);
-    if(empty($wp_api_json[0]))
-        throw new Exception('"'.$site_url.'" does not include WordPress functionality that Equalify requires');
+    if(empty($wp_api_json[0])) {
+        throw new Exception(
+            "$site_url does not include WordPress " .
+            "functionality that Equalify requires"
+        );
+    }
 
     // Push JSON to pages array.
     $pages = [];
     foreach ($wp_api_json as $page):
-        array_push($pages, array('url' => $page['link']));
+        array_push($pages, $page['link']);
     endforeach;
 
-    // Remove WP JSON endbpoints.
-    $clean_curled_url = str_replace($json_endpoints, '', $curled_site['url']);
-
-    // Reformat the curled contents to be an array we can 
-    // work with.
-    $curled_site = array(
-        'url' => $clean_curled_url,
-        'contents' => $pages
-    );
-
-    // Insert site in DB.
-    add_xml_or_wordpress_site_to_db($curled_site, 'wordpress');    
-
+    // We want an array with each page URL.
+    return $pages;    
+    
 }
 
 /**
  * XML Site Adder
  */
 function xml_site_adder($site_url){
-
-    // Get URL contents.
-    $curled_site = run_curl($site_url, 'xml');
+    
+    // Instantiate Guzzle client to accept XML
+    $options = [
+        'headers' => ['Accept' => 'application/xml'],
+        'verify' => false,
+    ];
+    $client = new Client($options);
 
     // Valid XML files are only allowed!
-    $xml_contents = $curled_site['contents'];
-    if(!str_starts_with($xml_contents, '<?xml'))
-        throw new Exception('"'.$curled_site['url'].'" is not a readable XML format');
+    $xml_contents = $client->get($site_url)->getBody();
+    if(!str_starts_with($xml_contents, '<?xml')) {
+        throw new Exception("$site_url did not return XML");
+    }
 
     // Convert XML to JSON, so we can use it later
     $xml = simplexml_load_string($xml_contents);
     $json = json_encode($xml);
-    $json_entries = json_decode($json,TRUE);
+    $json_entries = json_decode($json, true);
 
     // Push JSON to pages array.
     $pages = [];
-    foreach ($json_entries['url'] as $page):
-        array_push($pages, array('url' => $page['loc']));
-    endforeach;
+    if(array_key_exists('url', $json_entries)){
 
-    // Reformat the curled contents to be an array we can 
-    // work with.
-    $curled_site = array(
-        'url' => $curled_site['url'],
-        'contents' => $pages
-    );
+        // This gets around a weird bug where json_decode
+        // doesn't wrap single entry xmls into an array.
+        if(!empty($json_entries['url']['loc'])){
+            $json_entries['url'] = [$json_entries['url']];
+        }
 
-    // Insert site in DB.
-    add_xml_or_wordpress_site_to_db($curled_site, 'xml');
-    
-}
+        // Now we can prepare our output
+        foreach ($json_entries['url'] as $page):
+            array_push($pages, $page['loc']);
+        endforeach;
 
-/**
- * Add XML or WordPress Site to DB
- */
-function add_xml_or_wordpress_site_to_db($curled_site, $type){
+    }
 
-    // Both XML and WP deliver similar content.
-    $pages = $curled_site['contents'];
-    $site_url = $curled_site['url'];
-
-    // We're setting the status and adding pages here so we
-    // do not have to call the db inside "models/adders.php",
-    // keeping each model focused on distinct functions.
-    $pages_records = [];
-    foreach ($pages as &$page):
-
-        // Push each page to pages' records.
-        array_push(
-            $pages_records, 
-            array(
-                'url'       => $page['url'], 
-                'site'      => $site_url,
-                'status'    => 'active',
-                'type'      => $type
-            )
-        );
-
-    endforeach; 
-
-    // Finalllly, we can add pages to the DB.
-    DataAccess::add_pages($pages_records);
+    // Prepare contents and return them.
+    return $pages;
 
 }

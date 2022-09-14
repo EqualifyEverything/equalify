@@ -1,3 +1,14 @@
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the sites view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
+?>
+
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
@@ -9,12 +20,14 @@
     </div>
     <div class="row row-cols-3 g-4 pb-4">
         
-        <?php
-        // Show Sites
-        $sites = DataAccess::get_sites();
-        if($sites != NULL ):
-            foreach($sites as $site):  
-        ?>
+<?php
+// Show Sites
+$sites = DataAccess::get_db_rows(
+    'sites', [], get_current_page_number()
+);
+if( count($sites['content']) > 0 ):
+    foreach($sites['content'] as $site):  
+?>
 
         <div class="col">
             <div class="card">
@@ -22,20 +35,26 @@
 
                     <?php
                     // The Status Badge
-                    $status = DataAccess::get_site_status($site);
+                    $status = $site->status;
                     if($status == 'archived'){
-                        $bg_class = 'bg-dark';
+                        $extra_classes = 'bg-dark';
                         $text = 'Archived';
+                    }elseif(empty($site->scanned)){
+                        $extra_classes = 'bg-warning text-dark';
+                        $text = 'Unscanned';
                     }else{
-                        $bg_class = 'bg-success';
+                        $extra_classes = 'bg-success';
                         $text = 'Active';
                     }
-                    echo '<span class="badge mb-2 '.$bg_class.'">'.$text.'</span>';
                     ?>
+
+                    <span class="badge mb-2 <?php echo $extra_classes;?>">
+                        <?php echo $text;?>
+                    </span>
 
                     <?php
                     // The Type Badge
-                    $type = DataAccess::get_site_type($site);
+                    $type = $site->type;
                     if($type == 'wordpress'){
                         $type = 'WordPress';
                     }elseif($type == 'xml'){
@@ -43,13 +62,17 @@
                     }elseif($type == 'single_page'){
                         $type = 'Single Page';
                     }
-                    echo '<span class="badge bg-light text-dark">'
-                        .$type.
-                        '<span class="visually-hidden"> Site Type</span></span>';
                     ?>
-                    
+
+                    <span class="badge bg-light text-dark">
+                        <?php echo $type;?>
+                        <span class="visually-hidden">
+                            Site Type
+                        </span>
+                    </span>
+
                     <h2 class="h5 card-title">
-                        <?php echo $site; ?> 
+                        <?php echo $site->url; ?> 
                     </h2>
 
                     <?php
@@ -57,30 +80,38 @@
                     if($status == 'archived'){
                         $button_text = 'Activate';
                         $button_class = 'btn-outline-success';
+                        $processing = false;
                     }else{
                         $button_text = 'Archive';
                         $button_class = 'btn-outline-secondary';
+                        $processing = false;
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2" href="actions/toggle_site_status.php?site=<?php echo $site;?>&old_status=<?php echo $status;?>">
-                        <?php echo $button_text;?>
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?id=<?php echo $site->id;?>&old_status=<?php echo $status;?>">
+                        <?php if($processing) echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; echo $button_text;?>
                     </a>
                 </div>
             </div>
         </div>
         
         <?php 
-            endforeach;
-        else:
+        // Fallback.
+        endforeach; else:
         ?>
 
             <p>No sites exist.</p>
 
         <?php 
+        // End Sites
         endif;
         ?>
 
-        </tbody>
     </div>
+
+    <?php
+    // The pagination
+    the_pagination($sites['total_pages']);
+    ?>
+
 </section>

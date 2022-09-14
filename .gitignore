@@ -2,3 +2,5 @@
 .vscode
 login/
 config.php
+vendor/
+test/

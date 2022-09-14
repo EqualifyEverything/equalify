@@ -1,63 +1,54 @@
 # Equalify the web!
 
-**96.8% of homepages are inaccessible**, according to [WebAIM](https://webaim.org/projects/million/).
+**96.8% of homepages have WCAG conformance failures,** according to [WebAIM](https://webaim.org/projects/million/).
 
-That statistic is unacceptable.
-
-Everyone should have access to online information.
+The internet must become more accessible!
 
 ## Support Equalify
 
-⭐ Star the repo to show your support.
+⭐ **Star the repo** to show your support.
 
-⬇️ [Download and use](https://github.com/bbertucc/equalify#download-and-use) Equalify.
+🌸 **Try our managed service**, [equalify.app](https://equalify.app/).
 
-🛠️ Contribute with a pull request or [new issue](https://github.com/bbertucc/equalify/issues).
+🛠️ **Contribute a pull request** or [new issue](https://github.com/bbertucc/equalify/issues).
 
-## How will Equalify increase accessibility?
+🎩 **[Donate](https://equalify.app/donate/)** to Equalify.
 
-Equalify creates deep integrations with services that run your website. 
+## How will Equalify increase content accessibility?
 
-Imagine: You solve A11Y issues at their source - be that source the server or a CMS. 
+Equalify aims to:
+1. **Promote transparency** with a Open Source A11Y platform (✅ Done!).
+2. **Reduce the cost** of multi-page website scans (ongoing).
+3. **Improve automation** to simplify WCAG issue resolution (2023). 
 
-Equalify will become your WebOps hub, designed to solve any accessibility issue. 
+We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
-<img width="1375" alt="A screenshot of Equalify's Integrations page." src="https://user-images.githubusercontent.com/46652/185225047-9c1c2e0f-4c4d-490b-a253-f3172710f1b0.png">
-
+![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
 
 ## What does Equalify currently do?
 
-The app currently scans pages for WCAG errors.
+The app currently scans websites for WCAG errors.
 
-Equalify supports [Little Forest](https://littleforest.co.uk/feature/web-accessibility/), a free WCAG 2.1 scan, and the popular [WAVE scan](https://wave.webaim.org/). 
+You can import pages from WordPress, XML sitemaps, and single URLs. Equalify then crawls all your pages for WCAG 2.1 errors using the popular [WAVE scan](https://wave.webaim.org/).
 
-After selecting an integration, import any site.
+Every alert is reported on a filterable dashboard.
 
-The app imports pages from XML sitemaps, the WordPress API, and single URLs.
-
-After all your pages are added, click "Scan" and Equalify reports WCAG errors as they are found.
-
-The goal: **Equalify every website.**
-
-![equalify-screenshot-1](https://user-images.githubusercontent.com/46652/185225467-de1114fc-8f96-4b41-8365-897de3b55d5f.png)
+![equalify-alerts](https://user-images.githubusercontent.com/46652/188710908-9bfb7da8-68ff-490c-8d6b-f9ce1f38d4c8.png)
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Change `sample-config.php` to `config.php` and update info.
-3. Upload/run on a Linux server (PHP 8 + MySQL required).
-4. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
-5. Checkout our [demo video](https://www.youtube.com/watch?v=yrsG32G3I0g) for usage tips.
-6. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
+3. Run `composer install` to install Composer dependencies.
+4. Upload/run on a Linux server (PHP 8 + MySQL required).
+5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
-Not a technical user? Signup for our early access program at [equalify.app](https://equalify.app/).
+**Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
 
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for Drupalcon tickets and other great resources that help this project grow. Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the braintrust behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp)- I consider y'all first contributors - woot woot! & Grace- You are the 🔥 behind everything I do.
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
 
-This project is Open Source to inspire new collaborations.
+This project is Open Source under [AGPL](https://github.com/bbertucc/equalify/blob/mvp-1.2/LICENSE) to inspire new collaborations.
 
 Together, **we can equalify the internet**.
 
 -[@bbertucc](https://github.com/bbertucc)
-
-PS: For more information on the notions behind Equalify, see my [Ethical Business Notion page](https://bbertucc.notion.site/Ethical-Business-7d8cb00d2e5f4558998450d6e38a61b6). 

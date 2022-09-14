@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: Pantheon 
- * Description: Adds WebOps alerts, errors, and deeplinking with Terminus.
+ * Description: One-click fixes via Terminus.
  * Status: Planned
  */
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: Drupal 
- * Description: Adds WebOps enforcement alerts via a module.
+ * Description: Adds WebOps enforcement.
  * Status: Planned
  */
 ?>

@@ -1,96 +1,149 @@
-<section>
-    <h1 class="mb-3 pb-4 border-bottom">
-        All Alerts
-    </h1>
-    <ul class="nav nav-tabs mb-3">
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the alerts view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 
-        <?php
-        // Setup alert tabs.
-        $alert_tabs = DataAccess::get_meta_value('alert_tabs');
-        if(empty($alert_tabs)){
+// Sometimes this view is filtered to a label's data.
+if(!empty($_GET['label'])){
 
-            // By default, we include an "Default Alerts" tab.
-            $alert_tabs = array(
-                'current_tab' => 1,
-                'tabs'  => array(
-                    1 => array(
-                        'id'        => 1,
-                        'name'      => 'My Alerts',
-                        'filters'   => array()
-                    )
+    // Load the data of a selected label.
+    $filtered_to_label = array(
+        array(
+            'name' => 'meta_name',
+            'value' => $_GET['label']
+        )
+    );
+    $label = DataAccess::get_db_rows(
+        'meta', $filtered_to_label
+    )['content'][0];
+
+    // We need to unserialize the meta from the label.
+    $label_meta = unserialize($label->meta_value);
+
+    // No archived alerts are shown in labels.
+    array_push($label_meta, array(
+        'name' => 'archived',
+        'value' => 0
+    ));
+
+// We also have special presets
+}elseif(!empty($_GET['preset'])){
+
+    // The active preset contains all alerts.
+    if($_GET['preset'] == 'all'){
+        $label = array(
+            'meta_name' => '',
+            'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'All Alerts'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
                 )
-            );
-            DataAccess::add_meta('alert_tabs', $alert_tabs);
+            )
+        );
+        $label_meta = $label['meta_value'];    
 
-        }else{
+    // The ignored preset contains all 'ignored' alerts.
+    }elseif($_GET['preset'] == 'ignored'){
+        $label = array(
+            'meta_name' => '',
+            'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'Ignored Alerts'
+                ),
+                array(
+                    'name' => 'status',
+                    'value' => 'ignored'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
+                )
+            )
+        );
+        $label_meta = $label['meta_value'];
 
-            // We need to unserialze MySQL data if that data 
-            // exists.
-            $alert_tabs = unserialize($alert_tabs);
-
-        }
-
-        // Setup variables.
-        $tabs = $alert_tabs['tabs'];
-        $current_tab = $alert_tabs['current_tab'];
-        $current_tab_data = $tabs[$current_tab];
-
-        // Start tabs Loop
-        if(!empty($tabs)): foreach ($tabs as $tab):
-        ?>
-
-        <li class="nav-item">
+    // The equalified preset contains all 'equalified' 
+    // alerts.
+    }elseif($_GET['preset'] == 'equalified'){
+        $label = array(
+            'meta_name' => '',
+            'meta_value' => array(
+                array(
+                    'name' => 'title',
+                    'value' => 'Equalified Alerts'
+                ),
+                array(
+                    'name' => 'status',
+                    'value' => 'equalified'
+                ), array(
+                    'name' => 'archived',
+                    'value' => 0
+                )
+            )
+        );
+        $label_meta = $label['meta_value'];
         
-            <a 
-                class="nav-link <?php if($current_tab == $tab['id']) echo 'active';?>" 
-                aria-current="page" 
-                href="actions/switch_alert_tab.php?alert_tab=<?php echo $tab['id'];?>"
-            >
-            
-                <?php echo $tab['name']; ?>
+    }
 
-                <span class="
-                    ms-1
-                    badge 
-                    bg-<?php if($current_tab == $tab['id']){ echo 'primary'; }else{ echo 'secondary'; }?> 
-                    rounded
-                ">
+}else{
 
-                <?php
-                //  Alert counter
-                $alert_count = DataAccess::count_alerts($tab['filters']);
-                echo $alert_count;
-                ?>
+    // When there's no label data, we get active alerts.
+    $label = array(
+        'meta_name' => '',
+        'meta_value' => array(
+            array(
+                'name' => 'title',
+                'value' => 'Active Alerts'
+            ),
+            array(
+                'name' => 'status',
+                'value' => 'active'
+            ), array(
+                'name' => 'archived',
+                'value' => 0
+            )
+        )
+    );
+    $label_meta = $label['meta_value'];
 
-                </span>
-            </a>
-        </li>
+}
 
-        <?php
-        // End tabs loop
-        endforeach; 
-    endif;
-        ?>
+// Let's extract the "title" meta, so we can use it 
+// later and so we can use any label's meta_values to
+// fitler the alerts.
+foreach($label_meta as $k => $val) {
+    if($val['name'] == 'title') {
+        $the_title = $val['value'];
+        unset($label_meta[$k]);
+    }
+}
+?>
 
-        <li class="nav-item <?php if(empty($tabs)){ echo 'mb-3';}else{ echo 'ms-2'; }?>">
-            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="addTabButton">+ Add Tab</button>
-        </li>
-    </ul>
-    <div class="row row-cols-lg-auto g-3 align-items-center mb-3">
-        <div class="col-12">
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control" placeholder="Keyword or Website.." aria-label="Search Term" aria-describedby="basic-addon1">
-                <button class="btn btn-outline-secondary" type="button">Search</button>
-            </div>
+<section>
+    <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
+        <div>
+            <h1><?php echo $the_title;?></h1>
         </div>
-        <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alertOptions" id="editTabButton">
-                Tab Filters & Settings
-            </button>
+        <div>
+            <?php
+            // If we're not on a label page, we can't edit
+            // the page.
+            if(!empty($_GET['label'])):
+            ?>
 
-            <?php 
-            // Alert tabs Modal
-            the_alert_tab_options($current_tab_data);
+            <a href="index.php?view=label_customizer&name=<?php echo $label->meta_name;?>" class="btn btn-primary">
+                Edit Label
+            </a>
+
+            <?php
+            endif;
             ?>
 
         </div>
@@ -108,33 +161,63 @@
         </thead>
 
         <?php
-        // Begin Alerts
-        $filters = $current_tab_data['filters'];
-        $alerts = DataAccess::get_alerts($filters, get_current_page_number());
-        $alerts_content = $alerts['content'];
-        if(count($alerts_content) > 0 ): foreach($alerts_content as $alert):    
+        // We need to setup the different filters from the
+        // all label meta.
+        $filters = $label_meta;
+        $alerts = DataAccess::get_db_rows( 'alerts',
+            $filters, get_current_page_number()
+        );
+        if( count($alerts['content']) > 0 ): 
+            foreach($alerts['content'] as $alert):    
         ?>
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo ucwords($alert->source);?></td>
+            <td><?php echo ucwords(str_replace('_', ' ', $alert->source));?></td>
             <td><?php echo $alert->url;?></td>
             <td><?php echo ucwords($alert->type);?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
-                <a href="actions/delete_alert.php?id=<?php echo $alert->id;?>" class="btn btn-outline-secondary btn-sm">
-                    Dismiss
+
+                <?php
+                // Active alerts can be ignored.
+                if( $alert->status == 'active' && $alert->archived != 1 ){
+                ?>
+
+                <a href="actions/ignore_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
+                    Ignore Alert
                 </a>
+
+                <?php
+                // Ignored alerts can be activated.
+                }elseif( $alert->status == 'ignored' ){
+                ?>
+
+                <a href="actions/activate_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-success btn-sm">
+                    Activate Alert
+                </a>
+
+                <?php
+                }
+                ?>
             </td>
         </tr>
 
         <?php 
-        // Fallback
+        // Fallback.
         endforeach; else:
         ?>
 
         <tr>
-            <td colspan="6">No alerts found.</td>
+            <td colspan="6">
+                <p class="text-center my-2 lead">
+                    No alerts found.<br>
+                </p>
+                <p class="text-center my-2">
+                    <img src="plumeria.png" alt="Three frangiapani flowers. The flowers five pedals. Color eminates fron the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <strong>Get out and smell the frangiapani!</strong>
+                </p>
+            </td>
         </tr>
 
         <?php 
