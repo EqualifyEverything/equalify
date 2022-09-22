@@ -78,14 +78,15 @@ if(!empty($alerts_output)){
         array_push( $filters,
             array(
                 'name' => 'url',
-                'value' => $site->url
+                'value' => $site->url,
+                'condition' => 'OR'
             )
         );
     }
 
     // Let's update the site!
     DataAccess::update_db_rows(
-        'sites', $fields, $filters, 'OR'
+        'sites', $fields, $filters
     );
 
 }
