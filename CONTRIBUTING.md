@@ -18,6 +18,8 @@ Fixes and reports of A11Y or UX errors are greatly appreciated.
 
 I'm up for any new coding standards!
 
+As for governance and a code of conduct, checkout my [discussion around governance](https://github.com/bbertucc/equalify/discussions/91).
+
 ## Usable hooks and patterns. 
 
 Checkout [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/actions/scan_all_pages.php](/actions/scan_all_pages.php).
