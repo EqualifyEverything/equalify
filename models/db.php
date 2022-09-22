@@ -386,7 +386,6 @@ class DataAccess {
         foreach ($filters['params'] as $param){
             $params[] = $param;
         }
-        print_r($sql); 
 
         // Query
         $results = self::query($sql, $params, false);
