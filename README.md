@@ -1,42 +1,54 @@
-# Equalify Pro
+# Equalify the web!
 
-Open Source projects like Equalify need a revenue stream to keep their work alive.
+**96.8% of homepages have WCAG conformance failures,** according to [WebAIM](https://webaim.org/projects/million/).
 
-So, if we're going to make Web Accessibility better, we gotta make some dough!
+The internet must become more accessible!
 
-## Pro Features
+## Support Equalify
 
-A managed "service" version of Equalify includes:
-- Hosted Service
-- Chat Support
-- View-based alerting
-- Enhanced notifications 
-  - Send alert by alert email
-  - View-based alerts
-  - Bundle alerts into weekly/monthly summaries.
-- Add multiple accounts to a "team"
-- "Team" Management 
-  - Assign alerts as "tasks" for different team members
-  - Track completion of tasks
+⭐ **Star the repo** to show your support.
 
-## Pro Pricing
+🌸 **Try our managed service**, [equalify.app](https://equalify.app/).
 
-Pricing starts at $1,400/yr for 1 team member and 10,000 annual alerts.
+🛠️ **Contribute a pull request** or [new issue](https://github.com/bbertucc/equalify/issues).
 
-Add $99/yr for every new team member and $99/yr for every additional 1,000 annual alerts.
+🎩 **[Donate](https://equalify.app/donate/)** to Equalify.
 
-## Other Notes
+## How will Equalify increase content accessibility?
 
-Making money can cloud purpose.
+Equalify aims to:
+1. **Promote transparency** with a Open Source A11Y platform (✅ Done!).
+2. **Reduce the cost** of multi-page website scans (ongoing).
+3. **Improve automation** to simplify WCAG issue resolution (2023). 
 
-The purpose of Equalify, and my life, is to do ethical good.
+We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
-Here's a basic comparison of Open Source vs. Proprietary projects from [An Open Source Survey](https://www.researchgate.net/publication/265411256_Open_Source_Software_A_Survey_from_10000_Feet):
+![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
 
-![1B3C7CE8-691B-4403-9B81-73BC7E077D89](https://user-images.githubusercontent.com/46652/169911414-6123539e-fb9f-49e4-b663-2c4cfd2172b0.jpeg)
+## What does Equalify currently do?
 
-It should go without saying that the values of Open Source projects are more ethical than the values of proprietary projects.
+The app currently scans websites for WCAG errors.
 
-If the Pro plan is indeed designed to sustain Equalify, we must focus on that goal (and temper our desires with [basic income nest eggs](https://bbertucc.notion.site/Basic-Income-Nest-Eggs-4b555b09d02d40389086c01ec84c1424)).
+You can import pages from WordPress, XML sitemaps, and single URLs. Equalify then crawls all your pages for WCAG 2.1 errors using the popular [WAVE scan](https://wave.webaim.org/).
 
-Onward and upward!
+Every alert is reported on a filterable dashboard.
+
+![equalify-alerts](https://user-images.githubusercontent.com/46652/188710908-9bfb7da8-68ff-490c-8d6b-f9ce1f38d4c8.png)
+
+## Download and Use
+1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
+2. Change `sample-config.php` to `config.php` and update info.
+3. Run `composer install` to install Composer dependencies.
+4. Upload/run on a Linux server (PHP 8 + MySQL required).
+5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
+
+**Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
+
+## Special Thanks
+A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
+
+This project is Open Source under [AGPL](https://github.com/bbertucc/equalify/blob/mvp-1.2/LICENSE) to inspire new collaborations.
+
+Together, **we can equalify the internet**.
+
+-[@bbertucc](https://github.com/bbertucc)
