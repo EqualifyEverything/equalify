@@ -26,7 +26,7 @@ function update_scan_log($message){
 
     // Let's add the message to the db's scan log.
     DataAccess::update_meta_value( 'scan_log', $message, 
-        $concatenate = true
+        true
     );
 
     // We return a message for CLI users.
@@ -50,7 +50,37 @@ function kill_scan($message){
         'scan_status', ''
     );
 
+
     // Now let's stop the process.
     die;
+    
+}
+
+/**
+ * Run Scan
+ */
+function run_scan(){
+
+    // Only one scan runs at a time.
+    if(
+        DataAccess::get_meta_value('scan_status')
+        != 'running'
+    ):
+
+        // Let's clear out any old log files.
+        DataAccess::update_meta_value('scan_log', '');
+
+        // We keep track of the scan process in the DB to see
+        // if the scan is running in other areas of our app.
+        DataAccess::update_meta_value( 'scan_status', 
+            'running'
+        );
+
+        // Initiate scan.
+        exec($GLOBALS['PHP_PATH'].' '.__ROOT__.'/cli/scan.php > /dev/null &', $output, $retval);
+        //echo "Returned with status $retval and output:\n";
+
+    // Finish condition.
+    endif;
     
 }

@@ -1,4 +1,13 @@
 <?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * Change the meta information. 
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
+
 // Add DB Info
 require_once '../config.php';
 require_once '../models/db.php';

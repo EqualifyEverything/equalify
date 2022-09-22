@@ -8,6 +8,7 @@
  * Equalify works for everyone.
 **********************************************************/
 
+
 // Add DB info and required functions.
 require_once '../config.php';
 require_once '../models/integrations.php';

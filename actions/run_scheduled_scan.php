@@ -10,6 +10,14 @@
  * Equalify works for everyone.
 **********************************************************/
 
+// Since this file can run in the CLI, we must set the 
+// directory if it isn't already set.
+if(!defined('__ROOT__'))
+    define('__ROOT__', dirname(dirname(__FILE__)));
+
+// We'll use the directory to include required files.
+require_once(__ROOT__.'/helpers/scan.php');
+
 // The scan_schedule meta value sets the interval.
 $scan_schedule = DataAccess::get_meta_value(
     'scan_schedule'
@@ -36,13 +44,12 @@ if($scan_schedule != 'manually'):
         'last_scan_time'
     );
 
-    // When Equalify is istalled, scan_time is empty, so we 
+    // When Equalify is installed, scan_time is empty, so we 
     // know we can just run the scan then.
     if(empty($scan_time)){
-        shell_exec(
-            $GLOBALS['PHP_PATH'].
-            ' actions/scan.php > /dev/null 2>/dev/null &'
-        );
+
+        // Lets run the scan.
+        run_scan();
 
     // If a scan time is set, we have to run further checks.
     }else{
@@ -58,12 +65,9 @@ if($scan_schedule != 'manually'):
             < date('Y-m-d H:i:s') 
         ){
 
-            // All checks complete, let's trigger the scan.
-            if(empty($scan_process))
-                shell_exec(
-                    $GLOBALS['PHP_PATH'].
-                    ' actions/scan.php > /dev/null 2>/dev/null &'
-                );                
+            // Run scan.
+            run_scan();
+            
         }
 
     }

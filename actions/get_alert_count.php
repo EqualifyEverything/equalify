@@ -7,6 +7,7 @@
  * Equalify works for everyone.
 **********************************************************/
 
+
 // Since this file can run in the CLI, we must set the 
 // directory if it isn't already set.
 if(!defined('__ROOT__'))

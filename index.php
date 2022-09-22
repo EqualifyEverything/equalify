@@ -1,5 +1,4 @@
 <?php
-
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * Equalify is a platform developed to integrate various
  * services that manage websites.
@@ -41,7 +40,7 @@ require_once 'install.php';
 
 // We also check to see if we can run the scan on every
 // page load.
-require_once 'scheduled_scan.php';
+require_once 'actions/run_scheduled_scan.php';
 
 ?>
 

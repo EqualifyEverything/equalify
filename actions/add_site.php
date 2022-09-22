@@ -1,5 +1,12 @@
 <?php
-// ***************!!EQUALIFY IS FOR EVERYONE!!***************
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document adds a site.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 
 // Info on DB must be declared to use db.php models.
 require_once '../config.php';
