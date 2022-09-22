@@ -7,8 +7,15 @@
  * Equalify works for everyone.
 **********************************************************/
 
-// Lets get Composer dependencies.
-require_once '../vendor/autoload.php';
+// Since this file can run in the CLI, we must set the 
+// directory if it isn't already set.
+if(!defined('__ROOT__'))
+    define('__ROOT__', dirname(dirname(__FILE__)));
+
+// Let's load in Composer.
+require_once (__ROOT__.'/vendor/autoload.php');
+
+// Let's run Guzzle.
 use GuzzleHttp\Client;
 
 /**

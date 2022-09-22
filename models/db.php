@@ -25,7 +25,9 @@ class DataAccess {
                 $GLOBALS['DB_USERNAME'], 
                 $GLOBALS['DB_PASSWORD'], 
                 $GLOBALS['DB_NAME'],  
-                $GLOBALS['DB_PORT']); 
+                $GLOBALS['DB_PORT'],
+                $GLOBALS['DB_SOCKET']
+            ); 
             if(self::$conn->connect_error){
                 throw new Exception(
                     'Cannot connect to database: '
@@ -250,9 +252,12 @@ class DataAccess {
     /**
      * Get Joined DB
      * @param string requesting
+     * @param array site_ids
      */
     public static function get_joined_db(
-        $requesting){
+        $requesting, $sites = []){
+
+            // TODO: Add "WHERE" with site id, so that we only equalify active site alerts.
 
         // Set conditions based on type.
         if($requesting == 'equalified_alerts'){
@@ -277,6 +282,11 @@ class DataAccess {
         $sql.= "AND $table1.type=$table2.type ";
         $sql.= "AND $table1.source=$table2.source ";
         $sql.= "WHERE $table2.id IS NULL ";
+        if(!empty($sites)){
+            foreach($sites as $site){
+                $sql.= "AND $table1.site_id = $site->id ";
+            }
+        }
         $params = array();
     
         // Query
@@ -679,10 +689,10 @@ class DataAccess {
     
         // SQL
         $sql = 
-            'CREATE TABLE `alerts` (
+            "CREATE TABLE `alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) NOT NULL DEFAULT "active",
+                `status` varchar(200) NOT NULL DEFAULT 'active',
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `site_id` bigint(20) NOT NULL,
@@ -690,7 +700,7 @@ class DataAccess {
                 `message` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         
         // Query
@@ -705,10 +715,10 @@ class DataAccess {
     
         // SQL
         $sql = 
-            'CREATE TABLE `queued_alerts` (
+            "CREATE TABLE `queued_alerts` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) NOT NULL DEFAULT "active",
+                `status` varchar(200) NOT NULL DEFAULT 'active',
                 `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `site_id` bigint(20) NOT NULL,
@@ -716,7 +726,7 @@ class DataAccess {
                 `message` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;';
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         
         // Query
@@ -728,35 +738,35 @@ class DataAccess {
      * Create Meta Table
      */
     public static function create_meta_table(){
-    
+
         // First, create the meta table
         $sql_1 = 
-        'CREATE TABLE `meta` (
+        "CREATE TABLE `meta` (
             `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `meta_name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT "",
+            `meta_name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
             `meta_value` longtext COLLATE utf8mb4_unicode_520_ci,
             PRIMARY KEY (`meta_id`),
             UNIQUE KEY `option_name` (`meta_name`)
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-        ';
+        ";
         $params = array();
 
         // Query 1
-        $result_1 = self::query($sql_1, $params, false);
+        self::query($sql_1, $params, false);
 
         // Now, create the content in the meta table.
-        $sql_2 = '
+        $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES 
-            ("active_integrations", ?),
-            ("wave_key", ?),
-            ("scan_status", ?),
-            ("scan_schedule", ?),
-            ("scan_log", ?),
-            ("scannable_pages", ?),
-            ("pages_scanned", ?),
-            ("last_scan_time", ?);
-        ';
+            ('active_integrations', ?),
+            ('wave_key', ?),
+            ('scan_status', ?),
+            ('scan_schedule', ?),
+            ('scan_log', ?),
+            ('scannable_pages', ?),
+            ('pages_scanned', ?),
+            ('last_scan_time', ?);
+        ";
         $default_active_integrations = serialize(array('wave'));
         $default_wave_key = $GLOBALS['wave_key'];
         $default_scan_status = '';
@@ -766,15 +776,19 @@ class DataAccess {
         $default_last_scan_time = '';
         $default_pages_scanned = 0;
         $params = array(
-            $default_active_integrations, $default_wave_key,
-            $default_scan_status, $default_scan_schedule,
-            $default_scan_log, $default_scannable_pages, 
-            $default_pages_scanned, $default_last_scan_time
+            $default_active_integrations, 
+            $default_wave_key,
+            $default_scan_status, 
+            $default_scan_schedule,
+            $default_scan_log, 
+            $default_scannable_pages, 
+            $default_pages_scanned, 
+            $default_last_scan_time
         );
 
         // Query 2
-        $result_2 = self::query($sql_2, $params, false);
-        
+        self::query($sql_2, $params, false);
+
     }
     
     /**
@@ -784,14 +798,14 @@ class DataAccess {
 
         // SQL
         $sql = 
-            'CREATE TABLE `sites` (
+            "CREATE TABLE `sites` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
-                `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "static",
-                `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT "active",
+                `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
+                `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'active',
                 `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
                 PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;';
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
         $params = array();
         
         // Query

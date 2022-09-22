@@ -23,6 +23,9 @@ function process_alerts( array $integration_output) {
     $processed_urls = $integration_output[
         'processed_urls'
     ];
+    $processed_sites = $integration_output[
+        'processed_sites'
+    ];
 
     // We don't know where helpers are being called, so 
     // we must set the directory if it isn't already set.
@@ -61,7 +64,7 @@ function process_alerts( array $integration_output) {
 
     // Let's find equalified alerts.
     $equalified_alerts =  DataAccess::get_joined_db(
-        'equalified_alerts'
+        'equalified_alerts', $processed_sites
     );
 
     // Let's mark the status of these alerts "Equalified".
