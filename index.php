@@ -65,10 +65,21 @@ require_once 'actions/run_scheduled_scan.php';
     <main>
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-light sticky-top border-end" style="width: 250px;">
             <a href="index.php" class="d-flex text-success align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
-            <embed src="<?php echo $GLOBALS['service_logo']; ?>">
-                <?php if ($GLOBALS['service_name']) { ?>     
-                <h1 id="brand" class="fs-4 fw-bolder"><?php echo $GLOBALS['service_name']; ?></h1>
-                <?php } ?>
+                <embed id="service_logo" src="<?php echo $GLOBALS['service_logo']; ?>">
+
+                <?php 
+                // Sets the service name, defined in config.php
+                if ($GLOBALS['service_name']) { 
+                ?>
+
+                <h1 id="service_name" class="fs-4 fw-bolder">
+                    <?php echo $GLOBALS['service_name']; ?>
+                </h1>
+                
+                <?php 
+                } 
+                ?>
+
             </a>
             <ul class="nav nav-pills flex-column mb-auto mt-5">
                 <li class="nav-item">

@@ -49,9 +49,16 @@ pre code{
 .fs-7{
     font-size: .9em;
 }
-#brand{
+#service_name{
     text-transform: uppercase;
     letter-spacing: .035em;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    padding-top: .55rem;
+}
+#service_logo{
+    margin-right: .5rem;
 }
 .badge .spinner-border-sm{
     --bs-spinner-width: .7rem;
