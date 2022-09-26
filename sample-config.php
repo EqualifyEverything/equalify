@@ -28,5 +28,5 @@ $GLOBALS['page_limit'] = '1111';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';
 
-$GLOBALS['service_logo'] = 'assets/equalify/equalify-logo_layers.svg';
+$GLOBALS['service_logo'] = 'assets/equalify/equalify-logo.svg';
 $GLOBALS['service_name'] = 'Equalify';
