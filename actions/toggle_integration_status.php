@@ -51,23 +51,7 @@ if($old_status == 'Active'){
                     );
             }
         }
-
-        // Delete "pages" fields.
-        if( !empty($integration_db_fields['pages']) ){
-            foreach(
-                $integration_db_fields['pages'] 
-                as $integration_pages_field
-            ){
-                if(
-                    DataAccess::db_column_exists('pages', 
-                    $integration_pages_field['name']
-                ))
-                    DataAccess::delete_db_column(
-                        'pages', $integration_pages_field['name']
-                    );
-            }
-        }
-
+        
     }
 
     // Remove tags.
