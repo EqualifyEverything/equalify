@@ -14,6 +14,7 @@ require_once '../config.php';
 require_once '../models/integrations.php';
 require_once '../models/db.php';
 require_once '../helpers/register_tags.php';
+require_once '../helpers/delete_tags.php';
 
 // Get URL parameters.
 $integration_uri = $_GET['uri'];
@@ -69,6 +70,14 @@ if($old_status == 'Active'){
 
     }
 
+    // Remove tags.
+    $integration_tags = get_integration_tags(
+        $integration_uri
+    );
+    if( !empty($integration_tags) ){
+        delete_tags($integration_tags);
+    }
+    
     // Remove from "active_integrations" meta field.
     $active_integrations = unserialize(
         DataAccess::get_meta_value('active_integrations')
