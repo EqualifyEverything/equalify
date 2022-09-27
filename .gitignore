@@ -4,3 +4,5 @@ login/
 config.php
 vendor/
 test/
+_dev/
+_private/
