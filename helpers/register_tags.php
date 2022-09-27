@@ -22,8 +22,8 @@ function register_tags(array $tags){
         define('__ROOT__', dirname(dirname(__FILE__)));
 
     // We'll use the directory to include required files.
-    require_once(__ROOT__.'/config.php');
-    require_once(__ROOT__.'/models/db.php');
+    require_once(__ROOT__.'/../config.php');
+    require_once(__ROOT__.'/../models/db.php');
 
     // To make sure all the slugs are unique, we need to 
     // reformat the tags for a db filter.

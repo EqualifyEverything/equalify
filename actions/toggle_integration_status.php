@@ -13,6 +13,7 @@
 require_once '../config.php';
 require_once '../models/integrations.php';
 require_once '../models/db.php';
+require_once '../helpers/register_tags.php';
 
 // Get URL parameters.
 $integration_uri = $_GET['uri'];
@@ -132,6 +133,14 @@ if($old_status == 'Active'){
             }
         }
 
+    }
+
+    // Register tags.
+    $integration_tags = get_integration_tags(
+        $integration_uri
+    );
+    if( !empty($integration_tags) ){
+        register_tags($integration_tags);
     }
 
     // Add to "active_integrations" meta field.

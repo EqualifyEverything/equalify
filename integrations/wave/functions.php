@@ -56,7 +56,7 @@ function wave_tags(){
         define('__ROOT__', dirname(dirname(__FILE__)));
     
     // Read the JSON file - pulled from https://wave.webaim.org/api/docs?format=json
-    $wave_tag_json = file_get_contents(__ROOT__.'/integrations/wave/wave_tags.json');
+    $wave_tag_json = file_get_contents(__ROOT__.'/wave/wave_tags.json');
     $wave_tags = json_decode($wave_tag_json,true);
 
     // Convert WAVE format into Equalify format:
@@ -90,6 +90,9 @@ function wave_tags(){
 
         }
     }
+
+    // Return tags.
+    return $tags;
 
 }
 
