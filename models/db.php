@@ -716,11 +716,9 @@ class DataAccess {
         // Let's create the tags table.
         $sql = 
             "CREATE TABLE `tags` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `slug` varchar(255) NOT NULL,
                 `title` varchar(255) NOT NULL,
-                `description` text,
-                PRIMARY KEY (`id`)
+                `description` text
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         $result = self::query($sql, $params, false);
