@@ -1,0 +1,1617 @@
+[
+  {
+    "name": "alt_missing",
+    "title": "Missing alternative text",
+    "type": "error",
+    "summary": "Image alternative text is not present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_link_missing",
+    "title": "Linked image missing alternative text",
+    "type": "error",
+    "summary": "An image without alternative text results in an empty link.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "alt_spacer_missing",
+    "title": "Spacer image missing alternative text",
+    "type": "error",
+    "summary": "A layout spacer image (which should have null/empty alternative text) does not have an alt attribute.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_input_missing",
+    "title": "Image button missing alternative text",
+    "type": "error",
+    "summary": "Alternative text is not present for a form image button.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "alt_area_missing",
+    "title": "Image map area missing alternative text",
+    "type": "error",
+    "summary": "Alternative text is not present for an image map area (hot spot).",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "alt_map_missing",
+    "title": "Image map missing alternative text",
+    "type": "error",
+    "summary": "An image that has hot spots does not have an alt attribute.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "longdesc_invalid",
+    "title": "Invalid longdesc",
+    "type": "error",
+    "summary": "The longdesc attribute is not a URL.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "label_missing",
+    "title": "Missing form label",
+    "type": "error",
+    "summary": "A form control does not have a corresponding label.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "label_empty",
+    "title": "Empty form label",
+    "type": "error",
+    "summary": "A form label is present, but does not contain any content.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "label_multiple",
+    "title": "Multiple form labels",
+    "type": "error",
+    "summary": "A form control has more than one label associated with it.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_reference_broken",
+    "title": "Broken ARIA reference",
+    "type": "error",
+    "summary": "An aria-labelledby or aria-describedby reference exists, but the target for the reference does not exist.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_menu_broken",
+    "title": "Broken ARIA menu",
+    "type": "error",
+    "summary": "An ARIA menu does not contain required menu items.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "title_invalid",
+    "title": "Missing or uninformative page title",
+    "type": "error",
+    "summary": "The page title is missing or not descriptive.",
+    "guidelines": [
+      {
+        "name": "2.4.2 Page Titled (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.2"
+      }
+    ]
+  },
+  {
+    "name": "language_missing",
+    "title": "Language missing or invalid",
+    "type": "error",
+    "summary": "The language of the document is not identified or a lang attribute value is invalid.",
+    "guidelines": [
+      {
+        "name": "3.1.1 Language of Page (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.1.1"
+      }
+    ]
+  },
+  {
+    "name": "meta_refresh",
+    "title": "Page refreshes or redirects",
+    "type": "error",
+    "summary": "The page is set to automatically change location or refresh using a <meta> tag.",
+    "guidelines": [
+      {
+        "name": "2.2.1 Timing Adjustable (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.2.1"
+      },
+      {
+        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
+      }
+    ]
+  },
+  {
+    "name": "heading_empty",
+    "title": "Empty heading",
+    "type": "error",
+    "summary": "A heading contains no content.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "button_empty",
+    "title": "Empty button",
+    "type": "error",
+    "summary": "A button is empty or has no value text.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "link_empty",
+    "title": "Empty link",
+    "type": "error",
+    "summary": "A link contains no text.",
+    "guidelines": [
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "link_skip_broken",
+    "title": "Broken skip link",
+    "type": "error",
+    "summary": "A skip navigation link exists, but the target for the link does not exist or the link is not keyboard accessible.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "th_empty",
+    "title": "Empty table header",
+    "type": "error",
+    "summary": "A <th> (table header) contains no text.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "blink",
+    "title": "Blinking content",
+    "type": "error",
+    "summary": "Blinking content is present.",
+    "guidelines": [
+      {
+        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
+      }
+    ]
+  },
+  {
+    "name": "marquee",
+    "title": "Marquee",
+    "type": "error",
+    "summary": "A <marquee> element is present.",
+    "guidelines": [
+      {
+        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
+      }
+    ]
+  },
+  {
+    "name": "contrast",
+    "title": "Very low contrast",
+    "type": "contrast",
+    "summary": "Very low contrast between text and background colors.",
+    "guidelines": [
+      {
+        "name": "1.4.3 Contrast (Minimum) (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.4.3"
+      }
+    ]
+  },
+  {
+    "name": "alt_suspicious",
+    "title": "Suspicious alternative text",
+    "type": "alert",
+    "summary": "Alternative text is likely insufficient or contains extraneous information.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_redundant",
+    "title": "Redundant alternative text",
+    "type": "alert",
+    "summary": "The alternative text for an image is the same as nearby or adjacent text.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_duplicate",
+    "title": "A nearby image has the same alternative text",
+    "type": "alert",
+    "summary": "Two images near each other have the same alternative text.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_long",
+    "title": "Long alternative text",
+    "type": "alert",
+    "summary": "An image has very long alternative text.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "longdesc",
+    "title": "Long description",
+    "type": "alert",
+    "summary": "The longdesc attribute is present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "image_title",
+    "title": "Image with title",
+    "type": "alert",
+    "summary": "An image has a title attribute value but no alt value.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "label_orphaned",
+    "title": "Orphaned form label",
+    "type": "alert",
+    "summary": "A form label is present, but it is not correctly associated with a form control.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "label_title",
+    "title": "Unlabeled form control with title",
+    "type": "alert",
+    "summary": "A form control does not have a label, but has a title.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "select_missing_label",
+    "title": "Select missing label",
+    "type": "alert",
+    "summary": "A select element does not have an associated label",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "fieldset_missing",
+    "title": "Missing fieldset",
+    "type": "alert",
+    "summary": "A group of check boxes or radio buttons is not enclosed in a fieldset.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "legend_missing",
+    "title": "Fieldset missing legend",
+    "type": "alert",
+    "summary": "A fieldset does not have a legend.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "3.3.2 Labels or Instructions (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
+      }
+    ]
+  },
+  {
+    "name": "heading_missing",
+    "title": "No heading structure",
+    "type": "alert",
+    "summary": "The page has no headings.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h1_missing",
+    "title": "Missing first level heading",
+    "type": "alert",
+    "summary": "A page does not have a first level heading.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "region_missing",
+    "title": "No page regions",
+    "type": "alert",
+    "summary": "No page regions or ARIA landmarks were found.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "heading_skipped",
+    "title": "Skipped heading level",
+    "type": "alert",
+    "summary": "A heading level is skipped.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "heading_possible",
+    "title": "Possible heading",
+    "type": "alert",
+    "summary": "Text appears to be a heading but is not a heading element.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "table_layout",
+    "title": "Layout table",
+    "type": "alert",
+    "summary": "A layout table is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "1.3.2 Meaningful Sequence (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.2"
+      }
+    ]
+  },
+  {
+    "name": "table_caption_possible",
+    "title": "Possible table caption",
+    "type": "alert",
+    "summary": "Text appears to be a table caption, but is not a caption element.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "list_possible",
+    "title": "Possible list",
+    "type": "alert",
+    "summary": "Text is structured like a list but lacks proper list semantics.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "link_internal_broken",
+    "title": "Broken same-page link",
+    "type": "alert",
+    "summary": "A link to another location within the page is present but does not have a corresponding target.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      }
+    ]
+  },
+  {
+    "name": "link_suspicious",
+    "title": "Suspicious link text",
+    "type": "alert",
+    "summary": "Link text contains extraneous text or may not make sense out of context.",
+    "guidelines": [
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "link_redundant",
+    "title": "Redundant link",
+    "type": "alert",
+    "summary": "Adjacent links go to the same URL.",
+    "guidelines": [
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "link_word",
+    "title": "Link to Word document",
+    "type": "alert",
+    "summary": "A link to a Microsoft Word document is present.",
+    "guidelines": []
+  },
+  {
+    "name": "link_excel",
+    "title": "Link to Excel spreadsheet",
+    "type": "alert",
+    "summary": "A link to a Microsoft Excel spreadsheet is present.",
+    "guidelines": []
+  },
+  {
+    "name": "link_powerpoint",
+    "title": "Link to PowerPoint document",
+    "type": "alert",
+    "summary": "A link to a Microsoft PowerPoint presentation is present.",
+    "guidelines": []
+  },
+  {
+    "name": "link_pdf",
+    "title": "Link to PDF document",
+    "type": "alert",
+    "summary": "A link to a PDF document is present.",
+    "guidelines": []
+  },
+  {
+    "name": "link_document",
+    "title": "Link to document",
+    "type": "alert",
+    "summary": "A link to a non-HTML document is present.",
+    "guidelines": []
+  },
+  {
+    "name": "audio_video",
+    "title": "Audio/Video",
+    "type": "alert",
+    "summary": "An audio or video file or link is present.",
+    "guidelines": [
+      {
+        "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.1"
+      },
+      {
+        "name": "1.2.2 Captions (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.2"
+      },
+      {
+        "name": "1.2.3 Audio Description or Media Alternative (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.3"
+      },
+      {
+        "name": "1.2.5 Audio Description (Prerecorded) (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.5"
+      },
+      {
+        "name": "1.4.2 Audio Control (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.4.2"
+      }
+    ]
+  },
+  {
+    "name": "html5_video_audio",
+    "title": "HTML5 video or audio",
+    "type": "alert",
+    "summary": "A <video> or <audio> element is present.",
+    "guidelines": [
+      {
+        "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.1"
+      },
+      {
+        "name": "1.2.2 Captions (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.2"
+      },
+      {
+        "name": "1.2.3 Audio Description or Media Alternative (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.3"
+      },
+      {
+        "name": "1.2.5 Audio Description (Prerecorded) (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.5"
+      },
+      {
+        "name": "1.4.2 Audio Control (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.4.2"
+      }
+    ]
+  },
+  {
+    "name": "youtube_video",
+    "title": "YouTube video",
+    "type": "alert",
+    "summary": "An embedded or linked YouTube video is present.",
+    "guidelines": [
+      {
+        "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.1"
+      },
+      {
+        "name": "1.2.2 Captions (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.2"
+      },
+      {
+        "name": "1.2.3 Audio Description or Media Alternative (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.3"
+      }
+    ]
+  },
+  {
+    "name": "flash",
+    "title": "Flash",
+    "type": "alert",
+    "summary": "Flash content is present.",
+    "guidelines": [
+      {
+        "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.1"
+      },
+      {
+        "name": "1.2.2 Captions (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.2"
+      },
+      {
+        "name": "1.2.3 Audio Description or Media Alternative (Prerecorded) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.3"
+      },
+      {
+        "name": "1.2.5 Audio Description (Prerecorded) (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.2.5"
+      },
+      {
+        "name": "2.1.2 No Keyboard Trap (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.2"
+      }
+    ]
+  },
+  {
+    "name": "applet",
+    "title": "Java applet",
+    "type": "alert",
+    "summary": "A Java applet is present.",
+    "guidelines": []
+  },
+  {
+    "name": "plugin",
+    "title": "Plugin",
+    "type": "alert",
+    "summary": "An unidentified plugin is present.",
+    "guidelines": []
+  },
+  {
+    "name": "noscript",
+    "title": "Noscript element",
+    "type": "alert",
+    "summary": "A <noscript> element is present.",
+    "guidelines": []
+  },
+  {
+    "name": "event_handler",
+    "title": "Device dependent event handler",
+    "type": "alert",
+    "summary": "An event handler is present that may not be accessible.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      }
+    ]
+  },
+  {
+    "name": "javascript_jumpmenu",
+    "title": "JavaScript jump menu",
+    "type": "alert",
+    "summary": "A JavaScript jump menu may be present.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      },
+      {
+        "name": "3.2.2 On Input (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.2.2"
+      }
+    ]
+  },
+  {
+    "name": "accesskey",
+    "title": "Accesskey",
+    "type": "alert",
+    "summary": "An accesskey attribute is present.",
+    "guidelines": [
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "tabindex",
+    "title": "Tabindex",
+    "type": "alert",
+    "summary": "A positive tabindex value is present.",
+    "guidelines": [
+      {
+        "name": "2.4.3 Focus Order (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.3"
+      }
+    ]
+  },
+  {
+    "name": "text_small",
+    "title": "Very small text",
+    "type": "alert",
+    "summary": "Text is very small.",
+    "guidelines": []
+  },
+  {
+    "name": "text_justified",
+    "title": "Justified text",
+    "type": "alert",
+    "summary": "Fully justified text is present.",
+    "guidelines": []
+  },
+  {
+    "name": "underline",
+    "title": "Underlined text",
+    "type": "alert",
+    "summary": "Underlined text is present.",
+    "guidelines": []
+  },
+  {
+    "name": "title_redundant",
+    "title": "Redundant title text",
+    "type": "alert",
+    "summary": "Title attribute text is the same as text or alternative text.",
+    "guidelines": []
+  },
+  {
+    "name": "alt",
+    "title": "Alternative text",
+    "type": "feature",
+    "summary": "Image alternative text is present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_null",
+    "title": "Null or empty alternative text",
+    "type": "feature",
+    "summary": "Alternative text is null or empty (alt=\"\").",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_spacer",
+    "title": "Null or empty alternative text on spacer",
+    "type": "feature",
+    "summary": "Alternative text is null or empty (alt=\"\") on a spacer image.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_link",
+    "title": "Linked image with alternative text",
+    "type": "feature",
+    "summary": "Alternative text is present for an image that is within a link.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "alt_input",
+    "title": "Image button with alternative text",
+    "type": "feature",
+    "summary": "Alternative text is present for an image input element.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "alt_map",
+    "title": "Image map with alternative text",
+    "type": "feature",
+    "summary": "An alt attribute is present for an image that has hot spots.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "alt_area",
+    "title": "Image map area with alternative text",
+    "type": "feature",
+    "summary": "Alternative text is present for an image map area (hot spot).",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
+      }
+    ]
+  },
+  {
+    "name": "figure",
+    "title": "Figure",
+    "type": "feature",
+    "summary": "A figure is present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      }
+    ]
+  },
+  {
+    "name": "label",
+    "title": "Form label",
+    "type": "feature",
+    "summary": "A form label is present and associated with a form control.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "fieldset",
+    "title": "Fieldset",
+    "type": "feature",
+    "summary": "A fieldset is present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "link_skip",
+    "title": "Skip link",
+    "type": "feature",
+    "summary": "A link is present which allows users to skip over navigation or other content.",
+    "guidelines": [
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "link_skip_target",
+    "title": "Skip link target",
+    "type": "feature",
+    "summary": "A target for a \"skip\" link is present.",
+    "guidelines": [
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "lang",
+    "title": "Language",
+    "type": "feature",
+    "summary": "The language of the document or a page element is identified.",
+    "guidelines": [
+      {
+        "name": "3.1.2 Language of Parts (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.1.2"
+      }
+    ]
+  },
+  {
+    "name": "h1",
+    "title": "Heading level 1",
+    "type": "structure",
+    "summary": "A first level heading (<h1> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h2",
+    "title": "Heading level 2",
+    "type": "structure",
+    "summary": "A second level heading (<h2> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h3",
+    "title": "Heading level 3",
+    "type": "structure",
+    "summary": "A third level heading (<h3> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h4",
+    "title": "Heading level 4",
+    "type": "structure",
+    "summary": "A fourth level heading (<h4> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h5",
+    "title": "Heading level 5",
+    "type": "structure",
+    "summary": "A fifth level heading (<h5> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "h6",
+    "title": "Heading level 6",
+    "type": "structure",
+    "summary": "A sixth level heading (<h6> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      }
+    ]
+  },
+  {
+    "name": "ol",
+    "title": "Ordered list",
+    "type": "structure",
+    "summary": "An ordered (numbered) list (<ol> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "ul",
+    "title": "Unordered list",
+    "type": "structure",
+    "summary": "An unordered (bulleted) list (<ul> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "dl",
+    "title": "Definition/description list",
+    "type": "structure",
+    "summary": "A definition/description list (<dl> element) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "header",
+    "title": "Header",
+    "type": "structure",
+    "summary": "A <header> element or banner landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "nav",
+    "title": "Navigation",
+    "type": "structure",
+    "summary": "A <nav> element or navigation landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "search",
+    "title": "Search",
+    "type": "structure",
+    "summary": "An ARIA search landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "main",
+    "title": "Main content",
+    "type": "structure",
+    "summary": "A <main> element or main landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "aside",
+    "title": "Aside",
+    "type": "structure",
+    "summary": "An <aside> element or complementary landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "footer",
+    "title": "Footer",
+    "type": "structure",
+    "summary": "A <footer> element or contentinfo landmark is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "region",
+    "title": "Generic region",
+    "type": "structure",
+    "summary": "An ARIA region is present",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.1 Bypass Blocks (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
+      }
+    ]
+  },
+  {
+    "name": "table_data",
+    "title": "Data table",
+    "type": "structure",
+    "summary": "A data table is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "table_caption",
+    "title": "Table caption",
+    "type": "structure",
+    "summary": "A table caption is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "th",
+    "title": "Table header cell",
+    "type": "structure",
+    "summary": "A table header cell (<th>) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "th_col",
+    "title": "Column header cell",
+    "type": "structure",
+    "summary": "A table column header (<th scope=\"col\">) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "th_row",
+    "title": "Row header cell",
+    "type": "structure",
+    "summary": "A table row header (<th scope=\"row\">) is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      }
+    ]
+  },
+  {
+    "name": "iframe",
+    "title": "Inline frame",
+    "type": "structure",
+    "summary": "An inline frame (<iframe>) is present.",
+    "guidelines": []
+  },
+  {
+    "name": "aria",
+    "title": "ARIA",
+    "type": "aria",
+    "summary": "An ARIA role, state, or property is present.",
+    "guidelines": [
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_label",
+    "title": "ARIA label",
+    "type": "aria",
+    "summary": "An aria-label or aria-labelledby attribute is present.",
+    "guidelines": [
+      {
+        "name": "1.1.1 Non-text Content (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
+      },
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "2.4.6 Headings and Labels (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      },
+      {
+        "name": "2.5.3 Label in Name (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.5.3"
+      }
+    ]
+  },
+  {
+    "name": "aria_describedby",
+    "title": "ARIA description",
+    "type": "aria",
+    "summary": "An aria-describedby attribute is present.",
+    "guidelines": [
+      {
+        "name": "1.3.1 Info and Relationships (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_live_region",
+    "title": "ARIA alert or live region",
+    "type": "aria",
+    "summary": "An ARIA alert role or live region is present.",
+    "guidelines": [
+      {
+        "name": "3.3.1 Error Identification (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc3.3.1"
+      },
+      {
+        "name": "4.1.3 Status Messages (Level AA)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.3"
+      }
+    ]
+  },
+  {
+    "name": "aria_menu",
+    "title": "ARIA menu",
+    "type": "aria",
+    "summary": "An ARIA menu is present.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_button",
+    "title": "ARIA button",
+    "type": "aria",
+    "summary": "An element with role=\"button\" is present.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      },
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_expanded",
+    "title": "ARIA expanded",
+    "type": "aria",
+    "summary": "An aria-expanded attribute is present.",
+    "guidelines": [
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_haspopup",
+    "title": "ARIA popup",
+    "type": "aria",
+    "summary": "An element triggers a popup menu, dialog, or other element.",
+    "guidelines": [
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  },
+  {
+    "name": "aria_tabindex",
+    "title": "ARIA tabindex",
+    "type": "aria",
+    "summary": "A tabindex value of 0 or less is present.",
+    "guidelines": [
+      {
+        "name": "2.1.1 Keyboard (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
+      }
+    ]
+  },
+  {
+    "name": "aria_hidden",
+    "title": "ARIA hidden",
+    "type": "aria",
+    "summary": "Content is hidden with ARIA.",
+    "guidelines": [
+      {
+        "name": "4.1.2 Name, Role, Value (Level A)",
+        "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
+      }
+    ]
+  }
+]

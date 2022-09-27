@@ -45,6 +45,54 @@ function wave_fields(){
 
 }
 
+/**
+ * WAVE Tags
+ */
+function wave_tags(){
+
+    // We don't know where helpers are being called, so we
+    // have to set the directory if it isn't already set.
+    if(!defined('__ROOT__'))
+        define('__ROOT__', dirname(dirname(__FILE__)));
+    
+    // Read the JSON file - pulled from https://wave.webaim.org/api/docs?format=json
+    $wave_tag_json = file_get_contents(__ROOT__.'/integrations/wave/wave_tags.json');
+    $wave_tags = json_decode($wave_tag_json,true);
+
+    // Convert WAVE format into Equalify format:
+    // tags [ array('slug' => $value, 'name' => $value, 'description' => $value) ]
+    $tags = array();
+    if(!empty($wave_tags)){
+        foreach($wave_tags as $wave_tag){
+
+            // First, let's prepare the description, which is
+            // the summary and guidelines.
+            $description = '<p class="lead">'.$wave_tag['summary'].'</p>';
+            if(!empty($wave_tag['guidelines'])){
+                $description.= '<p><strong>Guidelines:</strong> ';
+                $copy = $wave_tag['guidelines'];
+                foreach($wave_tag['guidelines'] as $guideline){
+                    $description.= '<a href="'.$guideline['link'].'">'.$guideline['name'].'</a>';
+                    if (next($copy ))
+                        $description.= ', ';
+                }
+                $description.= '</p>';
+            }
+            
+            // Now lets put it all together into the Equalify format.
+            array_push(
+                $tags, array(
+                    'slug' => $wave_tag['name'],
+                    'name' => $wave_tag['title'],
+                    'description' => $description
+                )
+            );
+
+        }
+    }
+
+}
+
  /**
   * WAVE URLs
   * Maps site URLs to Little Forest URLs for processing.
