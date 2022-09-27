@@ -709,6 +709,27 @@ class DataAccess {
     }
 
     /**
+     * Create Tags Table
+     */
+    public static function create_tags_table(){
+    
+        // SQL
+        $sql = 
+            "CREATE TABLE `tags` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `slug` varchar(255) NOT NULL,
+                `name` varchar(255) NOT NULL,
+                `description` text,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
+        
+    }
+
+    /**
      * Create Queued Alerts Table
      */
     public static function create_queued_alerts_table(){
