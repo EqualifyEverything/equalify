@@ -60,7 +60,7 @@ function register_tags(array $tags){
             array_push( 
                 $data, array(
                     'slug' => $tag['slug'],
-                    'name' => $tag['name'],
+                    'title' => $tag['title'],
                     'description' => $tag['description']
                 )
             );

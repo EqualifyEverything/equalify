@@ -83,7 +83,7 @@ function wave_tags(){
             array_push(
                 $tags, array(
                     'slug' => $wave_tag['name'],
-                    'name' => $wave_tag['title'],
+                    'title' => $wave_tag['title'],
                     'description' => $description
                 )
             );
