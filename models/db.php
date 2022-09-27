@@ -713,7 +713,7 @@ class DataAccess {
      */
     public static function create_tags_table(){
     
-        // SQL
+        // Let's create the tags table.
         $sql = 
             "CREATE TABLE `tags` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -723,9 +723,19 @@ class DataAccess {
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
-        
-        // Query
         $result = self::query($sql, $params, false);
+
+        // Now we need to register WAVE tags, since
+        // the plugin is activated by default.
+        require_once 'integrations.php';
+        require_once 'helpers/register_tags.php';
+        $integration_tags = get_integration_tags(
+            'wave'
+        );
+        if( !empty($integration_tags) ){
+            register_tags($integration_tags);
+        }
+
         
     }
 

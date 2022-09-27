@@ -52,11 +52,11 @@ function wave_tags(){
 
     // We don't know where helpers are being called, so we
     // have to set the directory if it isn't already set.
-    if(!defined('__ROOT__'))
-        define('__ROOT__', dirname(dirname(__FILE__)));
+    if(!defined('__DIR__'))
+        define('__DIR__', dirname(dirname(__FILE__)));
     
     // Read the JSON file - pulled from https://wave.webaim.org/api/docs?format=json
-    $wave_tag_json = file_get_contents(__ROOT__.'/wave/wave_tags.json');
+    $wave_tag_json = file_get_contents(__DIR__.'/wave_tags.json');
     $wave_tags = json_decode($wave_tag_json,true);
 
     // Convert WAVE format into Equalify format:
