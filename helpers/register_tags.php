@@ -14,7 +14,7 @@
  * @param string tags [ array('slug' => $value, 'name' => 
  * * $value, 'description' => $value) ]
  */
-function register_tags($tags){
+function register_tags(array $tags){
 
     // We don't know where helpers are being called, so we
     // have to set the directory if it isn't already set.
@@ -25,7 +25,35 @@ function register_tags($tags){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Let's prepare the tags for the db.
+    // To make sure all the slugs are unique, we need to 
+    // reformat the tags for a db filter.
+    // [ array ('name' => $name, 'value' => $value, 
+    // 'operator' => '=', 'condition' => 'AND' ) ]
+    $filters = array();
+    if(!empty($tags)){
+        foreach($tags as $tag):
+            array_push( 
+                $filters, array(
+                    'name' => 'slug',
+                    'value' => $tag['slug'],
+                    'condition' => 'OR'
+                )
+            );
+        endforeach;
+    }
+
+    // Now let's see if any of those slugs exist.
+    $existing_tags = DataAccess::get_db_rows(
+        'tags', $filters 
+    );
+
+    // We can't go on if a slug already exists.
+    if(!empty($existing_tags['content']))
+        throw new Exception(
+            "A tag's slug is already use. All slugs must be unique"
+        );
+
+    // Let's prepare the tags to be added to the db.
     $data = array();
     if(!empty($tags)){
         foreach($tags as $tag):
