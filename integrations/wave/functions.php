@@ -84,6 +84,7 @@ function wave_tags(){
                 $tags, array(
                     'slug' => $wave_tag['name'],
                     'title' => $wave_tag['title'],
+                    'category' => $wave_tag['category'],
                     'description' => $description
                 )
             );

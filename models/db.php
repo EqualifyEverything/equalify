@@ -718,6 +718,7 @@ class DataAccess {
             "CREATE TABLE `tags` (
                 `slug` varchar(255) NOT NULL,
                 `title` varchar(255) NOT NULL,
+                `category` varchar(255),
                 `description` text
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();

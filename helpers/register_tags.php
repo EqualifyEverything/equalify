@@ -61,7 +61,8 @@ function register_tags(array $tags){
                 $data, array(
                     'slug' => $tag['slug'],
                     'title' => $tag['title'],
-                    'description' => $tag['description']
+                    'description' => $tag['description'],
+                    'category' => $tag['category']
                 )
             );
         endforeach;
