@@ -1626,7 +1626,7 @@
     "title": "ARIA alert or live region",
     "type": "aria",
     "summary": "An ARIA alert role or live region is present.",
-    "category": "",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "3.3.1 Error Identification (Level A)",
