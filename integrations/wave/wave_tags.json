@@ -229,7 +229,7 @@
     "title": "Language missing or invalid",
     "type": "error",
     "summary": "The language of the document is not identified or a lang attribute value is invalid.",
-    "category": "Document Settings",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "3.1.1 Language of Page (Level A)",
@@ -259,7 +259,7 @@
     "title": "Empty heading",
     "type": "error",
     "summary": "A heading contains no content.",
-    "category": "Document Settings",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -612,7 +612,7 @@
     "title": "No page regions",
     "type": "alert",
     "summary": "No page regions or ARIA landmarks were found.",
-    "category": "Document Settings",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
