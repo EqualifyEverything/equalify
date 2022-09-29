@@ -94,7 +94,7 @@
     "title": "Invalid longdesc",
     "type": "error",
     "summary": "The longdesc attribute is not a URL.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -353,7 +353,7 @@
     "title": "Marquee",
     "type": "error",
     "summary": "A <marquee> element is present.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "2.2.2 Pause, Stop, Hide (Level A)",
@@ -366,7 +366,7 @@
     "title": "Very low contrast",
     "type": "contrast",
     "summary": "Very low contrast between text and background colors.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "1.4.3 Contrast (Minimum) (Level AA)",
@@ -431,7 +431,7 @@
     "title": "Long description",
     "type": "alert",
     "summary": "The longdesc attribute is present.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -938,7 +938,7 @@
     "title": "JavaScript jump menu",
     "type": "alert",
     "summary": "A JavaScript jump menu may be present.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -955,7 +955,7 @@
     "title": "Accesskey",
     "type": "alert",
     "summary": "An accesskey attribute is present.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "2.4.1 Bypass Blocks (Level A)",
@@ -968,7 +968,7 @@
     "title": "Tabindex",
     "type": "alert",
     "summary": "A positive tabindex value is present.",
-    "category": "Uncategorized",
+    "category": "Other Tags",
     "guidelines": [
       {
         "name": "2.4.3 Focus Order (Level A)",
