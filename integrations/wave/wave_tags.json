@@ -4,6 +4,7 @@
     "title": "Missing alternative text",
     "type": "error",
     "summary": "Image alternative text is not present.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -16,6 +17,7 @@
     "title": "Linked image missing alternative text",
     "type": "error",
     "summary": "An image without alternative text results in an empty link.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -32,6 +34,7 @@
     "title": "Spacer image missing alternative text",
     "type": "error",
     "summary": "A layout spacer image (which should have null/empty alternative text) does not have an alt attribute.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -44,6 +47,7 @@
     "title": "Image button missing alternative text",
     "type": "error",
     "summary": "Alternative text is not present for a form image button.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -60,6 +64,7 @@
     "title": "Image map area missing alternative text",
     "type": "error",
     "summary": "Alternative text is not present for an image map area (hot spot).",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -76,6 +81,7 @@
     "title": "Image map missing alternative text",
     "type": "error",
     "summary": "An image that has hot spots does not have an alt attribute.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -88,6 +94,7 @@
     "title": "Invalid longdesc",
     "type": "error",
     "summary": "The longdesc attribute is not a URL.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -100,6 +107,7 @@
     "title": "Missing form label",
     "type": "error",
     "summary": "A form control does not have a corresponding label.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -124,6 +132,7 @@
     "title": "Empty form label",
     "type": "error",
     "summary": "A form label is present, but does not contain any content.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -148,6 +157,7 @@
     "title": "Multiple form labels",
     "type": "error",
     "summary": "A form control has more than one label associated with it.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -172,6 +182,7 @@
     "title": "Broken ARIA reference",
     "type": "error",
     "summary": "An aria-labelledby or aria-describedby reference exists, but the target for the reference does not exist.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -188,6 +199,7 @@
     "title": "Broken ARIA menu",
     "type": "error",
     "summary": "An ARIA menu does not contain required menu items.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -204,6 +216,7 @@
     "title": "Missing or uninformative page title",
     "type": "error",
     "summary": "The page title is missing or not descriptive.",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "2.4.2 Page Titled (Level A)",
@@ -216,6 +229,7 @@
     "title": "Language missing or invalid",
     "type": "error",
     "summary": "The language of the document is not identified or a lang attribute value is invalid.",
+    "category": "Document Settings",
     "guidelines": [
       {
         "name": "3.1.1 Language of Page (Level A)",
@@ -228,6 +242,7 @@
     "title": "Page refreshes or redirects",
     "type": "error",
     "summary": "The page is set to automatically change location or refresh using a <meta> tag.",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "2.2.1 Timing Adjustable (Level A)",
@@ -244,6 +259,7 @@
     "title": "Empty heading",
     "type": "error",
     "summary": "A heading contains no content.",
+    "category": "Document Settings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -264,6 +280,7 @@
     "title": "Empty button",
     "type": "error",
     "summary": "A button is empty or has no value text.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -280,6 +297,7 @@
     "title": "Empty link",
     "type": "error",
     "summary": "A link contains no text.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.4.4 Link Purpose (In Context) (Level A)",
@@ -292,6 +310,7 @@
     "title": "Broken skip link",
     "type": "error",
     "summary": "A skip navigation link exists, but the target for the link does not exist or the link is not keyboard accessible.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -308,6 +327,7 @@
     "title": "Empty table header",
     "type": "error",
     "summary": "A <th> (table header) contains no text.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -320,6 +340,7 @@
     "title": "Blinking content",
     "type": "error",
     "summary": "Blinking content is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "2.2.2 Pause, Stop, Hide (Level A)",
@@ -332,6 +353,7 @@
     "title": "Marquee",
     "type": "error",
     "summary": "A <marquee> element is present.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "2.2.2 Pause, Stop, Hide (Level A)",
@@ -344,6 +366,7 @@
     "title": "Very low contrast",
     "type": "contrast",
     "summary": "Very low contrast between text and background colors.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "1.4.3 Contrast (Minimum) (Level AA)",
@@ -356,6 +379,7 @@
     "title": "Suspicious alternative text",
     "type": "alert",
     "summary": "Alternative text is likely insufficient or contains extraneous information.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -368,6 +392,7 @@
     "title": "Redundant alternative text",
     "type": "alert",
     "summary": "The alternative text for an image is the same as nearby or adjacent text.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -380,6 +405,7 @@
     "title": "A nearby image has the same alternative text",
     "type": "alert",
     "summary": "Two images near each other have the same alternative text.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -392,6 +418,7 @@
     "title": "Long alternative text",
     "type": "alert",
     "summary": "An image has very long alternative text.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -404,6 +431,7 @@
     "title": "Long description",
     "type": "alert",
     "summary": "The longdesc attribute is present.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -416,6 +444,7 @@
     "title": "Image with title",
     "type": "alert",
     "summary": "An image has a title attribute value but no alt value.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -428,6 +457,7 @@
     "title": "Orphaned form label",
     "type": "alert",
     "summary": "A form label is present, but it is not correctly associated with a form control.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -452,6 +482,7 @@
     "title": "Unlabeled form control with title",
     "type": "alert",
     "summary": "A form control does not have a label, but has a title.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -476,6 +507,7 @@
     "title": "Select missing label",
     "type": "alert",
     "summary": "A select element does not have an associated label",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -496,6 +528,7 @@
     "title": "Missing fieldset",
     "type": "alert",
     "summary": "A group of check boxes or radio buttons is not enclosed in a fieldset.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -520,6 +553,7 @@
     "title": "Fieldset missing legend",
     "type": "alert",
     "summary": "A fieldset does not have a legend.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -544,6 +578,7 @@
     "title": "No heading structure",
     "type": "alert",
     "summary": "The page has no headings.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -560,6 +595,7 @@
     "title": "Missing first level heading",
     "type": "alert",
     "summary": "A page does not have a first level heading.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -576,6 +612,7 @@
     "title": "No page regions",
     "type": "alert",
     "summary": "No page regions or ARIA landmarks were found.",
+    "category": "Document Settings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -592,6 +629,7 @@
     "title": "Skipped heading level",
     "type": "alert",
     "summary": "A heading level is skipped.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -612,6 +650,7 @@
     "title": "Possible heading",
     "type": "alert",
     "summary": "Text appears to be a heading but is not a heading element.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -632,6 +671,7 @@
     "title": "Layout table",
     "type": "alert",
     "summary": "A layout table is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -648,6 +688,7 @@
     "title": "Possible table caption",
     "type": "alert",
     "summary": "Text appears to be a table caption, but is not a caption element.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -660,6 +701,7 @@
     "title": "Possible list",
     "type": "alert",
     "summary": "Text is structured like a list but lacks proper list semantics.",
+    "category": "Text and Lists",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -672,6 +714,7 @@
     "title": "Broken same-page link",
     "type": "alert",
     "summary": "A link to another location within the page is present but does not have a corresponding target.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -684,6 +727,7 @@
     "title": "Suspicious link text",
     "type": "alert",
     "summary": "Link text contains extraneous text or may not make sense out of context.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.4.4 Link Purpose (In Context) (Level A)",
@@ -696,6 +740,7 @@
     "title": "Redundant link",
     "type": "alert",
     "summary": "Adjacent links go to the same URL.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.4.4 Link Purpose (In Context) (Level A)",
@@ -708,6 +753,7 @@
     "title": "Link to Word document",
     "type": "alert",
     "summary": "A link to a Microsoft Word document is present.",
+    "category": "Links",
     "guidelines": []
   },
   {
@@ -715,6 +761,7 @@
     "title": "Link to Excel spreadsheet",
     "type": "alert",
     "summary": "A link to a Microsoft Excel spreadsheet is present.",
+    "category": "Links",
     "guidelines": []
   },
   {
@@ -722,6 +769,7 @@
     "title": "Link to PowerPoint document",
     "type": "alert",
     "summary": "A link to a Microsoft PowerPoint presentation is present.",
+    "category": "Links",
     "guidelines": []
   },
   {
@@ -729,6 +777,7 @@
     "title": "Link to PDF document",
     "type": "alert",
     "summary": "A link to a PDF document is present.",
+    "category": "Links",
     "guidelines": []
   },
   {
@@ -736,6 +785,7 @@
     "title": "Link to document",
     "type": "alert",
     "summary": "A link to a non-HTML document is present.",
+    "category": "Links",
     "guidelines": []
   },
   {
@@ -743,6 +793,7 @@
     "title": "Audio/Video",
     "type": "alert",
     "summary": "An audio or video file or link is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
@@ -771,6 +822,7 @@
     "title": "HTML5 video or audio",
     "type": "alert",
     "summary": "A <video> or <audio> element is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
@@ -799,6 +851,7 @@
     "title": "YouTube video",
     "type": "alert",
     "summary": "An embedded or linked YouTube video is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
@@ -819,6 +872,7 @@
     "title": "Flash",
     "type": "alert",
     "summary": "Flash content is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "1.2.1 Prerecorded Audio-only and Video-only (Level A)",
@@ -847,6 +901,7 @@
     "title": "Java applet",
     "type": "alert",
     "summary": "A Java applet is present.",
+    "category": "Media",
     "guidelines": []
   },
   {
@@ -854,6 +909,7 @@
     "title": "Plugin",
     "type": "alert",
     "summary": "An unidentified plugin is present.",
+    "category": "Media",
     "guidelines": []
   },
   {
@@ -861,6 +917,7 @@
     "title": "Noscript element",
     "type": "alert",
     "summary": "A <noscript> element is present.",
+    "category": "Media",
     "guidelines": []
   },
   {
@@ -868,6 +925,7 @@
     "title": "Device dependent event handler",
     "type": "alert",
     "summary": "An event handler is present that may not be accessible.",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -880,6 +938,7 @@
     "title": "JavaScript jump menu",
     "type": "alert",
     "summary": "A JavaScript jump menu may be present.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -896,6 +955,7 @@
     "title": "Accesskey",
     "type": "alert",
     "summary": "An accesskey attribute is present.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "2.4.1 Bypass Blocks (Level A)",
@@ -908,6 +968,7 @@
     "title": "Tabindex",
     "type": "alert",
     "summary": "A positive tabindex value is present.",
+    "category": "Uncategorized",
     "guidelines": [
       {
         "name": "2.4.3 Focus Order (Level A)",
@@ -920,6 +981,7 @@
     "title": "Very small text",
     "type": "alert",
     "summary": "Text is very small.",
+    "category": "Text and Lists",
     "guidelines": []
   },
   {
@@ -927,6 +989,7 @@
     "title": "Justified text",
     "type": "alert",
     "summary": "Fully justified text is present.",
+    "category": "Text and Lists",
     "guidelines": []
   },
   {
@@ -934,6 +997,7 @@
     "title": "Underlined text",
     "type": "alert",
     "summary": "Underlined text is present.",
+    "category": "Text and Lists",
     "guidelines": []
   },
   {
@@ -941,6 +1005,7 @@
     "title": "Redundant title text",
     "type": "alert",
     "summary": "Title attribute text is the same as text or alternative text.",
+    "category": "Text and Lists",
     "guidelines": []
   },
   {
@@ -948,6 +1013,7 @@
     "title": "Alternative text",
     "type": "feature",
     "summary": "Image alternative text is present.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -960,6 +1026,7 @@
     "title": "Null or empty alternative text",
     "type": "feature",
     "summary": "Alternative text is null or empty (alt=\"\").",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -972,6 +1039,7 @@
     "title": "Null or empty alternative text on spacer",
     "type": "feature",
     "summary": "Alternative text is null or empty (alt=\"\") on a spacer image.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -984,6 +1052,7 @@
     "title": "Linked image with alternative text",
     "type": "feature",
     "summary": "Alternative text is present for an image that is within a link.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1000,6 +1069,7 @@
     "title": "Image button with alternative text",
     "type": "feature",
     "summary": "Alternative text is present for an image input element.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1016,6 +1086,7 @@
     "title": "Image map with alternative text",
     "type": "feature",
     "summary": "An alt attribute is present for an image that has hot spots.",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1028,6 +1099,7 @@
     "title": "Image map area with alternative text",
     "type": "feature",
     "summary": "Alternative text is present for an image map area (hot spot).",
+    "category": "Alt-related",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1044,6 +1116,7 @@
     "title": "Figure",
     "type": "feature",
     "summary": "A figure is present.",
+    "category": "Media",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1056,6 +1129,7 @@
     "title": "Form label",
     "type": "feature",
     "summary": "A form label is present and associated with a form control.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1076,6 +1150,7 @@
     "title": "Fieldset",
     "type": "feature",
     "summary": "A fieldset is present.",
+    "category": "Form Elements",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1096,6 +1171,7 @@
     "title": "Skip link",
     "type": "feature",
     "summary": "A link is present which allows users to skip over navigation or other content.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.4.1 Bypass Blocks (Level A)",
@@ -1108,6 +1184,7 @@
     "title": "Skip link target",
     "type": "feature",
     "summary": "A target for a \"skip\" link is present.",
+    "category": "Links",
     "guidelines": [
       {
         "name": "2.4.1 Bypass Blocks (Level A)",
@@ -1120,6 +1197,7 @@
     "title": "Language",
     "type": "feature",
     "summary": "The language of the document or a page element is identified.",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "3.1.2 Language of Parts (Level AA)",
@@ -1132,6 +1210,7 @@
     "title": "Heading level 1",
     "type": "structure",
     "summary": "A first level heading (<h1> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1152,6 +1231,7 @@
     "title": "Heading level 2",
     "type": "structure",
     "summary": "A second level heading (<h2> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1172,6 +1252,7 @@
     "title": "Heading level 3",
     "type": "structure",
     "summary": "A third level heading (<h3> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1192,6 +1273,7 @@
     "title": "Heading level 4",
     "type": "structure",
     "summary": "A fourth level heading (<h4> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1212,6 +1294,7 @@
     "title": "Heading level 5",
     "type": "structure",
     "summary": "A fifth level heading (<h5> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1232,6 +1315,7 @@
     "title": "Heading level 6",
     "type": "structure",
     "summary": "A sixth level heading (<h6> element) is present.",
+    "category": "Headings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1252,6 +1336,7 @@
     "title": "Ordered list",
     "type": "structure",
     "summary": "An ordered (numbered) list (<ol> element) is present.",
+    "category": "Text and Lists",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1264,6 +1349,7 @@
     "title": "Unordered list",
     "type": "structure",
     "summary": "An unordered (bulleted) list (<ul> element) is present.",
+    "category": "Text and Lists",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1276,6 +1362,7 @@
     "title": "Definition/description list",
     "type": "structure",
     "summary": "A definition/description list (<dl> element) is present.",
+    "category": "Text and Lists",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1288,6 +1375,7 @@
     "title": "Header",
     "type": "structure",
     "summary": "A <header> element or banner landmark is present.",
+    "category": "Page Settings",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1304,6 +1392,7 @@
     "title": "Navigation",
     "type": "structure",
     "summary": "A <nav> element or navigation landmark is present.",
+    "category": "Other HTML",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1320,6 +1409,7 @@
     "title": "Search",
     "type": "structure",
     "summary": "An ARIA search landmark is present.",
+    "category": "Other HTML",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1336,6 +1426,7 @@
     "title": "Main content",
     "type": "structure",
     "summary": "A <main> element or main landmark is present.",
+    "category": "Other HTML",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1352,6 +1443,7 @@
     "title": "Aside",
     "type": "structure",
     "summary": "An <aside> element or complementary landmark is present.",
+    "category": "Other HTML",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1368,6 +1460,7 @@
     "title": "Footer",
     "type": "structure",
     "summary": "A <footer> element or contentinfo landmark is present.",
+    "category": "Other HTML",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1384,6 +1477,7 @@
     "title": "Generic region",
     "type": "structure",
     "summary": "An ARIA region is present",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1400,6 +1494,7 @@
     "title": "Data table",
     "type": "structure",
     "summary": "A data table is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1412,6 +1507,7 @@
     "title": "Table caption",
     "type": "structure",
     "summary": "A table caption is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1424,6 +1520,7 @@
     "title": "Table header cell",
     "type": "structure",
     "summary": "A table header cell (<th>) is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1436,6 +1533,7 @@
     "title": "Column header cell",
     "type": "structure",
     "summary": "A table column header (<th scope=\"col\">) is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1448,6 +1546,7 @@
     "title": "Row header cell",
     "type": "structure",
     "summary": "A table row header (<th scope=\"row\">) is present.",
+    "category": "Tables",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1460,6 +1559,7 @@
     "title": "Inline frame",
     "type": "structure",
     "summary": "An inline frame (<iframe>) is present.",
+    "category": "Other HTML",
     "guidelines": []
   },
   {
@@ -1467,6 +1567,7 @@
     "title": "ARIA",
     "type": "aria",
     "summary": "An ARIA role, state, or property is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "4.1.2 Name, Role, Value (Level A)",
@@ -1479,6 +1580,7 @@
     "title": "ARIA label",
     "type": "aria",
     "summary": "An aria-label or aria-labelledby attribute is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "1.1.1 Non-text Content (Level A)",
@@ -1507,6 +1609,7 @@
     "title": "ARIA description",
     "type": "aria",
     "summary": "An aria-describedby attribute is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "1.3.1 Info and Relationships (Level A)",
@@ -1523,6 +1626,7 @@
     "title": "ARIA alert or live region",
     "type": "aria",
     "summary": "An ARIA alert role or live region is present.",
+    "category": "",
     "guidelines": [
       {
         "name": "3.3.1 Error Identification (Level A)",
@@ -1539,6 +1643,7 @@
     "title": "ARIA menu",
     "type": "aria",
     "summary": "An ARIA menu is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -1555,6 +1660,7 @@
     "title": "ARIA button",
     "type": "aria",
     "summary": "An element with role=\"button\" is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -1571,6 +1677,7 @@
     "title": "ARIA expanded",
     "type": "aria",
     "summary": "An aria-expanded attribute is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "4.1.2 Name, Role, Value (Level A)",
@@ -1583,6 +1690,7 @@
     "title": "ARIA popup",
     "type": "aria",
     "summary": "An element triggers a popup menu, dialog, or other element.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "4.1.2 Name, Role, Value (Level A)",
@@ -1595,6 +1703,7 @@
     "title": "ARIA tabindex",
     "type": "aria",
     "summary": "A tabindex value of 0 or less is present.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "2.1.1 Keyboard (Level A)",
@@ -1607,6 +1716,7 @@
     "title": "ARIA hidden",
     "type": "aria",
     "summary": "Content is hidden with ARIA.",
+    "category": "Aria",
     "guidelines": [
       {
         "name": "4.1.2 Name, Role, Value (Level A)",
