@@ -17,12 +17,12 @@ if(!empty($_GET['report'])){
             'value' => $_GET['report']
         )
     );
-    $report = DataAccess::get_db_rows(
+    $report = (array)DataAccess::get_db_rows(
         'meta', $filtered_to_report
     )['content'][0];
 
     // We need to unserialize the meta from the report.
-    $report_meta = unserialize($report->meta_value);
+    $report_meta = unserialize($report['meta_value']);
 
     // No archived alerts are shown in reports.
     array_push($report_meta, array(
@@ -36,7 +36,7 @@ if(!empty($_GET['report'])){
     // The active preset contains all alerts.
     if($_GET['preset'] == 'all'){
         $report = array(
-            'meta_name' => '',
+            'meta_name' => 'all',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -52,7 +52,7 @@ if(!empty($_GET['report'])){
     // The ignored preset contains all 'ignored' alerts.
     }elseif($_GET['preset'] == 'ignored'){
         $report = array(
-            'meta_name' => '',
+            'meta_name' => 'ignored',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -73,7 +73,7 @@ if(!empty($_GET['report'])){
     // alerts.
     }elseif($_GET['preset'] == 'equalified'){
         $report = array(
-            'meta_name' => '',
+            'meta_name' => 'equalified',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -96,7 +96,7 @@ if(!empty($_GET['report'])){
 
     // When there's no report data, we get active alerts.
     $report = array(
-        'meta_name' => '',
+        'meta_name' => 'active',
         'meta_value' => array(
             array(
                 'name' => 'title',
@@ -131,70 +131,19 @@ foreach($report_meta as $k => $val) {
         <div>
             <h1><?php echo $the_title;?></h1>
         </div>
-        <div>            
-            <!-- 
-            OLD BUTTON FOR TESTING PURPOSES
-            <a href="index.php?view=new_report&name=<?php //echo $report->meta_name;?>" class="btn btn-primary">
-                Edit Report
-            </a> 
-            -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#alertFilters">
-                Filters <span class="badge bg-danger" aria-label="Active Filters">4</span>
-            </button>
-            <div class="modal fade" id="alertFilters" tabindex="-1" aria-labelledby="alertFiltersLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 class="modal-title" id="alertFiltersLabel"><?php echo $the_title;?> Filters and Settings</h2>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
+        <div> 
 
-                            <?php
-                            // Start markup for reports.
-                            if(!empty($_GET['report'])):
-                            ?>
-
-                            <div id="alert_report_options">
-                            </div>
-
-                            <?php
-                            // End status markup for reports.
-                            endif;
-
-                            // Get the tags, which we use to filter.
-                            $tags = DataAccess::get_db_rows( 'tags',
-                                array(), 1, 10000000
-                            );
-
-                            // Start tag markup.
-                            if(!empty($tags)): 
-                                echo '<div id="alert_tags">';
-                                foreach ($tags['content'] as $tag):
-                            ?>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="<?php echo $tag->slug;?>">
-                                <label class="form-check-label" for="<?php echo $tag->slug;?>">
-                                    <?php echo $tag->title;?>
-                                </label>
-                            </div>
-
-                            <?php
-                            // End tag markup.
-                                endforeach;
-                                echo '</div>';
-                            endif;
-                            ?>
-                            
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save filters</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php
+            // We'll count the active filters by looking
+            // for meta that isn't name information.
+            $filters_count = count($report_meta)-1;
+            if($filters_count > 0)
+                echo '<span class="badge text-bg-secondary" aria-label="Active Filters">'.$filters_count.' Active Filters</span>';
+            ?>
+                       
+            <a href="index.php?view=report_settings&report=<?php echo $report['meta_name']; ?>" class="btn btn-primary">
+                Filters & Settings
+            </a>
         </div>
     </div>
     <table class="table">
