@@ -15,7 +15,7 @@
 function get_default_view(){
 
     // Set the default view if no other view is selected.
-    return "views/alerts.php";
+    return "views/reports.php";
     
 }
 
@@ -27,11 +27,11 @@ function the_active_class($selection){
     // 'active' class is largely dependant on view.
     if(!empty($_GET['view'])){
 
-        // Labels and presets need special treatment.
+        // Reports and presets need special treatment.
         if(
             (
-                !empty($_GET['label'])
-                && ($_GET['label'] == $selection)
+                !empty($_GET['report'])
+                && ($_GET['report'] == $selection)
             ) || (
                 !empty($_GET['preset'])
                 && ($_GET['preset'] == $selection)
@@ -42,19 +42,19 @@ function the_active_class($selection){
             // page is selected.
             echo 'active';
 
-        // Customizing labels also need special treatment.
+        // Customizing reports also need special treatment.
         }elseif(
             !empty($_GET['name'])
-            && ($_GET['view'] == 'label_customizer')
+            && ($_GET['view'] == 'report_customizer')
         ){
 
             echo '';
 
-        // Anything that's not a label will be active if
+        // Anything that's not a report will be active if
         // the selection is also set in the view.
         }elseif(
             $_GET['view'] == $selection 
-            && empty($_GET['label'])
+            && empty($_GET['report'])
             && empty($_GET['preset'])
          ){
             echo 'active';
@@ -215,11 +215,11 @@ function the_pagination($total_pages){
         $view_parameters = '?view='.get_default_view();
     }
 
-    // Define label.
-    if(!empty($_GET['label'])){
-        $label_parameters = '&label='.$_GET['label'];
+    // Define report.
+    if(!empty($_GET['report'])){
+        $report_parameters = '&report='.$_GET['report'];
     }else{
-        $label_parameters = '';
+        $report_parameters = '';
     }
 
     // Define preset.
@@ -250,10 +250,10 @@ function the_pagination($total_pages){
 <nav aria-label="Page Navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item <?php if($current_page_number <= 1){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo ''.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
+            <a class="page-link" href="<?php if($current_page_number <= 1){ echo '#'; } else { echo ''.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number - 1); } ?>">Previous</a>
         </li>
         <li class="page-item  <?php echo get_active_state($current_page_number, 1)?>">
-            <a class="page-link" href="<?php echo $view_parameters.$label_parameters.$preset_parameters;?>&current_page_number=1">1</a>
+            <a class="page-link" href="<?php echo $view_parameters.$report_parameters.$preset_parameters;?>&current_page_number=1">1</a>
         </li>
 
         <?php
@@ -267,25 +267,25 @@ function the_pagination($total_pages){
         // If there are more than 5 pages and current page number isn't
         // first, second, or last or if we're on the third page of 4...
         if(($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages) || ($total_pages == 4 && $current_page_number == 3))
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // If there are more than 3 pages and current page number isn't
         // first or last...
         if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
-            echo '<li class="page-item active"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
+            echo '<li class="page-item active"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
 
         // If there are more than 5 pages and current page is the first or second or we're on the second page of four..
         if(($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2)) || ($total_pages == 4 && $current_page_number == 2))
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // If there are more than 5 pages and current page is the last or second to last..
         if($total_pages > 5 && $current_page_number == $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
 
         // Show next page number if there are more than 5 pages and current
         // page number isn't first, second, second to last, or last...
         if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $total_pages != ($current_page_number+1) && $current_page_number != $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // Show "..." if there are more than 3 pages and we're not on the page before,
         // the last display a disabled elipses so that the user knows to click 'next'.
@@ -294,10 +294,10 @@ function the_pagination($total_pages){
         ?>
 
         <li class="page-item <?php echo get_active_state($current_page_number, $total_pages)?>">
-            <a class="page-link" href="<?php echo $view_parameters.$label_parameters.$preset_parameters;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
+            <a class="page-link" href="<?php echo $view_parameters.$report_parameters.$preset_parameters;?>&current_page_number=<?php echo $total_pages; ?>"><?php echo $total_pages;?></a>
         </li>
         <li class="page-item <?php if($current_page_number >= $total_pages){ echo 'disabled'; } ?>">
-            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo ''.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
+            <a class="page-link" href="<?php if($current_page_number >= $total_pages){ echo '#'; } else { echo ''.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number + 1); } ?>">Next</a>
         </li>
     </ul>
 </nav>
@@ -305,4 +305,134 @@ function the_pagination($total_pages){
 <?php
     // End pagination.
     endif;
+}
+
+/**
+ * The Report Settings
+ * @param array data ['name' => $value, 'title' => $value, 
+ * * 'status' => $value, 'type' => $value]
+ */
+function the_report_settings($data){
+
+    // Let's setup the variables that we're going to be using
+    // in this document.
+    $name   = '';
+    $title = 'Untitled';
+    $status = '';
+    $type   = '';
+
+    // We use this view to customize reports if a id is 
+    // provided, otherwise we create a new report.
+    if(!empty($_GET['name'])){
+        $data['name'] = $_GET['name'];
+        
+        // Let's load in predefined variables for the report.
+        $existing_report = unserialize(
+            DataAccess::get_meta_value($data['name'] )
+        );
+
+        // Let's reformat the meta so we can use it in a
+        // more understandable format.
+        foreach($existing_report as $report) {
+            if($report['name'] == 'title') 
+                $data['title']  = $report['value'];
+            if($report['name'] == 'type') 
+                $data['type']  = $report['value'];
+            if($report['name'] == 'status') 
+                $data['status']  = $report['value'];
+        }
+
+    }
+    ?>
+
+        <form action="actions/save_report.php" method="post">
+            <div class="mb-3">
+                <label for="statusSelect" class="form-label fw-semibold">Status</label>
+                <select id="typeSelect" class="form-select" name="status">
+                    <option value="">Any</option>
+
+                    <?php 
+                    // Set status as array so we can simplify
+                    // the logic to build the option html.
+                    $status_options = array(
+                        'active', 'ignored', 'equalified'
+                    );
+                    
+                    // Build options.
+                    foreach ($status_options as $option){
+
+                        // A source may already be saved. 
+                        if($option == $status){
+                            $selected_attribute = 'selected';
+                        }else{
+                            $selected_attribute = '';
+                        }
+
+                        // Build option.
+                        echo '<option value="'.$option.'" '
+                        .$selected_attribute.'>'
+                        .ucwords($option).'</option>';
+
+                    }
+                    ?>
+
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
+                <select id="typeSelect" class="form-select" name="type">
+                    <option value="">Any</option>
+                    
+                    <?php 
+                    // Set types as array so we can simplify the logic
+                    // when building the option html.
+                    $type_options = array(
+                        'error', 'warning', 'notice'
+                    );
+                
+                    // Build options.
+                    foreach ($type_options as $option){
+
+                        // A type may already be saved. 
+                        if($option == $type){
+                            $selected_attribute = 'selected';
+                        }else{
+                            $selected_attribute = '';
+                        }
+                        
+                        // Build option
+                        echo '<option value="'.$option.'" '
+                        .$selected_attribute.' >'
+                        .ucwords($option).'</option>';
+
+                    }
+                    ?>
+            
+                </select>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
+                <input type="text" id="reportTitleInput" class="form-control" value="<?php echo $data['title'];?>" name="title" required>
+            </div>
+            
+            <?php
+            // New reports can't be deleted.
+            if(!empty($data['name']))
+                echo '<a href="actions/delete_report.php?name='.$data['name'].'" class="btn btn-outline-danger">Delete Report</a>';
+            ?>
+
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
+            <input type="hidden" name="name" value="<?php echo $data['name'];?>">
+        </form>
+    </section>
+
+<?php
+}
+
+/**
+ * The Report Filters
+ */
+function the_report_filters(){
+
 }

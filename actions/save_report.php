@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * Let's save a label!
+ * Let's save a report!
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -46,12 +46,12 @@ if(!empty($_POST['title'])){
 }
 
 // Depending on if the name is present, we'll either save
-// or update the label.
+// or update the report.
 if(empty($_POST['name'])){
 
     // No ID means we need to generate an id by counting
     // all the rows in meta 
-    $name = 'label_'.DataAccess::count_db_rows('meta');
+    $name = 'report_'.DataAccess::count_db_rows('meta');
 
     // Now we can create the meta.
     $fields = array(
@@ -77,14 +77,14 @@ if(empty($_POST['name'])){
     );
 
     // All fields are filtered to the current post.
-    $filtered_to_label = array(
+    $filtered_to_report = array(
         array(
             'name' => 'meta_name',
             'value' => $_POST['name']
         )
     );
     DataAccess::update_db_rows(
-        'meta', $fields, $filtered_to_label
+        'meta', $fields, $filtered_to_report
     );
 
     // And let's set the name with the post variable.
@@ -92,8 +92,8 @@ if(empty($_POST['name'])){
 
 }
 
-// When done, we can checkout the saved label.
-header('Location: ../index.php?view=alerts&status=success&label='.$name);
+// When done, we can checkout the saved report.
+header('Location: ../index.php?view=reports&status=success&report='.$name);
 
 /**
  * Prepare Meta.
