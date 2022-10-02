@@ -25,7 +25,7 @@ function process_sites(){
     require_once(__ROOT__.'/models/adders.php');
     require_once(__ROOT__.'/helpers/scan.php');
 
-    // The goal of this process is to setup this array.
+    // The goal of this process is to set up this array.
     $sites_output = array();
 
     // Let's log our process for the CLI.
@@ -119,7 +119,7 @@ function process_sites(){
         $formatted_pages_count = number_format($pages_count);
         update_scan_log("\n> Found $formatted_pages_count scannable pages.");
         
-        // Restrict the amount of pages.
+        // Restrict the number of pages.
         if($pages_count > $GLOBALS['page_limit']){
             $page_limit = number_format($GLOBALS['page_limit']);
             kill_scan("You have too many pages.\n\nEqualify allows up to $page_limit pages.\n\nArchive sites or delete pages from WordPress/XML.");

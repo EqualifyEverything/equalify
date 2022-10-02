@@ -17,7 +17,7 @@ The internet must become more accessible!
 ## How will Equalify increase content accessibility?
 
 Equalify aims to:
-1. **Promote transparency** with a Open Source A11Y platform (✅ Done!).
+1. **Promote transparency** with an Open Source A11Y platform (✅ Done!).
 2. **Reduce the cost** of multi-page website scans (ongoing).
 3. **Improve automation** to simplify WCAG issue resolution (2023). 
 

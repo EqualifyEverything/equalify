@@ -17,11 +17,11 @@ require_once '../models/db.php';
 // Get URL parameters.
 $integration_uri = $_GET['uri'];
 if(empty($integration_uri))
-    throw new Exception('Integration is not specfied');
+    throw new Exception('Integration is not specified');
 $old_status = $_GET['old_status'];
 if(empty($old_status))
     throw new Exception(
-        'Old status is not specfied for integration 
+        'Old status is not specified for integration 
         "'.$integration_uri.'"'
     );
 
@@ -91,14 +91,14 @@ if($old_status == 'Active'){
 
 }elseif($old_status == 'Disabled'){
 
-    // Setup fields.
+    // Set up fields.
     $integration_fields = get_integration_fields(
         $integration_uri
     );
     if( !empty($integration_fields['db']) ){
         $integration_db_fields = $integration_fields['db'];
 
-        // Setup "meta" fields.
+        // Set up "meta" fields.
         if( !empty($integration_db_fields['meta']) ){
             foreach(
                 $integration_db_fields['meta']
@@ -115,7 +115,7 @@ if($old_status == 'Active'){
             }
         }
 
-        // Setup "pages" fields.
+        // Set up "pages" fields.
         if( !empty($integration_db_fields['pages']) ){
             foreach(
                 $integration_db_fields['pages'] 
@@ -206,7 +206,7 @@ function update_alerts($new_status, $integration_uri) {
         )
     );
 
-    // Now lets update fields.
+    // Now let's update fields.
     $updated_fields = array(
         array(
             'name' => 'archived',

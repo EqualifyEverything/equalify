@@ -12,7 +12,7 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-// Setup variables.
+// Set up variables.
 $alert_label = $_GET['name'];
 
 // Delete DB 

@@ -34,7 +34,7 @@ function single_page_adder($site_url){
     $response = $client->get($site_url);
 
     // This is primarily a check that the URL is 
-    // accessible. If site has any content, we return the 
+    // accessible. If the site has any content, we return the 
     // site URL in an array.
     if ($response->getBody()) {
         return [$site_url];
@@ -110,7 +110,7 @@ function xml_site_adder($site_url){
     if(array_key_exists('url', $json_entries)){
 
         // This gets around a weird bug where json_decode
-        // doesn't wrap single entry xmls into an array.
+        // doesn't wrap single entry XMLs into an array.
         if(!empty($json_entries['url']['loc'])){
             $json_entries['url'] = [$json_entries['url']];
         }

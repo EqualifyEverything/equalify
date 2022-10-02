@@ -10,7 +10,7 @@ function uploaded_integrations($path_to_integrations){
     $uploaded_integrations = [];
     foreach ($integration_folders as $integration_folder){
 
-		// Exclude certain files or filders
+		// Exclude certain files or folders
 		$excluded_items = array('.DS_Store');
 
         // Create URI from folder name.
@@ -32,7 +32,7 @@ function uploaded_integrations($path_to_integrations){
  * Get Integration Meta
  *
  * Modeled after WordPress's get_file_data() .. Searches for metadata in the 
- * first 8 KB of an integation. Each piece of metadata must be on its own line. 
+ * first 8 KB of an integration. Each piece of metadata must be on its own line. 
  * Fields can not span multiple lines, the value will get cut at the end of the 
  * first line.
  *

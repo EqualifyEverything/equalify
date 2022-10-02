@@ -19,7 +19,7 @@ if(empty($site_id))
 $old_status = $_GET['old_status'];
 if(empty($old_status))
     throw new Exception(
-        'Status is not specfied for "'.$site.'"'
+        'Status is not specified for "'.$site.'"'
     );
 
 // Toggle site status.
@@ -117,7 +117,7 @@ function update_alerts($new_status, $site_id) {
         )
     );
 
-    // Now lets update fields.
+    // Now let's update fields.
     $updated_fields = array(
         array(
             'name' => 'archived',

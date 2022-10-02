@@ -1,13 +1,13 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document composes the alerts view.
+ * This document composes the alert's view.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
  * Equalify works for everyone.
 **********************************************************/
 
-// Sometimes this view is filtered to a label's data.
+// Sometimes, this view is filtered to a label's data.
 if(!empty($_GET['label'])){
 
     // Load the data of a selected label.
@@ -116,8 +116,8 @@ if(!empty($_GET['label'])){
 }
 
 // Let's extract the "title" meta, so we can use it 
-// later and so we can use any label's meta_values to
-// fitler the alerts.
+// later and use any label's meta_values to
+// filter the alerts.
 foreach($label_meta as $k => $val) {
     if($val['name'] == 'title') {
         $the_title = $val['value'];
@@ -161,7 +161,7 @@ foreach($label_meta as $k => $val) {
         </thead>
 
         <?php
-        // We need to setup the different filters from the
+        // We need to set up the different filters from the
         // all label meta.
         $filters = $label_meta;
         $alerts = DataAccess::get_db_rows( 'alerts',
@@ -214,8 +214,8 @@ foreach($label_meta as $k => $val) {
                     No alerts found.<br>
                 </p>
                 <p class="text-center my-2">
-                    <img src="plumeria.png" alt="Three frangiapani flowers. The flowers five pedals. Color eminates fron the center of the flower before becoming colorless at the tip of each petal."  ><br>
-                    <strong>Get out and smell the frangiapani!</strong>
+                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five pedals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <strong>Get out and smell the frangipani!</strong>
                 </p>
             </td>
         </tr>

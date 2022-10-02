@@ -1,7 +1,7 @@
 <?php
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * Here we set functions that are regularly used to create
+ * Here, we set functions that are regularly used to create
  * our views.
  * 
  * As always, we must remember that every function should 
@@ -151,7 +151,7 @@ function the_integration_settings_button(
     $integration_uri, $integration_status
     ){
 
-    // Only show button on active inteagrations
+    // Only show button on active integrations
     if($integration_status == 'Active'){
         echo '<a href="index.php?view=integration_settings&uri='
             .$integration_uri.'" class="btn btn-secondary">
@@ -230,7 +230,7 @@ function the_pagination($total_pages){
     }
 
 
-    // Set active state as function so we don't have to keep
+    // Set active state as function, so we don't have to keep
     // writing this condition.
     function get_active_state(
         $current_page_number, $item_number
@@ -259,7 +259,7 @@ function the_pagination($total_pages){
         <?php
         // If there are more than 3 pages and we're not on page 2
         // and if there are more than 5 pages and we're not on page 3,
-        // display a disabled elipses so that the user knows to click
+        // display a disabled ellipsis so that the user knows to click
         // 'previous'.
         if($current_page_number != 1 && ($total_pages > 3 && $current_page_number != 2) && ($total_pages > 5 && $current_page_number != 3) || ($total_pages == 4 && $current_page_number == 4))
             echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
@@ -288,7 +288,7 @@ function the_pagination($total_pages){
             echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$label_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
 
         // Show "..." if there are more than 3 pages and we're not on the page before,
-        // the last display a disabled elipses so that the user knows to click 'next'.
+        // the last display a disabled ellipsis so that the user knows to click 'next'.
         if($current_page_number != $total_pages && $total_pages > 3 && $current_page_number != ($total_pages-1) && $total_pages != ($current_page_number+2))
             echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
         ?>
