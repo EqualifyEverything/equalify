@@ -123,13 +123,26 @@ if(!empty($_GET['report'])){
         <?php
         // Get the tags, which we use to filter.
         $tags = DataAccess::get_db_rows( 'tags',
-            array(), 1, 10000000
+            array(), 1, 10000000, 'category'
         );
+
+        // We'll use this variable later..
+        $stored_category = '';
 
         // Start tag markup.
         if(!empty($tags)): 
-            echo '<hr><div id="alert_tags"><h2>Filter by Tags</h2>';
+            echo '<hr><div id="alert_tags"><h2>Filter by Tags</h2><div class="d-flex flex-wrap">';
             foreach ($tags['content'] as $tag):
+            
+            // We need to start by ending the previous category's
+            // div if it exists.
+            if(($stored_category !== '') && ($stored_category !== $tag->category))
+                echo '</div>';
+
+            // Start a new section for every new category.
+            if($stored_category !== $tag->category)
+                echo '<div class="pe-4"><h3 class="mt-4 fs-4">'.$tag->category.'</h3>';
+            
         ?>
 
         <div class="form-check">
@@ -140,9 +153,12 @@ if(!empty($_GET['report'])){
         </div>
 
         <?php
-        // End tag markup.
+            // Store the category so we can group by category.
+            $stored_category = $tag->category;
+                
+            // End tag markup.
             endforeach;
-            echo '</div>';
+            echo '</div></div>';
         endif;
         ?>
         

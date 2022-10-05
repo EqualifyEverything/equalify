@@ -178,11 +178,12 @@ class DataAccess {
      * 'operator' => '=', 'condition' => 'AND' ) ]
      * @param string page
      * @param string rows_per_page
-     * @param string operator
+     * @param string order_by
      */
     public static function get_db_rows(
         $table, array $filters = [], $page = 1, 
-        $rows_per_page = self::ITEMS_PER_PAGE
+        $rows_per_page = self::ITEMS_PER_PAGE, 
+        $order_by = ''
     ){
 
         // Set rows per page.
@@ -197,6 +198,10 @@ class DataAccess {
 
         // Add optional filters to content and total_pages.
         $filters = self::filters($filters);
+
+        // Add optional "ORDER BY".
+        if(!empty($order_by))
+            $content_sql.= ' ORDER BY `'.$order_by.'`';
 
         // Add filters and page limit.
         $total_pages_sql.= $filters['sql'];
