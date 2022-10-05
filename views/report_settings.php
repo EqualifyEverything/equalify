@@ -56,6 +56,11 @@ if(!empty($_GET['report'])){
     </div>
     <form action="actions/save_report.php" method="post">
         <div class="mb-3">
+            <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
+            <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
+        </div>
+        <hr>
+        <div class="mb-3">
             <label for="statusSelect" class="form-label fw-semibold">Status</label>
             <select id="statusSelect" class="form-select" name="status">
                 <option value="">Any</option>
@@ -130,52 +135,64 @@ if(!empty($_GET['report'])){
         $stored_category = '';
 
         // Start tag markup.
-        if(!empty($tags)): 
-            echo '<hr><div id="alert_tags"><h2>Filter by Tags</h2><div class="d-flex flex-wrap">';
-            foreach ($tags['content'] as $tag):
-            
-            // We need to start by ending the previous category's
-            // div if it exists.
-            if(($stored_category !== '') && ($stored_category !== $tag->category))
-                echo '</div>';
-
-            // Start a new section for every new category.
-            if($stored_category !== $tag->category)
-                echo '<div class="pe-4"><h3 class="mt-4 fs-4">'.$tag->category.'</h3>';
-            
+        if(!empty($tags)):
         ?>
 
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="<?php echo $tag->slug;?>">
-            <label class="form-check-label" for="<?php echo $tag->slug;?>">
-                <?php echo $tag->title;?>
-            </label>
-        </div>
+        <hr>
+        <div id="alert_tags" class="mb-3">
+            <h2>Filter by Tags</h2>
+            <div class="d-flex flex-wrap">
 
-        <?php
+            <?php
+            // Start Loop
+            foreach ($tags['content'] as $tag):
+            
+                // We need to start by ending the previous category's
+                // div if it exists.
+                if(($stored_category !== '') && ($stored_category !== $tag->category))
+                    echo '</div>';
+
+                // Start a new section for every new category.
+                if($stored_category !== $tag->category)
+                    echo '<div class="pe-4"><h3 class="mt-4 fs-4 text-muted">'.$tag->category.'</h3>';
+                
+            ?>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="<?php echo $tag->slug;?>">
+                <label class="form-check-label" for="<?php echo $tag->slug;?>">
+                    <?php echo $tag->title;?>
+                </label>
+            </div>
+
+            <?php
             // Store the category so we can group by category.
             $stored_category = $tag->category;
                 
-            // End tag markup.
+            // End loop.
             endforeach;
-            echo '</div></div>';
-        endif;
-        ?>
-        
-        <hr>
-        <div class="mb-3">
-            <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
-            <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
+            ?>
+
+            </div>
         </div>
+        <hr>
         
         <?php
-        // New reports can't be deleted.
-        if(!empty($name))
-            echo '<a href="actions/delete_report.php?report='.$name.'" class="btn btn-outline-danger">Delete Report</a>';
+        // End tag markup.
+        endif;
         ?>
 
-        <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
-        <input type="hidden" name="name" value="<?php echo $name;?>">
+        <div>
+
+            <?php
+            // New reports can't be deleted.
+            if(!empty($name))
+                echo '<a href="actions/delete_report.php?report='.$name.'" class="btn btn-outline-danger">Delete Report</a>';
+            ?>
+
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
+            <input type="hidden" name="name" value="<?php echo $name;?>">
+        </div>
     </form>
 </section>
 
