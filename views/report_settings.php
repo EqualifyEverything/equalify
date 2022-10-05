@@ -60,69 +60,71 @@ if(!empty($_GET['report'])){
             <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
         </div>
         <hr>
-        <div class="mb-3">
-            <label for="statusSelect" class="form-label fw-semibold">Status</label>
-            <select id="statusSelect" class="form-select" name="status">
-                <option value="">Any</option>
+        <div class="mb-3 row">
+            <div class="col">
+                <label for="statusSelect" class="form-label fw-semibold">Status</label>
+                <select id="statusSelect" class="form-select" name="status">
+                    <option value="">Any</option>
 
-                <?php 
-                // Set status as array so we can simplify
-                // the logic to build the option html.
-                $status_options = array(
-                    'active', 'ignored', 'equalified'
-                );
-                
-                // Build options.
-                foreach ($status_options as $option){
-
-                    // A source may already be saved. 
-                    if($option == $status){
-                        $selected_attribute = 'selected';
-                    }else{
-                        $selected_attribute = '';
-                    }
-
-                    // Build option.
-                    echo '<option value="'.$option.'" '
-                    .$selected_attribute.'>'
-                    .ucwords($option).'</option>';
-
-                }
-                ?>
-
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
-            <select id="typeSelect" class="form-select" name="type">
-                <option value="">Any</option>
-                
-                <?php 
-                // Set types as array so we can simplify the logic
-                // when building the option html.
-                $type_options = array(
-                    'error', 'warning', 'notice'
-                );
-            
-                // Build options.
-                foreach ($type_options as $option){
-
-                    // A type may already be saved. 
-                    if($option == $type){
-                        $selected_attribute = 'selected';
-                    }else{
-                        $selected_attribute = '';
-                    }
+                    <?php 
+                    // Set status as array so we can simplify
+                    // the logic to build the option html.
+                    $status_options = array(
+                        'active', 'ignored', 'equalified'
+                    );
                     
-                    // Build option
-                    echo '<option value="'.$option.'" '
-                    .$selected_attribute.' >'
-                    .ucwords($option).'</option>';
+                    // Build options.
+                    foreach ($status_options as $option){
 
-                }
-                ?>
-        
-            </select>
+                        // A source may already be saved. 
+                        if($option == $status){
+                            $selected_attribute = 'selected';
+                        }else{
+                            $selected_attribute = '';
+                        }
+
+                        // Build option.
+                        echo '<option value="'.$option.'" '
+                        .$selected_attribute.'>'
+                        .ucwords($option).'</option>';
+
+                    }
+                    ?>
+
+                </select>
+            </div>
+            <div class="col">
+                <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
+                <select id="typeSelect" class="form-select" name="type">
+                    <option value="">Any</option>
+                    
+                    <?php 
+                    // Set types as array so we can simplify the logic
+                    // when building the option html.
+                    $type_options = array(
+                        'error', 'warning', 'notice'
+                    );
+                
+                    // Build options.
+                    foreach ($type_options as $option){
+
+                        // A type may already be saved. 
+                        if($option == $type){
+                            $selected_attribute = 'selected';
+                        }else{
+                            $selected_attribute = '';
+                        }
+                        
+                        // Build option
+                        echo '<option value="'.$option.'" '
+                        .$selected_attribute.' >'
+                        .ucwords($option).'</option>';
+
+                    }
+                    ?>
+            
+                </select>
+            </div>
         </div>
 
         <?php
