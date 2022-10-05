@@ -182,9 +182,9 @@ require_once 'actions/run_scheduled_scan.php';
 
                                 <?php 
                                 // Count items, filtered to report_meta.
-                                echo DataAccess::count_db_rows(
-                                    'alerts', $report_meta
-                                );
+                                // echo DataAccess::count_db_rows(
+                                //     'alerts', $report_meta
+                                // );
                                 ?>
                             
                             </span>

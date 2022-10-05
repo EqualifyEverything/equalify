@@ -25,15 +25,22 @@ if(!empty($_GET['report'])){
     );
 
     // Let's reformat the meta so we can use it in a
-    // more understandable format.
+    // more understandable format. The dynamically
+    // added content is added to $dynamic_meta.
+    $dynamic_meta = array();
     foreach($existing_report as $report) {
-        if($report['name'] == 'title') 
+        print_r($report);
+        if($report['name'] == 'title'){
             $title = $report['value'];
-        if($report['name'] == 'type') 
+        }elseif($report['name'] == 'type'){
             $type = $report['value'];
-        if($report['name'] == 'status') 
+        }elseif($report['name'] == 'status'){
             $status = $report['value'];
+        }else{
+            $dynamic_meta[] = 'apple';
+        }
     }
+    print_r($dynamic_meta);
 
 }
 ?>
@@ -161,7 +168,17 @@ if(!empty($_GET['report'])){
             ?>
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="<?php echo $tag->slug;?>">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="<?php echo $tag->slug;?>" 
+                    name="<?php echo $tag->slug;?>"
+                    
+                    <?php
+                    // Conditionally show selected tag.
+                    //if()
+                    ?>
+                >
                 <label class="form-check-label" for="<?php echo $tag->slug;?>">
                     <?php echo $tag->title;?>
                 </label>

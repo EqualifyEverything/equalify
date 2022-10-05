@@ -27,3 +27,4 @@ $GLOBALS['wave_key'] = '';
 $GLOBALS['page_limit'] = '1111';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';
+$GLOBALS['ITEMS_PER_PAGE'] = '10';

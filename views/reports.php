@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document composes the alerts view.
+ * This document composes the reports view.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -24,13 +24,25 @@ if(!empty($_GET['report'])){
     // We need to unserialize the meta from the report.
     $report_meta = unserialize($report['meta_value']);
 
+    // Let's prepare the tags to be queried by the db.
+    $tags = array();
+    if(!empty($report_meta)){
+        foreach ($report_meta as $key => $meta ){
+            if($meta['value'] == 'on'){
+                $tags[] = $meta['name'];
+                unset($report_meta[$key]);
+            }
+        }
+    }
+
     // No archived alerts are shown in reports.
     array_push($report_meta, array(
         'name' => 'archived',
         'value' => 0
     ));
+    echo'<pre>';print_r($report_meta);echo'</pre>';die;
 
-// We also have special presets
+// We also have special presets.
 }elseif(!empty($_GET['preset'])){
 
     // The active preset contains all alerts.
@@ -115,9 +127,10 @@ if(!empty($_GET['report'])){
 
 }
 
+
 // Let's extract the "title" meta, so we can use it 
 // later and so we can use any report's meta_values to
-// fitler the alerts.
+// filter the alerts.
 foreach($report_meta as $k => $val) {
     if($val['name'] == 'title') {
         $the_title = $val['value'];
@@ -163,7 +176,7 @@ foreach($report_meta as $k => $val) {
         // all report meta.
         $filters = $report_meta;
         $alerts = DataAccess::get_db_rows( 'alerts',
-            $filters, get_current_page_number()
+            $filters, get_current_page_number(), 
         );
         if( count($alerts['content']) > 0 ): 
             foreach($alerts['content'] as $alert):    

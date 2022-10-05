@@ -1,3 +1,4 @@
+<pre>
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * Let's save a report!
@@ -17,32 +18,21 @@ require_once '../models/db.php';
 $updated_meta = array();
 
 // The array is populated with URL parameters.
-if(!empty($_POST['status'])){
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'status',
-            'value' => $_POST['status']
-        )
-    );
-}
-if(!empty($_POST['type'])){
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'type',
-            'value' => $_POST['type']
-        )
-    );
-}
-if(!empty($_POST['title'])){
-    array_push(
-        $updated_meta,
-        array(
-            'name' => 'title',
-            'value' => strip_tags($_POST['title'])
-        )
-    );
+if(!empty($_POST)){
+    foreach ($_POST as $key => $value){
+
+        // We'll push every value but the name,
+        // which receive special treatment later.
+        if($key != 'name')
+            array_push(
+                $updated_meta,
+                array(
+                    'name' => $key,
+                    'value' => strip_tags($value)
+                )
+            );
+
+    }
 }
 
 // Depending on if the name is present, we'll either save
@@ -95,36 +85,5 @@ if(empty($_POST['name'])){
 // When done, we can checkout the saved report.
 header('Location: ../index.php?view=reports&status=success&report='.$name);
 
-/**
- * Prepare Meta.
- * @param string input
- * @param string name
- */
-function submeta($input, $name){
-
-    // Our string can't use spaces.
-    str_replace(
-        ' ', '', $input
-    );
-
-    // Now lets create an array.
-    $items = explode(',', $input);
-
-    // We turn the array into a subfilter.
-    $subfilter = array();
-    foreach($items  as $item){
-        array_push(
-            $subfilter,
-            array(
-                'name' => $name,
-                'value' => $item,
-                'condition' => 'OR'
-            )
-        );
-    }
-
-    // Let's return the subfilter.
-    return $subfilter;
-
-}
 ?>
+</pre>
