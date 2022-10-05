@@ -138,7 +138,7 @@ foreach($report_meta as $k => $val) {
             // for meta that isn't name information.
             $filters_count = count($report_meta)-1;
             if($filters_count > 0)
-                echo '<span class="badge text-bg-secondary" aria-label="Active Filters">'.$filters_count.' Active Filters</span>';
+                echo '<span class="badge text-bg-secondary">'.$filters_count.' Active Filters</span>';
             ?>
                        
             <a href="index.php?view=report_settings&report=<?php echo $report['meta_name']; ?>" class="btn btn-primary">
