@@ -154,7 +154,7 @@ if(!empty($_GET['report'])){
 
                 // Start a new section for every new category.
                 if($stored_category !== $tag->category)
-                    echo '<div class="pe-4"><h3 class="mt-4 fs-4 text-muted">'.$tag->category.'</h3>';
+                    echo '<div class="pe-3 mb-3"><h3 class="fs-4 text-muted">'.$tag->category.'</h3>';
                 
             ?>
 
