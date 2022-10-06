@@ -39,11 +39,7 @@ if(!empty($_GET['report'])){
             $dynamic_meta[] = $report['name'];
         }
     }
-
-    // Conditionally show selected tag.
-    if(in_array('h5', $dynamic_meta))
-        echo 'selected';
-
+    
 }
 ?>
 
