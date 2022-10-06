@@ -21,9 +21,9 @@ $updated_meta = array();
 if(!empty($_POST)){
     foreach ($_POST as $key => $value){
 
-        // We'll push every value but the name,
+        // We'll push every filled value but the name,
         // which receive special treatment later.
-        if($key != 'name')
+        if($key != 'name' && !empty($value))
             array_push(
                 $updated_meta,
                 array(

@@ -24,23 +24,32 @@ if(!empty($_GET['report'])){
     // We need to unserialize the meta from the report.
     $report_meta = unserialize($report['meta_value']);
 
-    // Let's prepare the tags to be queried by the db.
-    $tags = array();
-    if(!empty($report_meta)){
-        foreach ($report_meta as $key => $meta ){
-            if($meta['value'] == 'on'){
-                $tags[] = $meta['name'];
-                unset($report_meta[$key]);
-            }
-        }
-    }
-
     // No archived alerts are shown in reports.
     array_push($report_meta, array(
         'name' => 'archived',
         'value' => 0
     ));
-    echo'<pre>';print_r($report_meta);echo'</pre>';die;
+
+    // Let's prepare the tags to be queried by the db.
+    $tags = array();
+    if(!empty($report_meta)){
+        foreach ($report_meta as $key => $meta ){
+            if($meta['value'] == 'on'){
+                $tags[] = array(
+                    'value' => $meta['name'],
+                    'column' => 'tags'
+                );
+                unset($report_meta[$key]);
+            }
+        }
+    }
+    if(!empty($tags)){
+        $report_meta[] = array(
+            'name' => '',
+            'type' => 'find_in_set',
+            'value' => $tags
+        );
+    }
 
 // We also have special presets.
 }elseif(!empty($_GET['preset'])){
@@ -104,6 +113,9 @@ if(!empty($_GET['report'])){
         
     }
 
+    // We have no tags.
+    $tags = array();
+
 }else{
 
     // When there's no report data, we get active alerts.
@@ -124,6 +136,10 @@ if(!empty($_GET['report'])){
         )
     );
     $report_meta = $report['meta_value'];
+
+    // We have no tags.
+    $tags = array();
+
 
 }
 
@@ -147,9 +163,25 @@ foreach($report_meta as $k => $val) {
         <div> 
 
             <?php
-            // We'll count the active filters by looking
-            // for meta that isn't name information.
-            $filters_count = count($report_meta)-1;
+            // We'll count the active filters.
+            $filters_count = 0;
+            if(!empty($report_meta)){
+                foreach($report_meta as $meta){
+                    
+                    // We count tags individually.
+                    if(!empty($meta['type']) && $meta['type'] == 'find_in_set'){
+                        $filters_count = count($meta['value'])+$filters_count;
+                    
+                    // We also don't count the archived filter, since that's set by default.
+                    }elseif($meta['name'] == 'archived'){
+
+                    // We'll count the remaining filters.
+                    }else{
+                        $filters_count++;
+                    }
+
+                }
+            }
             if($filters_count > 0)
                 echo '<span class="badge text-bg-secondary">'.$filters_count.' Active Filters</span>';
             ?>
@@ -176,7 +208,8 @@ foreach($report_meta as $k => $val) {
         // all report meta.
         $filters = $report_meta;
         $alerts = DataAccess::get_db_rows( 'alerts',
-            $filters, get_current_page_number(), 
+            $filters, get_current_page_number(), NULL,
+            NULL, $tags
         );
         if( count($alerts['content']) > 0 ): 
             foreach($alerts['content'] as $alert):    

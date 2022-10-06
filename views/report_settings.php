@@ -29,7 +29,6 @@ if(!empty($_GET['report'])){
     // added content is added to $dynamic_meta.
     $dynamic_meta = array();
     foreach($existing_report as $report) {
-        print_r($report);
         if($report['name'] == 'title'){
             $title = $report['value'];
         }elseif($report['name'] == 'type'){
@@ -37,10 +36,13 @@ if(!empty($_GET['report'])){
         }elseif($report['name'] == 'status'){
             $status = $report['value'];
         }else{
-            $dynamic_meta[] = 'apple';
+            $dynamic_meta[] = $report['name'];
         }
     }
-    print_r($dynamic_meta);
+
+    // Conditionally show selected tag.
+    if(in_array('h5', $dynamic_meta))
+        echo 'selected';
 
 }
 ?>
@@ -176,8 +178,10 @@ if(!empty($_GET['report'])){
                     
                     <?php
                     // Conditionally show selected tag.
-                    //if()
+                    if(in_array($tag->slug, $dynamic_meta))
+                        echo 'checked';
                     ?>
+
                 >
                 <label class="form-check-label" for="<?php echo $tag->slug;?>">
                     <?php echo $tag->title;?>
