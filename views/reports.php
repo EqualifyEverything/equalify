@@ -151,6 +151,11 @@ foreach($report_meta as $k => $val) {
     if($val['name'] == 'title') {
         $the_title = $val['value'];
         unset($report_meta[$k]);
+        
+        // We'll also add text to non-presets.
+        if(empty($_GET['preset']))
+            $the_title.= ' Report';
+
     }
 }
 ?>
