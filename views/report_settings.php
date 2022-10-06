@@ -204,7 +204,7 @@ if(!empty($_GET['meta_name'])){
         ?>
 
         <div id="alert_tags" class="mb-3">
-            <h2>Filter by Tags</h2>
+            <h2>Show Alerts Tagged</h2>
             <div class="d-flex flex-wrap">
 
             <?php
