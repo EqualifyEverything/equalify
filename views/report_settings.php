@@ -174,8 +174,9 @@ if(!empty($_GET['report'])){
                     
                     <?php
                     // Conditionally show selected tag.
-                    if(in_array($tag->slug, $dynamic_meta))
-                        echo 'checked';
+                    if(!empty($dynamic_meta))
+                        if(in_array($tag->slug, $dynamic_meta))
+                            echo 'checked';
                     ?>
 
                 >
