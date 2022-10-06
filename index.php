@@ -175,20 +175,8 @@ require_once 'actions/run_scheduled_scan.php';
                             }
                         }
                         echo $the_title;
-                        ?>                        
-
-                        <span class="badge text-bg-light float-end">
-                            <span id="alert_count">
-
-                                <?php 
-                                // Count items, filtered to report_meta.
-                                // echo DataAccess::count_db_rows(
-                                //     'alerts', $report_meta
-                                // );
-                                ?>
-                            
-                            </span>
-                        </span>
+                        ?>                
+                                
                     </a>
                 </li>
 
