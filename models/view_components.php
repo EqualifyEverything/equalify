@@ -44,8 +44,8 @@ function the_active_class($selection){
 
         // Customizing reports also need special treatment.
         }elseif(
-            !empty($_GET['name'])
-            && ($_GET['view'] == 'report_customizer')
+            !empty($_GET['meta_name'])
+            && ($_GET['view'] == 'report_settings')
         ){
 
             echo '';

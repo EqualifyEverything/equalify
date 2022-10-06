@@ -57,7 +57,7 @@ if(!empty($_GET['report'])){
     // The active preset contains all alerts.
     if($_GET['preset'] == 'all'){
         $report = array(
-            'meta_name' => 'all',
+            'meta_name' => 'report_all',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -73,7 +73,7 @@ if(!empty($_GET['report'])){
     // The ignored preset contains all 'ignored' alerts.
     }elseif($_GET['preset'] == 'ignored'){
         $report = array(
-            'meta_name' => 'ignored',
+            'meta_name' => 'report_ignored',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -94,7 +94,7 @@ if(!empty($_GET['report'])){
     // alerts.
     }elseif($_GET['preset'] == 'equalified'){
         $report = array(
-            'meta_name' => 'equalified',
+            'meta_name' => 'report_equalified',
             'meta_value' => array(
                 array(
                     'name' => 'title',
@@ -186,7 +186,7 @@ foreach($report_meta as $k => $val) {
                 echo '<span class="badge text-bg-secondary">'.$filters_count.' Active Filters</span>';
             ?>
                        
-            <a href="index.php?view=report_settings&report=<?php echo $report['meta_name']; ?>" class="btn btn-primary">
+            <a href="index.php?view=report_settings&meta_name=<?php echo $report['meta_name']; ?>" class="btn btn-primary">
                 Filters & Settings
             </a>
         </div>

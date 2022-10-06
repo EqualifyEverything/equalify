@@ -9,35 +9,75 @@
 
 // Let's setup the variables that we're going to be using
 // in this document.
-$name   = '';
 $title = 'Untitled';
 $status = '';
 $type   = '';
+$name   = '';
+$preset = FALSE;
 
 // We use this view to customize reports if a id is 
 // provided, otherwise we create a new report.
-if(!empty($_GET['report'])){
-    $name = $_GET['report'];
+if(!empty($_GET['meta_name'])){
     
+    // Set the meta name
+    $name = $_GET['meta_name'];
+
+    // Some reports are preset. Presets have restricted fields
+    // you can edit and special naming rules.
+    $presets = array(
+        'report_equalified', 'report_ignored', 'report_all',
+        'report_active', 'report_active'
+    );
+    if(in_array($name, $presets))
+        $preset = TRUE;
+
     // Let's load in predefined variables for the report.
     $existing_report = unserialize(
         DataAccess::get_meta_value($name)
     );
 
-    // Let's reformat the meta so we can use it in a
-    // more understandable format. The dynamically
-    // added content is added to $dynamic_meta.
-    $dynamic_meta = array();
-    foreach($existing_report as $report) {
-        if($report['name'] == 'title'){
-            $title = $report['value'];
-        }elseif($report['name'] == 'type'){
-            $type = $report['value'];
-        }elseif($report['name'] == 'status'){
-            $status = $report['value'];
-        }else{
-            $dynamic_meta[] = $report['name'];
+    // Some reports, like Equalified alerts, won't
+    // have data, so we'll have to prepare variables
+    if(empty($existing_report)){
+
+        // Set the default title field.
+        if($name == 'report_equalified'){
+            $title = 'Equalified Alerts';
+        }elseif($name == 'report_ignored'){
+            $title = 'Ignored Alerts';
+        }elseif($name == 'report_all'){
+            $title = 'All Alerts';
+        }elseif($name == 'report_active'){
+            $title = 'Active Alerts';
         }
+
+        // Set the default status field.
+        if($name == 'report_equalified'){
+            $status = 'equalified';
+        }elseif($name == 'report_ignored'){
+            $status = 'ignored';
+        }elseif($name == 'report_active'){
+            $status = 'active';
+        }
+
+    }else{
+
+        // Let's reformat the meta so we can use it in a
+        // more understandable format. The dynamically
+        // added content is added to $dynamic_meta.
+        $dynamic_meta = array();
+        foreach($existing_report as $report) {
+            if($report['name'] == 'title'){
+                $title = $report['value'];
+            }elseif($report['name'] == 'type'){
+                $type = $report['value'];
+            }elseif($report['name'] == 'status'){
+                $status = $report['value'];
+            }else{
+                $dynamic_meta[] = $report['name'];
+            }
+        }
+
     }
     
 }
@@ -46,20 +86,34 @@ if(!empty($_GET['report'])){
 <section>
     <div class="mb-3 pb-4 border-bottom">
         <h1>
+
             <?php
             // Lets add helper text, depending on if we're
-            // editing the report.
-            if(!empty($name)){
-                echo 'Editing ';
-            }else{
-                echo 'New ';
-            }
+            // creating a new report or not
+            if(empty($name))
+                echo 'New';
             ?>
             
-            "<span id="reportName"><?php echo $title;?></span>" Report
+            "<span id="reportName"><?php echo $title;?></span>"
+
+            <?php
+            // More helper text.
+            if(empty($name) || (!empty($name) && $preset == FALSE))
+                echo 'Report ';
+            if(!empty($name))
+                echo 'Filters & Settings';
+            ?>
+            
         </h1>
     </div>
     <form action="actions/save_report.php" method="post">
+
+        <?php
+        // Certain reports don't allow editing
+        // of fields other than tag fields.
+        if($preset = FALSE):
+        ?>
+        
         <div class="mb-3">
             <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
             <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
@@ -131,8 +185,12 @@ if(!empty($_GET['report'])){
                 </select>
             </div>
         </div>
+        <hr>
 
         <?php
+        // End hidden fields condition.
+        endif;
+
         // Get the tags, which we use to filter.
         $tags = DataAccess::get_db_rows( 'tags',
             array(), 1, 10000000, 'category'
@@ -145,7 +203,6 @@ if(!empty($_GET['report'])){
         if(!empty($tags)):
         ?>
 
-        <hr>
         <div id="alert_tags" class="mb-3">
             <h2>Filter by Tags</h2>
             <div class="d-flex flex-wrap">
