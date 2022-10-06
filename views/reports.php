@@ -233,7 +233,7 @@ foreach($report_meta as $k => $val) {
                 if( $alert->status == 'active' && $alert->archived != 1 ){
                 ?>
 
-                <a href="actions/ignore_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
+                <a href="actions/ignore_alert.php?id=<?php echo $alert->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
                     Ignore Alert
                 </a>
 
@@ -242,7 +242,7 @@ foreach($report_meta as $k => $val) {
                 }elseif( $alert->status == 'ignored' ){
                 ?>
 
-                <a href="actions/activate_alert.php?id=<?php echo $alert->id;?>&preset=<?php if(isset($_GET['preset'])) echo $_GET['preset'];?>" class="btn btn-outline-success btn-sm">
+                <a href="actions/activate_alert.php?id=<?php echo $alert->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-success btn-sm">
                     Activate Alert
                 </a>
 
