@@ -172,10 +172,14 @@ class DataAccess {
                     // Add "find in set" variables.
                     if($filter['type'] === 'find_in_set'){
                         $copy = $filter['value'];
+                        $output['sql'].= '(';
                         foreach($filter['value'] as $value){
                             $output['sql'].= ' FIND_IN_SET("'.$value['value'].'", '.$value['column'].')';
-                            if(next($copy))
+                            if(next($copy)){
                                 $output['sql'].= ' OR ';
+                            }else{
+                                $output['sql'].= ')';
+                            }
                         }
                     }      
                                  
@@ -243,7 +247,7 @@ class DataAccess {
                 $content[] = $row;
             }
         }
-    
+
         // Create and return data.
         $data = [
             'total_rows' => $total_pages_rows,
