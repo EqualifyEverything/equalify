@@ -40,4 +40,4 @@ DataAccess::update_db_entry(
 );
 
 // If a "referrer" session was create
-header('Location:  ../index.php?view=alerts'.$preset);
+header('Location:  ../index.php?view=reports'.$preset);
