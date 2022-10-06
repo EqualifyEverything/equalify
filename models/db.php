@@ -726,6 +726,7 @@ class DataAccess {
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
+                `tags` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
