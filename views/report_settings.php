@@ -111,7 +111,7 @@ if(!empty($_GET['meta_name'])){
         <?php
         // Certain reports don't allow editing
         // of fields other than tag fields.
-        if($preset = FALSE):
+        if($preset === FALSE):
         ?>
         
         <div class="mb-3">
