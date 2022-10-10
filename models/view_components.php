@@ -242,10 +242,7 @@ function the_pagination($total_pages){
         }
     }
 
-    //TODO: Adjust with WP standards
-    // Creates pagination element.
-    // Useful for consistency & avoiding human errors
-    function create_pagination_element($view_parameters, $label_parameters, $preset_parameters, $item_number) {
+    function create_pagination_element( $view_parameters, $label_parameters, $preset_parameters, $item_number ) {
         echo
         '<li class="page-item ' . get_active_state(get_current_page_number(), $item_number) . '">' .
         '<a class="page-link" href="' .
@@ -272,41 +269,29 @@ function the_pagination($total_pages){
         </li>
 
         <?php
-        //There are more than 5 pages
-        if ($total_pages > 5) {
-            // if ($current_page_number >= 4) {
-            //     echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
-            //     create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$current_page_number - 1);
-            // }
-
-            //$current_page_number is close to 1 (in between 1 and 3, inclusive)
-            if ($current_page_number >= 1 && $current_page_number <= 3) {
-                //Create elements 2 to 4
-                for ($i = 2; $i <= 4; $i++) {
-                    create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$i);
+        if ( $total_pages > 5 ) {
+            if ( $current_page_number >= 1 && $current_page_number <= 3 ) {
+                //$current_page_number is close to 1 (in between 1 and 3, inclusive)
+                for ( $i = 2; $i <= 4; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
+                }
+                create_ellipses_element();
+            } else if ( $current_page_number >= $total_pages - 2 && $current_page_number <= $total_pages ) {
+                //$current_page_number is close to $total_pages (in between $total_pages - 2 and $total_pages, inclusive)
+                create_ellipses_element();
+                for ( $i = $total_pages - 3; $i < $total_pages; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
+                }
+            } else {
+                //$current_page_number isn't close to 1 or $total_pages
+                create_ellipses_element();
+                for ( $i = $current_page_number - 1; $i <= $current_page_number + 1; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
                 }
                 create_ellipses_element();
             }
-
-            //$current_page_number is close to $total_pages (in between $total_pages - 2 and $total_pages, inclusive)
-            else if ($current_page_number >= $total_pages - 2 && $current_page_number <= $total_pages) {
-                create_ellipses_element();
-                for ($i = $total_pages - 3; $i < $total_pages; $i++) {
-                    create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$i);
-                }
-            }
-
-            //$current_page_number isn't close to 1 or $total_pages
-            else {
-                create_ellipses_element();
-                for ($i = $current_page_number - 1; $i <= $current_page_number + 1; $i++) {
-                    create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$i);
-                }
-                create_ellipses_element();
-            }
-        }
-        //There are less than 5 pages
-        else {
+        } else {
+            //Less than 5 pages; simpler logic
             for ($i = 2; $i <= $total_pages - 1; $i++) {
                 create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$i);
             }
