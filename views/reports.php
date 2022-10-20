@@ -120,7 +120,7 @@ if(!empty($_GET['report'])){
 
     // When there's no report data, we get active alerts.
     $report = array(
-        'meta_name' => 'active',
+        'meta_name' => 'report_active',
         'meta_value' => array(
             array(
                 'name' => 'title',
@@ -139,7 +139,6 @@ if(!empty($_GET['report'])){
 
     // We have no tags.
     $tags = array();
-
 
 }
 
@@ -165,6 +164,12 @@ foreach($report_meta as $k => $val) {
         <div>
             <h1><?php echo $the_title;?></h1>
         </div>
+
+        <?php
+        // Hide filters on pages that are not reports.
+        if(!empty($_GET['report'])):
+        ?>
+
         <div> 
 
             <?php
@@ -195,6 +200,12 @@ foreach($report_meta as $k => $val) {
                 Filters & Settings
             </a>
         </div>
+
+        <?php
+        // End filter hider.
+        endif;
+        ?>
+
     </div>
     <table class="table">
         <thead>

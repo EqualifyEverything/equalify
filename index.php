@@ -3,9 +3,6 @@
  * Equalify is a platform developed to integrate various
  * services that manage websites.
  * 
- * The heart of the app is in actions/process_site.php -
- * which also contains more info about our architecture.
- * 
  * You'll see comment sections like this at the top of
  * many files to remind us of basic operating principles
  * that drive the Equalify project forward.
@@ -167,7 +164,7 @@ require_once 'actions/run_scheduled_scan.php';
 
                         // Let's extract the "title" meta, so we can use it 
                         // later and so we can use any report's meta_values to
-                        // fitler the alerts.
+                        // filter the alerts.
                         foreach($report_meta as $k => $val) {
                             if($val['name'] == 'title') {
                                 $the_title = $val['value'];
@@ -186,7 +183,7 @@ require_once 'actions/run_scheduled_scan.php';
                 ?>
 
                 <li class="nav-item">
-                    <a href="index.php?view=report_settings" class="nav-link <?php the_active_class('report_settings');?>">
+                    <a href="index.php?view=report_settings&new_report" class="nav-link <?php the_active_class('report_settings');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2" viewBox="0 0 16 16">
                             <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z"></path>
                         </svg>

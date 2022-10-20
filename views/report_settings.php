@@ -7,6 +7,17 @@
  * Equalify works for everyone.
 **********************************************************/
 
+// Meta_name is used to load existing report info.
+if(empty($_GET['meta_name'])){
+    
+    // No meta_name means we can create a new report
+    // or edit the active report, which is default.
+    if(!isset($_GET['new_report'])){
+        $_GET['meta_name'] = 'report_active';
+    }
+
+}
+
 // Let's setup the variables that we're going to be using
 // in this document.
 $title = 'Untitled';
@@ -210,7 +221,7 @@ if(!empty($_GET['meta_name'])){
             <?php
             // Start Loop
             foreach ($tags['content'] as $tag):
-            
+                
                 // We need to start by ending the previous category's
                 // div if it exists.
                 if(($stored_category !== '') && ($stored_category !== $tag->category))
