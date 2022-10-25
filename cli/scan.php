@@ -91,7 +91,7 @@ if(!empty($alerts_output)){
 
 }
 
-// Log our progress..
+// Log our progress.
 $ending_time = microtime(true);
 $exec_time = $ending_time - $starting_time;
 update_scan_log("\n\nScan complete.");
@@ -99,7 +99,7 @@ update_scan_log(
     "\n\n\nEqualify scan took just $exec_time seconds."
 );
 
-// Set the amount of scans to date.
+// Set the number of scans to date.
 $pages_scanned = DataAccess::get_meta_value(
     'pages_scanned'
 );

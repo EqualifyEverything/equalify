@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * These configs are used to setup Equalify's database
+ * These configs are used to set up Equalify's database
  * and execution.
  * 
  * As always, we must remember that every function should 

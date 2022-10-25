@@ -25,7 +25,7 @@ function queue_alert(array $attributes){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Now lets start work by setting required attributes.
+    // Now let's start work by setting required attributes.
     if(empty($attributes['source']))
         throw new Exception('Source is missing', 1);
     if(empty($attributes['type']))
@@ -48,7 +48,7 @@ function queue_alert(array $attributes){
     );
     if(!in_array($attributes['type'], $allowed_types))
         throw new Exception(
-            'Alert type "'.$attributes['type'].'" is invlaid'
+            'Alert type "'.$attributes['type'].'" is invalid'
         );
 
     // We should also sanitize the message to a format
@@ -62,7 +62,7 @@ function queue_alert(array $attributes){
         );
     }
 
-    // Let's setup attributes in a usable way for the DB.
+    // Let's set up attributes in a usable way for the DB.
     $alert_arguments = array(
         array(
 
@@ -104,7 +104,7 @@ function queue_alert(array $attributes){
         )
     );
 
-    // Time to get exsiting alerts, so we're not posting
+    // Time to get existing alerts, so we're not posting
     // duplicate alerts.
     $existing_alerts = DataAccess::get_db_rows(
         'alerts', $alert_arguments
@@ -120,7 +120,7 @@ function queue_alert(array $attributes){
     );
 
     // Now let's update or add the alert, depending on 
-    // if a similar alert already exists.x
+    // if a similar alert already exists.
     if(!empty($existing_alerts)){
 
         // All alerts with the same data will need to be
@@ -137,7 +137,7 @@ function queue_alert(array $attributes){
 
     }else{
         
-        // Lets add an active alert, since it doesn't 
+        // Let's add an active alert, since it doesn't 
         // already exists.
         DataAccess::add_db_entry( 
             'alerts', $alert_arguments

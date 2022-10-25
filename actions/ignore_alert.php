@@ -39,5 +39,5 @@ DataAccess::update_db_entry(
     'alerts', $id, $alert_arguments
 );
 
-// If a "referrer" session was create
+// If a "referrer" session was created
 header('Location:  ../index.php?view=alerts'.$preset);

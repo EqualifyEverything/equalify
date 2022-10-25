@@ -1,20 +1,20 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document composes the label customerizer view.
+ * This document composes the label customizer view.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
  * Equalify works for everyone.
 **********************************************************/
 
-// Let's setup the variables that we're going to be using
+// Let's set up the variables that we're going to be using
 // in this document.
 $name   = '';
 $title = 'Untitled';
 $status = '';
 $type   = '';
 
-// We use this view to customize labels if a id is 
+// We use this view to customize labels if an id is 
 // provided, otherwise we create a new label.
 if(!empty($_GET['name'])){
     $name = $_GET['name'];
@@ -42,7 +42,7 @@ if(!empty($_GET['name'])){
     <div class="mb-3 pb-4 border-bottom">
         <h1>
             <?php
-            // Lets add helper text, depending on if we're
+            // Let's add helper text, depending on if we're
             // editing the label.
             if(!empty($name)){
                 echo 'Editing ';

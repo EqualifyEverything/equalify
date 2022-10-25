@@ -79,7 +79,7 @@ class DataAccess {
      */
     private static function filters($filters){
 
-        // Our goal is to output sql and params.
+        // Our goal is to output SQL and params.
         $output = array(
             'sql' => '',
             'params' => array()
@@ -92,7 +92,7 @@ class DataAccess {
         // We only need to prepare SQL if filters exist.
         if($filter_count > 0){
             
-            // We start a loop to setup our filters.
+            // We start a loop to set up our filters.
             $output['sql'] = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){
@@ -118,16 +118,16 @@ class DataAccess {
                 // You can nest filters in filter values.
                 if(is_array($filter['value'])){
 
-                    // Start the sub filter SQL.
+                    // Start the sub-filter SQL.
                     $sub_filter_iteration = 0;
                     $sub_filter_count = count($filter['value']);
                     $output['sql'].= '(';
 
-                    // We only support one sub filter.
+                    // We only support one sub-filter.
                     foreach($filter['value'] as $sub_filter){
 
                         // Like we did before, let's build the
-                        // sql and add to params.
+                        // SQL and add to params.
                         if(empty($sub_filter['condition'])){
                             $sub_condition = 'AND';
                         }else{
@@ -146,12 +146,12 @@ class DataAccess {
                         
                     }
 
-                    // End the sub filter SQL.
+                    // End the sub-filter SQL.
                     $output['sql'].= ')';
                     
                 }else{
 
-                    // If the filter doesn't have array, we can just
+                    // If the filter doesn't have an array, we can just
                     // assemble it with existing content.
                     $output['sql'].= '`'.$filter['name'].'` '.$operator
                     .' ?';

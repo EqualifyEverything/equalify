@@ -12,7 +12,7 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-// First let's create an array that we'll use to update 
+// First, let's create an array that we'll use to update 
 // the meta from.
 $updated_meta = array();
 
@@ -68,7 +68,7 @@ if(empty($_POST['name'])){
 
 }else{
 
-    // Otherwise we can update the fields.
+    // Otherwise, we can update the fields.
     $fields = array(
         array(
             'name' => 'meta_value',
@@ -107,7 +107,7 @@ function submeta($input, $name){
         ' ', '', $input
     );
 
-    // Now lets create an array.
+    // Now let's create an array.
     $items = explode(',', $input);
 
     // We turn the array into a subfilter.

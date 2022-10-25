@@ -15,7 +15,7 @@
  * can redistribute it and/or modify it under the terms of
  * the GNU Affero General Public License as published by
  * the Free Foundation, either version 3 of the License,
- * or (at your option) anylater version.
+ * or (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be
  * useful, but WITHOUT ANY WARRANTY; without even the
@@ -165,8 +165,8 @@ require_once 'actions/run_scheduled_scan.php';
                         ));
 
                         // Let's extract the "title" meta, so we can use it 
-                        // later and so we can use any label's meta_values to
-                        // fitler the alerts.
+                        // later and use any label's meta_values to
+                        // filter the alerts.
                         foreach($label_meta as $k => $val) {
                             if($val['name'] == 'title') {
                                 $the_title = $val['value'];
