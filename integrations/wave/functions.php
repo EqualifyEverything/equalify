@@ -126,11 +126,6 @@ function wave_alerts($response_body, $page_url){
     // Sometimes WAVE can't read the json.
     if(empty($wave_json_decoded)){
 
-        // We'll set the attributes to empty.
-        $wave_errors = array();
-        $wave_contrast_errors = array();
-        $wave_warnings = array();
-
         // And add an alert.
         $alert = array(
             'source'  => 'wave',
@@ -138,7 +133,7 @@ function wave_alerts($response_body, $page_url){
             'type'    => 'error',
             'message' => 'WAVE cannot reach the page.',
         );
-        array_push($wave_contrast_errors, $alert);
+        array_push($wave_alerts, $alert);
 
     }else{
 

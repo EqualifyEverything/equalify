@@ -115,6 +115,7 @@ function process_alerts( array $integration_output) {
                 'type'      => $alert->type,
                 'status'    => $alert->status,
                 'site_id'   => $alert->site_id,
+                'tags'      => $alert->tags,
                 'source'    => $alert->source
             );
             array_push($rows, $new_row);
