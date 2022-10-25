@@ -130,7 +130,6 @@ function wave_alerts($response_body, $page_url){
         $alert = array(
             'source'  => 'wave',
             'url'     => $page_url,
-            'type'    => 'error',
             'message' => 'WAVE cannot reach the page.',
         );
         array_push($wave_alerts, $alert);
@@ -158,7 +157,6 @@ function wave_alerts($response_body, $page_url){
             // Default variables.
             $alert = array();
             $alert['source'] = 'wave';
-            $alert['type'] = 'error';
             $alert['url'] = $page_url;
 
             // Setup tags.
