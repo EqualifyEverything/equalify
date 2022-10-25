@@ -57,7 +57,7 @@ function process_alerts( array $integration_output) {
         )
     );
     $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 1000000, 'OR'
+        'alerts', $existing_alert_filters, 1, 1000000
     )['content'];
     if(empty($existing_alerts))
         $existing_alerts = array();
@@ -115,6 +115,7 @@ function process_alerts( array $integration_output) {
                 'type'      => $alert->type,
                 'status'    => $alert->status,
                 'site_id'   => $alert->site_id,
+                'tags'      => $alert->tags,
                 'source'    => $alert->source
             );
             array_push($rows, $new_row);

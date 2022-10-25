@@ -19,10 +19,13 @@ if(empty($id))
         'ID "'.$id.'" is invalid or missing'
     );
 
-// We will redirect back to a specified to a preset.
-$preset = '';
-if (isset($_GET['preset']))
-    $preset = '&preset='.$_GET['preset'];
+// We will redirect back to a specific a preset or report.
+$redirect = '';
+if (isset($_GET['preset'])){
+    $redirect = '&preset='.$_GET['preset'];
+}elseif(isset($_GET['report'])){
+    $redirect = '&report='.$_GET['report'];
+}
 
 // Set the entry to "ignored".
 $alert_arguments = array(
@@ -39,5 +42,5 @@ DataAccess::update_db_entry(
     'alerts', $id, $alert_arguments
 );
 
-// If a "referrer" session was created
-header('Location:  ../index.php?view=alerts'.$preset);
+// If a "referrer" session was create
+header('Location:  ../index.php?view=reports'.$redirect);

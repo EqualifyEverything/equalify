@@ -45,6 +45,58 @@ function wave_fields(){
 
 }
 
+/**
+ * WAVE Tags
+ */
+function wave_tags(){
+
+    // We don't know where helpers are being called, so we
+    // have to set the directory if it isn't already set.
+    if(!defined('__DIR__'))
+        define('__DIR__', dirname(dirname(__FILE__)));
+    
+    // Read the JSON file - pulled from https://wave.webaim.org/api/docs?format=json
+    $wave_tag_json = file_get_contents(__DIR__.'/wave_tags.json');
+    $wave_tags = json_decode($wave_tag_json,true);
+
+    // Convert WAVE format into Equalify format:
+    // tags [ array('slug' => $value, 'name' => $value, 'description' => $value) ]
+    $tags = array();
+    if(!empty($wave_tags)){
+        foreach($wave_tags as $wave_tag){
+
+            // First, let's prepare the description, which is
+            // the summary and guidelines.
+            $description = '<p class="lead">'.$wave_tag['summary'].'</p>';
+            if(!empty($wave_tag['guidelines'])){
+                $description.= '<p><strong>Guidelines:</strong> ';
+                $copy = $wave_tag['guidelines'];
+                foreach($wave_tag['guidelines'] as $guideline){
+                    $description.= '<a href="'.$guideline['link'].'">'.$guideline['name'].'</a>';
+                    if (next($copy ))
+                        $description.= ', ';
+                }
+                $description.= '</p>';
+            }
+            
+            // Now lets put it all together into the Equalify format.
+            array_push(
+                $tags, array(
+                    'slug' => $wave_tag['name'],
+                    'title' => $wave_tag['title'],
+                    'category' => $wave_tag['category'],
+                    'description' => $description
+                )
+            );
+
+        }
+    }
+
+    // Return tags.
+    return $tags;
+
+}
+
  /**
   * WAVE URLs
   * Maps site URLs to Little Forest URLs for processing.
@@ -74,11 +126,6 @@ function wave_alerts($response_body, $page_url){
     // Sometimes WAVE can't read the json.
     if(empty($wave_json_decoded)){
 
-        // We'll set the attributes to empty.
-        $wave_errors = array();
-        $wave_contrast_errors = array();
-        $wave_warnings = array();
-
         // And add an alert.
         $alert = array(
             'source'  => 'wave',
@@ -86,44 +133,50 @@ function wave_alerts($response_body, $page_url){
             'type'    => 'error',
             'message' => 'WAVE cannot reach the page.',
         );
-        array_push($wave_contrast_errors, $alert);
+        array_push($wave_alerts, $alert);
 
     }else{
 
-        // Correctly working JSON gets the following attributes.
-        $wave_errors = $wave_json_decoded['categories']['error'];
-        $wave_contrast_errors = $wave_json_decoded['categories']['contrast'];
-        $wave_warnings = $wave_json_decoded['categories']['alert'];
+        // Reformat correctly working items.
+        $wave_items = array();
+        foreach($wave_json_decoded['categories'] as $wave_json_entry){
+            if(!empty($wave_json_entry['items'])){
+                foreach($wave_json_entry['items'] as $wave_item)
+                    $wave_items[] = $wave_item;
+            }
+        }
+
     
     }
 
-    // Prevent a bug that occurs because LF adds "0" when no notices or errors.
-    if($wave_errors == 0)
-        $wave_errors = [];
-    if($wave_warnings == 0)
-        $wave_warnings = [];
-    if($wave_contrast_errors == 0)
-        $wave_contrast_errors = [];
-
     // Add alerts.
-    $alert['source'] = 'wave';
-    $alert['url'] = $page_url;
-    if(!empty($wave_errors) && ($wave_errors['count'] !== 0)) {
-        $alert['message'] = $wave_errors['count'].' page errors found! See <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE report</a>.';
-        $alert['type'] = 'error';
-        $wave_alerts[] = $alert;
-    }
-    if(!empty($wave_warnings)) {
-        $alert['message'] = $wave_warnings['count'].' page errors found! See <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE report</a>.';
-        $alert['type'] = 'warning';
-        $wave_alerts[] = $alert;
+    if(!empty($wave_items)) {
 
-    }
+        // Setup alert variables.
+        foreach($wave_items as $wave_item){
 
-    if(!empty($wave_contrast_errors)) {
-        $alert['message'] = $wave_contrast_errors['count'].' contrast page errors found! See <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE report</a>.';
-        $alert['type'] = 'error';
-        $wave_alerts[] = $alert;
+            // Default variables.
+            $alert = array();
+            $alert['source'] = 'wave';
+            $alert['type'] = 'error';
+            $alert['url'] = $page_url;
+
+            // Setup tags.
+            $alert['tags'] = $wave_item['id'];
+
+            // Setup message.
+            if($wave_item['count'] > 1){
+                $appended_text = ' (total: '.$wave_item['count'].')';
+            }else{
+                $appended_text = '';
+            }
+            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report</a>';
+
+            // Push alert.
+            $wave_alerts[] = $alert;
+            
+        }
+
     }
 
     // Return alerts.

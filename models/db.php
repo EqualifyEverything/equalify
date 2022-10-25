@@ -75,7 +75,7 @@ class DataAccess {
      * Filters helper.
      * @param array filters  
      * [ array ('name' => $name, 'value' => $value, 
-     * 'operator' => '=', 'condition' => 'AND' ) ]
+     * 'operator' => '=', 'condition' => 'AND', 'type' = '' ) ]
      */
     private static function filters($filters){
 
@@ -97,70 +97,93 @@ class DataAccess {
             $filter_iteration = 0;
             foreach ($filters as $filter){
 
-                // The default condition 'AND'.
-                if(empty($filter['condition'])){
-                    $condition = 'AND';
+                // Filters without type have the standard 
+                // markup
+                if(empty($filter['type'])){
 
-                // You can use other conditions like 'OR'.
-                }else{
-                    $condition = $filter['condition'];
-                }
+                    // The default condition 'AND'.
+                    if(empty($filter['condition'])){
+                        $condition = 'AND';
 
-                // The default operator is '='.
-                if(empty($filter['operator'])){
-                    $operator = '=';
-
-                // You can use other operators like 'IS'.
-                }else{
-                    $operator = $filter['operator'];
-                }
-
-                // You can nest filters in filter values.
-                if(is_array($filter['value'])){
-
-                    // Start the sub-filter SQL.
-                    $sub_filter_iteration = 0;
-                    $sub_filter_count = count($filter['value']);
-                    $output['sql'].= '(';
-
-                    // We only support one sub-filter.
-                    foreach($filter['value'] as $sub_filter){
-
-                        // Like we did before, let's build the
-                        // SQL and add to params.
-                        if(empty($sub_filter['condition'])){
-                            $sub_condition = 'AND';
-                        }else{
-                            $sub_condition = $sub_filter['condition'];
-                        }
-                        if(empty($sub_filter['operator'])){
-                            $sub_operator = '=';        
-                        }else{
-                            $sub_operator = $sub_filter['operator'];
-                        }
-                        $output['sql'].= '`'.$sub_filter['name'].'` '
-                        .$sub_operator.' ?';
-                        if(++$sub_filter_iteration != $sub_filter_count)
-                            $output['sql'].= ' '.$sub_condition.' ';
-                        $output['params'][] = $sub_filter['value'];
-                        
+                    // You can use other conditions like 'OR'.
+                    }else{
+                        $condition = $filter['condition'];
                     }
 
-                    // End the sub-filter SQL.
-                    $output['sql'].= ')';
-                    
+                    // The default operator is '='.
+                    if(empty($filter['operator'])){
+                        $operator = '=';
+
+                    // You can use other operators like 'IS'.
+                    }else{
+                        $operator = $filter['operator'];
+                    }
+
+                    // You can nest filters in filter values.
+                    if(is_array($filter['value'])){
+
+                        // Start the sub filter SQL.
+                        $sub_filter_iteration = 0;
+                        $sub_filter_count = count($filter['value']);
+                        $output['sql'].= '(';
+
+                        // We only support one sub filter.
+                        foreach($filter['value'] as $sub_filter){
+
+                            // Like we did before, let's build the
+                            // sql and add to params.
+                            if(empty($sub_filter['condition'])){
+                                $sub_condition = 'AND';
+                            }else{
+                                $sub_condition = $sub_filter['condition'];
+                            }
+                            if(empty($sub_filter['operator'])){
+                                $sub_operator = '=';        
+                            }else{
+                                $sub_operator = $sub_filter['operator'];
+                            }
+                            $output['sql'].= '`'.$sub_filter['name'].'` '
+                            .$sub_operator.' ?';
+                            if(++$sub_filter_iteration != $sub_filter_count)
+                                $output['sql'].= ' '.$sub_condition.' ';
+                            $output['params'][] = $sub_filter['value'];
+                            
+                        }
+
+                        // End the sub filter SQL.
+                        $output['sql'].= ')';
+                        
+                    }else{
+
+                        // If the filter doesn't have array, we can just
+                        // assemble it with existing content.
+                        $output['sql'].= '`'.$filter['name'].'` '.$operator
+                        .' ?';
+                        $output['params'][] = $filter['value'];
+
+                    }
+
+                    if(++$filter_iteration != $filter_count)
+                        $output['sql'].= ' '.$condition.' ';
+
+                // Other filters are setup differently.
                 }else{
 
-                    // If the filter doesn't have an array, we can just
-                    // assemble it with existing content.
-                    $output['sql'].= '`'.$filter['name'].'` '.$operator
-                    .' ?';
-                    $output['params'][] = $filter['value'];
-
-                }
-
-                if(++$filter_iteration != $filter_count)
-                    $output['sql'].= ' '.$condition.' ';
+                    // Add "find in set" variables.
+                    if($filter['type'] === 'find_in_set'){
+                        $copy = $filter['value'];
+                        $output['sql'].= '(';
+                        foreach($filter['value'] as $value){
+                            $output['sql'].= ' FIND_IN_SET("'.$value['value'].'", '.$value['column'].')';
+                            if(next($copy)){
+                                $output['sql'].= ' OR ';
+                            }else{
+                                $output['sql'].= ')';
+                            }
+                        }
+                    }      
+                                 
+                } 
 
             }
 
@@ -178,14 +201,16 @@ class DataAccess {
      * 'operator' => '=', 'condition' => 'AND' ) ]
      * @param string page
      * @param string rows_per_page
-     * @param string operator
+     * @param string order_by
      */
     public static function get_db_rows(
         $table, array $filters = [], $page = 1, 
-        $rows_per_page = self::ITEMS_PER_PAGE
+        $rows_per_page = '', $order_by = ''
     ){
 
         // Set rows per page.
+        if(empty($rows_per_page))
+            $rows_per_page = self::ITEMS_PER_PAGE;
         $page_offset = ($page-1) * $rows_per_page;
 
         // Create 'total_pages' SQL.
@@ -197,6 +222,10 @@ class DataAccess {
 
         // Add optional filters to content and total_pages.
         $filters = self::filters($filters);
+
+        // Add optional "ORDER BY".
+        if(!empty($order_by))
+            $content_sql.= ' ORDER BY `'.$order_by.'`';
 
         // Add filters and page limit.
         $total_pages_sql.= $filters['sql'];
@@ -218,7 +247,7 @@ class DataAccess {
                 $content[] = $row;
             }
         }
-    
+
         // Create and return data.
         $data = [
             'total_rows' => $total_pages_rows,
@@ -270,7 +299,8 @@ class DataAccess {
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
             $selected_columns.= "$table1.type, $table1.status, ";
-            $selected_columns.= "$table1.site_id, $table1.source ";
+            $selected_columns.= "$table1.site_id, $table1.source, ";
+            $selected_columns.= "$table1.tags ";
         }
     
         // SQL.
@@ -615,7 +645,6 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
-        print_r($sql);
 
         // Fallback
         if(!$result)
@@ -683,6 +712,30 @@ class DataAccess {
     }
 
     /**
+     * Get Next ID
+     */
+    public static function get_next_id($table){
+
+        // SQL
+        $sql = 'SELECT AUTO_INCREMENT FROM 
+            information_schema.TABLES WHERE 
+            TABLE_SCHEMA = "'.$GLOBALS['DB_NAME'].'"
+            AND TABLE_NAME = "'.$table.'"';
+            
+        // Query
+        $results = self::query($sql, array(), true);
+
+        // Returns meta_value.
+        $data = $results->fetch_object();
+        if(empty($data)){
+            return false;
+        }else{
+            return $data->AUTO_INCREMENT;
+        }
+
+    }
+
+    /**
      * Create Alerts Table
      */
     public static function create_alerts_table(){
@@ -698,6 +751,7 @@ class DataAccess {
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
+                `tags` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -705,6 +759,36 @@ class DataAccess {
         
         // Query
         $result = self::query($sql, $params, false);
+        
+    }
+
+    /**
+     * Create Tags Table
+     */
+    public static function create_tags_table(){
+    
+        // Let's create the tags table.
+        $sql = 
+            "CREATE TABLE `tags` (
+                `slug` varchar(255) NOT NULL,
+                `title` varchar(255) NOT NULL,
+                `category` varchar(255),
+                `description` text
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $params = array();
+        $result = self::query($sql, $params, false);
+
+        // Now we need to register WAVE tags, since
+        // the plugin is activated by default.
+        require_once 'integrations.php';
+        require_once 'helpers/register_tags.php';
+        $integration_tags = get_integration_tags(
+            'wave'
+        );
+        if( !empty($integration_tags) ){
+            register_tags($integration_tags);
+        }
+
         
     }
 
@@ -724,6 +808,7 @@ class DataAccess {
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
                 `message` text,
+                `tags` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";

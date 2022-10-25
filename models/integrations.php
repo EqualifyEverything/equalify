@@ -96,3 +96,20 @@ function get_integration_fields( $uri ){
 	}
 
 }
+
+/**
+ * Get Integration Tags
+ */
+function get_integration_tags( $uri ){
+
+	// Get integration file.
+	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
+    require_once $integration_path;
+    $integration_db_tags = $uri.'_tags';
+    if( function_exists( $integration_db_tags) ){
+		return $integration_db_tags();
+	}else{
+		false;
+	}
+
+}

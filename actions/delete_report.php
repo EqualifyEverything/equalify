@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document deletes labels.
+ * This document deletes reports.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -12,19 +12,16 @@
 require_once '../config.php';
 require_once '../models/db.php';
 
-// Set up variables.
-$alert_label = $_GET['name'];
-
 // Delete DB 
-$filtered_to_label = array(
+$filtered_to_report = array(
     array(
         'name' => 'meta_name',
-        'value' => $_GET['name'],
+        'value' => $_GET['report'],
     )
 );
 DataAccess::delete_db_entries(
-    'meta', $filtered_to_label
+    'meta', $filtered_to_report
 );
 
-// Reload alerts page.
-header('Location: ../index.php?view=alerts');
+// Reload reports page.
+header('Location: ../index.php?view=reports');

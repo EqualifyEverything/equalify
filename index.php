@@ -3,9 +3,6 @@
  * Equalify is a platform developed to integrate various
  * services that manage websites.
  * 
- * The heart of the app is in actions/process_site.php -
- * which also contains more info about our architecture.
- * 
  * You'll see comment sections like this at the top of
  * many files to remind us of basic operating principles
  * that drive the Equalify project forward.
@@ -76,7 +73,7 @@ require_once 'actions/run_scheduled_scan.php';
             </a>
             <ul class="nav nav-pills flex-column mb-auto mt-5">
                 <li class="nav-item">
-                    <a href="index.php?view=alerts" class="nav-link <?php the_active_class('alerts');?>">
+                    <a href="index.php?view=reports" class="nav-link <?php the_active_class('reports');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 bi bi-inbox-fill" viewBox="0 0 16 16">
                             <path d="M4.98 4a.5.5 0 0 0-.39.188L1.54 8H6a.5.5 0 0 1 .5.5 1.5 1.5 0 1 0 3 0A.5.5 0 0 1 10 8h4.46l-3.05-3.812A.5.5 0 0 0 11.02 4H4.98zm-1.17-.437A1.5 1.5 0 0 1 4.98 3h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1 .106.374l-.39 3.124A1.5 1.5 0 0 1 14.117 13H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .106-.374l3.7-4.625z"></path>
                         </svg>
@@ -106,7 +103,7 @@ require_once 'actions/run_scheduled_scan.php';
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=alerts&preset=equalified" class="nav-link <?php the_active_class('equalified');?>">
+                    <a href="index.php?view=reports&preset=equalified" class="nav-link <?php the_active_class('equalified');?>">
                         <svg viewBox="-387.606 -871.444 1637.169 1556.107" xmlns="http://www.w3.org/2000/svg" fill="currentColor"  width="16" height="16" class="me-2 bi">
                             <path d="M 694.48 -64.946 C 694.48 -188.933 661.663 -312.902 599.152 -420.729 C 573.664 -464.707 544.71 -507.875 506.874 -542.58 C 458.726 -586.743 399.108 -619.143 335.904 -637.029 C 287.052 -650.855 236.121 -659.132 185.265 -659.132 C 173.805 -659.132 162.484 -659.073 151.07 -658.303 C 146.172 -657.973 139.943 -659.158 135.554 -656.412 C 128.511 -652.005 123.974 -638.092 120.342 -630.924 C 107.247 -605.062 97.266 -577.673 89.151 -549.94 C 57.942 -443.305 69.134 -331.392 119.417 -232.374 C 130.637 -210.289 144.546 -189.633 159.12 -169.587 C 163.611 -163.41 169.895 -151.143 176.984 -147.813 C 181.346 -145.757 188.999 -148.66 193.582 -149.324 C 208.036 -151.416 222.527 -153.063 237.018 -154.765 C 280.869 -159.934 327.041 -160.816 371.022 -156.694 C 445.888 -149.678 519.193 -135.883 590.05 -110.397 C 612.932 -102.162 635.38 -92.871 657.514 -82.862 C 669.879 -77.275 681.708 -69.523 694.48 -64.946 M 742.537 79.734 C 761.677 75.376 780.872 66.767 798.91 59.188 C 839.028 42.336 877.88 22.554 914.431 -0.941 C 1007.679 -60.869 1099.864 -144.874 1147.034 -246.022 C 1172.634 -300.918 1184.287 -360.565 1184.287 -420.729 C 1184.287 -474.079 1175.887 -525.959 1160.915 -577.238 C 1157.311 -589.576 1152.856 -601.619 1148.291 -613.636 C 1146.766 -617.654 1145.204 -624.61 1141.415 -627.136 C 1134.678 -631.619 1121.056 -631.673 1113.126 -632.744 C 1089.061 -635.993 1065.32 -637.294 1041.042 -637.294 C 929.587 -637.294 815.877 -598.469 736.067 -519.912 C 715.662 -499.826 696.919 -479.12 679.804 -456.217 C 674.998 -449.792 663.594 -438.828 662.726 -430.739 C 662.236 -426.125 667.273 -420.175 669.296 -416.18 C 675.553 -403.878 681.57 -391.457 687.217 -378.873 C 705.191 -338.817 719.322 -297.452 730.633 -255.122 C 750.66 -180.125 759.846 -98.622 754.468 -21.269 C 752.102 12.727 746.899 45.939 742.537 79.734 Z" transform="matrix(0.839096, 0.543984, -0.543984, 0.839096, -56.54034, -388.24704)"/>
                             <path d="M 367.426 -388.26 C 248.503 -426.35 119.204 -432.746 -3.166 -408.642 C -55.168 -398.396 -107.199 -383.81 -153.805 -358.359 C -208.228 -328.631 -254.558 -285.983 -290.71 -236.301 C -321.733 -193.67 -346.714 -145.962 -363.589 -96.17 C -367.369 -85.024 -370.76 -73.804 -374.023 -62.503 C -375.252 -58.226 -378.154 -51.456 -376.814 -47.034 C -373.866 -37.298 -358.239 -25.697 -350.651 -19.208 C -327.64 0.473 -304.562 19.727 -278.566 35.596 C -184.302 93.141 -76.655 116.108 32.877 98.018 C 56.036 94.197 78.993 88.273 101.266 80.966 C 108.955 78.436 120.34 76.808 126.846 71.967 C 129.989 69.628 129.637 63.841 130.164 60.338 C 131.754 49.701 133.731 39.037 135.875 28.49 C 143.805 -10.527 154.858 -48.7 168.444 -86.161 C 195.41 -160.503 234.993 -231.997 283.927 -294.536 C 300.063 -315.146 316.624 -335.947 335.089 -354.592 C 344.607 -364.2 361.667 -376.367 367.426 -388.26 Z" transform="matrix(0.839096, 0.543984, -0.543984, 0.839096, -87.491196, -22.999788)"/>
@@ -117,7 +114,7 @@ require_once 'actions/run_scheduled_scan.php';
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=alerts&preset=ignored" class="nav-link <?php the_active_class('ignored');?>">
+                    <a href="index.php?view=reports&preset=ignored" class="nav-link <?php the_active_class('ignored');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 bi bi-bell-slash-fill" viewBox="0 0 16 16">
                             <path d="M5.164 14H15c-1.5-1-2-5.902-2-7 0-.264-.02-.523-.06-.776L5.164 14zm6.288-10.617A4.988 4.988 0 0 0 8.995 2.1a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 7c0 .898-.335 4.342-1.278 6.113l9.73-9.73zM10 15a2 2 0 1 1-4 0h4zm-9.375.625a.53.53 0 0 0 .75.75l14.75-14.75a.53.53 0 0 0-.75-.75L.625 15.625z"></path>
                         </svg>
@@ -125,7 +122,7 @@ require_once 'actions/run_scheduled_scan.php';
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=alerts&preset=all" class="nav-link <?php the_active_class('all');?>">
+                    <a href="index.php?view=reports&preset=all" class="nav-link <?php the_active_class('all');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 bi bi-inboxes-fill" viewBox="0 0 16 16">
                             <path d="M4.98 1a.5.5 0 0 0-.39.188L1.54 5H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0A.5.5 0 0 1 10 5h4.46l-3.05-3.812A.5.5 0 0 0 11.02 1H4.98zM3.81.563A1.5 1.5 0 0 1 4.98 0h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1 .106.374l-.39 3.124A1.5 1.5 0 0 1 14.117 10H1.883A1.5 1.5 0 0 1 .394 8.686l-.39-3.124a.5.5 0 0 1 .106-.374L3.81.563zM.125 11.17A.5.5 0 0 1 .5 11H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0 .5.5 0 0 1 .5-.5h5.5a.5.5 0 0 1 .496.562l-.39 3.124A1.5 1.5 0 0 1 14.117 16H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .121-.393z"></path>
                         </svg>
@@ -134,74 +131,63 @@ require_once 'actions/run_scheduled_scan.php';
                 </li>
                 <hr class="navbar-divider my-3">
                 <?php
-                // Show various labels.
-                $filtered_to_labels = array(
+                // Show various reports.
+                $filtered_to_reports = array(
                     array(
                         'name' => 'meta_name',
-                        'value' => 'label_%',
+                        'value' => 'report_%',
                         'operator' => 'LIKE'
                     )
                 );
-                $labels = DataAccess::get_db_rows(
-                    'meta', $filtered_to_labels, 1, 1000
+                $reports = DataAccess::get_db_rows(
+                    'meta', $filtered_to_reports, 1, 1000
                 )['content'];
-                if(!empty($labels)): foreach($labels as $label):
+                if(!empty($reports)): foreach($reports as $report):
                 ?>
 
                 <li class="nav-item">
-                    <a href="index.php?view=alerts&label=<?php echo $label->meta_name;?>" class="nav-link <?php the_active_class($label->meta_name);?>">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-tag-fill" viewBox="0 0 16 16">
-                            <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+                    <a href="index.php?view=reports&report=<?php echo $report->meta_name;?>" class="nav-link <?php the_active_class($report->meta_name);?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2 bi-clipboard-data-fill" viewBox="0 0 16 16">
+                            <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1ZM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V8Zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1Zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z"/>
                         </svg>
                         
                         <?php
-                        // We'll get some data to make the label.
-                        $label_meta = unserialize($label->meta_value);
+                        // We'll get some data to make the report.
+                        $report_meta = unserialize($report->meta_value);
 
-                        // No archived alerts are shown in labels.
-                        array_push($label_meta, array(
+                        // No archived alerts are shown in reports.
+                        array_push($report_meta, array(
                             'name' => 'archived',
                             'value' => 0
                         ));
 
                         // Let's extract the "title" meta, so we can use it 
-                        // later and use any label's meta_values to
+                        // later and so we can use any report's meta_values to
                         // filter the alerts.
-                        foreach($label_meta as $k => $val) {
+                        foreach($report_meta as $k => $val) {
                             if($val['name'] == 'title') {
                                 $the_title = $val['value'];
-                                unset($label_meta[$k]);
+                                unset($report_meta[$k]);
                             }
                         }
                         echo $the_title;
-                        ?>                        
-
-                        <span class="badge text-bg-light float-end">
-                            <span id="alert_count">
-
-                                <?php 
-                                // Count items, filtered to label_meta.
-                                echo DataAccess::count_db_rows(
-                                    'alerts', $label_meta
-                                );
-                                ?>
-                            
-                            </span>
-                        </span>
+                        ?>                
+                                
                     </a>
                 </li>
 
                 <?php
-                // End labels.
+                // End reports.
                 endforeach; endif;
                 ?>
 
                 <li class="nav-item">
-                    <a href="index.php?view=label_customizer" class="nav-link <?php the_active_class('label_customizer');?>">
+                    <a href="index.php?view=report_settings&new_report" class="nav-link <?php the_active_class('report_settings');?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-2" viewBox="0 0 16 16">
                             <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z"></path>
                         </svg>
-                        Add Label
+                        New Report
                     </a>
                 </li>
                 <hr class="navbar-divider my-3">
