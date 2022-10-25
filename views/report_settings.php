@@ -278,8 +278,8 @@ if(!empty($_GET['meta_name'])){
                 echo '<a href="actions/delete_report.php?report='.$name.'" class="btn btn-outline-danger">Delete Report</a>';
             ?>
 
-            <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
             <input type="hidden" name="name" value="<?php echo $name;?>">
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
         </div>
     </form>
 </section>

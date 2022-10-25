@@ -711,6 +711,30 @@ class DataAccess {
     }
 
     /**
+     * Get Next ID
+     */
+    public static function get_next_id($table){
+
+        // SQL
+        $sql = 'SELECT AUTO_INCREMENT FROM 
+            information_schema.TABLES WHERE 
+            TABLE_SCHEMA = "'.$GLOBALS['DB_NAME'].'"
+            AND TABLE_NAME = "'.$table.'"';
+            
+        // Query
+        $results = self::query($sql, array(), true);
+
+        // Returns meta_value.
+        $data = $results->fetch_object();
+        if(empty($data)){
+            return false;
+        }else{
+            return $data->AUTO_INCREMENT;
+        }
+
+    }
+
+    /**
      * Create Alerts Table
      */
     public static function create_alerts_table(){

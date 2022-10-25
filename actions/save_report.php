@@ -41,7 +41,7 @@ if(empty($_POST['name'])){
 
     // No ID means we need to generate an id by counting
     // all the rows in meta 
-    $name = 'report_'.DataAccess::count_db_rows('meta');
+    $name = 'report_'.DataAccess::get_next_id('meta');
 
     // Now we can create the meta.
     $fields = array(
