@@ -9,7 +9,7 @@ $integration = get_integration_meta('integrations/'.$uri.'/functions.php');
 if(empty($integration) == 1)
     throw new Exception('There is no integration with the URI "'.$uri.'"');
 
-// Set variables now to minimize chases of multiple queries.
+// Set variables now to minimize cases of multiple queries.
 $integration_fields = get_integration_fields($uri);
 $settings = $integration_fields['settings'];
 

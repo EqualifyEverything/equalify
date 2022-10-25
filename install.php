@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * Let's setup all the tables that Equalify needs to run!
+ * Let's set up all the tables that Equalify needs to run!
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 

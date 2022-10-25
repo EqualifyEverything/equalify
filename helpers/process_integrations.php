@@ -29,7 +29,7 @@ use GuzzleHttp\Psr7\Response;
  */
 function process_integrations(array $sites_output){
 
-    // The goal of this process is to setup this array.
+    // The goal of this process is to set up this array.
     $integrations_output = array(
         'processed_sources' => array(),
         'processed_urls'    => array(),
@@ -53,7 +53,7 @@ function process_integrations(array $sites_output){
         DataAccess::get_meta_value('active_integrations')
     );
 
-    // Without active integrations, there's no reason to coninue.
+    // Without active integrations, there's no reason to continue.
     if(empty($active_integrations))
         kill_scan("You have no active integrations.");
 
@@ -70,7 +70,7 @@ function process_integrations(array $sites_output){
     $logged_progress.='.';
     update_scan_log($logged_progress);
 
-    // If there's no integrations ready to process, 
+    // If there are no integrations ready to process, 
     // we won't run the process.
     if (empty($active_integrations)) {
         return $integrations_output;
@@ -119,10 +119,10 @@ function process_integrations(array $sites_output){
         // We'll run each integration against each site.
         foreach ($integrations_output['processed_sites'] as $site) {
 
-            // setup in process_site.php
+            // set up in process_site.php
             $scannable_pages = $site->urls;
 
-            // No scannable pages means no need to run the integration.
+            // No scannable pages mean no need to run the integration.
             if (empty($scannable_pages)) {
                 continue;
             }

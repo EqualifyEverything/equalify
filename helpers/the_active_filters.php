@@ -22,7 +22,7 @@ function the_active_filters(){
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Now lets get active integrations.
+    // Now let's get active integrations.
     $active_integrations = unserialize(
         DataAccess::get_meta_value('active_integrations')
     );

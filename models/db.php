@@ -79,7 +79,7 @@ class DataAccess {
      */
     private static function filters($filters){
 
-        // Our goal is to output sql and params.
+        // Our goal is to output SQL and params.
         $output = array(
             'sql' => '',
             'params' => array()
@@ -92,7 +92,7 @@ class DataAccess {
         // We only need to prepare SQL if filters exist.
         if($filter_count > 0){
             
-            // We start a loop to setup our filters.
+            // We start a loop to set up our filters.
             $output['sql'] = ' WHERE ';
             $filter_iteration = 0;
             foreach ($filters as $filter){

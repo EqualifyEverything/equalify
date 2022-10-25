@@ -36,7 +36,7 @@ function process_alerts( array $integration_output) {
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Now lets get our existing alerts, filtered to the
+    // Now let's get our existing alerts, filtered to the
     // pages we're interested in.
     $urls_to_filter = array();
     foreach ( $processed_urls as $url){
@@ -80,7 +80,7 @@ function process_alerts( array $integration_output) {
             array_push($filters, $new_filter);
         };
 
-        // Now lets update the rows in alerts.
+        // Now let's update the rows in alerts.
         $fields = array(
             array(
                 'name' => 'status',
@@ -91,7 +91,7 @@ function process_alerts( array $integration_output) {
             'alerts', $fields, $filters
         );
 
-        // And lets remove equalified alerts from the queue.
+        // And let's remove equalified alerts from the queue.
         DataAccess::delete_db_entries(
             'queued_alerts', $filters
         );
@@ -121,7 +121,7 @@ function process_alerts( array $integration_output) {
             array_push($rows, $new_row);
         };
 
-        // Now lets update the rows in alerts.
+        // Now let's update the rows in alerts.
         DataAccess::add_db_rows(
             'alerts', $rows
         );

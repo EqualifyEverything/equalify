@@ -274,8 +274,8 @@ foreach($report_meta as $k => $val) {
                     No alerts found.<br>
                 </p>
                 <p class="text-center my-2">
-                    <img src="plumeria.png" alt="Three frangiapani flowers. The flowers five pedals. Color eminates fron the center of the flower before becoming colorless at the tip of each petal."  ><br>
-                    <strong>Get out and smell the frangiapani!</strong>
+                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five pedals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <strong>Get out and smell the frangipani!</strong>
                 </p>
             </td>
         </tr>

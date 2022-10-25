@@ -1,6 +1,6 @@
 <?php
 /*
- * A bare-bones implementation of an ordered hook system, kinda like WordPress's.
+ * A bare-bones implementation of an ordered hook system, similar to that of WordPress.
  * 
  * Ordering between hooks comes from PHP's arrays being ordered dicts.
  * Ordering within hooks comes from each action's priority number.
