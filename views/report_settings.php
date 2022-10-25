@@ -163,38 +163,6 @@ if(!empty($_GET['meta_name'])){
 
                 </select>
             </div>
-            <div class="col">
-                <label for="typeSelect" class="form-label fw-semibold">Alert Type</label>
-                <select id="typeSelect" class="form-select" name="type">
-                    <option value="">Any</option>
-                    
-                    <?php 
-                    // Set types as array so we can simplify the logic
-                    // when building the option html.
-                    $type_options = array(
-                        'error', 'warning', 'notice'
-                    );
-                
-                    // Build options.
-                    foreach ($type_options as $option){
-
-                        // A type may already be saved. 
-                        if($option == $type){
-                            $selected_attribute = 'selected';
-                        }else{
-                            $selected_attribute = '';
-                        }
-                        
-                        // Build option
-                        echo '<option value="'.$option.'" '
-                        .$selected_attribute.' >'
-                        .ucwords($option).'</option>';
-
-                    }
-                    ?>
-            
-                </select>
-            </div>
         </div>
         <hr>
 

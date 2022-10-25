@@ -112,7 +112,6 @@ function process_alerts( array $integration_output) {
             $new_row = array(
                 'url'       => $alert->url,
                 'message'   => $alert->message,
-                'type'      => $alert->type,
                 'status'    => $alert->status,
                 'site_id'   => $alert->site_id,
                 'tags'      => $alert->tags,

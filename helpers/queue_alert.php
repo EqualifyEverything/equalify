@@ -41,16 +41,6 @@ function queue_alert(array $attributes){
     if(empty($attributes['meta']))
         $attributes['meta'] = '';
 
-    // Let's validate the variables to make sure they
-    // include allowed data.
-    $allowed_types = array(
-        'error', 'warning', 'notice'
-    );
-    if(!in_array($attributes['type'], $allowed_types))
-        throw new Exception(
-            'Alert type "'.$attributes['type'].'" is invalid'
-        );
-
     // We should also sanitize the message to a format
     // ready for the DB.
     $attributes['message'] = htmlspecialchars(
@@ -78,13 +68,6 @@ function queue_alert(array $attributes){
             // What URL is the report related to?
             'name' => 'url',
             'value'=> $attributes['url']
-
-        ),
-        array(
-
-            // What type of alert is this?
-            'name' => 'type',
-            'value'=> $attributes['type']
 
         ),
         array(

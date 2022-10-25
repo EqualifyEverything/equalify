@@ -298,9 +298,8 @@ class DataAccess {
             $table2 = 'alerts';
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
-            $selected_columns.= "$table1.type, $table1.status, ";
-            $selected_columns.= "$table1.site_id, $table1.source, ";
-            $selected_columns.= "$table1.tags ";
+            $selected_columns.= "$table1.status, $table1.site_id, ";
+            $selected_columns.= "$table1.source, $table1.tags ";
         }
     
         // SQL.
@@ -309,7 +308,6 @@ class DataAccess {
         $sql.= "ON $table1.url=$table2.url ";
         $sql.= "AND $table1.message=$table2.message ";
         $sql.= "AND $table1.site_id=$table2.site_id ";
-        $sql.= "AND $table1.type=$table2.type ";
         $sql.= "AND $table1.source=$table2.source ";
         $sql.= "WHERE $table2.id IS NULL ";
         if(!empty($sites)){
@@ -746,7 +744,6 @@ class DataAccess {
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `status` varchar(200) NOT NULL DEFAULT 'active',
-                `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
@@ -803,7 +800,6 @@ class DataAccess {
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `status` varchar(200) NOT NULL DEFAULT 'active',
-                `type` varchar(200) NOT NULL,
                 `source` varchar(200) NOT NULL,
                 `site_id` bigint(20) NOT NULL,
                 `url` text,
