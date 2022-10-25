@@ -242,6 +242,18 @@ function the_pagination($total_pages){
         }
     }
 
+    function create_pagination_element( $view_parameters, $label_parameters, $preset_parameters, $item_number ) {
+        echo
+        '<li class="page-item ' . get_active_state(get_current_page_number(), $item_number) . '">' .
+        '<a class="page-link" href="' .
+        $view_parameters.$label_parameters.$preset_parameters .
+        '&current_page_number=' . $item_number . '">' . $item_number . '</a>' . '</li>';
+    }
+
+    function create_ellipses_element() {
+        echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
+    }
+
     // Only show pagination for more than one page
     if($total_pages > 1):
 
@@ -257,40 +269,33 @@ function the_pagination($total_pages){
         </li>
 
         <?php
-        // If there are more than 3 pages and we're not on page 2
-        // and if there are more than 5 pages and we're not on page 3,
-        // display a disabled ellipsis so that the user knows to click
-        // 'previous'.
-        if($current_page_number != 1 && ($total_pages > 3 && $current_page_number != 2) && ($total_pages > 5 && $current_page_number != 3) || ($total_pages == 4 && $current_page_number == 4))
-            echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
-
-        // If there are more than 5 pages and current page number isn't
-        // first, second, or last or if we're on the third page of 4...
-        if(($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $current_page_number != $total_pages) || ($total_pages == 4 && $current_page_number == 3))
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
-
-        // If there are more than 3 pages and current page number isn't
-        // first or last...
-        if($total_pages > 3 && $current_page_number != 1 && $current_page_number != $total_pages)
-            echo '<li class="page-item active"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.$current_page_number.'">'.$current_page_number.'</a></li>';
-
-        // If there are more than 5 pages and current page is the first or second or we're on the second page of four..
-        if(($total_pages > 5 && ($current_page_number == 1 || $current_page_number == 2)) || ($total_pages == 4 && $current_page_number == 2))
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
-
-        // If there are more than 5 pages and current page is the last or second to last..
-        if($total_pages > 5 && $current_page_number == $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number-1).'">'.($current_page_number-1).'</a></li>';
-
-        // Show next page number if there are more than 5 pages and current
-        // page number isn't first, second, second to last, or last...
-        if($total_pages > 5 && $current_page_number != 1 && $current_page_number != 2 && $total_pages != ($current_page_number+1) && $current_page_number != $total_pages)
-            echo '<li class="page-item"><a class="page-link" href="'.$view_parameters.$report_parameters.$preset_parameters.'&current_page_number='.($current_page_number+1).'">'.($current_page_number+1).'</a></li>';
-
-        // Show "..." if there are more than 3 pages and we're not on the page before,
-        // the last display a disabled ellipsis so that the user knows to click 'next'.
-        if($current_page_number != $total_pages && $total_pages > 3 && $current_page_number != ($total_pages-1) && $total_pages != ($current_page_number+2))
-            echo '<li class="page-item disabled"><a class="page-link" href="">...</a></li>';
+        if ( $total_pages > 5 ) {
+            if ( $current_page_number >= 1 && $current_page_number <= 3 ) {
+                //$current_page_number is close to 1 (in between 1 and 3, inclusive)
+                for ( $i = 2; $i <= 4; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
+                }
+                create_ellipses_element();
+            } else if ( $current_page_number >= $total_pages - 2 && $current_page_number <= $total_pages ) {
+                //$current_page_number is close to $total_pages (in between $total_pages - 2 and $total_pages, inclusive)
+                create_ellipses_element();
+                for ( $i = $total_pages - 3; $i < $total_pages; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
+                }
+            } else {
+                //$current_page_number isn't close to 1 or $total_pages
+                create_ellipses_element();
+                for ( $i = $current_page_number - 1; $i <= $current_page_number + 1; $i++ ) {
+                    create_pagination_element( $view_parameters, $label_parameters, $preset_parameters,$i );
+                }
+                create_ellipses_element();
+            }
+        } else {
+            //Less than 5 pages; simpler logic
+            for ($i = 2; $i <= $total_pages - 1; $i++) {
+                create_pagination_element($view_parameters, $label_parameters, $preset_parameters,$i);
+            }
+        }
         ?>
 
         <li class="page-item <?php echo get_active_state($current_page_number, $total_pages)?>">
