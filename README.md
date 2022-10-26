@@ -2,7 +2,7 @@
 
 **96.8% of homepages have WCAG conformance failures,** according to [WebAIM](https://webaim.org/projects/million/).
 
-The internet must become more accessible!
+Equalify aims to make the internet more accessible.
 
 ## Support Equalify
 
@@ -17,9 +17,9 @@ The internet must become more accessible!
 ## How will Equalify increase content accessibility?
 
 Equalify aims to:
-1. **Promote transparency** with an Open Source A11Y platform (✅ Done!).
-2. **Reduce the cost** of multi-page website scans (ongoing).
-3. **Improve automation** to simplify WCAG issue resolution (2023). 
+1. **Promote transparency** with an Open Source A11Y platform.
+2. **Reduce the cost** of multi-page website scans.
+3. **Improve automation & manual procedures**, simplifying issue resolution. 
 
 We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
@@ -44,8 +44,10 @@ Every alert is reported on a filterable dashboard.
 
 **Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
 
+For more information, checkout the [Equalify FAQs](https://github.com/bbertucc/equalify/wiki/Equalify-FAQs/).
+
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
+A chaos wizard 🧙 and many others help Equalify. Special shout out to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains that helped launched this idea.  [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
 
 This project is Open Source under [AGPL](https://github.com/bbertucc/equalify/blob/mvp-1.2/LICENSE) to inspire new collaborations.
 
