@@ -18,7 +18,7 @@
         </div>
     </div>
     <div id="terminal" class="bg-dark text-white px-5">
-        <pre id="scan_log" class="pt-3 pb-5"></pre>
+        <pre id="scan_log" class="pt-3 pb-5" aria-live="polite"></pre>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">
         <div class="modal-dialog">
