@@ -23,7 +23,7 @@ Equalify aims to:
 
 We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
-![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
+<img width="1316" alt="Equalify's integrations page that includes logos of Pantheon, Drupal, URLBox, WAVE, WordPress, and XML Sitemaps." src="https://user-images.githubusercontent.com/46652/198109576-6c2810f8-65c7-4a67-b584-cafd18138153.png">
 
 ## What does Equalify currently do?
 
@@ -33,7 +33,7 @@ You can import pages from WordPress, XML sitemaps, and single URLs. Equalify the
 
 Every alert is reported on a filterable dashboard.
 
-![equalify-alerts](https://user-images.githubusercontent.com/46652/188710908-9bfb7da8-68ff-490c-8d6b-f9ce1f38d4c8.png)
+<img width="1316" alt="Equalify's reporting dashboard that lists different alerts including Missing Alt Text, Missing Form Label, and Very Log Contrast alerts" src="https://user-images.githubusercontent.com/46652/198109248-36343405-9e89-48b7-ac9f-ee0c0d830859.png">
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
