@@ -24,7 +24,7 @@ $title = 'Untitled';
 $status = '';
 $type   = '';
 $name   = '';
-$site   = '';
+$site_id = '';
 $preset = FALSE;
 
 // We use this view to customize reports if a id is 
@@ -85,8 +85,8 @@ if(!empty($_GET['meta_name'])){
                 $type = $report['value'];
             }elseif($report['name'] == 'status'){
                 $status = $report['value'];
-            }elseif($report['name'] == 'site'){
-                $site = $report['value'];
+            }elseif($report['name'] == 'site_id'){
+                $site_id = $report['value'];
             }else{
                 $dynamic_meta[] = $report['name'];
             }
@@ -136,7 +136,7 @@ if(!empty($_GET['meta_name'])){
         <div class="mb-3 row">
             <div class="col">
                 <label for="statusSelect" class="form-label fw-semibold">Site</label>
-                <select id="statusSelect" class="form-select" name="site">
+                <select id="statusSelect" class="form-select" name="site_id">
                     <option value="">Any</option>
 
                     <?php 
@@ -150,7 +150,7 @@ if(!empty($_GET['meta_name'])){
                         foreach ($sites as $site_option){
 
                             // A site may already be saved. 
-                            if($site_option->id == $site){
+                            if($site_option->id == $site_id){
                                 $selected_attribute = 'selected';
                             }else{
                                 $selected_attribute = '';
