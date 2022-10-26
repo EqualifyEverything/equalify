@@ -136,7 +136,7 @@ if(!empty($_GET['meta_name'])){
         <div class="mb-3 row">
             <div class="col">
                 <label for="statusSelect" class="form-label fw-semibold">Site</label>
-                <select id="statusSelect" class="form-select" name="status">
+                <select id="statusSelect" class="form-select" name="site">
                     <option value="">Any</option>
 
                     <?php 
@@ -150,7 +150,7 @@ if(!empty($_GET['meta_name'])){
                         foreach ($sites as $site_option){
 
                             // A site may already be saved. 
-                            if($site_option == $site){
+                            if($site_option->id == $site){
                                 $selected_attribute = 'selected';
                             }else{
                                 $selected_attribute = '';
@@ -169,7 +169,7 @@ if(!empty($_GET['meta_name'])){
             </div>
             <div class="col">
                 <label for="statusSelect" class="form-label fw-semibold">Alert Status</label>
-                <select id="statusSelect" class="form-select" name="site">
+                <select id="statusSelect" class="form-select" name="status">
                     <option value="">Any</option>
 
                     <?php 
