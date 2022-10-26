@@ -24,6 +24,7 @@ $title = 'Untitled';
 $status = '';
 $type   = '';
 $name   = '';
+$site   = '';
 $preset = FALSE;
 
 // We use this view to customize reports if a id is 
@@ -84,6 +85,8 @@ if(!empty($_GET['meta_name'])){
                 $type = $report['value'];
             }elseif($report['name'] == 'status'){
                 $status = $report['value'];
+            }elseif($report['name'] == 'site'){
+                $site = $report['value'];
             }else{
                 $dynamic_meta[] = $report['name'];
             }
@@ -132,8 +135,41 @@ if(!empty($_GET['meta_name'])){
         <hr>
         <div class="mb-3 row">
             <div class="col">
-                <label for="statusSelect" class="form-label fw-semibold">Status</label>
+                <label for="statusSelect" class="form-label fw-semibold">Site</label>
                 <select id="statusSelect" class="form-select" name="status">
+                    <option value="">Any</option>
+
+                    <?php 
+                    // Get the sites.
+                    $sites = DataAccess::get_db_rows( 'sites',
+                        array(), 1, 10000000
+                    )['content'];
+
+                    // Build options.
+                    if(!empty($sites)){
+                        foreach ($sites as $site_option){
+
+                            // A site may already be saved. 
+                            if($site_option == $site){
+                                $selected_attribute = 'selected';
+                            }else{
+                                $selected_attribute = '';
+                            }
+
+                            // Build option.
+                            echo '<option value="'.$site_option->id.'" '
+                            .$selected_attribute.'>'.
+                            $site_option->url.'</option>';
+
+                        }
+                    }
+                    ?>
+
+                </select>
+            </div>
+            <div class="col">
+                <label for="statusSelect" class="form-label fw-semibold">Alert Status</label>
+                <select id="statusSelect" class="form-select" name="site">
                     <option value="">Any</option>
 
                     <?php 
