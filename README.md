@@ -2,7 +2,7 @@
 
 **96.8% of homepages have WCAG conformance failures,** according to [WebAIM](https://webaim.org/projects/million/).
 
-The internet must become more accessible!
+Equalify aims to make the internet more accessible.
 
 ## Support Equalify
 
@@ -17,13 +17,13 @@ The internet must become more accessible!
 ## How will Equalify increase content accessibility?
 
 Equalify aims to:
-1. **Promote transparency** with an Open Source A11Y platform (✅ Done!).
-2. **Reduce the cost** of multi-page website scans (ongoing).
-3. **Improve automation** to simplify WCAG issue resolution (2023). 
+1. **Promote transparency** with an Open Source A11Y platform.
+2. **Reduce the cost** of multi-page website scans.
+3. **Improve automation & manual procedures**, simplifying issue resolution. 
 
 We will tackle these goals by integrating with existing web services, making Equalify your WebOps hub. 
 
-![equalify-integrations](https://user-images.githubusercontent.com/46652/188710874-e53ccb85-f542-46f3-a680-837aaf02ae92.png)
+<img width="1316" alt="Equalify's integrations page that includes logos of Pantheon, Drupal, URLBox, WAVE, WordPress, and XML Sitemaps." src="https://user-images.githubusercontent.com/46652/198109576-6c2810f8-65c7-4a67-b584-cafd18138153.png">
 
 ## What does Equalify currently do?
 
@@ -33,7 +33,7 @@ You can import pages from WordPress, XML sitemaps, and single URLs. Equalify the
 
 Every alert is reported on a filterable dashboard.
 
-![equalify-alerts](https://user-images.githubusercontent.com/46652/188710908-9bfb7da8-68ff-490c-8d6b-f9ce1f38d4c8.png)
+<img width="1316" alt="Equalify's reporting dashboard that lists different alerts including Missing Alt Text, Missing Form Label, and Very Log Contrast alerts" src="https://user-images.githubusercontent.com/46652/198109248-36343405-9e89-48b7-ac9f-ee0c0d830859.png">
 
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
@@ -44,8 +44,10 @@ Every alert is reported on a filterable dashboard.
 
 **Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
 
+For more information, checkout the [Equalify FAQs](https://github.com/bbertucc/equalify/wiki/Equalify-FAQs/).
+
 ## Special Thanks
-A chaos wizard 🧙 and many brilliant brains help Equalify. Special shoutout to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains behind any great idea. Brad- You push me to code better. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
+A chaos wizard 🧙 and many others help Equalify. Special shout out to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains that helped launched this idea.  [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
 
 This project is Open Source under [AGPL](https://github.com/bbertucc/equalify/blob/mvp-1.2/LICENSE) to inspire new collaborations.
 
