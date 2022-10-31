@@ -18,16 +18,16 @@ Fixes and reports of A11Y or UX errors are greatly appreciated.
 
 I'm up for any new coding standards!
 
-As for governance and a code of conduct, checkout my [discussion around governance](https://github.com/bbertucc/equalify/discussions/91).
+As for governance and a code of conduct, check out my [discussion around governance](https://github.com/bbertucc/equalify/discussions/91).
 
 ## Usable hooks and patterns. 
 
-Checkout [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/actions/scan_all_pages.php](/actions/scan_all_pages.php).
+Check out [/models/hooks.php](/models/hooks.php) and the `_scan` pattern in [/actions/scan_all_pages.php](/actions/scan_all_pages.php).
 
 ## Progress Depends on Bugs
 I am inspired by the development of [Gutenberg](https://github.com/WordPress/gutenberg).
 
-A community of engaged devs builds the future of WordPress around issues that are reported by users. Checkout the [Help Wanted](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
+A community of engaged devs builds the future of WordPress around issues that are reported by users. Check out the [Help Wanted](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
 
 We can build a more accessible internet together.
 

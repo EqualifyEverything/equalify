@@ -36,7 +36,7 @@ function process_alerts( array $integration_output) {
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Now lets get our existing alerts, filtered to the
+    // Now let's get our existing alerts, filtered to the
     // pages we're interested in.
     $urls_to_filter = array();
     foreach ( $processed_urls as $url){
@@ -57,7 +57,7 @@ function process_alerts( array $integration_output) {
         )
     );
     $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 1000000, 'OR'
+        'alerts', $existing_alert_filters, 1, 1000000
     )['content'];
     if(empty($existing_alerts))
         $existing_alerts = array();
@@ -80,7 +80,7 @@ function process_alerts( array $integration_output) {
             array_push($filters, $new_filter);
         };
 
-        // Now lets update the rows in alerts.
+        // Now let's update the rows in alerts.
         $fields = array(
             array(
                 'name' => 'status',
@@ -91,7 +91,7 @@ function process_alerts( array $integration_output) {
             'alerts', $fields, $filters
         );
 
-        // And lets remove equalified alerts from the queue.
+        // And let's remove equalified alerts from the queue.
         DataAccess::delete_db_entries(
             'queued_alerts', $filters
         );
@@ -112,15 +112,15 @@ function process_alerts( array $integration_output) {
             $new_row = array(
                 'url'       => $alert->url,
                 'message'   => $alert->message,
-                'type'      => $alert->type,
                 'status'    => $alert->status,
                 'site_id'   => $alert->site_id,
+                'tags'      => $alert->tags,
                 'source'    => $alert->source
             );
             array_push($rows, $new_row);
         };
 
-        // Now lets update the rows in alerts.
+        // Now let's update the rows in alerts.
         DataAccess::add_db_rows(
             'alerts', $rows
         );

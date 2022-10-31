@@ -18,7 +18,7 @@
         </div>
     </div>
     <div id="terminal" class="bg-dark text-white px-5">
-        <pre id="scan_log" class="pt-3 pb-5"></pre>
+        <pre id="scan_log" class="pt-3 pb-5" aria-live="polite"></pre>
     </div>
     <div class="modal fade" id="scanSchedule" tabindex="-1" aria-labelledby="scanScheduleLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -28,7 +28,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <label for="scanScheduleOptions" class="form-label">When should the automatically scan run?</label>
+                    <label for="scanScheduleOptions" class="form-label">When should the automatic scan run?</label>
                     <select id="scanScheduleOptions" class="form-select form-select mb-3" aria-label="scheudle options" name="scan_schedule">
 
                         <?php
@@ -93,13 +93,13 @@
         // We update #scan_log
         scanLog = document.getElementById('scan_log');
 
-        // Sometimes there's no data.
+        // Sometimes, there's no data.
         if(data == ''){
 
             // Add a fallback message.
             scanLog.innerHTML = "\nNo scan is running.";
 
-        // With data, we setup html and repeat.
+        // With data, we set up html and repeat.
         }else{
 
             // Populate the scan log.
@@ -156,19 +156,19 @@
         // We update #run_scan
         scanButton = document.getElementById('run_scan');
 
-        // Sometimes there's no data.
+        // Sometimes, there's no data.
         if(data == ''){
 
             // Make sure the scan button is enabled.
             scanButton.disabled = false;
 
-        // With data, we setup html and repeat in 3 secs.
+        // With data, we set up html and repeat in 3 secs.
         }else{
 
             // Disable the scan button.
             scanButton.disabled = true;
 
-            // Hit promises again after .5 second.
+            // Hit promises again after .5 seconds.
             let timer = setTimeout(handleScanPromises, 500);
 
         }

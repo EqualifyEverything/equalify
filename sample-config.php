@@ -12,18 +12,20 @@
 $GLOBALS['DB_HOST'] = 'localhost';
 $GLOBALS['DB_USERNAME'] = 'root';
 $GLOBALS['DB_PASSWORD'] = 'root';
-$GLOBALS['DB_NAME'] = 'equalify';
+$GLOBALS['DB_NAME'] = 'equalify_open_source';
 $GLOBALS['DB_PORT'] = '3306';
-$GLOBALS['DB_SOCKET'] = '/tmp/mysql/mysql.sock';
+$GLOBALS['DB_SOCKET'] = '/Applications/MAMP/tmp/mysql/mysql.sock';
 
 // Configure PHP path, which you can find by running 
 // `which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/local/bin/php';
 
 // Scanner settings.
-$GLOBALS['wave_key'] = '';
+$GLOBALS['wave_key'] = 'm5WgSFUj2753';
 
 // Additional options.
-$GLOBALS['page_limit'] = '1111';
+$GLOBALS['page_limit'] = '2222';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';
+$GLOBALS['service_logo'] = 'assets/equalify/equalify-logo.svg';
+$GLOBALS['service_name'] = 'Equalify';

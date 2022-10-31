@@ -13,15 +13,17 @@
 require_once '../config.php';
 require_once '../models/integrations.php';
 require_once '../models/db.php';
+require_once '../helpers/register_tags.php';
+require_once '../helpers/delete_tags.php';
 
 // Get URL parameters.
 $integration_uri = $_GET['uri'];
 if(empty($integration_uri))
-    throw new Exception('Integration is not specfied');
+    throw new Exception('Integration is not specified');
 $old_status = $_GET['old_status'];
 if(empty($old_status))
     throw new Exception(
-        'Old status is not specfied for integration 
+        'Old status is not specified for integration 
         "'.$integration_uri.'"'
     );
 
@@ -49,25 +51,17 @@ if($old_status == 'Active'){
                     );
             }
         }
-
-        // Delete "pages" fields.
-        if( !empty($integration_db_fields['pages']) ){
-            foreach(
-                $integration_db_fields['pages'] 
-                as $integration_pages_field
-            ){
-                if(
-                    DataAccess::db_column_exists('pages', 
-                    $integration_pages_field['name']
-                ))
-                    DataAccess::delete_db_column(
-                        'pages', $integration_pages_field['name']
-                    );
-            }
-        }
-
+        
     }
 
+    // Remove tags.
+    $integration_tags = get_integration_tags(
+        $integration_uri
+    );
+    if( !empty($integration_tags) ){
+        delete_tags($integration_tags);
+    }
+    
     // Remove from "active_integrations" meta field.
     $active_integrations = unserialize(
         DataAccess::get_meta_value('active_integrations')
@@ -91,14 +85,14 @@ if($old_status == 'Active'){
 
 }elseif($old_status == 'Disabled'){
 
-    // Setup fields.
+    // Set up fields.
     $integration_fields = get_integration_fields(
         $integration_uri
     );
     if( !empty($integration_fields['db']) ){
         $integration_db_fields = $integration_fields['db'];
 
-        // Setup "meta" fields.
+        // Set up "meta" fields.
         if( !empty($integration_db_fields['meta']) ){
             foreach(
                 $integration_db_fields['meta']
@@ -115,7 +109,7 @@ if($old_status == 'Active'){
             }
         }
 
-        // Setup "pages" fields.
+        // Set up "pages" fields.
         if( !empty($integration_db_fields['pages']) ){
             foreach(
                 $integration_db_fields['pages'] 
@@ -132,6 +126,14 @@ if($old_status == 'Active'){
             }
         }
 
+    }
+
+    // Register tags.
+    $integration_tags = get_integration_tags(
+        $integration_uri
+    );
+    if( !empty($integration_tags) ){
+        register_tags($integration_tags);
     }
 
     // Add to "active_integrations" meta field.
@@ -206,7 +208,7 @@ function update_alerts($new_status, $integration_uri) {
         )
     );
 
-    // Now lets update fields.
+    // Now let's update fields.
     $updated_fields = array(
         array(
             'name' => 'archived',

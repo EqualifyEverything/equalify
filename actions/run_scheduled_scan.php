@@ -48,13 +48,13 @@ if($scan_schedule != 'manually'):
     // know we can just run the scan then.
     if(empty($scan_time)){
 
-        // Lets run the scan.
+        // Let's run the scan.
         run_scan();
 
     // If a scan time is set, we have to run further checks.
     }else{
 
-        // When scan time is not empty we should set the time 
+        // When scan time is not empty, we should set the time 
         // of the next scan.
         $scan_time = new DateTime($scan_time); 
         $next_scan_time = $scan_time->modify('+'.$scan_interval);

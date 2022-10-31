@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document composes the sites view.
+ * This document composes the site's view.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
