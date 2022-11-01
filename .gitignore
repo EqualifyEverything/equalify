@@ -6,3 +6,4 @@ vendor/
 test/
 _dev/
 _private/
+.ddev/
