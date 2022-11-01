@@ -75,7 +75,8 @@ function process_alerts( array $integration_output) {
         foreach($equalified_alerts as $alert){
             $new_filter = array(
                 'name' => 'id',
-                'value' => $alert->id
+                'value' => $alert->id,
+                'condition' => 'OR'
             );
             array_push($filters, $new_filter);
         };

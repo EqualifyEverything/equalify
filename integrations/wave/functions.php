@@ -144,8 +144,7 @@ function wave_alerts($response_body, $page_url){
             if(
                 !empty($wave_json_entry['items'])
                 && (
-                    $wave_json_entry['description'] == 'Alerts'
-                    || $wave_json_entry['description'] == 'Errors'
+                    $wave_json_entry['description'] == 'Errors'
                     || $wave_json_entry['description'] == 'Contrast Errors'
                 )
             ){
