@@ -139,10 +139,20 @@ function wave_alerts($response_body, $page_url){
         // Reformat correctly working items.
         $wave_items = array();
         foreach($wave_json_decoded['categories'] as $wave_json_entry){
-            if(!empty($wave_json_entry['items'])){
+
+            // Only show alerts and errors.
+            if(
+                !empty($wave_json_entry['items'])
+                && (
+                    $wave_json_entry['description'] == 'Alerts'
+                    || $wave_json_entry['description'] == 'Errors'
+                    || $wave_json_entry['description'] == 'Contrast Errors'
+                )
+            ){
                 foreach($wave_json_entry['items'] as $wave_item)
                     $wave_items[] = $wave_item;
             }
+
         }
 
     
