@@ -38,8 +38,8 @@ Every alert is reported on a filterable dashboard.
 ## Download and Use
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Change `sample-config.php` to `config.php` and update info.
-3. Run `composer install` to install Composer dependencies.
-4. Upload/run on a Linux server (PHP 8 + MySQL required).
+3. Run `composer install` to install Composer dependencies (Composer v. 2.4.4 required).
+4. Upload/run on a Linux server (PHP 8.1 + MySQL required).
 5. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
 **Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/).
