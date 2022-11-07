@@ -769,8 +769,9 @@ class DataAccess {
             "CREATE TABLE `tags` (
                 `slug` varchar(255) NOT NULL,
                 `title` varchar(255) NOT NULL,
-                `category` varchar(255),
-                `description` text
+                `category` varchar(255) DEFAULT NULL,
+                `description` text DEFAULT NULL,
+                PRIMARY KEY (slug)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         $result = self::query($sql, $params, false);
@@ -785,7 +786,6 @@ class DataAccess {
         if( !empty($integration_tags) ){
             register_tags($integration_tags);
         }
-
         
     }
 
