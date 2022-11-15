@@ -174,7 +174,7 @@ class DataAccess {
                         $copy = $filter['value'];
                         $output['sql'].= '(';
                         foreach($filter['value'] as $value){
-                            $output['sql'].= ' FIND_IN_SET("'.$value['value'].'", '.$value['column'].')';
+                            $output['sql'].= ' FIND_IN_SET(\''.$value['value'].'\', '.$value['column'].')';
                             if(next($copy)){
                                 $output['sql'].= ' OR ';
                             }else{
@@ -773,7 +773,7 @@ class DataAccess {
                 `category` varchar(255) DEFAULT NULL,
                 `description` text DEFAULT NULL,
                 PRIMARY KEY (slug)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         $result = self::query($sql, $params, false);
 
@@ -787,7 +787,7 @@ class DataAccess {
         if( !empty($integration_tags) ){
             register_tags($integration_tags);
         }
-        
+
     }
 
     /**
