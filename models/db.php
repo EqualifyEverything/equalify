@@ -715,10 +715,11 @@ class DataAccess {
     public static function get_next_id($table){
 
         // SQL
-        $sql = 'SELECT AUTO_INCREMENT FROM 
-            information_schema.TABLES WHERE 
-            TABLE_SCHEMA = "'.$GLOBALS['DB_NAME'].'"
-            AND TABLE_NAME = "'.$table.'"';
+        $db = $GLOBALS['DB_NAME'];
+        $sql = "SELECT `AUTO_INCREMENT` FROM 
+            INFORMATION_SCHEMA.TABLES WHERE 
+            TABLE_SCHEMA = '$db'
+            AND TABLE_NAME = '$table'";
             
         // Query
         $results = self::query($sql, array(), true);

@@ -7,6 +7,10 @@
  * Equalify works for everyone.
 **********************************************************/
 
+// PRIVATE session ID is declared as an argument in CLI.
+if(!isset($_SESSION))
+    $_SESSION['id'] = $argv[1];
+    
 // Since this file can run in the CLI, we must set the 
 // directory if it isn't already set.
 if(!defined('__ROOT__'))
