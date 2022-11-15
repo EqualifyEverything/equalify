@@ -223,8 +223,7 @@ foreach($report_meta as $k => $val) {
         // all report meta.
         $filters = $report_meta;
         $alerts = DataAccess::get_db_rows( 'alerts',
-            $filters, get_current_page_number(), NULL,
-            NULL, $tags
+            $filters, get_current_page_number()
         );
         if( count($alerts['content']) > 0 ): 
             foreach($alerts['content'] as $alert):    
