@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "wcag2a",
+    "title": "WCAG 2.0 Level A",
+    "description": "",
+    "category": "Axe Tags"
+  },
+  {
+    "slug": "wcag2aa", 
+    "title": "WCAG 2.0 Level AA",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "wcag2aaa", 
+    "title": "WCAG 2.0 Level AAA",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "wcag21a", 
+    "title": "WCAG 2.1 Level A",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "wcag21aa", 
+    "title": "WCAG 2.1 Level AA",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "wcag21aaa", 
+    "title": "WCAG 2.1 Level AAA",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "best-practice", 
+    "title": "Best Practices",
+    "category": "Axe Tags",
+    "description": "Common accessibility best practices."
+  },
+  {
+    "slug": "cat.aria",
+    "title": "Aria",
+    "category": "Axe Categories",
+    "description": ""
+  },
+  {
+    "slug": "cat.color",
+    "title": "Color",
+    "category": "Axe Categories",
+    "description": ""
+  },
+  {
+    "slug": "cat.forms",
+    "title": "Forms",
+    "category": "Axe Categories",
+    "description": "axe/forms contains accessibility rules from the axe forms category."
+  },
+  {
+    "slug": "cat.keyboard",
+    "title": "Keyboard",
+    "category": "Axe Categories",
+    "description": "axe/keyboard contains accessibility rules from the axe keyboard category."
+  },
+  {
+    "slug": "cat.language",
+    "title": "Language",
+    "category": "Axe Categories",
+    "description": "axe/language contains accessibility rules from the axe language category."
+  },
+  {
+    "slug": "cat.name-role-value",
+    "title": "Name Role Value",
+    "category": "Axe Categories",
+    "description": "axe/name-role-value contains accessibility rules from the axe name-role-value category."
+  },
+  {
+    "slug": "cat.parsing",
+    "title": "Parsing",
+    "category": "Axe Categories",
+    "description": "axe/parsing contains accessibility rules from the axe parsing category."
+  },
+  {
+    "slug": "cat.semantics",
+    "title": "Semantics",
+    "category": "Axe Categories",
+    "description": "axe/semantics contains accessibility rules from the axe semantics category."
+  },
+  {
+    "slug": "cat.sensory-and-visual-cues",
+    "title": "Sensory and Visual Cues",
+    "category": "Axe Categories",
+    "description": "axe/sensory-and-visual-cues contains accessibility rules from the axe sensory-and-visual-cues category."
+  },
+  {
+    "slug": "cat.structure",
+    "title": "Structure",
+    "category": "Axe Categories",
+    "description": "axe/structure contains accessibility rules from the axe structure category."
+  },
+  {
+    "slug": "cat.tables",
+    "title": "Tables",
+    "category": "Axe Categories",
+    "description": "axe/tables contains accessibility rules from the axe tables category."
+  },
+  {
+    "slug": "cat.text-alternatives",
+    "title": "Text Alternatives",
+    "category": "Axe Categories",
+    "description": "axe/text-alternatives contains accessibility rules from the axe text-alternatives category."
+  },
+  {
+    "slug": "cat.time-and-media",
+    "title": "Time and Media",
+    "category": "Axe Categories",
+    "description": "axe/time-and-media contains accessibility rules from the axe time-and-media category."
+  }
+]
