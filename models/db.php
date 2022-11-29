@@ -841,7 +841,6 @@ class DataAccess {
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES 
             ('active_integrations', ?),
-            ('wave_key', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
@@ -849,8 +848,7 @@ class DataAccess {
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
-        $default_active_integrations = serialize(array('wave'));
-        $default_wave_key = $GLOBALS['wave_key'];
+        $default_active_integrations = serialize(array('axe'));
         $default_scan_status = '';
         $default_scan_schedule = 'manually';
         $default_scan_log = '';
@@ -859,7 +857,6 @@ class DataAccess {
         $default_pages_scanned = 0;
         $params = array(
             $default_active_integrations, 
-            $default_wave_key,
             $default_scan_status, 
             $default_scan_schedule,
             $default_scan_log, 
