@@ -61,67 +61,67 @@ function axe_urls($page_url) {
  */
 function axe_alerts($response_body, $page_url){
 
-    // Our goal is to return alerts.
-    $axe_alerts = [];
-    $axe_json = $response_body; 
+    // // Our goal is to return alerts.
+    // $axe_alerts = [];
+    // $axe_json = $response_body; 
 
-    // Decode JSON and count WCAG errors.
-    $axe_json_decoded = json_decode($axe_json, true);
+    // // Decode JSON and count WCAG errors.
+    // $axe_json_decoded = json_decode($axe_json, true);
 
-    // Fallback if Axe scan doesn't work.
-    // if(!empty($axe_json_decoded['status']['error']))
-    //     throw new Exception('axe error:"'.$axe_json_decoded['status']['error'].'"');
+    // // Fallback if Axe scan doesn't work.
+    // // if(!empty($axe_json_decoded['status']['error']))
+    // //     throw new Exception('axe error:"'.$axe_json_decoded['status']['error'].'"');
 
-    // Sometimes Axe can't read the json.
-    if(empty($axe_json_decoded)){
+    // // Sometimes Axe can't read the json.
+    // if(empty($axe_json_decoded)){
 
-        // And add an alert.
-        $alert = array(
-            'source'  => 'axe-core',
-            'url'     => $page_url,
-            'message' => 'axe-core cannot reach the page.',
-        );
-        array_push($axe_alerts, $alert);
+    //     // And add an alert.
+    //     $alert = array(
+    //         'source'  => 'axe-core',
+    //         'url'     => $page_url,
+    //         'message' => 'axe-core cannot reach the page.',
+    //     );
+    //     array_push($axe_alerts, $alert);
 
-    }else{
+    // }else{
 
-        // Show axe violations
-        $axe_violations = array();
-        foreach($axe_json_decoded['violations'] as $violation){
+    //     // Show axe violations
+    //     $axe_violations = array();
+    //     foreach($axe_json_decoded['violations'] as $violation){
 
-            // Only show violations.
-            $axe_violations[] = $violation;
+    //         // Only show violations.
+    //         $axe_violations[] = $violation;
 
-        }
+    //     }
 
     
-    }
+    // }
 
-    // Add alerts.
-    if(!empty($axe_items)) {
+    // // Add alerts.
+    // if(!empty($axe_items)) {
 
-        // Setup alert variables.
-        foreach($axe_violations as $axe_item){
+    //     // Setup alert variables.
+    //     foreach($axe_violations as $axe_item){
 
-            // Default variables.
-            $alert = array();
-            $alert['source'] = 'axe';
-            $alert['url'] = $page_url;
+    //         // Default variables.
+    //         $alert = array();
+    //         $alert['source'] = 'axe';
+    //         $alert['url'] = $page_url;
 
-            // Setup tags.
-            $alert['tags'] = $axe_item['tags'];
+    //         // Setup tags.
+    //         $alert['tags'] = $axe_item['tags'];
 
-            // Setup message.
-            $alert['message'] = '"'.$axe_item['id'].'" violation: '.$axe_item['help'];
+    //         // Setup message.
+    //         $alert['message'] = '"'.$axe_item['id'].'" violation: '.$axe_item['help'];
 
-            // Push alert.
-            $axe_alerts[] = $alert;
+    //         // Push alert.
+    //         $axe_alerts[] = $alert;
             
-        }
+    //     }
 
-    }
+    // }
 
-    // Return alerts.
-    return $axe_alerts;
+    // // Return alerts.
+    // return $axe_alerts;
 
 }
