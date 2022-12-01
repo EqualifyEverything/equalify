@@ -31,10 +31,15 @@ function axe_tags(){
             // Now lets put it all together into the Equalify format.
             array_push(
                 $tags, array(
-                    'slug' => $axe_tag['slug'],
                     'title' => $axe_tag['title'],
                     'category' => $axe_tag['category'],
-                    'description' => $description
+                    'description' => $description,
+
+                    // axe-core uses periods, which get screwed up
+                    // when equalify serializes them, so we're
+                    // just not going to use periods
+                    'slug' => str_replace('.', '', $axe_tag['slug'])
+
                 )
             );
 
@@ -103,8 +108,9 @@ function axe_alerts($response_body, $page_url){
                 $alert['source'] = 'axe-core';
                 $alert['url'] = $page_url;
 
-                // Setup tags.
-                $alert['tags'] = $violation->tags;
+                // Setup tags - we need to get rid of periods so
+                // equalify wont convert them to underscores.
+                $alert['tags'] = str_replace('.', '', $violation->tags);
 
                 // Setup message.
                 $alert['message'] = '"'.$violation->id.'" violation: '.$violation->help;
