@@ -78,9 +78,9 @@ function axe_alerts($response_body, $page_url){
 
         // And add an alert.
         $alert = array(
-            'source'  => 'axe-core',
+            'source'  => 'axe',
             'url'     => $page_url,
-            'message' => 'axe-core cannot reach the page.',
+            'message' => 'axe cannot reach the page.',
         );
         array_push($axe_alerts, $alert);
 
@@ -105,7 +105,7 @@ function axe_alerts($response_body, $page_url){
 
                 // Default variables.
                 $alert = array();
-                $alert['source'] = 'axe-core';
+                $alert['source'] = 'axe';
                 $alert['url'] = $page_url;
 
                 // Setup tags - we need to get rid of periods so
