@@ -36,6 +36,18 @@
     "description": ""
   },
   {
+    "slug": "wcag311", 
+    "title": "WCAG 3.1.1",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "ACT", 
+    "title": "ACT",
+    "category": "Axe Tags",
+    "description": "ACT Rules are designed to harmonize how edge cases for WCAG and other accessibility guidance are tested."
+  },
+  {
     "slug": "best-practice", 
     "title": "Best Practices",
     "category": "Axe Tags",

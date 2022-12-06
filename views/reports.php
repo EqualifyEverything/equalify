@@ -237,6 +237,17 @@ foreach($report_meta as $k => $val) {
             <td style="min-width: 200px;">
 
                 <?php
+                // Conditionally show "More Info".
+                if(!empty($alert->more_info)){
+                ?>
+
+                <a href="?view=single_alert&id=<?php echo $alert->id;?>" class="btn btn-outline-primary btn-sm">
+                    More Info
+                </a>
+
+                <?php
+                }
+
                 // Active alerts can be ignored.
                 if( $alert->status == 'active' && $alert->archived != 1 ){
                 ?>
@@ -257,6 +268,7 @@ foreach($report_meta as $k => $val) {
                 <?php
                 }
                 ?>
+
             </td>
         </tr>
 
