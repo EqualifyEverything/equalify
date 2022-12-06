@@ -299,7 +299,8 @@ class DataAccess {
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
             $selected_columns.= "$table1.status, $table1.site_id, ";
-            $selected_columns.= "$table1.source, $table1.tags ";
+            $selected_columns.= "$table1.source, $table1.tags, ";
+            $selected_columns.= "$table1.more_info, $table1.more_info";
         }
     
         // SQL.

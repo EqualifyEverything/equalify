@@ -122,10 +122,15 @@ function axe_alerts($response_body, $page_url){
                         if (next($copy ))
                             $alert['tags'].= ',';
                     }
-                }
+                }                
 
                 // Setup message.
                 $alert['message'] = '"'.$violation->id.'" violation: '.$violation->help;
+
+                // Setup more info.
+                $alert['more_info'] = '';
+                if($violation->nodes)
+                    $alert['more_info'] = $violation->nodes;
 
                 // Push alert.
                 $axe_alerts[] = $alert;
