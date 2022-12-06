@@ -750,6 +750,7 @@ class DataAccess {
                 `url` text,
                 `message` text,
                 `tags` text,
+                `more_info` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -806,6 +807,7 @@ class DataAccess {
                 `url` text,
                 `message` text,
                 `tags` text,
+                `more_info` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
