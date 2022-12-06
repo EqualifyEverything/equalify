@@ -80,7 +80,7 @@ function axe_alerts($response_body, $page_url){
         $alert = array(
             'source'  => 'axe',
             'url'     => $page_url,
-            'message' => 'axe cannot reach the page.',
+            'message' => 'axe-core cannot reach the page.',
         );
         array_push($axe_alerts, $alert);
 
