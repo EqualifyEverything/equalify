@@ -108,9 +108,21 @@ function axe_alerts($response_body, $page_url){
                 $alert['source'] = 'axe';
                 $alert['url'] = $page_url;
 
-                // Setup tags - we need to get rid of periods so
-                // equalify wont convert them to underscores.
-                $alert['tags'] = str_replace('.', '', $violation->tags);
+                // Setup tags.
+                $alert['tags'] = '';
+                if(!empty($violation->tags)){
+
+                    // We need to get rid of periods so Equalify
+                    // wont convert them to underscores and they
+                    // need to be comma separated.
+                    $tags = $violation->tags;
+                    $copy = $tags;
+                    foreach($tags as $tag){
+                        $alert['tags'].= str_replace('.', '', $tag);
+                        if (next($copy ))
+                            $alert['tags'].= ',';
+                    }
+                }
 
                 // Setup message.
                 $alert['message'] = '"'.$violation->id.'" violation: '.$violation->help;
