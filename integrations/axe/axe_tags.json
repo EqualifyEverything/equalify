@@ -36,8 +36,50 @@
     "description": ""
   },
   {
+    "slug": "wcag222", 
+    "title": "WCAG Success Criteria 2.2.2",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
     "slug": "wcag311", 
-    "title": "WCAG 3.1.1",
+    "title": "WCAG Success Criteria 3.1.1",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "wcag412", 
+    "title": "WCAG Success Criteria 4.1.2",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "section508", 
+    "title": "Section 508",
+    "category": "Axe Tags",
+    "description": "Section 508 is part of a 1998 amendment to the Rehabilitation Act of 1973. It requires all Federal electronic content to be accessible"
+  },
+  {
+    "slug": "section50822a", 
+    "title": "Section 508.22.a",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "section50822j", 
+    "title": "Section 508.22.j",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "section50822g", 
+    "title": "Section 508.22.g",
+    "category": "Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "section50822f", 
+    "title": "Section 508.22.f",
     "category": "Axe Tags",
     "description": ""
   },

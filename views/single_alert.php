@@ -28,7 +28,7 @@ $report = (array)DataAccess::get_db_rows(
         </h1>
     </div>
     <div class="lead">
-        <span class="badge text-bg-dark" aria-label="Website URL">
+        <span class="badge text-bg-dark" aria-describe="Website URL">
             <?php echo $report['url'];?>
         </span>
 
@@ -50,7 +50,7 @@ $report = (array)DataAccess::get_db_rows(
                     $tag_info = (array)DataAccess::get_db_rows(
                         'tags', $filtered_to_tag
                     )['content'][0];
-                    echo '<span class="badge bg-secondary" aria-label="Website URL">'.$tag_info['title'].'</span> ';
+                    echo '<span class="badge bg-secondary" aria-describe="Tag">'.$tag_info['title'].'</span> ';
                 }
 
             }
@@ -94,7 +94,7 @@ $report = (array)DataAccess::get_db_rows(
         $count++;
         echo '<div id="'.$count.'">';
         echo '<h3>'.$message.'</h3>';
-        echo '<pre class="rounded bg-secondary 
+        echo '<pre aria-describe="code snippet" class="rounded bg-secondary 
         text-white p-3 mb-1"><code>'.$info->html.'</code></pre>';
         echo '</div>';
     }
