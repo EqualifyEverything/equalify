@@ -17,7 +17,7 @@ $report = (array)DataAccess::get_db_rows(
 ?>
 
 <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
-    <div>
+    <div class="w-50">
         <h1>
         
             <?php 
@@ -29,7 +29,16 @@ $report = (array)DataAccess::get_db_rows(
     </div>
     <div class="lead">
         <span class="badge text-bg-dark" aria-describe="Website URL">
-            <?php echo $report['url'];?>
+
+            <?php 
+            // Show first 20 characters of the url.
+            if(strlen($report['url']) > 20){
+                echo substr($report['url'], 0, 20).'...';
+            }else{
+                echo $report['url'];
+            }
+            ?>
+
         </span>
 
         <?php
@@ -59,7 +68,7 @@ $report = (array)DataAccess::get_db_rows(
 
     </div>
 </div>
-<section id="meta_settings" class="mb-3 pb-3 border-bottom">
+<section id="meta_settings" class="mb-3 pb-3">
 
     <p class="lead">
 
@@ -75,30 +84,30 @@ $report = (array)DataAccess::get_db_rows(
     if(!empty($report['more_info'])):
     ?>
     
-    <h2>More Info</h2>
+    <h2 class="fs-3">More Info</h2>
 
-    <?php
-    // This was formatted for axe-core.
-    $count = 0;
-    foreach(unserialize($report['more_info']) as $info){
+        <?php
+        // This was formatted for axe-core.
+        $count = 0;
+        foreach(unserialize($report['more_info']) as $info){
 
-        // Setup axe-core items
-        if(empty($info->any[0]) && !empty($info->all[0])){
-            $message = $info->all[0]->message;
-        }elseif(!empty($info->any[0]) && empty($info->all[0])){
-            $message = $info->any[0]->message;
-        }else{
-            $message = '';
+            // Setup axe-core items
+            if(empty($info->any[0]) && !empty($info->all[0])){
+                $message = $info->all[0]->message;
+            }elseif(!empty($info->any[0]) && empty($info->all[0])){
+                $message = $info->any[0]->message;
+            }else{
+                $message = '';
+            }
+
+            $count++;
+            echo '<div class="mb-3 pb-3 border-bottom" id="error-'.$count.'">';
+            echo '<h3 class="fs-5">'.$message.'</h3>';
+            echo '<pre aria-describe="code snippet" class="rounded bg-secondary 
+            text-white p-3 mb-1"><code>'.$info->html.'</code></pre>';
+            echo '</div>';
         }
-
-        $count++;
-        echo '<div id="'.$count.'">';
-        echo '<h3>'.$message.'</h3>';
-        echo '<pre aria-describe="code snippet" class="rounded bg-secondary 
-        text-white p-3 mb-1"><code>'.$info->html.'</code></pre>';
-        echo '</div>';
-    }
-    ?>
+        ?>
 
     <?php
     //End more info.
