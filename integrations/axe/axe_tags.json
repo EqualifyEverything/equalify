@@ -3,204 +3,204 @@
     "slug": "wcag2a",
     "title": "WCAG 2.0 Level A",
     "description": "",
-    "category": "Axe Tags"
+    "category": "WCAG Axe Tags"
   },
   {
     "slug": "wcag2aa", 
     "title": "WCAG 2.0 Level AA",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag2aaa", 
     "title": "WCAG 2.0 Level AAA",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag21a", 
     "title": "WCAG 2.1 Level A",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag21aa", 
     "title": "WCAG 2.1 Level AA",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag21aaa", 
     "title": "WCAG 2.1 Level AAA",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag111", 
     "title": "WCAG Success Criteria 1.1.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag121", 
     "title": "WCAG Success Criteria 1.2.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag122", 
     "title": "WCAG Success Criteria 1.2.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag131", 
     "title": "WCAG Success Criteria 1.3.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag141", 
     "title": "WCAG Success Criteria 1.4.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag143", 
     "title": "WCAG Success Criteria 1.4.3",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag144", 
     "title": "WCAG Success Criteria 1.4.4",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag211", 
     "title": "WCAG Success Criteria 2.1.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag221", 
     "title": "WCAG Success Criteria 2.2.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag222", 
     "title": "WCAG Success Criteria 2.2.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag241", 
     "title": "WCAG Success Criteria 2.4.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag242", 
     "title": "WCAG Success Criteria 2.4.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag244", 
     "title": "WCAG Success Criteria 2.4.4",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag311", 
     "title": "WCAG Success Criteria 3.1.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag312", 
     "title": "WCAG Success Criteria 3.1.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag332", 
     "title": "WCAG Success Criteria 3.3.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag411", 
     "title": "WCAG Success Criteria 4.1.1",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "wcag412", 
     "title": "WCAG Success Criteria 4.1.2",
-    "category": "Axe Tags",
+    "category": "WCAG Axe Tags",
     "description": ""
   },
   {
     "slug": "section508", 
     "title": "Section 508",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": "Section 508 is part of a 1998 amendment to the Rehabilitation Act of 1973. It requires all Federal electronic content to be accessible"
   },
   {
     "slug": "section50822a", 
     "title": "Section 508.22.a",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822f", 
     "title": "Section 508.22.f",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822g", 
     "title": "Section 508.22.g",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822i", 
     "title": "Section 508.22.i",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822j", 
     "title": "Section 508.22.j",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822n", 
     "title": "Section 508.22.n",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "section50822o", 
     "title": "Section 508.22.o",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": ""
   },
   {
     "slug": "ACT", 
     "title": "ACT",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": "ACT Rules are designed to harmonize how edge cases for WCAG and other accessibility guidance are tested."
   },
   {
     "slug": "best-practice", 
     "title": "Best Practices",
-    "category": "Axe Tags",
+    "category": "Other Axe Tags",
     "description": "Common accessibility best practices."
   },
   {
