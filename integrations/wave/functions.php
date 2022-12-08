@@ -102,7 +102,7 @@ function wave_tags(){
   * Maps site URLs to Little Forest URLs for processing.
   */
 function wave_urls($page_url) {
-    return 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&url='.$page_url.'&reporttype=4';
+    return 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&reporttype=4&url='.$page_url;
 }
 
 /**
