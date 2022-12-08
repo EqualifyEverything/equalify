@@ -839,7 +839,8 @@ class DataAccess {
         // Query 1
         self::query($sql_1, $params, false);
 
-        // Now, create the content in the meta table.
+        // Now, create the content in the meta table with axe
+        // as the default integration.
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES 
@@ -848,6 +849,7 @@ class DataAccess {
             ('scan_schedule', ?),
             ('scan_log', ?),
             ('scannable_pages', ?),
+            ('axe_key', ?),
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
@@ -856,6 +858,7 @@ class DataAccess {
         $default_scan_schedule = 'manually';
         $default_scan_log = '';
         $default_scannable_pages = serialize(array());
+        $default_axe_key = '';
         $default_last_scan_time = '';
         $default_pages_scanned = 0;
         $params = array(
@@ -864,6 +867,7 @@ class DataAccess {
             $default_scan_schedule,
             $default_scan_log, 
             $default_scannable_pages, 
+            $default_axe_key,
             $default_pages_scanned, 
             $default_last_scan_time
         );
