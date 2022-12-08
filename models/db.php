@@ -302,7 +302,7 @@ class DataAccess {
             $selected_columns.= "$table1.source, $table1.tags, ";
             $selected_columns.= "$table1.more_info, $table1.more_info";
         }
-    
+        
         // SQL.
         $sql = "SELECT $selected_columns FROM $table1 ";
         $sql.= "LEFT JOIN $table2 ";
@@ -310,7 +310,7 @@ class DataAccess {
         $sql.= "AND $table1.message=$table2.message ";
         $sql.= "AND $table1.site_id=$table2.site_id ";
         $sql.= "AND $table1.source=$table2.source ";
-        $sql.= "WHERE $table2.id IS NULL ";
+        $sql.= "WHERE $table2.id IS NULL AND $table1.archived = 0 ";
         if(!empty($sites)){
             foreach($sites as $site){
                 $sql.= "AND $table1.site_id = $site->id ";
