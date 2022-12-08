@@ -166,6 +166,7 @@ function wave_alerts($response_body, $page_url){
             // Default variables.
             $alert = array();
             $alert['source'] = 'wave';
+            $alert['more_info'] = '';
             $alert['url'] = $page_url;
 
             // Setup tags.

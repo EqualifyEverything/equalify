@@ -1,6 +1,6 @@
 <?php
 /**
- * Name: Pantheon 
+ * Name: Pantheon
  * Description: One-click fixes via Terminus.
  * Status: Planned
  */

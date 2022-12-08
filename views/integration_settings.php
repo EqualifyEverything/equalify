@@ -46,13 +46,13 @@ if(!empty($settings['meta'])):
         $settings = $settings['meta'];
         foreach($settings as $setting):
             $name = $setting['name'];
-            $report = $setting['report'];
+            $label = $setting['label'];
             $type = $setting['type'];
         ?>
 
         <div class="mb-3">
             <label for="<?php echo $name?>_field" class="form-label">
-                <?php echo $report;?>
+                <?php echo $label;?>
             </label>
             <input 
                 id="<?php echo $name?>_field" 
