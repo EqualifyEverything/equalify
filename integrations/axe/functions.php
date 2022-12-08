@@ -5,6 +5,47 @@
  */
 
 /**
+ * axe-core Fields
+ */
+function axe_fields(){
+
+    $axe_fields = array(
+        
+        // These fields are added to the database.
+        'db' => [
+
+                // Meta values.
+                'meta' => [
+                    array(
+                        'name'     => 'axe_uri',
+                        'value'     => '',
+                    )
+                ]
+            
+        ],
+
+        // These fields are HTML fields on the settings view.
+        'settings' => [
+
+            // Meta settings.
+            'meta' => [
+                array(
+                    'name'     => 'axe_uri',
+                    'label'    => 'axe-core URI (ie- https://axe.equalify.app/?url=)',
+                    'type'     => 'text',
+                )
+            ]
+
+        ]
+
+    );
+
+    // Return fields
+    return $axe_fields;
+
+}
+
+/**
  * axe Tags
  */
 function axe_tags(){
@@ -56,7 +97,7 @@ function axe_tags(){
   * Maps site URLs to Axe URLs for processing.
   */
 function axe_urls($page_url) {
-    return 'https://axe.equalify.app/index.php?url='.$page_url;
+    return DataAccess::get_meta_value('axe_uri').$page_url;
 }
 
 /**

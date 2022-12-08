@@ -28,5 +28,8 @@ $account_records = [];
 if(!empty($_POST['wave_key'])){
     DataAccess::update_meta_value('wave_key', $_POST['wave_key']);
 };
+if(!empty($_POST['axe_uri'])){
+    DataAccess::update_meta_value('axe_uri', $_POST['axe_uri']);
+};
 
 header('Location: ../index.php?view='.$last_view.'&status=success');
