@@ -102,7 +102,15 @@ function wave_tags(){
   * Maps site URLs to Little Forest URLs for processing.
   */
 function wave_urls($page_url) {
-    return 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&url='.$page_url.'&reporttype=4';
+
+    // Require wave_key
+    $wave_key = DataAccess::get_meta_value('wave_key');
+    if(empty($wave_key)){
+        throw new Exception('WAVE key is not entered. Please add the WAVE key in the integration settings.');
+    }else{
+        return 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
+    }
+
 }
 
 /**
