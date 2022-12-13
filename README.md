@@ -12,7 +12,7 @@
 
 🛠️ **Contribute a pull request** or [new issue](https://github.com/bbertucc/equalify/issues).
 
-🎩 **[Donate](https://equalify.app/donate/)** to Equalify.
+🎩 **[Sponsor / Donate](https://github.com/sponsors/bbertucc)** to Equalify.
 
 ## How will Equalify increase content accessibility?
 
