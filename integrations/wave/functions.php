@@ -102,7 +102,15 @@ function wave_tags(){
   * Maps site URLs to Little Forest URLs for processing.
   */
 function wave_urls($page_url) {
-    return 'https://wave.webaim.org/api/request?key='.DataAccess::get_meta_value('wave_key').'&url='.$page_url.'&reporttype=4';
+
+    // Require wave_key
+    $wave_key = DataAccess::get_meta_value('wave_key');
+    if(empty($wave_key)){
+        throw new Exception('WAVE key is not entered. Please add the WAVE key in the integration settings.');
+    }else{
+        return 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
+    }
+
 }
 
 /**
@@ -166,6 +174,7 @@ function wave_alerts($response_body, $page_url){
             // Default variables.
             $alert = array();
             $alert['source'] = 'wave';
+            $alert['more_info'] = '';
             $alert['url'] = $page_url;
 
             // Setup tags.
@@ -177,7 +186,7 @@ function wave_alerts($response_body, $page_url){
             }else{
                 $appended_text = '';
             }
-            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report</a>';
+            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report <span class="screen-reader-only">(opens in a new tab)</span></a>';
 
             // Push alert.
             $wave_alerts[] = $alert;

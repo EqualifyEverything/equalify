@@ -299,9 +299,10 @@ class DataAccess {
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
             $selected_columns.= "$table1.status, $table1.site_id, ";
-            $selected_columns.= "$table1.source, $table1.tags ";
+            $selected_columns.= "$table1.source, $table1.tags, ";
+            $selected_columns.= "$table1.more_info, $table1.more_info";
         }
-    
+        
         // SQL.
         $sql = "SELECT $selected_columns FROM $table1 ";
         $sql.= "LEFT JOIN $table2 ";
@@ -309,7 +310,7 @@ class DataAccess {
         $sql.= "AND $table1.message=$table2.message ";
         $sql.= "AND $table1.site_id=$table2.site_id ";
         $sql.= "AND $table1.source=$table2.source ";
-        $sql.= "WHERE $table2.id IS NULL ";
+        $sql.= "WHERE $table2.id IS NULL AND $table1.archived = 0 ";
         if(!empty($sites)){
             foreach($sites as $site){
                 $sql.= "AND $table1.site_id = $site->id ";
@@ -750,6 +751,7 @@ class DataAccess {
                 `url` text,
                 `message` text,
                 `tags` text,
+                `more_info` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -806,6 +808,7 @@ class DataAccess {
                 `url` text,
                 `message` text,
                 `tags` text,
+                `more_info` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -836,34 +839,35 @@ class DataAccess {
         // Query 1
         self::query($sql_1, $params, false);
 
-        // Now, create the content in the meta table.
+        // Now, create the content in the meta table with axe
+        // as the default integration.
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES 
             ('active_integrations', ?),
-            ('wave_key', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
             ('scannable_pages', ?),
+            ('axe_key', ?),
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
-        $default_active_integrations = serialize(array('wave'));
-        $default_wave_key = $GLOBALS['wave_key'];
+        $default_active_integrations = serialize(array('axe'));
         $default_scan_status = '';
         $default_scan_schedule = 'manually';
         $default_scan_log = '';
         $default_scannable_pages = serialize(array());
+        $default_axe_key = '';
         $default_last_scan_time = '';
         $default_pages_scanned = 0;
         $params = array(
             $default_active_integrations, 
-            $default_wave_key,
             $default_scan_status, 
             $default_scan_schedule,
             $default_scan_log, 
             $default_scannable_pages, 
+            $default_axe_key,
             $default_pages_scanned, 
             $default_last_scan_time
         );

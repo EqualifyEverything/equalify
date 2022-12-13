@@ -130,7 +130,7 @@ if(!empty($_GET['meta_name'])){
         
         <div class="mb-3">
             <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
-            <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
+            <input type="text" id="reportTitleInput" class="form-control" value="<?php echo $title;?>" name="title" required>
         </div>
         <hr>
         <div class="mb-3 row">

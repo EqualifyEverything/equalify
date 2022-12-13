@@ -86,7 +86,6 @@ function update_alerts($new_status, $site_id) {
         DataAccess::get_meta_value('active_integrations')
     );
 
-
     // Create active sites to alerts filter.
     $integration_uris = NULL;
     if(!empty($active_integrations)){

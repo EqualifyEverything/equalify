@@ -7,10 +7,6 @@
  * Equalify works for everyone.
 **********************************************************/
 
-// Wave key is required for activation.
-if(empty($GLOBALS['wave_key']))
-    throw new Exception('Equalify requires a WAVE key. Get your key at https://wave.webaim.org/api/ and add it to the config.php file.');
-
 // All the tables are created with this action.
 if(DataAccess::table_exists('alerts') == false)
     DataAccess::create_alerts_table();
