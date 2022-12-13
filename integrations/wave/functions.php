@@ -186,7 +186,7 @@ function wave_alerts($response_body, $page_url){
             }else{
                 $appended_text = '';
             }
-            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report</a>';
+            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report <span class="screen-reader-only">(opens in a new tab)</span></a>';
 
             // Push alert.
             $wave_alerts[] = $alert;
