@@ -61,10 +61,8 @@ function the_active_class($selection){
         }
 
     // We need to return active for the default view.
-    }elseif(empty($_GET['view']) && $selection == 'alerts'){
-
+    }elseif(empty($_GET['view']) && $selection == 'reports'){
         echo 'active';
-    
     }else{
         return null;
     }
