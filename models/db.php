@@ -887,11 +887,11 @@ class DataAccess {
         // Default scannable_pages.
         $params[] = serialize(array());
         
-        // Default last_scan_time.
-        $params[] = '';
-        
         // Default pages_scanned.
         $params[] = 0;
+
+        // Default last_scan_time.
+        $params[] = '';
 
         // Query 2
         self::query($sql_2, $params, false);
