@@ -178,7 +178,7 @@ function wave_alerts($response_body, $page_url){
             $alert['url'] = $page_url;
 
             // Setup tags.
-            $alert['tags'] = $wave_item['id'];
+            $alert['tags'] = 'wave_'.$wave_item['id'];
 
             // Setup message.
             if($wave_item['count'] > 1){

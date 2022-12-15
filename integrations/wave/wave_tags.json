@@ -1,375 +1,375 @@
 [
   {
-    "name": "alt_missing",
+    "name": "wave_alt_missing",
     "title": "Missing alternative text",
     "type": "error",
     "summary": "Image alternative text is not present.",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       }
     ]
   },
   {
-    "name": "alt_link_missing",
+    "name": "wave_alt_link_missing",
     "title": "Linked image missing alternative text",
     "type": "error",
     "summary": "An image without alternative text results in an empty link.",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "name": "wave_2.4.4 Link Purpose (In Context) (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
       }
     ]
   },
   {
-    "name": "alt_spacer_missing",
+    "name": "wave_alt_spacer_missing",
     "title": "Spacer image missing alternative text",
     "type": "error",
     "summary": "A layout spacer image (which should have null/empty alternative text) does not have an alt attribute.",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       }
     ]
   },
   {
-    "name": "alt_input_missing",
+    "name": "wave_alt_input_missing",
     "title": "Image button missing alternative text",
     "type": "error",
     "summary": "Alternative text is not present for a form image button.",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "name": "wave_2.4.4 Link Purpose (In Context) (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
       }
     ]
   },
   {
-    "name": "alt_area_missing",
+    "name": "wave_alt_area_missing",
     "title": "Image map area missing alternative text",
     "type": "error",
     "summary": "Alternative text is not present for an image map area (hot spot).",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "name": "wave_2.4.4 Link Purpose (In Context) (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
       }
     ]
   },
   {
-    "name": "alt_map_missing",
+    "name": "wave_alt_map_missing",
     "title": "Image map missing alternative text",
     "type": "error",
     "summary": "An image that has hot spots does not have an alt attribute.",
     "category": "Alt-related",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       }
     ]
   },
   {
-    "name": "longdesc_invalid",
+    "name": "wave_longdesc_invalid",
     "title": "Invalid longdesc",
     "type": "error",
     "summary": "The longdesc attribute is not a URL.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       }
     ]
   },
   {
-    "name": "label_missing",
+    "name": "wave_label_missing",
     "title": "Missing form label",
     "type": "error",
     "summary": "A form control does not have a corresponding label.",
     "category": "Forms",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       },
       {
-        "name": "2.4.6 Headings and Labels (Level AA)",
+        "name": "wave_2.4.6 Headings and Labels (Level AA)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
       },
       {
-        "name": "3.3.2 Labels or Instructions (Level A)",
+        "name": "wave_3.3.2 Labels or Instructions (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
       }
     ]
   },
   {
-    "name": "label_empty",
+    "name": "wave_label_empty",
     "title": "Empty form label",
     "type": "error",
     "summary": "A form label is present, but does not contain any content.",
     "category": "Forms",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       },
       {
-        "name": "2.4.6 Headings and Labels (Level AA)",
+        "name": "wave_2.4.6 Headings and Labels (Level AA)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
       },
       {
-        "name": "3.3.2 Labels or Instructions (Level A)",
+        "name": "wave_3.3.2 Labels or Instructions (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
       }
     ]
   },
   {
-    "name": "label_multiple",
+    "name": "wave_label_multiple",
     "title": "Multiple form labels",
     "type": "error",
     "summary": "A form control has more than one label associated with it.",
     "category": "Forms",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       },
       {
-        "name": "2.4.6 Headings and Labels (Level AA)",
+        "name": "wave_2.4.6 Headings and Labels (Level AA)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
       },
       {
-        "name": "3.3.2 Labels or Instructions (Level A)",
+        "name": "wave_3.3.2 Labels or Instructions (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc3.3.2"
       }
     ]
   },
   {
-    "name": "aria_reference_broken",
+    "name": "wave_aria_reference_broken",
     "title": "Broken ARIA reference",
     "type": "error",
     "summary": "An aria-labelledby or aria-describedby reference exists, but the target for the reference does not exist.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       },
       {
-        "name": "4.1.2 Name, Role, Value (Level A)",
+        "name": "wave_4.1.2 Name, Role, Value (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
       }
     ]
   },
   {
-    "name": "aria_menu_broken",
+    "name": "wave_aria_menu_broken",
     "title": "Broken ARIA menu",
     "type": "error",
     "summary": "An ARIA menu does not contain required menu items.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "2.1.1 Keyboard (Level A)",
+        "name": "wave_2.1.1 Keyboard (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
       },
       {
-        "name": "4.1.2 Name, Role, Value (Level A)",
+        "name": "wave_4.1.2 Name, Role, Value (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc4.1.2"
       }
     ]
   },
   {
-    "name": "title_invalid",
+    "name": "wave_title_invalid",
     "title": "Missing or uninformative page title",
     "type": "error",
     "summary": "The page title is missing or not descriptive.",
     "category": "Document",
     "guidelines": [
       {
-        "name": "2.4.2 Page Titled (Level A)",
+        "name": "wave_2.4.2 Page Titled (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.2"
       }
     ]
   },
   {
-    "name": "language_missing",
+    "name": "wave_language_missing",
     "title": "Language missing or invalid",
     "type": "error",
     "summary": "The language of the document is not identified or a lang attribute value is invalid.",
     "category": "Document",
     "guidelines": [
       {
-        "name": "3.1.1 Language of Page (Level A)",
+        "name": "wave_3.1.1 Language of Page (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc3.1.1"
       }
     ]
   },
   {
-    "name": "meta_refresh",
+    "name": "wave_meta_refresh",
     "title": "Page refreshes or redirects",
     "type": "error",
     "summary": "The page is set to automatically change location or refresh using a <meta> tag.",
     "category": "Document",
     "guidelines": [
       {
-        "name": "2.2.1 Timing Adjustable (Level A)",
+        "name": "wave_2.2.1 Timing Adjustable (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.2.1"
       },
       {
-        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "name": "wave_2.2.2 Pause, Stop, Hide (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
       }
     ]
   },
   {
-    "name": "heading_empty",
+    "name": "wave_heading_empty",
     "title": "Empty heading",
     "type": "error",
     "summary": "A heading contains no content.",
     "category": "Elements",
     "guidelines": [
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       },
       {
-        "name": "2.4.1 Bypass Blocks (Level A)",
+        "name": "wave_2.4.1 Bypass Blocks (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
       },
       {
-        "name": "2.4.6 Headings and Labels (Level AA)",
+        "name": "wave_2.4.6 Headings and Labels (Level AA)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.6"
       }
     ]
   },
   {
-    "name": "button_empty",
+    "name": "wave_button_empty",
     "title": "Empty button",
     "type": "error",
     "summary": "A button is empty or has no value text.",
     "category": "Forms",
     "guidelines": [
       {
-        "name": "1.1.1 Non-text Content (Level A)",
+        "name": "wave_1.1.1 Non-text Content (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.1.1"
       },
       {
-        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "name": "wave_2.4.4 Link Purpose (In Context) (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
       }
     ]
   },
   {
-    "name": "link_empty",
+    "name": "wave_link_empty",
     "title": "Empty link",
     "type": "error",
     "summary": "A link contains no text.",
     "category": "Elements",
     "guidelines": [
       {
-        "name": "2.4.4 Link Purpose (In Context) (Level A)",
+        "name": "wave_2.4.4 Link Purpose (In Context) (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.4"
       }
     ]
   },
   {
-    "name": "link_skip_broken",
+    "name": "wave_link_skip_broken",
     "title": "Broken skip link",
     "type": "error",
     "summary": "A skip navigation link exists, but the target for the link does not exist or the link is not keyboard accessible.",
     "category": "Elements",
     "guidelines": [
       {
-        "name": "2.1.1 Keyboard (Level A)",
+        "name": "wave_2.1.1 Keyboard (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.1.1"
       },
       {
-        "name": "2.4.1 Bypass Blocks (Level A)",
+        "name": "wave_2.4.1 Bypass Blocks (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.4.1"
       }
     ]
   },
   {
-    "name": "th_empty",
+    "name": "wave_th_empty",
     "title": "Empty table header",
     "type": "error",
     "summary": "A <th> (table header) contains no text.",
     "category": "Elements",
     "guidelines": [
       {
-        "name": "1.3.1 Info and Relationships (Level A)",
+        "name": "wave_1.3.1 Info and Relationships (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.3.1"
       }
     ]
   },
   {
-    "name": "blink",
+    "name": "wave_blink",
     "title": "Blinking content",
     "type": "error",
     "summary": "Blinking content is present.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "name": "wave_2.2.2 Pause, Stop, Hide (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
       }
     ]
   },
   {
-    "name": "marquee",
+    "name": "wave_marquee",
     "title": "Marquee",
     "type": "error",
     "summary": "A <marquee> element is present.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "2.2.2 Pause, Stop, Hide (Level A)",
+        "name": "wave_2.2.2 Pause, Stop, Hide (Level A)",
         "link": "https://webaim.org/standards/wcag/checklist#sc2.2.2"
       }
     ]
   },
   {
-    "name": "contrast",
+    "name": "wave_contrast",
     "title": "Very low contrast",
     "type": "contrast",
     "summary": "Very low contrast between text and background colors.",
     "category": "Other Tags",
     "guidelines": [
       {
-        "name": "1.4.3 Contrast (Minimum) (Level AA)",
+        "name": "wave_1.4.3 Contrast (Minimum) (Level AA)",
         "link": "https://webaim.org/standards/wcag/checklist#sc1.4.3"
       }
     ]
