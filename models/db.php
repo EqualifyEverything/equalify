@@ -839,38 +839,59 @@ class DataAccess {
         // Query 1
         self::query($sql_1, $params, false);
 
-        // Now, create the content in the meta table with axe
-        // as the default integration.
+        // Let's create the params first, so we can do special
+        // things with them and global meta variables.
+        $params = array();
+
+        // Optionally set global meta variables.
+        if(isset($GLOBALS['wave_key'])){
+            $wave_sql = "('wave_key', ?),";
+            $params[] = $GLOBALS['wave_key'];
+        }else{
+            $wave_sql = '';
+        }
+        if(isset($GLOBALS['axe_uri'])){
+            $axe_sql = "('axe_uri', ?),";
+            $params[] = $GLOBALS['axe_uri'];
+        }else{
+            $axe_sql = '';
+        }
+
+        // Now, create the content in the meta table.
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
-            VALUES 
-            ('active_integrations', ?),
+            VALUES".
+            $wave_sql.
+            $axe_sql.
+            "('active_integrations', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
             ('scannable_pages', ?),
-            ('axe_key', ?),
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
-        $default_active_integrations = serialize(array('axe'));
-        $default_scan_status = '';
-        $default_scan_schedule = 'manually';
-        $default_scan_log = '';
-        $default_scannable_pages = serialize(array());
-        $default_axe_key = '';
-        $default_last_scan_time = '';
-        $default_pages_scanned = 0;
-        $params = array(
-            $default_active_integrations, 
-            $default_scan_status, 
-            $default_scan_schedule,
-            $default_scan_log, 
-            $default_scannable_pages, 
-            $default_axe_key,
-            $default_pages_scanned, 
-            $default_last_scan_time
-        );
+        
+        // Default active_integrations.
+        $params[] = serialize(array('axe'));
+        
+        // Default scan_status.
+        $params[] = '';
+        
+        // Default scan_schedule.
+        $params[] = 'manually';
+        
+        // Default scan_log.
+        $params[] = '';
+        
+        // Default scannable_pages.
+        $params[] = serialize(array());
+        
+        // Default last_scan_time.
+        $params[] = '';
+        
+        // Default pages_scanned.
+        $params[] = 0;
 
         // Query 2
         self::query($sql_2, $params, false);
