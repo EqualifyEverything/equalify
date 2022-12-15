@@ -784,7 +784,7 @@ class DataAccess {
         require_once 'integrations.php';
         require_once 'helpers/register_tags.php';
         $integration_tags = get_integration_tags(
-            'wave'
+            'axe'
         );
         if( !empty($integration_tags) ){
             register_tags($integration_tags);
