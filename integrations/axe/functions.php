@@ -167,7 +167,7 @@ function axe_alerts($response_body, $page_url){
                     $tags = $violation->tags;
                     $copy = $tags;
                     foreach($tags as $tag){
-                        $alert['tags'].= str_replace('.', '', $tag);
+                        $alert['tags'].= str_replace('.', '', 'axe_'.$tag);
                         if (next($copy ))
                             $alert['tags'].= ',';
                     }

@@ -784,7 +784,7 @@ class DataAccess {
         require_once 'integrations.php';
         require_once 'helpers/register_tags.php';
         $integration_tags = get_integration_tags(
-            'wave'
+            'axe'
         );
         if( !empty($integration_tags) ){
             register_tags($integration_tags);
@@ -851,19 +851,19 @@ class DataAccess {
             $wave_sql = '';
         }
         if(isset($GLOBALS['axe_uri'])){
-            $axe_sql = "('axe_uri', ?),";
-            $params[] = $GLOBALS['axe_uri'];
+            $axe_param = $GLOBALS['axe_uri'];
         }else{
-            $axe_sql = '';
+            $axe_param = '';
         }
 
-        // Now, create the content in the meta table.
+        // Now, create the content in the meta table
+        // with axe, since it's on by default. 
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES".
             $wave_sql.
-            $axe_sql.
-            "('active_integrations', ?),
+            "('axe_uri', ?),
+            ('active_integrations', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
@@ -871,10 +871,13 @@ class DataAccess {
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
+
+        // Default axe_uri.
+        $params[] = $axe_param;
         
         // Default active_integrations.
         $params[] = serialize(array('axe'));
-        
+
         // Default scan_status.
         $params[] = '';
         
@@ -886,12 +889,12 @@ class DataAccess {
         
         // Default scannable_pages.
         $params[] = serialize(array());
-        
-        // Default last_scan_time.
-        $params[] = '';
-        
+
         // Default pages_scanned.
         $params[] = 0;
+
+        // Default last_scan_time.
+        $params[] = '';
 
         // Query 2
         self::query($sql_2, $params, false);
