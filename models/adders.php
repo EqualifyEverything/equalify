@@ -138,16 +138,16 @@ function a11ywatch_site_adder($site_url){
     $options = [
         'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked', 'Authorization' => $jwt],
         'verify' => false,
-        'body' => [ 'url' => $url ]
     ];
     $client = new Client($options);
 
-    // The WP API JSON endpoint is always the same.
-    $a11ywatch_json_endpoint = '/api/crawl';
-    $url = $site_url . $a11ywatch_json_endpoint;
+    // The API JSON endpoint is always the same.
+    $a11ywatch_json_endpoint = $GLOBALS['a11ywatch_uri'] . '/api/crawl';
 
     $a11ywatch_api_json = json_decode(
-        $client->post()->getBody(), true
+        $client->post($a11ywatch_json_endpoint, [
+            GuzzleHttp\RequestOptions::JSON => [ 'url' => $site_url ]
+        ])->getBody(), true
     );
 
     if(empty($a11ywatch_api_json[0])) {
@@ -157,13 +157,13 @@ function a11ywatch_site_adder($site_url){
         );
     }
 
-    // Push JSON to pages array.
-    $pages = [];
-    foreach ($a11ywatch_api_json as $page):
-        array_push($pages, $page['link']);
-    endforeach;
+    // // Push JSON to pages array.
+    // $pages = [];
+    // foreach ($a11ywatch_api_json as $page):
+    //     array_push($pages, $page['link']);
+    // endforeach;
 
     // We want an array with each page URL.
-    return $pages;    
+    return [];    
     
 }
