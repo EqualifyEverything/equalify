@@ -854,6 +854,12 @@ class DataAccess {
         }else{
             $wave_sql = '';
         }
+        if(isset($GLOBALS['a11ywatch_key'])){
+            $a11ywatch_sql = "('a11ywatch_key', ?),";
+            $params[] = $GLOBALS['a11ywatch_key'];
+        }else{
+            $a11ywatch_sql = '';
+        }
         if(isset($GLOBALS['axe_uri'])){
             $axe_param = $GLOBALS['axe_uri'];
         }else{
@@ -866,6 +872,7 @@ class DataAccess {
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES".
             $wave_sql.
+            $a11ywatch_sql.
             "('axe_uri', ?),
             ('active_integrations', ?),
             ('scan_status', ?),

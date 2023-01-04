@@ -34,21 +34,20 @@ if($old_status == 'Active'){
     $integration_fields = get_integration_fields(
         $integration_uri
     );
-    if( !empty($integration_fields['db']) ){
+    if (!empty($integration_fields['db'])){
         $integration_db_fields = $integration_fields['db'];
 
         // Delete "meta" fields.
-        if( !empty($integration_db_fields['meta']) ){
+        if (!empty($integration_db_fields['meta']) ){
             foreach(
                 $integration_db_fields['meta'] 
                 as $integration_meta_field
             ){
-                if(!DataAccess::get_meta_value(
-                    $integration_meta_field['name']
-                ))
+                if (!DataAccess::get_meta_value($integration_meta_field['name'])) {
                     DataAccess::delete_meta(
                         $integration_meta_field['name']
                     );
+                }
             }
         }
         
@@ -114,14 +113,12 @@ if($old_status == 'Active'){
                 $integration_db_fields['pages'] 
                 as $integration_pages_field
             ){
-                if(
-                    !DataAccess::db_column_exists(
-                        'pages', $integration_pages_field['name']
-                ))
+                if(!DataAccess::db_column_exists( 'pages', $integration_pages_field['name'] )) {
                     DataAccess::add_db_column(
                         'pages', $integration_pages_field['name'], 
                         $integration_pages_field['type']
                     );
+                }
             }
         }
 

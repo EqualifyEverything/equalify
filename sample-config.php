@@ -26,7 +26,7 @@ $GLOBALS['wave_key'] = '';
 // Visit https://github.com/bbertucc/axe-equalify for more info.
 $GLOBALS['axe_uri'] = '';
 
-// Visit https://a11ywatch.com/api-info for more info.
+// Visit https://a11ywatch.com/api-info to get a A11yWatch key.
 $GLOBALS['a11ywatch_key'] = '';
 
 // Additional options.

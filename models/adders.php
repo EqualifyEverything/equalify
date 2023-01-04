@@ -132,10 +132,11 @@ function xml_site_adder($site_url){
  * A11yWatch Crawler Pages Adder
  */
 function a11ywatch_site_adder($site_url){
-    
+    $jwt = DataAccess::get_meta_value('a11ywatch_key');
+
     // Instantiate Guzzle client - A11yWatch API uses JSON streams.
     $options = [
-        'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked'],
+        'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked', 'Authorization' => $jwt],
         'verify' => false,
         'body' => [ 'url' => $url ]
     ];
