@@ -607,7 +607,7 @@ class DataAccess {
     /**
      * Get Meta Value
      */
-    public static function get_meta_value($meta_name){
+    public static function get_meta_value($meta_name, $strict_check = null){
 
         // SQL
         $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
@@ -618,9 +618,13 @@ class DataAccess {
 
         // Returns meta_value.
         $data = $results->fetch_object();
+
         if(empty($data)){
+            if ($strict_check) {
+                return;
+            }
             return false;
-        }else{
+        } else{
             return $data->meta_value;
         }
 

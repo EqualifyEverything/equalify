@@ -98,14 +98,13 @@ if($old_status == 'Active'){
                 $integration_db_fields['meta']
                 as $integration_meta_field
             ){
-                if(
-                    !DataAccess::get_meta_value(
-                        $integration_meta_field['name']
-                ))
+                // prevent checking empty strings for integrations
+                if (!empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
                     DataAccess::add_meta(
                         $integration_meta_field['name'], 
                         $integration_meta_field['value']
                     );
+                }
             }
         }
 
