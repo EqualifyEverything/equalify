@@ -1,0 +1,284 @@
+[
+  {
+    "slug": "a11ywatch_wcag2a",
+    "title": "WCAG 2.0 Level A",
+    "description": "",
+    "category": "WCAG A11yWatch Tags"
+  },
+  {
+    "slug": "a11ywatch_wcag2aa", 
+    "title": "WCAG 2.0 Level AA",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag2aaa", 
+    "title": "WCAG 2.0 Level AAA",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag21a", 
+    "title": "WCAG 2.1 Level A",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag21aa", 
+    "title": "WCAG 2.1 Level AA",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag21aaa", 
+    "title": "WCAG 2.1 Level AAA",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag111", 
+    "title": "WCAG Success Criteria 1.1.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag121", 
+    "title": "WCAG Success Criteria 1.2.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag122", 
+    "title": "WCAG Success Criteria 1.2.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag131", 
+    "title": "WCAG Success Criteria 1.3.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag141", 
+    "title": "WCAG Success Criteria 1.4.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag143", 
+    "title": "WCAG Success Criteria 1.4.3",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag144", 
+    "title": "WCAG Success Criteria 1.4.4",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag211", 
+    "title": "WCAG Success Criteria 2.1.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag221", 
+    "title": "WCAG Success Criteria 2.2.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag222", 
+    "title": "WCAG Success Criteria 2.2.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag241", 
+    "title": "WCAG Success Criteria 2.4.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag242", 
+    "title": "WCAG Success Criteria 2.4.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag244", 
+    "title": "WCAG Success Criteria 2.4.4",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag311", 
+    "title": "WCAG Success Criteria 3.1.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag312", 
+    "title": "WCAG Success Criteria 3.1.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag332", 
+    "title": "WCAG Success Criteria 3.3.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag411", 
+    "title": "WCAG Success Criteria 4.1.1",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_wcag412", 
+    "title": "WCAG Success Criteria 4.1.2",
+    "category": "WCAG A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section508", 
+    "title": "Section 508",
+    "category": "Other A11yWatch Tags",
+    "description": "Section 508 is part of a 1998 amendment to the Rehabilitation Act of 1973. It requires all Federal electronic content to be accessible"
+  },
+  {
+    "slug": "a11ywatch_section50822a", 
+    "title": "Section 508.22.a",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822f", 
+    "title": "Section 508.22.f",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822g", 
+    "title": "Section 508.22.g",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822i", 
+    "title": "Section 508.22.i",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822j", 
+    "title": "Section 508.22.j",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822n", 
+    "title": "Section 508.22.n",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_section50822o", 
+    "title": "Section 508.22.o",
+    "category": "Other A11yWatch Tags",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_ACT", 
+    "title": "ACT",
+    "category": "Other A11yWatch Tags",
+    "description": "ACT Rules are designed to harmonize how edge cases for WCAG and other accessibility guidance are tested."
+  },
+  {
+    "slug": "a11ywatch_best-practice", 
+    "title": "Best Practices",
+    "category": "Other A11yWatch Tags",
+    "description": "Common accessibility best practices."
+  },
+  {
+    "slug": "a11ywatch_cat.aria",
+    "title": "Aria",
+    "category": "A11yWatch Categories",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_cat.color",
+    "title": "Color",
+    "category": "A11yWatch Categories",
+    "description": ""
+  },
+  {
+    "slug": "a11ywatch_cat.forms",
+    "title": "Forms",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/forms contains accessibility rules from the a11ywatch forms category."
+  },
+  {
+    "slug": "a11ywatch_cat.keyboard",
+    "title": "Keyboard",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/keyboard contains accessibility rules from the a11ywatch keyboard category."
+  },
+  {
+    "slug": "a11ywatch_cat.language",
+    "title": "Language",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/language contains accessibility rules from the a11ywatch language category."
+  },
+  {
+    "slug": "a11ywatch_cat.name-role-value",
+    "title": "Name Role Value",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/name-role-value contains accessibility rules from the a11ywatch name-role-value category."
+  },
+  {
+    "slug": "a11ywatch_cat.parsing",
+    "title": "Parsing",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/parsing contains accessibility rules from the a11ywatch parsing category."
+  },
+  {
+    "slug": "a11ywatch_cat.semantics",
+    "title": "Semantics",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/semantics contains accessibility rules from the a11ywatch semantics category."
+  },
+  {
+    "slug": "a11ywatch_cat.sensory-and-visual-cues",
+    "title": "Sensory and Visual Cues",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/sensory-and-visual-cues contains accessibility rules from the a11ywatch sensory-and-visual-cues category."
+  },
+  {
+    "slug": "a11ywatch_cat.structure",
+    "title": "Structure",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/structure contains accessibility rules from the a11ywatch structure category."
+  },
+  {
+    "slug": "a11ywatch_cat.tables",
+    "title": "Tables",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/tables contains accessibility rules from the a11ywatch tables category."
+  },
+  {
+    "slug": "a11ywatch_cat.text-alternatives",
+    "title": "Text Alternatives",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/text-alternatives contains accessibility rules from the a11ywatch text-alternatives category."
+  },
+  {
+    "slug": "a11ywatch_cat.time-and-media",
+    "title": "Time and Media",
+    "category": "A11yWatch Categories",
+    "description": "a11ywatch/time-and-media contains accessibility rules from the a11ywatch time-and-media category."
+  }
+]

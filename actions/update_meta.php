@@ -28,6 +28,9 @@ $account_records = [];
 if(isset($_POST['wave_key'])){
     DataAccess::update_meta_value('wave_key', $_POST['wave_key']);
 };
+if(isset($_POST['a11ywatch_key'])){
+    DataAccess::update_meta_value('a11ywatch_key', $_POST['a11ywatch_key']);
+};
 if(isset($_POST['axe_uri'])){
     DataAccess::update_meta_value('axe_uri', $_POST['axe_uri']);
 };

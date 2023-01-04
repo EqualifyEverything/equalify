@@ -126,3 +126,43 @@ function xml_site_adder($site_url){
     return $pages;
 
 }
+
+
+/**
+ * A11yWatch Crawler Pages Adder
+ */
+function a11ywatch_site_adder($site_url){
+    
+    // Instantiate Guzzle client - A11yWatch API uses JSON streams.
+    $options = [
+        'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked'],
+        'verify' => false,
+        'body' => [ 'url' => $url ]
+    ];
+    $client = new Client($options);
+
+    // The WP API JSON endpoint is always the same.
+    $a11ywatch_json_endpoint = '/api/crawl';
+    $url = $site_url . $a11ywatch_json_endpoint;
+
+    $a11ywatch_api_json = json_decode(
+        $client->post()->getBody(), true
+    );
+
+    if(empty($a11ywatch_api_json[0])) {
+        throw new Exception(
+            "$site_url is not valid " .
+            "functionality that Equalify requires"
+        );
+    }
+
+    // Push JSON to pages array.
+    $pages = [];
+    foreach ($a11ywatch_api_json as $page):
+        array_push($pages, $page['link']);
+    endforeach;
+
+    // We want an array with each page URL.
+    return $pages;    
+    
+}
