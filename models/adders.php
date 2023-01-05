@@ -17,6 +17,7 @@ require_once (__ROOT__.'/vendor/autoload.php');
 
 // Let's run Guzzle.
 use GuzzleHttp\Client;
+use Psr\Http\Message\MessageInterface;
 
 /**
  * Single Page Adder
@@ -127,6 +128,11 @@ function xml_site_adder($site_url){
 
 }
 
+// handle updating alert records with results.
+function processItem($item)
+{
+    print_r($item);
+}
 
 /**
  * A11yWatch Crawler Pages Adder
@@ -138,24 +144,16 @@ function a11ywatch_site_adder($site_url){
     $options = [
         'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked', 'Authorization' => $jwt],
         'verify' => false,
+        'base_uri' => $GLOBALS['a11ywatch_uri'],
     ];
+
     $client = new Client($options);
 
-    // The API JSON endpoint is always the same.
-    $a11ywatch_json_endpoint = $GLOBALS['a11ywatch_uri'] . '/api/crawl';
-
-    $a11ywatch_api_json = json_decode(
-        $client->post($a11ywatch_json_endpoint, [
-            GuzzleHttp\RequestOptions::JSON => [ 'url' => $site_url ]
-        ])->getBody(), true
-    );
-
-    if(empty($a11ywatch_api_json[0])) {
-        throw new Exception(
-            "$site_url is not valid " .
-            "functionality that Equalify requires"
-        );
-    }
+    $response = $client->request("POST", '/api/crawl', [
+        GuzzleHttp\RequestOptions::JSON => [ 'url' => $site_url ]
+    ]);
+    $parser = new \JsonCollectionParser\Parser();
+    $parser->parseAsObjects($response->getBody(), 'processItem');
 
     // // Push JSON to pages array.
     // $pages = [];
