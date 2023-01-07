@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * Bootstrap application requirements on install.
+ * Launch application sidecars.
  * 
 **********************************************************/
 
