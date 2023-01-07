@@ -34,7 +34,7 @@ Every alert is reported on a filterable dashboard.
 1. Download or clone [the latest release](https://github.com/bbertucc/equalify/releases).
 2. Change `sample-config.php` to `config.php` and update info.
 3. Run `composer install` to install Composer dependencies (Composer v. 2.4.4 required).
-4. (Optional): `composer launch-sidecar` in order for platform integrations - use a different tab for step 5.
+4. (Optional): `composer launch-sidecar` start platform integrations - use a different tab for step 5.
 5. Upload/run on a Linux server (PHP 8.1 + MySQL required).
 6. Report [issues](https://github.com/bbertucc/equalify/issues), questions, and patches.
 
