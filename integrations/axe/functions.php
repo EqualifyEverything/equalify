@@ -123,19 +123,9 @@ function axe_alerts($response_body, $page_url){
     $axe_json_decoded = json_decode($axe_json);
 
     // Sometimes Axe can't read the json.
-    if(empty($axe_json_decoded)){
+    if(!empty($axe_json_decoded)){
 
-        // And add an alert.
-        $alert = array(
-            'source'  => 'axe',
-            'url'     => $page_url,
-            'message' => 'axe-core cannot reach the page.',
-        );
-        array_push($axe_alerts, $alert);
-
-    }else{
-
-        // We're add a lit of violations.
+        // We add violations to this array.
         $axe_violations = array();
 
         // Show axe violations
