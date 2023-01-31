@@ -783,7 +783,7 @@ class DataAccess {
         $params = array();
         $result = self::query($sql, $params, false);
 
-        // Now we need to register WAVE tags, since
+        // Now we need to register integration tags, since
         // the plugin is activated by default.
         require_once 'integrations.php';
         require_once 'helpers/register_tags.php';
@@ -848,12 +848,6 @@ class DataAccess {
         $params = array();
 
         // Optionally set global meta variables.
-        if(isset($GLOBALS['wave_key'])){
-            $wave_sql = "('wave_key', ?),";
-            $params[] = $GLOBALS['wave_key'];
-        }else{
-            $wave_sql = '';
-        }
         if(isset($GLOBALS['axe_uri'])){
             $axe_param = $GLOBALS['axe_uri'];
         }else{
@@ -864,9 +858,8 @@ class DataAccess {
         // with axe, since it's on by default. 
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
-            VALUES".
-            $wave_sql.
-            "('axe_uri', ?),
+            VALUES
+            ('axe_uri', ?),
             ('active_integrations', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
