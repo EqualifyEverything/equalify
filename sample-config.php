@@ -20,9 +20,6 @@ $GLOBALS['DB_SOCKET'] = '/var/run/mysqld/mysqld.sock';
 //`which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 
-// Visit https://wave.webaim.org/api/ to get a WAVE key.
-$GLOBALS['wave_key'] = '';
-
 // Visit https://github.com/bbertucc/axe-equalify for more info.
 $GLOBALS['axe_uri'] = '';
 

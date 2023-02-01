@@ -25,9 +25,6 @@ if(!empty($_POST['last_view'])){
 // TODO: update logic, so the $_POST parameters are
 // set in the integrations file. See Github Issue #12.
 $account_records = [];
-if(isset($_POST['wave_key'])){
-    DataAccess::update_meta_value('wave_key', $_POST['wave_key']);
-};
 if(isset($_POST['a11ywatch_key'])){
     DataAccess::update_meta_value('a11ywatch_key', $_POST['a11ywatch_key']);
 };
