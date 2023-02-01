@@ -23,6 +23,10 @@ $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 // Visit https://github.com/bbertucc/axe-equalify for more info.
 $GLOBALS['axe_uri'] = '';
 
+// Visit https://a11ywatch.com/api-info to get a A11yWatch key.
+$GLOBALS['a11ywatch_key'] = '';
+$GLOBALS['a11ywatch_uri'] = 'https://api.a11ywatch.com';
+
 // Additional options.
 $GLOBALS['page_limit'] = '2222';
 $GLOBALS['scan_concurrency'] = '6';

@@ -87,7 +87,11 @@ function process_sites(){
                     $site->url
                 );
             }
-
+            if($site->type == 'crawler'){
+                $site_pages = a11ywatch_site_adder(
+                    $site->url
+                );
+            }
             // Finally, we'll save the output if there
             // are pages or destroy it if there are not.
             if(!empty($site_pages)){

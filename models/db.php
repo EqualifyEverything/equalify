@@ -848,6 +848,12 @@ class DataAccess {
         $params = array();
 
         // Optionally set global meta variables.
+        if(isset($GLOBALS['a11ywatch_key'])){
+            $a11ywatch_sql = "('a11ywatch_key', ?),";
+            $params[] = $GLOBALS['a11ywatch_key'];
+        }else{
+            $a11ywatch_sql = '';
+        }
         if(isset($GLOBALS['axe_uri'])){
             $axe_param = $GLOBALS['axe_uri'];
         }else{
@@ -858,6 +864,9 @@ class DataAccess {
         // with axe, since it's on by default. 
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
+            VALUES".
+            $a11ywatch_sql.
+            "('axe_uri', ?),
             VALUES
             ('axe_uri', ?),
             ('active_integrations', ?),

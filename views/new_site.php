@@ -15,6 +15,7 @@
                     <option value="wordpress">WordPress Site</option>
                     <option value="xml">Site via XML Sitemap</option>
                     <option value="single_page">Single Page</option>
+                    <option value="a11ywatch">Crawler</option>
                 </select>
             </div>
         </div>

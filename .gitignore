@@ -10,3 +10,6 @@ _private/
 test.json
 test.php
 test.html
+node_modules
+package.json
+package-lock.json

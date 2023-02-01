@@ -68,7 +68,9 @@ if($type == 'single_page' ){
 
 // Since we're passing type through a URL, we have a fallback
 // in case someone passes an unsupported 'type'. 
-}else{
+} elseif($type == 'a11ywatch'){
+    $site = a11ywatch_site_adder($url);
+} else{
     throw new Exception('"'.$type.'" sites are unsupported');
 }
 
