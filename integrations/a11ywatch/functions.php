@@ -94,14 +94,18 @@ function a11ywatch_tags(){
   */
 function a11ywatch_urls($page_url) {
 
-    // Require a11ywatch_key
-    $a11ywatch_key = DataAccess::get_meta_value('a11ywatch_key');
-    if(empty($a11ywatch_key)){
-        throw new Exception('a11ywatch JWT is not entered. Please add the JWT in the integration settings.');
-    } else {
-        // todo: return object format to use with authorization header and page url
-        return 'https://api.a11ywatch.com/api/crawl?key='.$a11ywatch_key.'&url='.$page_url;
-    }
+    // Lets specify everything Guzzle needs to create request.
+    return array(
+        'type' => 'POST',
+        'url'  => 'https://api.a11ywatch.com/api/scan',
+        'headers' => array(
+            'Content-Type' => 'application/json'
+        ),
+        'data' => array(
+            'url' => $page_url
+        )
+    );
+    
 }
 
 /**
