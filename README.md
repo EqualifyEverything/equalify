@@ -1,6 +1,6 @@
 # Equalify the web!
 
-**Manage accessibility errors, super efficiently.** Equalify automatically resolves issues, maintains historical compliance data, and delivers an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)). Maintain accessibility faster and more accurately than ever before!
+**Maintain accessibility faster and more accurately than ever before!** Equalify automatically resolves issues, maintains historical compliance data, and delivers an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)).
 
 Follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
 
