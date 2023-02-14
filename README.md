@@ -1,6 +1,8 @@
 ![Equalify Logo](logo.svg)
 ---
-**Better web accessibility management!** Equalify resolves issues and organizes compliance data into an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)). We aim to be the most efficient tool for managing accessibility issues.
+## Better web accessibility management! 
+
+Equalify resolves issues and organizes compliance data into an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)). We aim to be the most efficient tool for managing accessibility issues.
 
 Follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
 
