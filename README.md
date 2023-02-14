@@ -1,5 +1,5 @@
-![Equalify Logo](logo.svg)
----
+<img src="logo.svg" alt="Equalify Logo" width="300">
+
 ## Better web accessibility management! 
 
 Equalify resolves issues and organizes compliance data into an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)). We aim to be the most efficient tool for managing accessibility issues.
