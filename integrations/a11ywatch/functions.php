@@ -109,7 +109,7 @@ function a11ywatch_urls($page_url) {
 }
 
 /**
- * Axe Alerts
+ * A11yWatch Alerts
  * @param string response_body
  * @param string page_url
  */
@@ -189,6 +189,7 @@ function a11ywatch_alerts($response_body, $page_url){
         }
 
     }
+    
     // Return alerts.
     return $a11ywatch_alerts;
 
