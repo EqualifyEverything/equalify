@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: WAVE
- * Description: Links to WCAG 2.1 page reports.
+ * Description: Automated testing, focused on issues that impact end users.
  */
 
 /**

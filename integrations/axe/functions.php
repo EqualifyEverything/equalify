@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: axe-core
- * Description: An automated accessibility scan.
+ * Description: The world's most popular accessibility testing library.
  */
 
 /**

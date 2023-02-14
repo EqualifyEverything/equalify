@@ -848,16 +848,14 @@ class DataAccess {
         $params = array();
 
         // Optionally set global meta variables.
+        $added_sql = '';
         if(isset($GLOBALS['a11ywatch_key'])){
-            $a11ywatch_sql = "('a11ywatch_key', ?),";
+            $added_sql.= "('a11ywatch_key', ?),";
             $params[] = $GLOBALS['a11ywatch_key'];
-        }else{
-            $a11ywatch_sql = '';
         }
         if(isset($GLOBALS['axe_uri'])){
-            $axe_param = $GLOBALS['axe_uri'];
-        }else{
-            $axe_param = '';
+            $added_sql.= "('axe_uri', ?),";
+            $params[] = $GLOBALS['axe_uri'];
         }
 
         // Now, create the content in the meta table
@@ -865,11 +863,8 @@ class DataAccess {
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES".
-            $a11ywatch_sql.
-            "('axe_uri', ?),
-            VALUES
-            ('axe_uri', ?),
-            ('active_integrations', ?),
+            $added_sql.
+            "('active_integrations', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
@@ -877,9 +872,6 @@ class DataAccess {
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
-
-        // Default axe_uri.
-        $params[] = $axe_param;
         
         // Default active_integrations.
         $params[] = serialize(array('axe'));
