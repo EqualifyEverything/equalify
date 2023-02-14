@@ -1,6 +1,6 @@
 # Equalify the web!
 
-**Maintain accessibility faster and more accurately than ever before!** Equalify automatically resolves issues, maintains historical compliance data, and delivers an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)).
+**Resolve accessibility issues faster!** Equalify resolves issues and organizes compliance data into an easy-to-use interface that is fully accessible (see our [accessibility statement](/ACESSIBILITY.md)).
 
 Follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
 
@@ -18,7 +18,7 @@ Follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) in
 
 ## Features
 
-Create reports, triage issues, and log changes with Equalify's easy-to-use interface. Equalify also automatically resolves issues and imports data from accessibility scanning services (such as WAVE and Deque's axe-core).
+Create reports, triage issues, and log changes with Equalify. The app also automatically resolves issues and imports data from accessibility scanning services, like WAVE and Deque's axe-core.
 
 <img width="1316" alt="Equalify's reporting dashboard lists different alerts including Missing Alt Text, Missing Form Label, and Contrast alerts" src="https://user-images.githubusercontent.com/46652/198109248-36343405-9e89-48b7-ac9f-ee0c0d830859.png">
 
