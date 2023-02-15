@@ -157,6 +157,20 @@ foreach($report_meta as $k => $val) {
 
     }
 }
+
+// PoC of adding basic JSON option
+if(!empty($_GET['format'])){
+    // JSON version of View
+    $filters = $report_meta;
+    $alerts = DataAccess::get_db_rows( 'alerts',
+        $filters, get_current_page_number()
+    );
+    if( count($alerts['content']) > 0 ): 
+        foreach($alerts['content'] as $alert):   
+            echo json_encode( $alert ); 
+        endforeach;
+    endif;
+} else {
 ?>
 
 <section>
@@ -302,3 +316,5 @@ foreach($report_meta as $k => $val) {
     ?>
 
 </section>
+
+<?php } ?>

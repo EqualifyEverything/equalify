@@ -39,6 +39,16 @@ require_once 'install.php';
 // page load.
 require_once 'actions/run_scheduled_scan.php';
 
+// PoC of adding basic JSON option
+if(!empty($_GET['format'])){
+    header('Content-type: application/json');
+    // JSON version of Show View
+    if(!empty($_GET['view'])){
+        require_once 'views/'.$_GET['view'].'.php';
+    }else{
+        require_once get_default_view();
+    }
+} else {
 ?>
 
 <!DOCTYPE html>
@@ -242,3 +252,5 @@ require_once 'actions/run_scheduled_scan.php';
 
 </body>
 </html>
+
+<?php } ?>
