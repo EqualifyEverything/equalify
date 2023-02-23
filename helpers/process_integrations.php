@@ -84,20 +84,16 @@ function process_integrations(array $sites_output){
             __ROOT__.'/integrations/'.$integration.'/functions.php'
         );
 
-        // (NOTE: A more robust integration interface might use a request generator
-        // function instead of a simple URL mapping; current integrations
-        // don't need this and just GET with Guzzle's default headers.)
-
         // Every integration needs to define two functions:
-        // One to map site URLs to integration request URLs
-        $integration_urls = $integration.'_urls';
+        // One to map site URLs to integration requests
+        $integration_request_builder = $integration.'_request';
         // Another to map integration responses to an array of Equalify alerts
         $integration_alerts = $integration.'_alerts';
         
         // Skip the integration if we fail to find either.
-        if (!function_exists($integration_urls)) {
+        if (!function_exists($integration_request_builder)) {
             update_scan_log(
-                "\n>>> ERROR: URL mapping function for Integration " . 
+                "\n>>> ERROR: Request builder function for Integration " . 
                 "'$integration' not found.\n"
             );
             continue;
@@ -130,7 +126,7 @@ function process_integrations(array $sites_output){
             $pool = build_integration_connection_pool(
                 $site,
                 $scannable_pages,
-                $integration_urls,
+                $integration_request_builder,
                 $integration_alerts, 
                 $integrations_output
             );
@@ -181,7 +177,7 @@ function process_integrations(array $sites_output){
 function build_integration_connection_pool(
     $site,
     array $page_urls, 
-    callable $integration_urls,
+    callable $integration_request_builder,
     callable $integration_alerts,
     array &$output
 ) {
@@ -199,17 +195,20 @@ function build_integration_connection_pool(
     // servers a bit of time to catch their breath).
     
     // Request generator
-    $requests = function ($page_urls) use ($integration_urls) {
+    $requests = function ($page_urls) use ($integration_request_builder) {
 
         // NOTE: for testing, keep a low maximum.
         $limit = $GLOBALS['page_limit'];
         $current = 0;
 
         foreach ($page_urls as $page_url) {
-
-            // Map site URL to integration-specific URL
-            $integration_url = $integration_urls($page_url);
-            $request = new Request('GET', $integration_url);
+            $request_params = $integration_request_builder($page_url);
+            $request = new Request(
+                $request_params['method'] ?? 'GET',
+                $request_params['uri'] ?? '', // this default should fail, with the error captured by $on_rejected
+                $request_params['headers'] ?? [],
+                $request_params['body'] ?? null
+            );
 
             // Yielding a key->value pair lets us specify the index for callbacks.
             // Using the original site's URL as the index here for logging purposes.

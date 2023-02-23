@@ -98,19 +98,24 @@ function wave_tags(){
 }
 
  /**
-  * WAVE URLs
-  * Maps site URLs to Little Forest URLs for processing.
+  * WAVE request builder.
+  * Maps site URLs to WAVE URLs for processing.
   */
-function wave_urls($page_url) {
-
-    // Require wave_key
+function wave_request($page_url) {
+    $request_url = '';
     $wave_key = DataAccess::get_meta_value('wave_key');
-    if(empty($wave_key)){
+
+    // wave_key is required
+    if (empty($wave_key)) {
         throw new Exception('WAVE key is not entered. Please add the WAVE key in the integration settings.');
-    }else{
-        return 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
+    } else {
+        $request_url = 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
     }
 
+    return [
+        'method' => 'GET',
+        'uri'  => $request_url,
+    ];
 }
 
 /**

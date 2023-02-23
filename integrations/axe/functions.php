@@ -93,17 +93,20 @@ function axe_tags(){
 }
 
  /**
-  * Axe URLs
+  * Axe request builder.
   * Maps site URLs to Axe URLs for processing.
   */
-function axe_urls($page_url) {
+function axe_request($page_url) {
 
     // Require axe_uri
     $axe_uri = DataAccess::get_meta_value('axe_uri');
     if(empty($axe_uri)){
         throw new Exception('axe-core URI is not entered. Please add the URI in the integration settings.');
     }else{
-        return $axe_uri.$page_url;
+        return [
+            'method' => 'GET',
+            'uri'  => $axe_uri . $page_url,
+        ];
     }
 
 }

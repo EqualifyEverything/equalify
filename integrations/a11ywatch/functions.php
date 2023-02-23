@@ -90,23 +90,24 @@ function a11ywatch_tags()
 }
 
 /**
- * A11yWatch Crawl process start
- * Maps site URLs to Axe URLs for processing.
+ * A11yWatch scan process request.
+ * Maps site URLs to A11yWatch API requests for processing.
  */
-function a11ywatch_urls($page_url)
+function a11ywatch_request($page_url)
 {
-
     // Lets specify everything Guzzle needs to create request.
-    return array(
-        'type' => 'POST',
-        'url'  => 'https://api.a11ywatch.com/api/scan',
-        'headers' => array(
-            'Content-Type' => 'application/json'
-        ),
-        'data' => array(
+    $auth_token = DataAccess::get_meta_value('a11ywatch_key');
+    return [
+        'method' => 'POST',
+        'uri'  => 'https://api.a11ywatch.com/api/scan',
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => $auth_token
+        ],
+        'body' => [
             'url' => $page_url
-        )
-    );
+        ]
+    ];
 }
 
 /**
