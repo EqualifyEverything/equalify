@@ -12,6 +12,7 @@
             <div class="col-3">
                 <label for="type" class="form-label">Scan Type</label>
                 <select id="type" name="type" class="form-select">
+                    <!-- TODO: Make this dynamic, depending on the scan functions in the active integrations. -->
                     <option value="a11ywatch_scan">A11yWatch Scan</option>
                     <option value="a11ywatch_sitemap_scan">A11yWatch Sitemap Scan</option>
                     <option value="a11ywatch_crawl">A11yWatch Crawl</option>
