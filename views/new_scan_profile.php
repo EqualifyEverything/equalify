@@ -2,7 +2,7 @@
     <div class="mb-3 pb-4 border-bottom">
         <h1>New Site</h1>
     </div>
-    <form action="actions/add_site.php" method="post" id="site_form">
+    <form action="actions/add_scan_profile.php" method="post" id="site_form">
         <div class="row">
             <div class="col">
                 <label for="url" class="form-label">Site URL</label>
@@ -10,12 +10,11 @@
                 <div id="url_helper" class="form-text"></div>
             </div>
             <div class="col-3">
-                <label for="type" class="form-label">Site Type</label>
+                <label for="type" class="form-label">Scan Type</label>
                 <select id="type" name="type" class="form-select">
-                    <option value="wordpress">WordPress Site</option>
-                    <option value="xml">Site via XML Sitemap</option>
-                    <option value="single_page">Single Page</option>
-                    <option value="a11ywatch">Crawler</option>
+                    <option value="a11ywatch_scan">A11yWatch Scan</option>
+                    <option value="a11ywatch_sitemap_scan">A11yWatch Sitemap Scan</option>
+                    <option value="a11ywatch_crawl">A11yWatch Crawl</option>
                 </select>
             </div>
         </div>

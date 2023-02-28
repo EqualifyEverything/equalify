@@ -72,7 +72,7 @@ if($old_status == 'archived'){
 
 
 // Redirect
-header('Location: ../index.php?view=sites');
+header('Location: ../index.php?view=scan_profiles');
 
 /**
  * Update Alerts
