@@ -1,11 +1,11 @@
 <section>
     <div class="mb-3 pb-4 border-bottom">
-        <h1>New Site</h1>
+        <h1>New Scan Profile</h1>
     </div>
     <form action="actions/add_scan_profile.php" method="post" id="site_form">
         <div class="row">
             <div class="col">
-                <label for="url" class="form-label">Site URL</label>
+                <label for="url" class="form-label">Scannable URL</label>
                 <input id="url"  name="url" type="text" class="form-control" placeholder="https://equalify.app" aria-describedby="url_helper" required>
                 <div id="url_helper" class="form-text"></div>
             </div>
@@ -21,7 +21,7 @@
         </div>
         <div class="my-3">
             <button type="submit" id="submit" class="btn btn-primary">
-                Add Site
+                Save Scan Profile
             </button>
         </div>
     </form> 
