@@ -27,26 +27,6 @@ if( $type == false)
         'Type is not specified for the URL "'.$url.'"'
     );
 
-// Static pages are treated as sites in themselves.
-if($type == 'single_page' ){
-    $site = single_page_adder($url);
-
-// WordPress sites are added via their API.
-}elseif($type == 'wordpress'){
-    $site = wordpress_site_adder($url);
-
-// .XML sites use the latest version of XML standards.
-}elseif($type == 'xml'){
-    $site = xml_site_adder($url);
-
-// Since we're passing type through a URL, we have a fallback
-// in case someone passes an unsupported 'type'. 
-} elseif($type == 'a11ywatch'){
-    $site = a11ywatch_site_adder($url);
-} else{
-    throw new Exception('"'.$type.'" sites are unsupported');
-}
-
 // If no errors occur, we can add these sites into the URL
 // with several default items.
 $fields = array(
