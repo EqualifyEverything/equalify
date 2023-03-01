@@ -27,6 +27,20 @@ if( $type == false)
         'Type is not specified for the URL "'.$url.'"'
     );
 
+// Static pages are treated as sites in themselves.
+if($type == 'single_page' ){
+    $site = single_page_adder($url);
+
+// .XML sites use the latest version of XML standards.
+}elseif($type == 'xml'){
+    $site = xml_site_adder($url);
+
+// Since we're passing type through a URL, we have a fallback
+// in case someone passes an unsupported 'type'. 
+} else{
+    throw new Exception('"'.$type.'" sites are unsupported');
+}
+
 // If no errors occur, we can add these sites into the URL
 // with several default items.
 $fields = array(
