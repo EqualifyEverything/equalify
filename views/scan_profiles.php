@@ -54,14 +54,11 @@ if( count($sites['content']) > 0 ):
 
                     <?php
                     // The Type Badge
-                    // TODO: Make this dynamic, depending on the scan functions in the active integrations.
                     $type = $site->type;
-                    if($type == 'a11ywatch_scan'){
-                        $type = 'A11yWatch Scan';
-                    }elseif($type == 'a11ywatch_sitemap_scan'){
-                        $type = 'A11yWatch Sitemap Scan';
-                    }elseif($type == 'a11ywatch_crawl'){
-                        $type = 'A11yWatch Crawl';
+                    if($type == 'xml'){
+                        $type = 'XML';
+                    }elseif($type == 'single_page'){
+                        $type = 'Single Page';
                     }
                     ?>
 
