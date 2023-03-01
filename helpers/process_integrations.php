@@ -84,28 +84,6 @@ function process_integrations(array $sites_output){
             __ROOT__.'/integrations/'.$integration.'/functions.php'
         );
 
-        // Every integration needs to define two functions:
-        // One to map site URLs to integration requests
-        $integration_request_builder = $integration.'_request';
-        // Another to map integration responses to an array of Equalify alerts
-        $integration_alerts = $integration.'_alerts';
-        
-        // Skip the integration if we fail to find either.
-        if (!function_exists($integration_request_builder)) {
-            update_scan_log(
-                "\n>>> ERROR: Request builder function for Integration " . 
-                "'$integration' not found.\n"
-            );
-            continue;
-        }
-        if (!function_exists($integration_alerts)) {
-            update_scan_log(
-                "\n>>> ERROR: Alerts function for Integration " . 
-                "'$integration' not found.\n"
-            );
-            continue;
-        }
-
         // Let's log our progress and time for CLI.
         update_scan_log(
             "\n>>> Running \"$integration\" against pages:\n"
@@ -114,12 +92,35 @@ function process_integrations(array $sites_output){
 
         // We'll run each integration against each site.
         foreach ($integrations_output['processed_sites'] as $site) {
+            // Every integration needs to define two functions per supported scan type:
+            // One to map site URLs to integration requests
+            // Another to map integration responses to an array of Equalify alerts
+            $scan_type = $site->type;
+            $integration_request_builder = "${integration}_${scan_type}_request";
+            $integration_alerts = "${integration}_${scan_type}_alerts";
+            
+            // Skip the integration if we fail to find either.
+            if (!function_exists($integration_request_builder)) {
+                update_scan_log(
+                    "\n>>> WARNING: Request builder function for '$integration' integration not found for '$scan_type' scan type.\n"
+                );
+                continue;
+            }
+            if (!function_exists($integration_alerts)) {
+                update_scan_log(
+                    "\n>>> WARNING: Alerts function for '$integration' integration not found for '$scan_type' scan type.\n"
+                );
+                continue;
+            }
 
             // set up in process_site.php
             $scannable_pages = $site->urls;
 
             // No scannable pages mean no need to run the integration.
             if (empty($scannable_pages)) {
+                update_scan_log(
+                    "\n>>> WARNING: No pages to scan for profile '$site->url'!\n"
+                );
                 continue;
             }
             
@@ -207,7 +208,7 @@ function build_integration_connection_pool(
                 $request_params['method'] ?? 'GET',
                 $request_params['uri'] ?? '', // this default should fail, with the error captured by $on_rejected
                 $request_params['headers'] ?? [],
-                $request_params['body'] ?? null
+                $request_params['body'] ?? null,
             );
 
             // Yielding a key->value pair lets us specify the index for callbacks.
@@ -255,7 +256,8 @@ function build_integration_connection_pool(
 
     // Sad path: log the transfer error
     $on_rejected = function (RequestException $reason, $page_url) {
-        $error_message = "Error for $page_url: " . $reason->getHandlerContext();
+        // $error_message = "Error for $page_url: " . $reason->getHandlerContext();
+        $error_message = "Error for $page_url: " . $reason->getMessage();
         update_scan_log("\n>>> $error_message\n");
     };
 

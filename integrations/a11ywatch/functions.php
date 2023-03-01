@@ -93,13 +93,32 @@ function a11ywatch_tags()
  * A11yWatch scan process request.
  * Maps site URLs to A11yWatch API requests for processing.
  */
-function a11ywatch_request($page_url)
+function a11ywatch_single_page_request($page_url)
 {
     // Lets specify everything Guzzle needs to create request.
     $auth_token = DataAccess::get_meta_value('a11ywatch_key');
     return [
         'method' => 'POST',
         'uri'  => 'https://api.a11ywatch.com/api/scan',
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => $auth_token
+        ],
+        'body' => json_encode(['url' => $page_url])
+    ];
+}
+
+/**
+ * A11yWatch crawl process request.
+ * Maps site URLs to A11yWatch API requests for processing.
+ */
+function a11ywatch_crawl_request($page_url)
+{
+    // Lets specify everything Guzzle needs to create request.
+    $auth_token = DataAccess::get_meta_value('a11ywatch_key');
+    return [
+        'method' => 'POST',
+        'uri'  => 'https://api.a11ywatch.com/api/crawl',
         'headers' => [
             'Content-Type' => 'application/json',
             'Authorization' => $auth_token
@@ -111,83 +130,99 @@ function a11ywatch_request($page_url)
 }
 
 /**
+ * A11yWatch sitemap process request.
+ * Maps site URLs to A11yWatch API requests for processing.
+ */
+function a11ywatch_sitemap_request($page_url)
+{
+    // Lets specify everything Guzzle needs to create request.
+    $auth_token = DataAccess::get_meta_value('a11ywatch_key');
+    return [
+        'method' => 'POST',
+        'uri'  => 'https://api.a11ywatch.com/api/crawl',
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => $auth_token,
+        ],
+        'body' => [
+            'url' => $page_url,
+            'sitemap' => 1
+        ]
+    ];
+}
+
+
+/**
  * A11yWatch Alerts
  * @param string response_body
  * @param string page_url
  */
-function a11ywatch_alerts($response_body, $page_url)
+function a11ywatch_single_page_alerts($response_body, $page_url)
 {
 
     // Our goal is to return alerts.
     $a11ywatch_alerts = [];
-    $a11ywatch_json = $response_body;
-
+    
     // Decode JSON.
-    $a11ywatch_json_decoded = json_decode($a11ywatch_json);
+    $a11ywatch_json = $response_body;
+    $a11ywatch_json_decoded = json_decode($a11ywatch_json, true);
 
-    // Sometimes Axe can't read the json.
+    // Empty/unparsable response.
     if (empty($a11ywatch_json_decoded)) {
 
-        // And add an alert.
-        $alert = array(
+        // Add a fallback alert.
+        $alert = [
             'source'  => 'a11ywatch',
             'url'     => $page_url,
             'message' => 'a11ywatch cannot reach the page.',
-        );
-        array_push($a11ywatch_alerts, $alert);
-    } else {
+        ];
+        $a11ywatch_alerts[] = $alert;
 
-        // We're add a lit of violations.
-        $a11ywatch_violations = array();
+        return $a11ywatch_alerts;
+    }
 
-        // Show a11ywatch violations
-        foreach ($a11ywatch_json_decoded[0]->violations as $violation) {
 
-            // Only show violations.
-            $a11ywatch_violations[] = $violation;
-        }
+    // Check that issues are where we expect in the response
+    $response_data = $a11ywatch_json_decoded['data'] ?? [];
+    $issues_found_in_response = array_key_exists('issues', $response_data);
+    if (!$issues_found_in_response) {
 
-        // Add alerts.
-        if (!empty($a11ywatch_violations)) {
+        // Add a fallback alert - arguably this is a parsing error
+        $alert = [
+            'source'  => 'a11ywatch',
+            'url'     => $page_url,
+            'message' => 'Could not parse a11ywatch response.',
+        ];
+        $a11ywatch_alerts[] = $alert;
 
-            // Setup alert variables.
-            foreach ($a11ywatch_violations as $violation) {
+        return $a11ywatch_alerts;
+    }
 
-                // Default variables.
-                $alert = array();
-                $alert['source'] = 'a11ywatch';
-                $alert['url'] = $page_url;
+    // Add all issues as alerts
+    $a11ywatch_issues = $response_data['issues'];
 
-                // Setup tags.
-                $alert['tags'] = '';
-                if (!empty($violation->tags)) {
+    foreach ($a11ywatch_issues as $issue) {
 
-                    // We need to get rid of periods so Equalify
-                    // wont convert them to underscores and they
-                    // need to be comma separated.
-                    $tags = $violation->tags;
-                    $copy = $tags;
-                    foreach ($tags as $tag) {
-                        $alert['tags'] .= str_replace('.', '', 'a11ywatch_' . $tag);
-                        if (next($copy))
-                            $alert['tags'] .= ',';
-                    }
-                }
+        // Build alert from issue
+        $alert = [
+            'source' => 'a11ywatch',
+            'url' => $page_url,
+            'tags' => $issue['type'], // type is error, warning, or notice
+            'message' => $issue['message'],
+        ];
 
-                // Setup message.
-                $alert['message'] = '"' . $violation->id . '" violation: ' . $violation->help;
+        // Add code, context, and recurrence to more_info
+        $code = $issue['code'];
+        $context = $issue['context'];
+        $recurrence = $issue['recurrence'];
+        $alert['more_info'] = "Code: '$code'. Context: '$context'. Recurrence: '$recurrence'.";
 
-                // Setup more info.
-                $alert['more_info'] = '';
-                if ($violation->nodes)
-                    $alert['more_info'] = $violation->nodes;
-
-                // Push alert.
-                $a11ywatch_alerts[] = $alert;
-            }
-        }
+        // Push to alerts array
+        $a11ywatch_alerts[] = $alert;
     }
 
     // Return alerts.
     return $a11ywatch_alerts;
 }
+
+// TODO: Alert formatters for crawl and sitemap scan types
