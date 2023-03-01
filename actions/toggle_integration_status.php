@@ -98,7 +98,7 @@ if($old_status == 'Active'){
                 as $integration_meta_field
             ){
                 // prevent checking empty strings for integrations
-                if (!empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
+                if (empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
                     DataAccess::add_meta(
                         $integration_meta_field['name'], 
                         $integration_meta_field['value']
