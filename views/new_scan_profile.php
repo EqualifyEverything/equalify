@@ -12,9 +12,9 @@
             <div class="col-3">
                 <label for="type" class="form-label">Scan Type</label>
                 <select id="type" name="type" class="form-select">
-                    <option value="sitemap">XML Sitemap Scan</option>
-                    <option value="single_page">Single Page Scan</option>
-                    <option value="crawl">Crawl & Scan</option>
+                    <option value="sitemap">XML Sitemap</option>
+                    <option value="single_page">Single Page</option>
+                    <option value="crawl">Crawl</option>
                 </select>
             </div>
         </div>
