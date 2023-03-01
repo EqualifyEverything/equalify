@@ -140,14 +140,14 @@ if(!empty($_GET['meta_name'])){
                     <option value="">Any</option>
 
                     <?php 
-                    // Get the sites.
-                    $sites = DataAccess::get_db_rows( 'sites',
+                    // Get the scan_profiles.
+                    $scan_profiles = DataAccess::get_db_rows( 'scan_profiles',
                         array(), 1, 10000000
                     )['content'];
 
                     // Build options.
-                    if(!empty($sites)){
-                        foreach ($sites as $site_option){
+                    if(!empty($scan_profiles)){
+                        foreach ($scan_profiles as $site_option){
 
                             // A site may already be saved. 
                             if($site_option->id == $site_id){

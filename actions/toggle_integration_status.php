@@ -163,27 +163,27 @@ header(
  */
 function update_alerts($new_status, $integration_uri) {
 
-    // Get active sites.
-    $sites_filter = array(
+    // Get active scan profiles.
+    $scan_profiles_filter = array(
         array(
             'name' => 'status',
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows(
-        'sites', $sites_filter, 1, 10000
+    $active_scan_profiles = DataAccess::get_db_rows(
+        'scan_profiles', $scan_profiles_filter, 1, 10000
     );
 
-    // Create active sites to alerts filter.
-    $site_ids = NULL;
-    if(!empty($active_sites['content'])){
-        $site_ids = array();
-        foreach ($active_sites['content'] as $site){
+    // Create active scan profiles to alerts filter.
+    $scan_profile_ids = NULL;
+    if(!empty($active_scan_profiles['content'])){
+        $scan_profile_ids = array();
+        foreach ($active_scan_profiles['content'] as $scan_profile){
             array_push(
-                $site_ids,
+                $scan_profile_ids,
                 array(
                     'name' => 'site_id',
-                    'value' => $site->id,
+                    'value' => $scan_profile->id,
                     'operator' => '=',
                     'condition' => 'OR'
                 )
@@ -192,7 +192,7 @@ function update_alerts($new_status, $integration_uri) {
     }
 
     // Create filter to select alerts with the current 
-    // integration and active sites.
+    // integration and active scan profiles.
     $alerts_filters = array(
         array(
             'name' => 'source',
@@ -200,7 +200,7 @@ function update_alerts($new_status, $integration_uri) {
         ),
         array(
             'name' => 'site_id',
-            'value' => $site_ids
+            'value' => $scan_profile_ids
         )
     );
 

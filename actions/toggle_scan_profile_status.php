@@ -39,7 +39,7 @@ if($old_status == 'active'){
         )
     );
     DataAccess::update_db_rows(
-        'sites', $fields_to_update, $filtered_to_id
+        'scan_profiles', $fields_to_update, $filtered_to_id
     );
 
     // Now we can archive alerts.
@@ -62,7 +62,7 @@ if($old_status == 'archived'){
         )
     );
     DataAccess::update_db_rows(
-        'sites', $fields_to_update, $filtered_to_id
+        'scan_profiles', $fields_to_update, $filtered_to_id
     );
 
     // Now we can unarchive alerts.
@@ -86,7 +86,7 @@ function update_alerts($new_status, $site_id) {
         DataAccess::get_meta_value('active_integrations')
     );
 
-    // Create active sites to alerts filter.
+    // Create active scan profiles to alerts filter.
     $integration_uris = NULL;
     if(!empty($active_integrations)){
         $integration_uris = array();
@@ -104,7 +104,7 @@ function update_alerts($new_status, $site_id) {
     }
 
     // Create filter to select alerts with the current 
-    // integration and active sites.
+    // integration and active scan profiles.
     $alerts_filters = array(
         array(
             'name' => 'site_id',
