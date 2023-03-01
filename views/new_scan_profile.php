@@ -2,7 +2,7 @@
     <div class="mb-3 pb-4 border-bottom">
         <h1>New Scan Profile</h1>
     </div>
-    <form action="actions/add_site.php" method="post" id="site_form">
+    <form action="actions/add_scan_profile.php" method="post" id="site_form">
         <div class="row">
             <div class="col">
                 <label for="url" class="form-label">Site URL</label>
