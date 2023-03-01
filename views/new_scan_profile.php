@@ -12,9 +12,9 @@
             <div class="col-3">
                 <label for="type" class="form-label">Scan Type</label>
                 <select id="type" name="type" class="form-select">
-                    <option value="sitemap">Site via XML Sitemap</option>
-                    <option value="single_page">Single Page</option>
-                    <option value="crawler">Crawler</option>
+                    <option value="sitemap">XML Sitemap Scan</option>
+                    <option value="single_page">Single Page Scan</option>
+                    <option value="crawl">Crawl & Scan</option>
                 </select>
             </div>
         </div>
@@ -39,15 +39,13 @@
         document.getElementById('url').placeholder = helperPlaceholder;
     }
     xmlHelperText = 'URL must be a standard <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
-    if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Site via XML Sitemap' ){
+    if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'XML Sitemap Scan' ){
         updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
     }else{
         updateHelper('', 'https://equalify.app/')
     }
     document.getElementById('type').addEventListener('change', function () {
-        if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'WordPress Site' ){
-            updateHelper(wordpressHelperText, 'https://equalify.app/')
-        } else if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'Site via XML Sitemap' ) {
+        if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'XML Sitemap Scan' ) {
             updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
         } else {
             updateHelper('', 'https://equalify.app/')

@@ -55,8 +55,10 @@ if( count($profiles['content']) > 0 ):
                     <?php
                     // The Type Badge
                     $type = $site->type;
-                    if($type == 'xml'){
-                        $type = 'XML';
+                    if($type == 'sitemap'){
+                        $type = 'Sitemap';
+                    }elseif($type == 'crawl'){
+                        $type = 'Crawl';
                     }elseif($type == 'single_page'){
                         $type = 'Single Page';
                     }

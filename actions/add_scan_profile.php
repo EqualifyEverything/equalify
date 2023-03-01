@@ -32,7 +32,7 @@ if($type == 'single_page' ){
     $site = single_page_adder($url);
 
 // We use the latest version of XML standards.
-}elseif($type == 'xml'){
+}elseif($type == 'sitemap'){
     $site = xml_site_adder($url);
 
 // Crawl fallback
