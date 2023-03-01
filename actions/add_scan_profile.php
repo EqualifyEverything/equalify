@@ -31,17 +31,20 @@ if( $type == false)
 if($type == 'single_page' ){
     $site = single_page_adder($url);
 
-// .XML sites use the latest version of XML standards.
+// We use the latest version of XML standards.
 }elseif($type == 'xml'){
     $site = xml_site_adder($url);
+
+// Crawl fallback
+}elseif($type == 'crawl'){
 
 // Since we're passing type through a URL, we have a fallback
 // in case someone passes an unsupported 'type'. 
 } else{
-    throw new Exception('"'.$type.'" sites are unsupported');
+    throw new Exception('"'.$type.'" scans are unsupported');
 }
 
-// If no errors occur, we can add these sites into the URL
+// If no errors occur, we can add these profiles into the URL
 // with several default items.
 $fields = array(
     array(
@@ -58,8 +61,8 @@ $fields = array(
     )
 );
 DataAccess::add_db_entry(
-    'sites', $fields
+    'scan_profiles', $fields
 );
 
 // Back home we go.
-header('Location: ../index.php?view=sites&status=success');
+header('Location: ../index.php?view=scan_profiles&status=success');

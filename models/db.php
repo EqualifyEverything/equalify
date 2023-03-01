@@ -900,13 +900,13 @@ class DataAccess {
     }
     
     /**
-     * Create Sites Table
+     * Create Scan Profiles Table
      */
-    public static function create_sites_table(){
+    public static function create_scan_profiles_table(){
 
         // SQL
         $sql = 
-            "CREATE TABLE `sites` (
+            "CREATE TABLE `scan_profiles` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',

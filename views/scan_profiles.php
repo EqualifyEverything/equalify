@@ -21,12 +21,12 @@
     <div class="row row-cols-3 g-4 pb-4">
         
 <?php
-// Show Sites
-$sites = DataAccess::get_db_rows(
-    'sites', [], get_current_page_number()
+// Show Scan Profiles
+$profiles = DataAccess::get_db_rows(
+    'scan_profiles', [], get_current_page_number()
 );
-if( count($sites['content']) > 0 ):
-    foreach($sites['content'] as $site):  
+if( count($profiles['content']) > 0 ):
+    foreach($profiles['content'] as $site):  
 ?>
 
         <div class="col">
@@ -98,10 +98,10 @@ if( count($sites['content']) > 0 ):
         endforeach; else:
         ?>
 
-            <p>No sites exist.</p>
+            <p>No profiles exist.</p>
 
         <?php 
-        // End Sites
+        // End Scan Profiles
         endif;
         ?>
 
@@ -109,7 +109,7 @@ if( count($sites['content']) > 0 ):
 
     <?php
     // The pagination
-    the_pagination($sites['total_pages']);
+    the_pagination($profiles['total_pages']);
     ?>
 
 </section>
