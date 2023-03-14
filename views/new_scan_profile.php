@@ -38,15 +38,15 @@
         document.getElementById('url_helper').innerHTML = helperText;
         document.getElementById('url').placeholder = helperPlaceholder;
     }
-    xmlHelperText = 'URL must be a standard <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
+    xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
     if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'XML Sitemap' ){
-        updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
+        updateHelper(xmlHelperText, 'http://www.pih.org/')
     }else{
         updateHelper('', 'https://equalify.app/')
     }
     document.getElementById('type').addEventListener('change', function () {
         if ( document.getElementById('type').options[document.getElementById('type').selectedIndex].text == 'XML Sitemap' ) {
-            updateHelper(xmlHelperText, 'http://www.pih.org/sitemap.xml')
+            updateHelper(xmlHelperText, 'http://www.pih.org/')
         } else {
             updateHelper('', 'https://equalify.app/')
         }
