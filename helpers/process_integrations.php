@@ -86,7 +86,7 @@ function process_integrations(array $sites_output){
 
         // Let's log our progress and time for CLI.
         update_scan_log(
-            "\n>>> Running \"$integration\" against pages:\n"
+            "\n>>> Running \"$integration\" against scan profiles:\n"
         );
         $time_pre = microtime(true);
 
@@ -225,7 +225,7 @@ function build_integration_connection_pool(
         try {
 
             // Update log with URL
-            update_scan_log("- $page_url\n");
+            update_scan_log("- $page_url ($site->type)\n");
 
             // Process any new alerts.
             $new_alerts = $integration_alerts(
