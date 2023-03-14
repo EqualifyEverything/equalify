@@ -129,8 +129,8 @@ if(!empty($_GET['meta_name'])){
         ?>
         
         <div class="mb-3">
-            <label for="reportTitleInput" class="form-label fw-semibold">Report Name</label>
-            <input type="text" id="reportTitleInput" class="form-control" value="<?php echo $title;?>" name="title" required>
+            <label for="reportNameInput" class="form-label fw-semibold">Report Name</label>
+            <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
         </div>
         <hr>
         <div class="mb-3 row">
@@ -289,14 +289,15 @@ if(!empty($_GET['meta_name'])){
 </section>
 
 <script>
-
-// Change report title text as you type.
-const reportName = document.getElementById('reportName');
-const reportNameInput = document.getElementById('reportNameInput');
-const changeReportName = function(e) {
-    reportName.innerHTML = e.target.value;
-}
-reportNameInput.addEventListener('input', changeReportName);
-reportNameInput.addEventListener('propertychange', changeReportName);
+document.addEventListener('DOMContentLoaded', () => {
+    // Change report title text as you type.
+    const reportName = document.getElementById('reportName');
+    const reportNameInput = document.getElementById('reportNameInput');
+    const changeReportName = function(e) {
+        reportName.innerHTML = e.target.value;
+    }
+    reportNameInput.addEventListener('input', changeReportName);
+    reportNameInput.addEventListener('propertychange', changeReportName);
+});
 
 </script>
