@@ -72,26 +72,10 @@ function process_sites(){
 
             // Processing a site means adding its 
             // site_pages as scannable_pages meta.
-            if($site->type == 'single_page'){
-                $site_pages = single_page_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'xml'){
-                $site_pages = xml_site_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'wordpress'){
-                $site_pages = wordpress_site_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'crawler'){
-                $site_pages = a11ywatch_site_adder(
-                    $site->url
-                );
-            }
+            $site_pages = single_page_adder(
+                $site->url
+            );
+            
             // Finally, we'll save the output if there
             // are pages or destroy it if there are not.
             if(!empty($site_pages)){
