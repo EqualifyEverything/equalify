@@ -85,6 +85,27 @@ function a11ywatch_tags()
         }
     }
 
+    // TODO: This is a temporary test of using error type as a tag
+    $tags[] = [
+        'title' => 'Error',
+        'category' => 'Error Level',
+        'description' => '',
+        'slug' => 'error',
+    ];
+    $tags[] = [
+        'title' => 'Warning',
+        'category' => 'Error Level',
+        'description' => '',
+        'slug' => 'warning',
+    ];
+    $tags[] = [
+        'title' => 'Notice',
+        'category' => 'Error Level',
+        'description' => '',
+        'slug' => 'notice',
+    ];
+
+
     // Return tags.
     return $tags;
 }
