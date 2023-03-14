@@ -86,7 +86,7 @@ if(!empty($alerts_output)){
 
     // Let's update the site!
     DataAccess::update_db_rows(
-        'sites', $fields, $filters
+        'scan_profiles', $fields, $filters
     );
 
 }
