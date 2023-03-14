@@ -102,6 +102,7 @@ function a11ywatch_single_page_request($page_url)
         'uri'  => 'https://api.a11ywatch.com/api/scan',
         'headers' => [
             'Content-Type' => 'application/json',
+            'Transfer-Encoding' => 'chunked',
             'Authorization' => $auth_token
         ],
         'body' => json_encode(['url' => $page_url])
@@ -121,10 +122,14 @@ function a11ywatch_crawl_request($page_url)
         'uri'  => 'https://api.a11ywatch.com/api/crawl',
         'headers' => [
             'Content-Type' => 'application/json',
+            'Transfer-Encoding' => 'chunked',
             'Authorization' => $auth_token
         ],
         'body' => [
-            'url' => $page_url
+            'url' => $page_url,
+            "subdomains" => false,
+            "sitemap" => 0,
+            "tld" => false
         ]
     ];
 }
@@ -142,11 +147,14 @@ function a11ywatch_sitemap_request($page_url)
         'uri'  => 'https://api.a11ywatch.com/api/crawl',
         'headers' => [
             'Content-Type' => 'application/json',
+            'Transfer-Encoding' => 'chunked',
             'Authorization' => $auth_token,
         ],
         'body' => [
             'url' => $page_url,
-            'sitemap' => 1
+            "subdomains" => false,
+            "sitemap" => 1,
+            "tld" => false
         ]
     ];
 }
@@ -164,65 +172,113 @@ function a11ywatch_single_page_alerts($response_body, $page_url)
     $a11ywatch_alerts = [];
     
     // Decode JSON.
-    $a11ywatch_json = $response_body;
-    $a11ywatch_json_decoded = json_decode($a11ywatch_json, true);
+    $scan_results = json_decode($response_body, true);
 
     // Empty/unparsable response.
-    if (empty($a11ywatch_json_decoded)) {
+    if (empty($scan_results)) {
 
-        // Add a fallback alert.
+        // Add a fallback alert
         $alert = [
             'source'  => 'a11ywatch',
             'url'     => $page_url,
-            'message' => 'a11ywatch cannot reach the page.',
+            'message' => 'a11ywatch returned an empty or unparsable response.',
         ];
         $a11ywatch_alerts[] = $alert;
 
         return $a11ywatch_alerts;
     }
 
+    // Generate and return alerts
+    return alerts_from_a11ywatch_issues($scan_results, $page_url);
+}
 
-    // Check that issues are where we expect in the response
-    $response_data = $a11ywatch_json_decoded['data'] ?? [];
-    $issues_found_in_response = array_key_exists('issues', $response_data);
-    if (!$issues_found_in_response) {
+/**
+ * A11yWatch Crawl Alerts
+ * @param string response_body
+ * @param string page_url
+ */
+function a11ywatch_crawl_alerts($response_body, $page_url)
+{
+    // Our goal is to return alerts.
+    $a11ywatch_alerts = [];
+    
+    // Decode JSON.
+    $scan_results = json_decode($response_body, true);
 
-        // Add a fallback alert - arguably this is a parsing error
+    // Empty/unparsable/non-array response.
+    if (empty($scan_results) || !is_array($scan_results)) {
         $alert = [
             'source'  => 'a11ywatch',
             'url'     => $page_url,
-            'message' => 'Could not parse a11ywatch response.',
+            'message' => 'a11ywatch returned an empty or unparsable response.',
         ];
         $a11ywatch_alerts[] = $alert;
 
         return $a11ywatch_alerts;
     }
 
-    // Add all issues as alerts
-    $a11ywatch_issues = $response_data['issues'];
-
-    foreach ($a11ywatch_issues as $issue) {
-
-        // Build alert from issue
-        $alert = [
-            'source' => 'a11ywatch',
-            'url' => $page_url,
-            'tags' => $issue['type'], // type is error, warning, or notice
-            'message' => $issue['message'],
-        ];
-
-        // Add code, context, and recurrence to more_info
-        $code = $issue['code'];
-        $context = $issue['context'];
-        $recurrence = $issue['recurrence'];
-        $alert['more_info'] = "Code: '$code'. Context: '$context'. Recurrence: '$recurrence'.";
-
-        // Push to alerts array
-        $a11ywatch_alerts[] = $alert;
+    // Loop through response array to generate alerts.
+    // Expecting an entry for each page scanned.
+    foreach ($scan_results as $scan_result) {
+        $new_alerts = alerts_from_a11ywatch_issues($scan_result, $page_url);
+        $a11ywatch_alerts += $new_alerts;
     }
 
-    // Return alerts.
     return $a11ywatch_alerts;
 }
 
-// TODO: Alert formatters for crawl and sitemap scan types
+/**
+ * A11yWatch Sitemap Alerts
+ * @param string response_body
+ * @param string page_url
+ */
+function a11ywatch_sitemap_alerts($response_body, $page_url)
+{
+    // Same format as crawl results.
+    return a11ywatch_crawl_alerts($response_body, $page_url);
+}
+
+/**
+ * Helper method to map a11ywatch issues for a page to equalify alerts
+ * @param array scan_result
+ * @param string page_url
+ */
+function alerts_from_a11ywatch_issues($scan_result, $page_url) {
+
+    // This array of alerts will be returned.
+    $alerts = [];
+
+    // Check that issues are where we expect in the response.
+    $response_data = $scan_result['data'] ?? [];
+    $url = $response_data['url'] ?? $page_url;
+        
+    // Add a parsing error fallback alert.
+    $issues_found_in_response = array_key_exists('issues', $response_data);
+    if (!$issues_found_in_response) {
+        $alert = [
+            'source'  => 'a11ywatch',
+            'url'     => $url,
+            'message' => 'Could not parse a11ywatch response.',
+            'more_info' => json_encode($scan_result, JSON_PRETTY_PRINT),
+        ];
+        $alerts[] = $alert;
+
+        return $alerts;
+    }
+
+    // Add all issues as alerts.
+    $a11ywatch_issues = $response_data['issues'];
+    foreach ($a11ywatch_issues as $issue) {
+        $alert = [
+            'source' => 'a11ywatch',
+            'url' => $url,
+            'tags' => $issue['type'], // type is error, warning, or notice
+            'message' => $issue['message'],
+            'more_info' => json_encode($issue, JSON_PRETTY_PRINT),
+        ];
+
+        $alerts[] = $alert;
+    }
+
+    return $alerts;
+}
