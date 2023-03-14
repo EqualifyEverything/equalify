@@ -146,12 +146,12 @@ function a11ywatch_crawl_request($page_url)
             'Transfer-Encoding' => 'chunked',
             'Authorization' => $auth_token
         ],
-        'body' => [
+        'body' => json_encode([
             'url' => $page_url,
             "subdomains" => false,
             "sitemap" => 0,
             "tld" => false
-        ]
+        ]),
     ];
 }
 
@@ -171,12 +171,12 @@ function a11ywatch_sitemap_request($page_url)
             'Transfer-Encoding' => 'chunked',
             'Authorization' => $auth_token,
         ],
-        'body' => [
+        'body' => json_encode([
             'url' => $page_url,
             "subdomains" => false,
             "sitemap" => 1,
             "tld" => false
-        ]
+        ]),
     ];
 }
 
@@ -242,7 +242,7 @@ function a11ywatch_crawl_alerts($response_body, $page_url)
     // Expecting an entry for each page scanned.
     foreach ($scan_results as $scan_result) {
         $new_alerts = alerts_from_a11ywatch_issues($scan_result, $page_url);
-        $a11ywatch_alerts += $new_alerts;
+        $a11ywatch_alerts = array_merge($a11ywatch_alerts, $new_alerts);
     }
 
     return $a11ywatch_alerts;
