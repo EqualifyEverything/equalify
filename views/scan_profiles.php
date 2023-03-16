@@ -12,21 +12,21 @@
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h1>All Sites</h1>
+            <h1>All Scan Profiles</h1>
         </div>
         <div>
-            <a href="?view=new_site" class="btn btn-primary">Add Site</a>
+            <a href="?view=new_scan_profile" class="btn btn-primary">New Profile</a>
         </div>
     </div>
     <div class="row row-cols-3 g-4 pb-4">
         
 <?php
-// Show Sites
-$sites = DataAccess::get_db_rows(
-    'sites', [], get_current_page_number()
+// Show Scan Profiles
+$profiles = DataAccess::get_db_rows(
+    'scan_profiles', [], get_current_page_number()
 );
-if( count($sites['content']) > 0 ):
-    foreach($sites['content'] as $site):  
+if( count($profiles['content']) > 0 ):
+    foreach($profiles['content'] as $site):  
 ?>
 
         <div class="col">
@@ -55,10 +55,10 @@ if( count($sites['content']) > 0 ):
                     <?php
                     // The Type Badge
                     $type = $site->type;
-                    if($type == 'wordpress'){
-                        $type = 'WordPress';
-                    }elseif($type == 'xml'){
-                        $type = 'XML';
+                    if($type == 'sitemap'){
+                        $type = 'Sitemap';
+                    }elseif($type == 'crawl'){
+                        $type = 'Crawl';
                     }elseif($type == 'single_page'){
                         $type = 'Single Page';
                     }
@@ -67,7 +67,7 @@ if( count($sites['content']) > 0 ):
                     <span class="badge bg-light text-dark">
                         <?php echo $type;?>
                         <span class="visually-hidden">
-                            Site Type
+                            Scan Type
                         </span>
                     </span>
 
@@ -88,7 +88,7 @@ if( count($sites['content']) > 0 ):
                     }
                     ?>
 
-                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_site_status.php?id=<?php echo $site->id;?>&old_status=<?php echo $status;?>">
+                    <a class="btn <?php echo $button_class;?> btn-sm mt-2"  href="actions/toggle_scan_profile_status.php?id=<?php echo $site->id;?>&old_status=<?php echo $status;?>">
                         <?php if($processing) echo '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; echo $button_text;?>
                     </a>
                 </div>
@@ -100,10 +100,10 @@ if( count($sites['content']) > 0 ):
         endforeach; else:
         ?>
 
-            <p>No sites exist.</p>
+            <p>No profiles exist.</p>
 
         <?php 
-        // End Sites
+        // End Scan Profiles
         endif;
         ?>
 
@@ -111,7 +111,7 @@ if( count($sites['content']) > 0 ):
 
     <?php
     // The pagination
-    the_pagination($sites['total_pages']);
+    the_pagination($profiles['total_pages']);
     ?>
 
 </section>

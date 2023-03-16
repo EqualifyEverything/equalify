@@ -34,21 +34,20 @@ if($old_status == 'Active'){
     $integration_fields = get_integration_fields(
         $integration_uri
     );
-    if( !empty($integration_fields['db']) ){
+    if (!empty($integration_fields['db'])){
         $integration_db_fields = $integration_fields['db'];
 
         // Delete "meta" fields.
-        if( !empty($integration_db_fields['meta']) ){
+        if (!empty($integration_db_fields['meta']) ){
             foreach(
                 $integration_db_fields['meta'] 
                 as $integration_meta_field
             ){
-                if(!DataAccess::get_meta_value(
-                    $integration_meta_field['name']
-                ))
+                if (!DataAccess::get_meta_value($integration_meta_field['name'])) {
                     DataAccess::delete_meta(
                         $integration_meta_field['name']
                     );
+                }
             }
         }
         
@@ -98,14 +97,13 @@ if($old_status == 'Active'){
                 $integration_db_fields['meta']
                 as $integration_meta_field
             ){
-                if(
-                    !DataAccess::get_meta_value(
-                        $integration_meta_field['name']
-                ))
+                // prevent checking empty strings for integrations
+                if (empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
                     DataAccess::add_meta(
                         $integration_meta_field['name'], 
                         $integration_meta_field['value']
                     );
+                }
             }
         }
 
@@ -115,14 +113,12 @@ if($old_status == 'Active'){
                 $integration_db_fields['pages'] 
                 as $integration_pages_field
             ){
-                if(
-                    !DataAccess::db_column_exists(
-                        'pages', $integration_pages_field['name']
-                ))
+                if(!DataAccess::db_column_exists( 'pages', $integration_pages_field['name'] )) {
                     DataAccess::add_db_column(
                         'pages', $integration_pages_field['name'], 
                         $integration_pages_field['type']
                     );
+                }
             }
         }
 
@@ -167,27 +163,27 @@ header(
  */
 function update_alerts($new_status, $integration_uri) {
 
-    // Get active sites.
-    $sites_filter = array(
+    // Get active scan profiles.
+    $scan_profiles_filter = array(
         array(
             'name' => 'status',
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows(
-        'sites', $sites_filter, 1, 10000
+    $active_scan_profiles = DataAccess::get_db_rows(
+        'scan_profiles', $scan_profiles_filter, 1, 10000
     );
 
-    // Create active sites to alerts filter.
-    $site_ids = NULL;
-    if(!empty($active_sites['content'])){
-        $site_ids = array();
-        foreach ($active_sites['content'] as $site){
+    // Create active scan profiles to alerts filter.
+    $scan_profile_ids = NULL;
+    if(!empty($active_scan_profiles['content'])){
+        $scan_profile_ids = array();
+        foreach ($active_scan_profiles['content'] as $scan_profile){
             array_push(
-                $site_ids,
+                $scan_profile_ids,
                 array(
                     'name' => 'site_id',
-                    'value' => $site->id,
+                    'value' => $scan_profile->id,
                     'operator' => '=',
                     'condition' => 'OR'
                 )
@@ -196,7 +192,7 @@ function update_alerts($new_status, $integration_uri) {
     }
 
     // Create filter to select alerts with the current 
-    // integration and active sites.
+    // integration and active scan profiles.
     $alerts_filters = array(
         array(
             'name' => 'source',
@@ -204,7 +200,7 @@ function update_alerts($new_status, $integration_uri) {
         ),
         array(
             'name' => 'site_id',
-            'value' => $site_ids
+            'value' => $scan_profile_ids
         )
     );
 

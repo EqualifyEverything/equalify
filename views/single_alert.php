@@ -87,25 +87,24 @@ $report = (array)DataAccess::get_db_rows(
     <h2 class="fs-3">More Info</h2>
 
         <?php
-        // This was formatted for axe-core.
-        $count = 0;
-        foreach(unserialize($report['more_info']) as $info){
-
-            // Setup axe-core items
-            if(empty($info->any[0]) && !empty($info->all[0])){
-                $message = $info->all[0]->message;
-            }elseif(!empty($info->any[0]) && empty($info->all[0])){
-                $message = $info->any[0]->message;
-            }else{
-                $message = '';
-            }
-
-            $count++;
-            echo '<div class="mb-3 pb-3 border-bottom" id="error-'.$count.'">';
-            echo '<h3 class="fs-5">'.$message.'</h3>';
+        // This was formatted for a pretty-printed JSON dump.
+        $info_pieces = json_decode($report['more_info'], true);
+        $escaped_info = htmlspecialchars( $report['more_info'], 
+            ENT_NOQUOTES | ENT_HTML5 | ENT_SUBSTITUTE, 'UTF-8', false );
+        if (empty($info_pieces)) {
+            echo '<div><p>No additional info found for this alert</p></div>';
+        } else {
             echo '<pre aria-describe="code snippet" class="rounded bg-secondary 
-            text-white p-3 mb-1"><code>'.$info->html.'</code></pre>';
-            echo '</div>';
+            text-white p-3 mb-1"><code>'.$escaped_info.'</code></pre>';
+            // $count = 0;
+            // foreach($info_pieces as $info_key => $info_val){
+            //     $count++;
+            //     echo '<div class="mb-3 pb-3 border-bottom" id="error-'.$count.'">';
+            //     echo '<h3 class="fs-5">'.$info_key.'</h3>';
+            //     echo '<pre aria-describe="code snippet" class="rounded bg-secondary 
+            //     text-white p-3 mb-1"><code>'.$info_val.'</code></pre>';
+            //     echo '</div>';
+            // }
         }
         ?>
 

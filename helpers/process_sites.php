@@ -38,7 +38,7 @@ function process_sites(){
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows( 'sites',
+    $active_sites = DataAccess::get_db_rows( 'scan_profiles',
         $filtered_to_active_sites, 1, 10000
     )['content'];
 
@@ -61,7 +61,7 @@ function process_sites(){
         foreach($active_sites as $site){
 
             // Log our progress for CLI.
-            update_scan_log("\n- $site->url");
+            update_scan_log("\n- $site->url ($site->type)");
 
             // Let's add a 'urls' array to our sites.
             $site->urls = array();
@@ -72,21 +72,9 @@ function process_sites(){
 
             // Processing a site means adding its 
             // site_pages as scannable_pages meta.
-            if($site->type == 'single_page'){
-                $site_pages = single_page_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'xml'){
-                $site_pages = xml_site_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'wordpress'){
-                $site_pages = wordpress_site_adder(
-                    $site->url
-                );
-            }
+            $site_pages = single_page_adder(
+                $site->url
+            );
 
             // Finally, we'll save the output if there
             // are pages or destroy it if there are not.
@@ -117,7 +105,7 @@ function process_sites(){
 
         // Update log for CLI.
         $formatted_pages_count = number_format($pages_count);
-        update_scan_log("\n> Found $formatted_pages_count scannable pages.");
+        update_scan_log("\n> Found $formatted_pages_count scan profiles.");
         
         // Restrict the number of pages.
         if($pages_count > $GLOBALS['page_limit']){
@@ -127,7 +115,7 @@ function process_sites(){
         
     // Without active sites, we kill the scan.
     }else{
-        kill_scan('At least one site needs to be active to run a scan.');
+        kill_scan('At least one scan profile needs to be active to run a scan.');
     }
 
     // Finally, we can return the values.

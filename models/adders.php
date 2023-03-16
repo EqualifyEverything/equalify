@@ -17,6 +17,7 @@ require_once (__ROOT__.'/vendor/autoload.php');
 
 // Let's run Guzzle.
 use GuzzleHttp\Client;
+use Psr\Http\Message\MessageInterface;
 
 /**
  * Single Page Adder
@@ -44,85 +45,40 @@ function single_page_adder($site_url){
 
 }
 
-/**
- * WordPress Pages Adder
- */
-function wordpress_site_adder($site_url){
-    
-    // Instantiate Guzzle client - WP API uses JSON.
-    $options = [
-        'headers' => ['Accept' => 'application/json'],
-        'verify' => false,
-    ];
-    $client = new Client($options);
-
-    // The WP API JSON endpoint is always the same.
-    $wp_json_endpoint = '/wp-json/wp/v2/pages?per_page=100';
-    $url = $site_url . $wp_json_endpoint;
-
-    $wp_api_json = json_decode(
-        $client->get($url)->getBody(), true
-    );
-
-    if(empty($wp_api_json[0])) {
-        throw new Exception(
-            "$site_url does not include WordPress " .
-            "functionality that Equalify requires"
-        );
-    }
-
-    // Push JSON to pages array.
-    $pages = [];
-    foreach ($wp_api_json as $page):
-        array_push($pages, $page['link']);
-    endforeach;
-
-    // We want an array with each page URL.
-    return $pages;    
-    
+// handle updating alert records with results.
+function processItem($item)
+{
+    print_r($item);
 }
 
 /**
- * XML Site Adder
+ * A11yWatch Crawler Pages Adder
  */
-function xml_site_adder($site_url){
-    
-    // Instantiate Guzzle client to accept XML
+function a11ywatch_site_adder($site_url){
+    $jwt = DataAccess::get_meta_value('a11ywatch_key');
+
+    // Instantiate Guzzle client - A11yWatch API uses JSON streams.
     $options = [
-        'headers' => ['Accept' => 'application/xml'],
+        'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked', 'Authorization' => $jwt],
         'verify' => false,
+        'base_uri' => $GLOBALS['a11ywatch_uri'],
     ];
+
     $client = new Client($options);
 
-    // Valid XML files are only allowed!
-    $xml_contents = $client->get($site_url)->getBody();
-    if(!str_starts_with($xml_contents, '<?xml')) {
-        throw new Exception("$site_url did not return XML");
-    }
+    $response = $client->request("POST", '/api/crawl', [
+        GuzzleHttp\RequestOptions::JSON => [ 'url' => $site_url ]
+    ]);
+    $parser = new \JsonCollectionParser\Parser();
+    $parser->parseAsObjects($response->getBody(), 'processItem');
 
-    // Convert XML to JSON, so we can use it later
-    $xml = simplexml_load_string($xml_contents);
-    $json = json_encode($xml);
-    $json_entries = json_decode($json, true);
+    // // Push JSON to pages array.
+    // $pages = [];
+    // foreach ($a11ywatch_api_json as $page):
+    //     array_push($pages, $page['link']);
+    // endforeach;
 
-    // Push JSON to pages array.
-    $pages = [];
-    if(array_key_exists('url', $json_entries)){
-
-        // This gets around a weird bug where json_decode
-        // doesn't wrap single entry XMLs into an array.
-        if(!empty($json_entries['url']['loc'])){
-            $json_entries['url'] = [$json_entries['url']];
-        }
-
-        // Now we can prepare our output
-        foreach ($json_entries['url'] as $page):
-            array_push($pages, $page['loc']);
-        endforeach;
-
-    }
-
-    // Prepare contents and return them.
-    return $pages;
-
+    // We want an array with each page URL.
+    return [];    
+    
 }

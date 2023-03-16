@@ -607,7 +607,7 @@ class DataAccess {
     /**
      * Get Meta Value
      */
-    public static function get_meta_value($meta_name){
+    public static function get_meta_value($meta_name, $strict_check = null){
 
         // SQL
         $sql = 'SELECT `meta_value` FROM `meta` WHERE `meta_name` = ?';
@@ -618,9 +618,13 @@ class DataAccess {
 
         // Returns meta_value.
         $data = $results->fetch_object();
+
         if(empty($data)){
+            if ($strict_check) {
+                return;
+            }
             return false;
-        }else{
+        } else{
             return $data->meta_value;
         }
 
@@ -779,7 +783,7 @@ class DataAccess {
         $params = array();
         $result = self::query($sql, $params, false);
 
-        // Now we need to register WAVE tags, since
+        // Now we need to register integration tags, since
         // the plugin is activated by default.
         require_once 'integrations.php';
         require_once 'helpers/register_tags.php';
@@ -844,16 +848,14 @@ class DataAccess {
         $params = array();
 
         // Optionally set global meta variables.
-        if(isset($GLOBALS['wave_key'])){
-            $wave_sql = "('wave_key', ?),";
-            $params[] = $GLOBALS['wave_key'];
-        }else{
-            $wave_sql = '';
+        $added_sql = '';
+        if(isset($GLOBALS['a11ywatch_key'])){
+            $added_sql.= "('a11ywatch_key', ?),";
+            $params[] = $GLOBALS['a11ywatch_key'];
         }
         if(isset($GLOBALS['axe_uri'])){
-            $axe_param = $GLOBALS['axe_uri'];
-        }else{
-            $axe_param = '';
+            $added_sql.= "('axe_uri', ?),";
+            $params[] = $GLOBALS['axe_uri'];
         }
 
         // Now, create the content in the meta table
@@ -861,9 +863,8 @@ class DataAccess {
         $sql_2 = "
             INSERT INTO `meta` (meta_name, meta_value)
             VALUES".
-            $wave_sql.
-            "('axe_uri', ?),
-            ('active_integrations', ?),
+            $added_sql.
+            "('active_integrations', ?),
             ('scan_status', ?),
             ('scan_schedule', ?),
             ('scan_log', ?),
@@ -871,9 +872,6 @@ class DataAccess {
             ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
-
-        // Default axe_uri.
-        $params[] = $axe_param;
         
         // Default active_integrations.
         $params[] = serialize(array('axe'));
@@ -902,13 +900,13 @@ class DataAccess {
     }
     
     /**
-     * Create Sites Table
+     * Create Scan Profiles Table
      */
-    public static function create_sites_table(){
+    public static function create_scan_profiles_table(){
 
         // SQL
         $sql = 
-            "CREATE TABLE `sites` (
+            "CREATE TABLE `scan_profiles` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
                 `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
