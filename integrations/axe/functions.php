@@ -97,7 +97,7 @@ function axe_tags()
  * Axe request builder.
  * Maps site URLs to Axe URLs for processing.
  */
-function axe_request($page_url)
+function axe_single_page_request($page_url)
 {
 
     // Require axe_uri
@@ -117,7 +117,7 @@ function axe_request($page_url)
  * @param string response_body
  * @param string page_url
  */
-function axe_alerts($response_body, $page_url)
+function axe_single_page_alerts($response_body, $page_url)
 {
 
     // Our goal is to return alerts.
@@ -173,7 +173,7 @@ function axe_alerts($response_body, $page_url)
                 // Setup more info.
                 $alert['more_info'] = '';
                 if ($violation->nodes)
-                    $alert['more_info'] = $violation->nodes;
+                    $alert['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
 
                 // Push alert.
                 $axe_alerts[] = $alert;
