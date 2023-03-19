@@ -50,16 +50,14 @@ $report = (array)DataAccess::get_db_rows(
                 
                 // Get Tag Title
                 if(!empty($tag)){
-                    $filtered_to_tag = array(
-                        array(
-                            'name' => 'slug',
-                            'value' => $tag
-                        )
-                    );
-                    $tag_info = (array)DataAccess::get_db_rows(
-                        'tags', $filtered_to_tag
-                    )['content'][0];
-                    echo '<span class="badge bg-secondary" aria-describe="Tag">'.$tag_info['title'].'</span> ';
+                    $tag_filter = [[ 'name' => 'slug', 'value' => $tag ]];
+                    $tag_result = DataAccess::get_db_rows('tags', $tag_filter);
+                    $tag_info = (array)$tag_result['content'][0] ?? [];
+                    if (!empty($tag_info)) {
+                        echo '<span class="badge bg-secondary" aria-describe="Tag">'
+                            . $tag_info['title']
+                            . '</span> ';
+                    }
                 }
 
             }
