@@ -233,9 +233,17 @@ function build_integration_connection_pool(
             );
             if (!empty($new_alerts)) {
                 
-                // We need to add the site ID to all the alerts.
                 foreach ($new_alerts as &$alert) {
+                    // We need to add the site ID to all the alerts.
                     $alert['site_id'] = $site->id;
+
+                    // Trim more_info if needed. 
+                    // (current hardcoded limit is arbitrary)
+                    if (array_key_exists('more_info', $alert)) {
+                        if (strlen($alert['more_info']) > 3000) {
+                            $alert['more_info'] = substr($alert['more_info'], 0, 2997).'...';
+                        }
+                    }
                 }
 
                 // Now let's queue the alerts.
