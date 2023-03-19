@@ -2,6 +2,7 @@
 .vscode
 login/
 config.php
+config-server.php
 vendor/
 test/
 _dev/
