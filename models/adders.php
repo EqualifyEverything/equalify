@@ -50,35 +50,3 @@ function processItem($item)
 {
     print_r($item);
 }
-
-/**
- * A11yWatch Crawler Pages Adder
- */
-function a11ywatch_site_adder($site_url){
-    $jwt = DataAccess::get_meta_value('a11ywatch_key');
-
-    // Instantiate Guzzle client - A11yWatch API uses JSON streams.
-    $options = [
-        'headers' => ['Content-Type' => 'application/json', 'Transfer-Encoding' => 'chunked', 'Authorization' => $jwt],
-        'verify' => false,
-        'base_uri' => $GLOBALS['a11ywatch_uri'],
-    ];
-
-    $client = new Client($options);
-
-    $response = $client->request("POST", '/api/crawl', [
-        GuzzleHttp\RequestOptions::JSON => [ 'url' => $site_url ]
-    ]);
-    $parser = new \JsonCollectionParser\Parser();
-    $parser->parseAsObjects($response->getBody(), 'processItem');
-
-    // // Push JSON to pages array.
-    // $pages = [];
-    // foreach ($a11ywatch_api_json as $page):
-    //     array_push($pages, $page['link']);
-    // endforeach;
-
-    // We want an array with each page URL.
-    return [];    
-    
-}
