@@ -191,7 +191,7 @@ function a11ywatch_single_page_alerts($response_body, $page_url)
 
     // Our goal is to return alerts.
     $a11ywatch_alerts = [];
-    
+
     // Decode JSON.
     $scan_results = json_decode($response_body, true);
 
@@ -222,7 +222,7 @@ function a11ywatch_crawl_alerts($response_body, $page_url)
 {
     // Our goal is to return alerts.
     $a11ywatch_alerts = [];
-    
+
     // Decode JSON.
     $scan_results = json_decode($response_body, true);
 
@@ -264,7 +264,8 @@ function a11ywatch_sitemap_alerts($response_body, $page_url)
  * @param array scan_result
  * @param string page_url
  */
-function alerts_from_a11ywatch_issues($scan_result, $page_url) {
+function alerts_from_a11ywatch_issues($scan_result, $page_url)
+{
 
     // This array of alerts will be returned.
     $alerts = [];
@@ -272,7 +273,7 @@ function alerts_from_a11ywatch_issues($scan_result, $page_url) {
     // Check that issues are where we expect in the response.
     $response_data = $scan_result['data'] ?? [];
     $url = $response_data['url'] ?? $page_url;
-        
+
     // Add a parsing error fallback alert.
     $issues_found_in_response = array_key_exists('issues', $response_data);
     if (!$issues_found_in_response) {
