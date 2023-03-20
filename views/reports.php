@@ -225,7 +225,6 @@ if(!empty($_GET['format'])){
         <thead>
             <tr>
                 <th scope="col">Time</th>
-                <th scope="col">Source</th>
                 <th scope="col">URL</th>
                 <th scope="col">Message</th>
                 <th scope="col">Actions</th>
@@ -245,7 +244,6 @@ if(!empty($_GET['format'])){
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo ucwords(str_replace('_', ' ', $alert->source));?></td>
             <td><?php echo $alert->url;?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
