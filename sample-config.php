@@ -27,6 +27,5 @@ $GLOBALS['axe_uri'] = '';
 $GLOBALS['a11ywatch_key'] = '';
 
 // Additional options.
-$GLOBALS['page_limit'] = '2222';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';
