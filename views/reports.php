@@ -291,13 +291,15 @@ if(!empty($_GET['format'])){
 
         <tr>
             <td colspan="6">
+                <?php ob_start(); ?>
                 <p class="text-center my-2 lead">
                     No alerts found.<br>
                 </p>
                 <p class="text-center my-2">
-                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five pedals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five petals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
                     <strong>Get out and smell the frangipani!</strong>
                 </p>
+                <?php echo $hook_system->apply_filters('no_alerts_fallback', ob_get_clean()); ?>
             </td>
         </tr>
 

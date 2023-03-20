@@ -66,7 +66,7 @@ if(!empty($_GET['format'])){
 
     <?php
     // Run "before_content" hook.
-    $hook_system->run_hook('before_content');
+    $hook_system->do_actions('before_content');
     ?>
 
     <main>
