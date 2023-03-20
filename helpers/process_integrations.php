@@ -198,10 +198,6 @@ function build_integration_connection_pool(
     // Request generator
     $requests = function ($page_urls) use ($integration_request_builder) {
 
-        // NOTE: for testing, keep a low maximum.
-        $limit = $GLOBALS['page_limit'];
-        $current = 0;
-
         foreach ($page_urls as $page_url) {
             $request_params = $integration_request_builder($page_url);
             $request = new Request(
@@ -215,9 +211,8 @@ function build_integration_connection_pool(
             // Using the original site's URL as the index here for logging purposes.
             yield $page_url => $request; 
             
-            $current++;
-            if ($current >= $limit) break;
         }
+        
     };
 
     // Happy path: run the integration, log the index, and update the output

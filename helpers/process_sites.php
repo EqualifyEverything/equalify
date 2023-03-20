@@ -106,13 +106,7 @@ function process_sites(){
         // Update log for CLI.
         $formatted_pages_count = number_format($pages_count);
         update_scan_log("\n> Found $formatted_pages_count scan profiles.");
-        
-        // Restrict the number of pages.
-        if($pages_count > $GLOBALS['page_limit']){
-            $page_limit = number_format($GLOBALS['page_limit']);
-            kill_scan("You have too many pages.\n\nEqualify allows up to $page_limit pages.\n\nArchive sites or delete pages from WordPress/XML.");
-        }
-        
+                
     // Without active sites, we kill the scan.
     }else{
         kill_scan('At least one scan profile needs to be active to run a scan.');
