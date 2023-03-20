@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: WAVE
- * Description: Automated testing, focused on issues that impact end users.
+ * Description: Single page scanning, focused on issues that impact end users.
  */
 
 /**

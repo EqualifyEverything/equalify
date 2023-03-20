@@ -97,12 +97,6 @@ function process_sites(){
         if($pages_count === 0)
             kill_scan("Your sites have no pages to scan.");
 
-        // Add pages count to the pages scanned meta.
-        $existing_pages_scanned = DataAccess::get_meta_value('pages_scanned');
-        DataAccess::update_meta_value(
-            'pages_scanned', $pages_count+$existing_pages_scanned
-        );
-
         // Update log for CLI.
         $formatted_pages_count = number_format($pages_count);
         update_scan_log("\n> Found $formatted_pages_count scan profiles.");

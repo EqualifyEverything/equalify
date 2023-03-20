@@ -2,7 +2,7 @@
 
 /**
  * Name: axe-core
- * Description: The world's most popular accessibility testing library.
+ * Description: Single page scanning using the popular axe-core ruleset.
  */
 
 /**

@@ -844,7 +844,6 @@ class DataAccess {
             ('scan_schedule', ?),
             ('scan_log', ?),
             ('scannable_pages', ?),
-            ('pages_scanned', ?),
             ('last_scan_time', ?);
         ";
         
@@ -862,9 +861,6 @@ class DataAccess {
         
         // Default scannable_pages.
         $params[] = serialize(array());
-
-        // Default pages_scanned.
-        $params[] = 0;
 
         // Default last_scan_time.
         $params[] = '';

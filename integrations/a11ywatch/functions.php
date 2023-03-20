@@ -2,7 +2,7 @@
 
 /**
  * Name: A11yWatch
- * Description: The fastest and most precise automated accessibility scan.
+ * Description: Quick crawl, sitemap, and single page scans.
  */
 
 /**
