@@ -2,21 +2,22 @@
 
 ## Better Accessibility Management
 
-Equalify manages digital accessibility issues with an easy-to-use dashboard. The project aims to streamline accessibility management with tools that are built from a codebase that anyone can contribute to (see our [contribution guidelines](/CONTRIBUTING.md)).
+Equalify streamlines accessibility management.
 
-To get started, follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
+This codebase includes Equalify's [core features](/README.md#features). Published code should be easy-to-understand for those who work with popular web content tools, like WordPress and Drupal. See our [contribution guidelines](/CONTRIBUTING.md) for more information.
+
+To spinup Equalify, follow our [Easy Install](/README.md#easy-install) instructions and start contributing by posting a [new issue](https://github.com/bbertucc/equalify/issues).
 
 **Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/) - no coding necessary!
 
 ## Support Equalify
+Support a more accessible web!
 
-⭐ **Star the repo** to show your support.
+⭐ **Star this repo** to show your support.
 
-🌸 **Try our managed service**, [equalify.app](https://equalify.app/).
+🛠️ **Submit a pull request or Issue** to help build features. 
 
-🛠️ **Contribute a pull request** or [new issue](https://github.com/bbertucc/equalify/issues).
-
-🎩 **[Sponsor / Donate](https://github.com/sponsors/bbertucc)** to Equalify.
+💸 **[Sponsor or donate](https://github.com/sponsors/bbertucc)** to fund continued work. 
 
 ## Features
 
