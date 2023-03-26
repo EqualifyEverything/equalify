@@ -34,10 +34,10 @@ Check out [/models/hooks.php](/models/hooks.php). We plan to add more hooks over
 
 ## Coding an Integration
 
-Integrations process URLs that Equalify scans. Use our [guide to coding an integration](/wiki/Coding-an-Integration) to build your integration.
+Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/bbertucc/equalify/wiki/Coding-an-Integration) to build your integration.
 
 ## Progress Depends on Bugs
 
-The future of Equalify depends on the issues that you report. Check out the [Help Wanted](/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
+The future of Equalify depends on the issues that you report. Check out the [Help Wanted](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
 
 With your help, we can equalify the internet.
