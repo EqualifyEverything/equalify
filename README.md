@@ -2,9 +2,9 @@
 
 ## Better Accessibility Management
 
-Equalify resolves issues and organizes compliance data into a fully accessible dashboard (see our [accessibility statement](/ACCESSIBILITY.md)). Our goal: Manage web accessibility issues more efficiently than any other tool.
+Equalify is an easy-to-understand accessibility dashboard, built with clearly a documented codebase. The project value accessibility (see our [accessibility statement](/ACCESSIBILITY.md)) and openness (see (see our [contribution guidelines](/CONTRIBUTING.md).
 
-Follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
+To get started, follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
 
 **Not a technical user?** Use Equalify now at [equalify.app](https://equalify.app/) - no coding necessary!
 
