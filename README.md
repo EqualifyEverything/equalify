@@ -2,7 +2,7 @@
 
 ## Better Accessibility Management
 
-Equalify manages digital accessibility issues from an easy-to-use dashboard. The project aims to streamline accessibility management with tools that are built from a codebase that anyone can contribute to (see our [contribution guidelines](/CONTRIBUTING.md)).
+Equalify manages digital accessibility issues with an easy-to-use dashboard. The project aims to streamline accessibility management with tools that are built from a codebase that anyone can contribute to (see our [contribution guidelines](/CONTRIBUTING.md)).
 
 To get started, follow our [Easy Install]( https://github.com/bbertucc/equalify#easy-install) instructions to get started.
 
