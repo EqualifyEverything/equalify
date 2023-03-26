@@ -1,20 +1,26 @@
 # Equalify Contributing Guide
 
-This document shares limits that sculpt Equalify possibilities. 
+This limits express in this doc sculpt Equalify possibilities. 
 
 ## Equalify's Mission
 
-Equalify aims to efficiently manage countless accessibility issues, so that accessibility administerators can resolve issues with quicker speed and accuracy than ever before.
+Equalify aims to efficiently manage countless accessibility issues, so that accessibility administerators can resolve issues with quicker speed and accuracy than ever before. The project also intends to inspire a diverse community of contributors. 
+
+We can achieve our goals by creating well-documented, open code, and a culture of collabroation that rewards experimentation as well as successful implementation.
 
 ## Judging a Pull Request
 
-Pull requests will only be merged if the reviewer can answer "yes" to each of these five questions:
+Pull requests (PRs) are only merged if the reviewer can answer "yes" to each of these five questions:
 
-1. **Is the new code understandable to a junior PHP developer?** Explicit commenting and naming conventions are key. Equalify code should be understandable to developers with experience building PHP projects like WordPress plugins and Drupal modules.
-2. **Does the new code work with the GNU AGPL?** Equalify is licensed under the [GNU Affero General Public License](https://github.com/bbertucc/equalify/blob/main/LICENSE). All new code must abide by the rules of the license.
-3. **Does the new code work within or simplify our official installation process?** Equalify's [official installation process](https://github.com/bbertucc/equalify#download-and-use) is straightforward to folks who've installed WordPress in the past. Future releases of Equalify should further simplify that process. 
-4. **Does the pull request introduce a useful update?** Equalify aims to be the most useful accessibility platform. All features and information should be useful to our users.
-5. **Does the update maintain compliance with our [Accessibility Statement](/ACCESSIBILITY.md)?** Every update must adhear to our accessibility standards.
+1. **Is the PR's code understandable to a junior PHP developer?** Explicit commenting and naming conventions are key. Equalify code should be understandable to developers with experience building PHP projects like WordPress plugins and Drupal modules.
+2. **Does PR code work with the GNU AGPL?** Equalify is licensed under the [GNU Affero General Public License](/LICENSE). All new code must abide by the rules of the license.
+3. **Can Equalify users spinup services that PR code relies on?** Third-party services should be easy to spinup. Equalify does not PRs that integrate with codebases that are willfully abstracted or poorly documented.
+4. **Does PR code work within or simplify our official installation process?** Equalify's [official installation process](/README.md#download-and-use) is straightforward to folks who've installed WordPress. Future releases of Equalify should further simplify that process. 
+5. **Does the pull request introduce a useful update?** Equalify aims to be useful. All features and information should solve problems for our users.
+6. **Does the update maintain compliance with our [Accessibility Statement](/ACCESSIBILITY.md)?** Every update must adhear to our accessibility standards.
+
+## Why PHP? Why are the WordPress and Drupal communities a model?
+Equalify is built for folks who work with web content. Since PHP is argueably the most popular web programming language and since WordPress + Drupal are the most popular content managent systems, Equalify is designed to work with that language and appeal to WordPress + Drupal users.
 
 ## Coding Standards
 
