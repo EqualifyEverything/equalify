@@ -1,6 +1,6 @@
 # Equalify Contributing Guide
 
-This limits express in this doc sculpt Equalify possibilities. 
+_Limits express Equalify possibilities._
 
 ## Equalify's Mission
 
@@ -15,7 +15,7 @@ Pull requests (PRs) are only merged if the reviewer can answer "yes" to each of 
 1. **Is the PR's code understandable to a junior PHP developer?** Explicit commenting and naming conventions are key. Equalify code should be understandable to developers with experience building PHP projects like WordPress plugins and Drupal modules.
 2. **Does PR code work with the GNU AGPL?** Equalify is licensed under the [GNU Affero General Public License](/LICENSE). All new code must abide by the rules of the license.
 3. **Can Equalify users spinup services that PR code relies on?** Third-party services should be easy to spinup. Equalify does not PRs that integrate with codebases that are willfully abstracted or poorly documented.
-4. **Does PR code work within or simplify our official installation process?** Equalify's [official installation process](/README.md#download-and-use) is straightforward to folks who've installed WordPress. Future releases of Equalify should further simplify that process. 
+4. **Does PR code work within or simplify our official installation process?** Equalify's [Easy Install](/README.md#easy-install) is straightforward to folks who've installed WordPress. Future releases of Equalify should further simplify that process. 
 5. **Does the pull request introduce a useful update?** Equalify aims to be useful. All features and information should solve problems for our users.
 6. **Does the update maintain compliance with our [Accessibility Statement](/ACCESSIBILITY.md)?** Every update must adhear to our accessibility standards.
 
@@ -34,10 +34,10 @@ Check out [/models/hooks.php](/models/hooks.php). We plan to add more hooks over
 
 ## Coding an Integration
 
-Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/bbertucc/equalify/wiki/Coding-an-Integration) to build your integration.
+Integrations process URLs that Equalify scans. Use our [guide to coding an integration](/wiki/Coding-an-Integration) to build your integration.
 
 ## Progress Depends on Bugs
 
-The future of Equalify depends on the issues that you report. Check out the [Help Wanted](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
+The future of Equalify depends on the issues that you report. Check out the [Help Wanted](/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
 
 With your help, we can equalify the internet.
