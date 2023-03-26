@@ -2,7 +2,7 @@
 
 ## Better Accessibility Management
 
-Equalify streamlines accessibility management.
+Equalify streamlines digital accessibility management.
 
 This codebase includes Equalify's [core features](/README.md#features). Published code should be easy-to-understand for those who work with popular web content tools, like WordPress and Drupal. See our [contribution guidelines](/CONTRIBUTING.md) for more information.
 
