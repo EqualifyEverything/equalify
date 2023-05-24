@@ -36,8 +36,8 @@ Submit bug reports, questions, and patches to the repo's [issues](https://github
 
 If you would like to submit a pull request, please read [CONTRIBUTING.md](/CONTRIBUTING.md) before you do.
 
-## Special Thanks
-A chaos wizard 🧙 and many others help Equalify. The project is run by [@bbertucc](https://github.com/bbertucc). Special shout out to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains that helped launched this idea. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! Much help also came from [mgifford](https://github.com/mgifford), [kreynen](https://github.com/kreynen), and [j-mendez](https://github.com/j-mendez) - you all rock! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
+## Contributors
+Equalify is maintained by [@bbertucc](https://github.com/bbertucc). Special shout out to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains that helped launched this idea. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! Much help also came from [mgifford](https://github.com/mgifford), [kreynen](https://github.com/kreynen), and [j-mendez](https://github.com/j-mendez) - you all rock! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible.
 
 <p>Hosting supported by:</p>
 <p>
