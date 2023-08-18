@@ -16,7 +16,7 @@
 
 ## How will Equalify increase content accessibility?
 
-Accessibility is a diverse category of work. Equalify focuses on [Web Accessibility Guidlines Version 2.1](https://www.w3.org/TR/WCAG21/) (WCAG) standards. We are building tools that help website managers align their sites with WCAG guidelines. Our tools will integrate automated WCAG testing services, web services, and teaching materials into one WebOps platform.
+Accessibility is a diverse category of work. Equalify focuses on [Web Accessibility Guidelines Version 2.1](https://www.w3.org/TR/WCAG21/) (WCAG) standards. We are building tools that help website managers align their sites with WCAG guidelines. Our tools will integrate automated WCAG testing services, web services, and teaching materials into one WebOps platform.
 
 <img width="1316" alt="Equalify's integrations page that includes logos of Pantheon, Drupal, URLBox, WAVE, WordPress, and XML Sitemaps." src="https://user-images.githubusercontent.com/46652/198109576-6c2810f8-65c7-4a67-b584-cafd18138153.png">
 
