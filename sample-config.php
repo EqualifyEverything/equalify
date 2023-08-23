@@ -23,7 +23,7 @@ $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 // Visit https://wave.webaim.org/api/ to get a WAVE key.
 $GLOBALS['wave_key'] = '';
 
-// Visit https://github.com/bbertucc/axe-equalify for more info.
+// Visit https://github.com/bbertucc/equalify-automated_scan for more info.
 $GLOBALS['axe_uri'] = '';
 
 // Additional options.
