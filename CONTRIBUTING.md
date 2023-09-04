@@ -1,6 +1,6 @@
 # Equalify Contributing Guide
 
-_Limits express Equalify possibilities._
+_These limits expand Equalify possibilities._
 
 ## Equalify's Mission
 
