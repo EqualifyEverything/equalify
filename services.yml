@@ -1,0 +1,7 @@
+services:
+  event_dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
+
+  Equalify\Event\TestEventSubscriber:
+    tags:
+      - { name: kernel.event_subscriber, event: content.before }
