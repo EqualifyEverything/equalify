@@ -1,7 +1,7 @@
 # Equalify Accessibility Statement
 
 ## How Can We Help?
-We welcome any comments, questions, or feedback on our site. If you notice aspects of our site that aren’t working for you or your assistive technology, please [submit an issue on Equalify's Github repo](https://github.com/bbertucc/equalify/issues/new).
+We welcome any comments, questions, or feedback on our site. If you notice aspects of our site that aren’t working for you or your assistive technology, please [submit an issue on Equalify's Github repo](https://github.com/EqualifyEverything/equalify/issues/new).
 
 ## Equalify is Committed to Digital Accessibility
 This project is committed to delivering an excellent user experience for everyone. Equalify's user interface is structured in a way that allows those of all abilities to easily and quickly find the information they need.
@@ -18,4 +18,4 @@ We continually test content and features for WCAG 2.1 Level AA compliance and re
 - Forms are associated with labels and instructions on filling in forms are available to screen reader users
 
 ## Project VPATs
-To request a conformance report using the Voluntary Product Accessibility Template (VPAT), please [submit an issue on Equalify's Github repo](https://github.com/bbertucc/equalify/issues/new).
+To request a conformance report using the Voluntary Product Accessibility Template (VPAT), please [submit an issue on Equalify's Github repo](https://github.com/EqualifyEverything/equalify/issues/new).
