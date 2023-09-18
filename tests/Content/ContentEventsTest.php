@@ -11,7 +11,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Equalify\Event\BeforeContentEvent;
 use Equalify\Test\Fixtures\Content\BeforeContentEventSubscriber;
 use PHPUnit\Framework\TestCase;
-class zippy {}
 
 final class ContentEventsTest extends TestCase {
 

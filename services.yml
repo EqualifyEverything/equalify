@@ -5,3 +5,6 @@ services:
   Equalify\Event\TestEventSubscriber:
     tags:
       - { name: kernel.event_subscriber, event: content.before }
+
+  db_service:
+    class: Equalify\Storage\Database\Mysql\MysqlDatabase
