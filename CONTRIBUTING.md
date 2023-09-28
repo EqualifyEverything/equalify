@@ -28,18 +28,12 @@ Most of the contributors to the project do WordPress development, so we follow [
 
 We're up for any new coding standards!
 
-## Usable Hooks & Patterns.
-
-Check out [/models/hooks.php](/models/hooks.php). We plan to add more hooks over time (see issue #174).
-
 ## Coding an Integration
 
 Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/bbertucc/equalify/wiki/Coding-an-Integration) to build your integration.
 
 ## Testing
-The unit tests are located in the `tests` directory.
-To run them, navigate to the root of the project and run the following command in a terminal:
-`./vendor/bin/phpunit tests`
+The unit tests are located in the `tests` directory. To run them, navigate to the root of the project and run the following command in a terminal: `./vendor/bin/phpunit tests`
 
 ## Progress Depends on Bugs
 
