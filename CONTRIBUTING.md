@@ -31,18 +31,15 @@ Equalify is intended to be a platform of its own. We want users to quickly be ab
 
 Most of the contributors to the project have done WordPress development, so we follow [WordPress coding standards](https://github.com/WordPress/WordPress-Coding-Standards). We want new coding standards! Create a PR or issue to request a change.
 
-## Usable Hooks & Patterns.
-
-Check out [/models/hooks.php](/models/hooks.php). We plan to add more hooks over time (see issue #174).
-
 ## Coding an Integration
 
 Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/EqualifyEverything/equalify/wiki/Coding-an-Integration) to build your integration.
 
+## Testing
+The unit tests are located in the `tests` directory. To run them, navigate to the root of the project and run the following command in a terminal: `./vendor/bin/phpunit tests`
+
 ## Progress Depends on Issues
 
 The future of Equalify depends on the issues that you report. Check out the [Help Wanted](https://github.com/EqualifyEverything/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/EqualifyEverything/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on. 
-
-Feel free to also re-open closed issues. We tend to close issues that are not part of a current release push, so there are definitely good ideas hiding [the "closed" tab](https://github.com/EqualifyEverything/equalify/issues?q=is%3Aissue+is%3Aclosed).
 
 With your help, we can equalify the internet.
