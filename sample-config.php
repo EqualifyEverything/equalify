@@ -20,13 +20,12 @@ $GLOBALS['DB_SOCKET'] = '/var/run/mysqld/mysqld.sock';
 //`which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 
-// Visit https://wave.webaim.org/api/ to get a WAVE key.
-$GLOBALS['wave_key'] = '';
-
-// Visit https://github.com/bbertucc/equalify-automated_scan for more info.
+// Visit https://github.com/EqualifyEverything/scan.equalify.app for more info.
 $GLOBALS['axe_uri'] = '';
 
+// Visit https://a11ywatch.com/api-info to get a A11yWatch key.
+$GLOBALS['a11ywatch_key'] = '';
+
 // Additional options.
-$GLOBALS['page_limit'] = '2222';
 $GLOBALS['scan_concurrency'] = '6';
 $GLOBALS['scan_timeout'] = '33';

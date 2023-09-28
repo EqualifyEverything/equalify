@@ -86,7 +86,7 @@ if(!empty($alerts_output)){
 
     // Let's update the site!
     DataAccess::update_db_rows(
-        'sites', $fields, $filters
+        'scan_profiles', $fields, $filters
     );
 
 }
@@ -97,15 +97,6 @@ $exec_time = $ending_time - $starting_time;
 update_scan_log("\n\nScan complete.");
 update_scan_log(
     "\n\n\nEqualify scan took just $exec_time seconds."
-);
-
-// Set the number of scans to date.
-$pages_scanned = DataAccess::get_meta_value(
-    'pages_scanned'
-);
-update_scan_log(
-    "\n\nTo date, Equalify has scanned ".
-    number_format($pages_scanned)." pages."
 );
 
 // After a successful scan, we set a timestamp.

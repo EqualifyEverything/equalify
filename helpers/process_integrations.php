@@ -84,53 +84,50 @@ function process_integrations(array $sites_output){
             __ROOT__.'/integrations/'.$integration.'/functions.php'
         );
 
-        // (NOTE: A more robust integration interface might use a request generator
-        // function instead of a simple URL mapping; current integrations
-        // don't need this and just GET with Guzzle's default headers.)
-
-        // Every integration needs to define two functions:
-        // One to map site URLs to integration request URLs
-        $integration_urls = $integration.'_urls';
-        // Another to map integration responses to an array of Equalify alerts
-        $integration_alerts = $integration.'_alerts';
-        
-        // Skip the integration if we fail to find either.
-        if (!function_exists($integration_urls)) {
-            update_scan_log(
-                "\n>>> ERROR: URL mapping function for Integration " . 
-                "'$integration' not found.\n"
-            );
-            continue;
-        }
-        if (!function_exists($integration_alerts)) {
-            update_scan_log(
-                "\n>>> ERROR: Alerts function for Integration " . 
-                "'$integration' not found.\n"
-            );
-            continue;
-        }
-
         // Let's log our progress and time for CLI.
         update_scan_log(
-            "\n>>> Running \"$integration\" against pages:\n"
+            "\n>>> Running \"$integration\" against scan profiles:\n"
         );
         $time_pre = microtime(true);
 
         // We'll run each integration against each site.
         foreach ($integrations_output['processed_sites'] as $site) {
+            // Every integration needs to define two functions per supported scan type:
+            // One to map site URLs to integration requests
+            // Another to map integration responses to an array of Equalify alerts
+            $scan_type = $site->type;
+            $integration_request_builder = "${integration}_${scan_type}_request";
+            $integration_alerts = "${integration}_${scan_type}_alerts";
+            
+            // Skip the integration if we fail to find either.
+            if (!function_exists($integration_request_builder)) {
+                update_scan_log(
+                    "\n>>> WARNING: Request builder function for '$integration' integration not found for '$scan_type' scan type.\n"
+                );
+                continue;
+            }
+            if (!function_exists($integration_alerts)) {
+                update_scan_log(
+                    "\n>>> WARNING: Alerts function for '$integration' integration not found for '$scan_type' scan type.\n"
+                );
+                continue;
+            }
 
             // set up in process_site.php
             $scannable_pages = $site->urls;
 
             // No scannable pages mean no need to run the integration.
             if (empty($scannable_pages)) {
+                update_scan_log(
+                    "\n>>> WARNING: No pages to scan for profile '$site->url'!\n"
+                );
                 continue;
             }
             
             $pool = build_integration_connection_pool(
                 $site,
                 $scannable_pages,
-                $integration_urls,
+                $integration_request_builder,
                 $integration_alerts, 
                 $integrations_output
             );
@@ -181,7 +178,7 @@ function process_integrations(array $sites_output){
 function build_integration_connection_pool(
     $site,
     array $page_urls, 
-    callable $integration_urls,
+    callable $integration_request_builder,
     callable $integration_alerts,
     array &$output
 ) {
@@ -199,25 +196,23 @@ function build_integration_connection_pool(
     // servers a bit of time to catch their breath).
     
     // Request generator
-    $requests = function ($page_urls) use ($integration_urls) {
-
-        // NOTE: for testing, keep a low maximum.
-        $limit = $GLOBALS['page_limit'];
-        $current = 0;
+    $requests = function ($page_urls) use ($integration_request_builder) {
 
         foreach ($page_urls as $page_url) {
-
-            // Map site URL to integration-specific URL
-            $integration_url = $integration_urls($page_url);
-            $request = new Request('GET', $integration_url);
+            $request_params = $integration_request_builder($page_url);
+            $request = new Request(
+                $request_params['method'] ?? 'GET',
+                $request_params['uri'] ?? '', // this default should fail, with the error captured by $on_rejected
+                $request_params['headers'] ?? [],
+                $request_params['body'] ?? null,
+            );
 
             // Yielding a key->value pair lets us specify the index for callbacks.
             // Using the original site's URL as the index here for logging purposes.
             yield $page_url => $request; 
             
-            $current++;
-            if ($current >= $limit) break;
         }
+        
     };
 
     // Happy path: run the integration, log the index, and update the output
@@ -225,7 +220,7 @@ function build_integration_connection_pool(
         try {
 
             // Update log with URL
-            update_scan_log("- $page_url\n");
+            update_scan_log("- $page_url ($site->type)\n");
 
             // Process any new alerts.
             $new_alerts = $integration_alerts(
@@ -233,9 +228,17 @@ function build_integration_connection_pool(
             );
             if (!empty($new_alerts)) {
                 
-                // We need to add the site ID to all the alerts.
                 foreach ($new_alerts as &$alert) {
+                    // We need to add the site ID to all the alerts.
                     $alert['site_id'] = $site->id;
+
+                    // Trim more_info if needed. 
+                    // (current hardcoded limit is arbitrary)
+                    if (array_key_exists('more_info', $alert)) {
+                        if (strlen($alert['more_info']) > 3000) {
+                            $alert['more_info'] = substr($alert['more_info'], 0, 2997).'...';
+                        }
+                    }
                 }
 
                 // Now let's queue the alerts.
@@ -256,7 +259,8 @@ function build_integration_connection_pool(
 
     // Sad path: log the transfer error
     $on_rejected = function (RequestException $reason, $page_url) {
-        $error_message = "Error for $page_url: " . $reason->getHandlerContext();
+        // $error_message = "Error for $page_url: " . $reason->getHandlerContext();
+        $error_message = "Error for $page_url: " . $reason->getMessage();
         update_scan_log("\n>>> $error_message\n");
     };
 

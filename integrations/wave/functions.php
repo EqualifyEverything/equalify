@@ -1,7 +1,7 @@
 <?php
 /**
  * Name: WAVE
- * Description: Links to WCAG 2.1 page reports.
+ * Description: Single page scanning, focused on issues that impact end users.
  */
 
 /**
@@ -98,19 +98,24 @@ function wave_tags(){
 }
 
  /**
-  * WAVE URLs
-  * Maps site URLs to Little Forest URLs for processing.
+  * WAVE request builder.
+  * Maps site URLs to WAVE URLs for processing.
   */
-function wave_urls($page_url) {
-
-    // Require wave_key
+function wave_single_page_request($page_url) {
+    $request_url = '';
     $wave_key = DataAccess::get_meta_value('wave_key');
-    if(empty($wave_key)){
+
+    // wave_key is required
+    if (empty($wave_key)) {
         throw new Exception('WAVE key is not entered. Please add the WAVE key in the integration settings.');
-    }else{
-        return 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
+    } else {
+        $request_url = 'https://wave.webaim.org/api/request?key='.$wave_key.'&reporttype=4&url='.$page_url;
     }
 
+    return [
+        'method' => 'GET',
+        'uri'  => $request_url,
+    ];
 }
 
 /**
@@ -118,84 +123,65 @@ function wave_urls($page_url) {
  * @param string response_body
  * @param string page_url
  */
-function wave_alerts($response_body, $page_url){
+function wave_single_page_alerts($response_body, $page_url){
 
     // Our goal is to return alerts.
     $wave_alerts = [];
-    $wave_json = $response_body; 
 
-    // Decode JSON and count WCAG errors.
-    $wave_json_decoded = json_decode($wave_json, true);
-
-    // Fallback if WAVE scan doesn't work.
-    if(!empty($wave_json_decoded['status']['error']))
-        throw new Exception('WAVE error:"'.$wave_json_decoded['status']['error'].'"');
-
-    // Sometimes WAVE can't read the json.
-    if(empty($wave_json_decoded)){
-
-        // And add an alert.
+    // Decode JSON.
+    $wave_json_decoded = json_decode($response_body, true);
+    
+    // Fallback: Empty/unparsable response .
+    if (empty($wave_json_decoded)) {
         $alert = array(
             'source'  => 'wave',
             'url'     => $page_url,
-            'message' => 'WAVE cannot reach the page.',
+            'message' => 'Could not parse WAVE response.',
         );
-        array_push($wave_alerts, $alert);
-
-    }else{
-
-        // Reformat correctly working items.
-        $wave_items = array();
-        foreach($wave_json_decoded['categories'] as $wave_json_entry){
-
-            // Only show alerts and errors.
-            if(
-                !empty($wave_json_entry['items'])
-                && (
-                    $wave_json_entry['description'] == 'Errors'
-                    || $wave_json_entry['description'] == 'Contrast Errors'
-                )
-            ){
-                foreach($wave_json_entry['items'] as $wave_item)
-                    $wave_items[] = $wave_item;
-            }
-
-        }
-
-    
+        $wave_alerts[] = $alert;
+        return $wave_alerts;
+    // Fallback: WAVE API error response.
+    } elseif (!empty($wave_json_decoded['status']['error'])) {
+        $alert = array(
+            'source'  => 'wave',
+            'url'     => $page_url,
+            'message' => 'WAVE error:"'.$wave_json_decoded['status']['error'].'"',
+            'more_info' => json_encode($wave_json_decoded, JSON_PRETTY_PRINT),
+        );
+        $wave_alerts[] = $alert;
+        return $wave_alerts;
     }
 
-    // Add alerts.
-    if(!empty($wave_items)) {
+    // Process alerts.
+    $errors = $wave_json_decoded['categories']['error']['items'] ?? [];
+    $contrast_errors = $wave_json_decoded['categories']['contrast']['items'] ?? [];
+    $alerts = $wave_json_decoded['categories']['alert']['items'] ?? [];
+    $all_issues = array_merge($errors, $contrast_errors, $alerts);
 
-        // Setup alert variables.
-        foreach($wave_items as $wave_item){
+    foreach ($all_issues as $issue) {
+            // Build alert.
+            $alert = [
+                'source' => 'wave',
+                'url' => $page_url,
+                'tags' => 'wave_'.$issue['id'],
+                'more_info' => json_encode($issue, JSON_PRETTY_PRINT),
+            ];
 
-            // Default variables.
-            $alert = array();
-            $alert['source'] = 'wave';
-            $alert['more_info'] = '';
-            $alert['url'] = $page_url;
-
-            // Setup tags.
-            $alert['tags'] = 'wave_'.$wave_item['id'];
-
-            // Setup message.
-            if($wave_item['count'] > 1){
-                $appended_text = ' (total: '.$wave_item['count'].')';
-            }else{
+            // Build message.
+            if ($issue['count'] > 1) {
+                $appended_text = ' (total: '.$issue['count'].')';
+            } else {
                 $appended_text = '';
             }
-            $alert['message'] = $wave_item['description'].$appended_text.' - <a href="https://wave.webaim.org/report#/'.$page_url.'" target="_blank">WAVE Report <span class="screen-reader-only">(opens in a new tab)</span></a>';
+            $alert['message'] = $issue['description']
+                . $appended_text
+                . ' - <a href="https://wave.webaim.org/report#/'
+                . $page_url
+                . '" target="_blank">WAVE Report <span class="screen-reader-only">(opens in a new tab)</span></a>';
 
-            // Push alert.
             $wave_alerts[] = $alert;
-            
-        }
-
     }
 
-    // Return alerts.
     return $wave_alerts;
 
 }

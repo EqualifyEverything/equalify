@@ -2,6 +2,7 @@
 .vscode
 login/
 config.php
+config-server.php
 vendor/
 test/
 _dev/
@@ -10,3 +11,7 @@ _private/
 test.json
 test.php
 test.html
+node_modules
+package.json
+package-lock.json
+.phpunit.result.cache

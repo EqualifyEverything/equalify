@@ -157,6 +157,20 @@ foreach($report_meta as $k => $val) {
 
     }
 }
+
+// PoC of adding basic JSON option
+if(!empty($_GET['format'])){
+    // JSON version of View
+    $filters = $report_meta;
+    $alerts = DataAccess::get_db_rows( 'alerts',
+        $filters, get_current_page_number()
+    );
+    if( count($alerts['content']) > 0 ): 
+        foreach($alerts['content'] as $alert):   
+            echo json_encode( $alert ); 
+        endforeach;
+    endif;
+} else {
 ?>
 
 <section>
@@ -211,7 +225,6 @@ foreach($report_meta as $k => $val) {
         <thead>
             <tr>
                 <th scope="col">Time</th>
-                <th scope="col">Source</th>
                 <th scope="col">URL</th>
                 <th scope="col">Message</th>
                 <th scope="col">Actions</th>
@@ -231,7 +244,6 @@ foreach($report_meta as $k => $val) {
 
         <tr>
             <td><?php echo $alert->time;?></td>
-            <td><?php echo ucwords(str_replace('_', ' ', $alert->source));?></td>
             <td><?php echo $alert->url;?></td>
             <td><?php echo covert_code_shortcode($alert->message);?></td>
             <td style="min-width: 200px;">
@@ -279,13 +291,15 @@ foreach($report_meta as $k => $val) {
 
         <tr>
             <td colspan="6">
+                <?php ob_start(); ?>
                 <p class="text-center my-2 lead">
                     No alerts found.<br>
                 </p>
                 <p class="text-center my-2">
-                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five pedals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
+                    <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five petals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
                     <strong>Get out and smell the frangipani!</strong>
                 </p>
+                <?php echo $hook_system->apply_filters('no_alerts_fallback', ob_get_clean()); ?>
             </td>
         </tr>
 
@@ -302,3 +316,5 @@ foreach($report_meta as $k => $val) {
     ?>
 
 </section>
+
+<?php } ?>

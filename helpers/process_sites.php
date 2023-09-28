@@ -38,7 +38,7 @@ function process_sites(){
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows( 'sites',
+    $active_sites = DataAccess::get_db_rows( 'scan_profiles',
         $filtered_to_active_sites, 1, 10000
     )['content'];
 
@@ -61,7 +61,7 @@ function process_sites(){
         foreach($active_sites as $site){
 
             // Log our progress for CLI.
-            update_scan_log("\n- $site->url");
+            update_scan_log("\n- $site->url ($site->type)");
 
             // Let's add a 'urls' array to our sites.
             $site->urls = array();
@@ -72,21 +72,9 @@ function process_sites(){
 
             // Processing a site means adding its 
             // site_pages as scannable_pages meta.
-            if($site->type == 'single_page'){
-                $site_pages = single_page_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'xml'){
-                $site_pages = xml_site_adder(
-                    $site->url
-                );
-            }
-            if($site->type == 'wordpress'){
-                $site_pages = wordpress_site_adder(
-                    $site->url
-                );
-            }
+            $site_pages = single_page_adder(
+                $site->url
+            );
 
             // Finally, we'll save the output if there
             // are pages or destroy it if there are not.
@@ -109,25 +97,13 @@ function process_sites(){
         if($pages_count === 0)
             kill_scan("Your sites have no pages to scan.");
 
-        // Add pages count to the pages scanned meta.
-        $existing_pages_scanned = DataAccess::get_meta_value('pages_scanned');
-        DataAccess::update_meta_value(
-            'pages_scanned', $pages_count+$existing_pages_scanned
-        );
-
         // Update log for CLI.
         $formatted_pages_count = number_format($pages_count);
-        update_scan_log("\n> Found $formatted_pages_count scannable pages.");
-        
-        // Restrict the number of pages.
-        if($pages_count > $GLOBALS['page_limit']){
-            $page_limit = number_format($GLOBALS['page_limit']);
-            kill_scan("You have too many pages.\n\nEqualify allows up to $page_limit pages.\n\nArchive sites or delete pages from WordPress/XML.");
-        }
-        
+        update_scan_log("\n> Found $formatted_pages_count scan profiles.");
+                
     // Without active sites, we kill the scan.
     }else{
-        kill_scan('At least one site needs to be active to run a scan.');
+        kill_scan('At least one scan profile needs to be active to run a scan.');
     }
 
     // Finally, we can return the values.
