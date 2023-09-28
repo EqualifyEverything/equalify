@@ -36,6 +36,11 @@ Check out [/models/hooks.php](/models/hooks.php). We plan to add more hooks over
 
 Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/bbertucc/equalify/wiki/Coding-an-Integration) to build your integration.
 
+## Testing
+The unit tests are located in the `tests` directory.
+To run them, navigate to the root of the project and run the following command in a terminal:
+`./vendor/bin/phpunit tests`
+
 ## Progress Depends on Bugs
 
 The future of Equalify depends on the issues that you report. Check out the [Help Wanted](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [Good First Issue](https://github.com/bbertucc/equalify/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tags for issues that we need particular help on.
