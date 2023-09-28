@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Equalify\Test\Content;
+namespace Equalify\Test\Entity;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,7 +12,7 @@ use Equalify\Event\BeforeContentEvent;
 use Equalify\Test\Fixtures\Content\BeforeContentEventSubscriber;
 use PHPUnit\Framework\TestCase;
 
-final class ContentEventsTest extends TestCase {
+final class SoloUserTest extends TestCase {
 
     /**
      * The service container.
@@ -43,32 +43,17 @@ final class ContentEventsTest extends TestCase {
     }
 
     /**
-     * This tests sending and receiving a BeforeContentEvent.
+     * This tests that the solo user has the 'access content' permission.
      *
-     * First, get the event dispatcher service from the container.
-     *
-     * Then, tell the event dispatcher about the BeforeContentEventSubscriber
-     * subscriber and dispatch the event.
-     *
-     * The subscriber should have modified the header.
+     * This test will fail if the site isn't in solo mode.
      */
     public function testBeforeContentEventWorks(): void {
-        $eventDispatcher = $this->container->get('event_dispatcher');
+        $currentUserService = $this->container->get('current_user_service');
+        $this->assertNotEmpty($currentUserService, 'currentUserService');
 
-        $event = new BeforeContentEvent();
+        $user = $currentUserService->getUser();
+        $this->assertNotEmpty($user, 'user');
 
-        $event->setContent([
-            'header' => 'THIS IS THE HEADER',
-            'body' => 'THIS IS THE BODY',
-            'footer' => 'THIS IS THE FOOTER',
-        ]);
-
-        $eventDispatcher->addSubscriber(new BeforeContentEventSubscriber());
-
-        $eventDispatcher->dispatch($event, BeforeContentEvent::NAME);
-
-        $content = $event->getContent();
-
-        $this->assertEquals($content['header'], 'NEW HEADER');
+        $this->assertTrue($user->hasPermission('access content'), 'Has "access content" permission');
     }
 }
