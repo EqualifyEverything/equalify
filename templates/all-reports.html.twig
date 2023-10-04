@@ -1,7 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    <h1>Welcome to the All Reports Page</h1>
-    <!-- Other content for the home page -->
+    <h1>Reporting</h1>
+    <!-- get reports data from controller(needs to be created)-->
+    
+    <!-- create grid of reports-->
+    {% for report in reports %}
+        <!-- add a bootstrapped card with hyperlinks to each report-->
+    {% endfor %}
+    <!-- create button for adding reports -->
+    <button type="button" class="btn btn-primary">Add Report</button>
+
 {% endblock %}
 
