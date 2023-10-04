@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Your App{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                {# initial header nav scaffolding needs creation/population/styling #}
+                <li><a href="{{all-reports.html.twig}}">All Reports</a></li>
+                <li><a href="{{ settings.html.twig }}">Settings</a></li>
+                <li><a href="{{ my-account.html.twig }}">My Account</a></li>
+                
+                <!-- Add more menu items as needed -->
+            </ul>
+        </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <!-- Footer content here -->
+    </footer>
+</body>
+</html>
+
