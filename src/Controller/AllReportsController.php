@@ -3,7 +3,8 @@ require_once 'vendor/autoload.php';
 
 // $loader = new \Twig\Loader\FilesystemLoader;
 // $twig = new \Twig\Environment;
-$loader = new \Twig\Loader\FilesystemLoader("/Users/jameswesleygoedert/RECENTER/mwm_Buildings/CodeSilo/L1CurrentWork/Decubing/equalify/templates");
+// $loader = new \Twig\Loader\FilesystemLoader("/Users/jameswesleygoedert/RECENTER/mwm_Buildings/CodeSilo/L1CurrentWork/Decubing/equalify/templates");
+$loader = new \Twig\Loader\FilesystemLoader("templates");
 $twig = new \Twig\Environment($loader);
 
 $dummyReports = [
@@ -33,6 +34,5 @@ $dummyReports = [
     ],
     // Add more dummy reports as needed
 ];
-var_dump($dummyReports);
 
 echo $twig->render('templates/all-reports.html.twig', ['reports' => $dummyReports]);

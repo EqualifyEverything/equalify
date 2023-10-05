@@ -38,6 +38,17 @@ require_once 'install.php';
 // page load.
 require_once 'actions/run_scheduled_scan.php';
 
+// Add twig into main php to access templates directory
+// Only for local testing- to be removed
+require_once 'vendor/autoload.php';
+
+$loader = new \Twig\Loader\FilesystemLoader('templates');
+$twig = new \Twig\Environment($loader);
+
+$template = 'all-reports.html.twig';
+
+echo $twig->render($template);
+
 // PoC of adding basic JSON option
 if(!empty($_GET['format'])){
     header('Content-type: application/json');

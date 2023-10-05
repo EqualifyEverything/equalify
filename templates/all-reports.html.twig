@@ -6,26 +6,43 @@
 
 	<!-- create grid of reports-->
 	<div class="container mt-5">
+    <p>{{ reports }} Anything?</p>
 		<div class="row">
-			{# {% for report in reports %} #}
-			{% for i in range(1,6) %}
-				<div class="col-md-4 mb-4">
-					<div class="card">
-						<div class="card-body">
-							<h5 class="card-title">
-								{# {{ report.title }} #}
-                Test Title
-							</h5>
-							<p class="card-text">
-                Some text for explaining the report...
-								{# {{ report.content }} #}
-							</p>
-						</div>
-					</div>
-				</div>
-				<!-- add a bootstrapped card with hyperlinks to each report-->
-			{% endfor %}
-
+      {% if reports is not empty %}
+        {% for report in reports %}
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">
+                  {{ report.title }}
+                </h5>
+                <p class="card-text">
+                  {{ report.content }}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        {% else %}
+          <div>
+            <p>No reports data populating stub data</p>
+          </div>
+          {% for i in range(1,6) %}
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    Test Title
+                  </h5>
+                  <p class="card-text">
+                    Some text for explaining the report...
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          <!-- add a bootstrapped card with hyperlinks to each report-->
+      {% endif %}
 		</div>
 	</div>
 	<!-- create button for adding reports -->
