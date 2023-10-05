@@ -26,7 +26,6 @@
 **********************************************************/
 
 // Add dependencies.
-require_once 'models/hooks.php';
 require_once 'config.php';
 require_once 'models/db.php';
 require_once 'models/view_components.php';
@@ -65,8 +64,9 @@ if(!empty($_GET['format'])){
 <body>
 
     <?php
+    // @TODO: run the new hooks system instead
     // Run "before_content" hook.
-    // $hook_system->do_actions('before_content');
+    //$hook_system->do_actions('before_content');
     ?>
 
     <main>
