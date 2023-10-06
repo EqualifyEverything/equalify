@@ -1,38 +1,48 @@
 <?php
-require_once 'vendor/autoload.php';
 
-// $loader = new \Twig\Loader\FilesystemLoader;
-// $twig = new \Twig\Environment;
-// $loader = new \Twig\Loader\FilesystemLoader("/Users/jameswesleygoedert/RECENTER/mwm_Buildings/CodeSilo/L1CurrentWork/Decubing/equalify/templates");
-$loader = new \Twig\Loader\FilesystemLoader("templates");
-$twig = new \Twig\Environment($loader);
+namespace Equalify\Controller;
 
-$dummyReports = [
-    [
-        'title' => 'Report 1',
-        'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-    ],
-    [
-        'title' => 'Report 2',
-        'content' => 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    ],
-    [
-        'title' => 'Report 3',
-        'content' => 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    ],
-    [
-        'title' => 'Report 4',
-        'content' => 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    ],
-    [
-        'title' => 'Report 5',
-        'content' => 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    ],
-    [
-        'title' => 'Report 6',
-        'content' => 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    ],
-    // Add more dummy reports as needed
-];
+class AllReportsController extends BaseController
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+    public function run(): void
+    {
 
-echo $twig->render('templates/all-reports.html.twig', ['reports' => $dummyReports]);
+        $dummyReports = [
+            [
+                'title' => 'Item 1',
+                'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo ipsum et tristique cursus.'
+            ],
+            [
+                'title' => 'Item 2',
+                'description' => 'Sed ac risus eget urna laoreet sollicitudin. Nullam elementum erat eu arcu cursus, et ultricies urna gravida.'
+            ],
+            [
+                'title' => 'Item 3',
+                'description' => 'Fusce euismod augue nec ante interdum lacinia. Phasellus ultricies turpis a sapien facilisis euismod.'
+            ],
+            [
+                'title' => 'Item 4',
+                'description' => 'Vestibulum non tortor ut nisl bibendum eleifend. Duis sit amet orci vel mi efficitur vulputate.'
+            ],
+            [
+                'title' => 'Item 5',
+                'description' => 'Aliquam erat volutpat. Integer ut massa et sapien malesuada pellentesque ac vel lectus.'
+            ],
+            [
+                'title' => 'Item 6 this is a test title to see what happens with too many characters on a title block for a card within reports view with over one hundred twenty characters',
+                'description' => 'Pellentesque auctor, quam in lacinia lacinia, orci leo tincidunt mi, ut lobortis massa ipsum nec velit. Pellentesque auctor, quam in lacinia lacinia, orci leo tincidunt mi, ut lobortis massa ipsum nec velit Pellentesque auctor, quam in lacinia lacinia, orci leo tincidunt mi, ut lobortis massa ipsum nec velit Pellentesque auctor, quam in lacinia lacinia, orci leo tincidunt mi, ut lobortis massa ipsum nec velit'
+            ]
+        ];
+
+        $dummyTitle = "title test take one";
+        $params = [
+            'dummyReports' => $dummyReports,
+            'dummyTitle' => $dummyTitle,
+        ];
+        echo $this->container->get('twig')->render('all-reports.html.twig', $params);
+    }
+}

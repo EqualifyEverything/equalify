@@ -1,19 +1,12 @@
 <?php
-// to be removed when templates are correctly wired
-// require_once 'vendor/autoload.php';
 
-// $loader = new \Twig\Loader\FilesystemLoader('templates');
-// $twig = new \Twig\Environment($loader);
+use Equalify\Controller\AllReportsController;
 
-// // $routes = [
-// //     'all-reports' => 'all-reports.html.twig',
-// //     // @TODO: add other twig template paths ie-
-// //     // 'Settings' => 'Settings.html.twig'
-// // ];
+$BASE_PATH = __DIR__ . '/..';
 
-// // $route = $_GET['route'] ?? 'all-reports';
-// // $template = $routes[$route] ?? 'all-reports.html.twig';
-// $template = 'all-reports.html.twig';
+require_once($BASE_PATH . '/config.php');
+require_once($BASE_PATH . '/vendor/autoload.php');
 
-// echo $twig->render($template);
+$controller = new AllReportsController();
+$controller->run();
 
