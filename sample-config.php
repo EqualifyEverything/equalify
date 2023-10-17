@@ -21,10 +21,7 @@ $GLOBALS['DB_SOCKET'] = '/var/run/mysqld/mysqld.sock';
 $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 
 // Visit https://github.com/EqualifyEverything/scan.equalify.app for more info.
-$GLOBALS['axe_uri'] = '';
-
-// Visit https://a11ywatch.com/api-info to get a A11yWatch key.
-$GLOBALS['a11ywatch_key'] = '';
+$GLOBALS['equalify_scan_uri'] = '';
 
 // Additional options.
 $GLOBALS['scan_concurrency'] = '6';

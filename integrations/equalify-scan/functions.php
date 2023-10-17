@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Name: axe-core
- * Description: Single page scanning using the popular axe-core ruleset.
+ * Name: Equalify Scan
+ * Description: Sitemap and single page automated accessibility scan.
  */
 
 /**
- * axe-core Fields
+ * Equalify Scan Fields
  */
-function axe_fields()
+function equalify_scan_fields()
 {
 
-    $axe_fields = array(
+    $equalify_scan_fields = array(
 
         // These fields are added to the database.
         'db' => [
@@ -19,7 +19,7 @@ function axe_fields()
             // Meta values.
             'meta' => [
                 array(
-                    'name'     => 'axe_uri',
+                    'name'     => 'equalify_scan_uri',
                     'value'     => '',
                 )
             ]
@@ -32,8 +32,8 @@ function axe_fields()
             // Meta settings.
             'meta' => [
                 array(
-                    'name'     => 'axe_uri',
-                    'label'    => 'axe-core URI (ie- https://axe.equalify.app/?url=)',
+                    'name'     => 'equalify_scan_uri',
+                    'label'    => 'equalify-scan URI (ie- https://scan.equalify.app/?url=)',
                     'type'     => 'text',
                 )
             ]
@@ -43,13 +43,13 @@ function axe_fields()
     );
 
     // Return fields
-    return $axe_fields;
+    return $equalify_scan_fields;
 }
 
 /**
- * axe Tags
+ * Equalify Scan Tags
  */
-function axe_tags()
+function equalify_scan_tags()
 {
 
     // We don't know where helpers are being called, so we
@@ -58,31 +58,31 @@ function axe_tags()
         define('__DIR__', dirname(dirname(__FILE__)));
 
     // Read the JSON file - pulled from https://axe.webaim.org/api/docs?format=json
-    $axe_tag_json = file_get_contents(__DIR__ . '/axe_tags.json');
-    $axe_tags = json_decode($axe_tag_json, true);
+    $equalify_scan_tag_json = file_get_contents(__DIR__ . '/equalify_scan_tags.json');
+    $equalify_scan_tags = json_decode($equalify_scan_tag_json, true);
 
     // Convert axe format into Equalify format:
     // tags [ array('slug' => $value, 'name' => $value, 'description' => $value) ]
     $tags = array();
-    if (!empty($axe_tags)) {
-        foreach ($axe_tags as $axe_tag) {
+    if (!empty($equalify_scan_tags)) {
+        foreach ($equalify_scan_tags as $equalify_scan_tag) {
 
             // First, let's prepare the description, which is
             // the summary and guidelines.
-            $description = '<p class="lead">' . $axe_tag['description'] . '</p>';
+            $description = '<p class="lead">' . $equalify_scan_tag['description'] . '</p>';
 
             // Now lets put it all together into the Equalify format.
             array_push(
                 $tags,
                 array(
-                    'title' => $axe_tag['title'],
-                    'category' => $axe_tag['category'],
+                    'title' => $equalify_scan_tag['title'],
+                    'category' => $equalify_scan_tag['category'],
                     'description' => $description,
 
-                    // axe-core uses periods, which get screwed up
+                    // equalify-scan uses periods, which get screwed up
                     // when equalify serializes them, so we're
                     // just not going to use periods
-                    'slug' => str_replace('.', '', $axe_tag['slug'])
+                    'slug' => str_replace('.', '', $equalify_scan_tag['slug'])
 
                 )
             );
@@ -94,61 +94,61 @@ function axe_tags()
 }
 
 /**
- * Axe request builder.
- * Maps site URLs to Axe URLs for processing.
+ * Equalify Scan request builder.
+ * Maps site URLs to Scan URLs for processing.
  */
-function axe_single_page_request($page_url)
+function equalify_scan_single_page_request($page_url)
 {
 
-    // Require axe_uri
-    $axe_uri = DataAccess::get_meta_value('axe_uri');
-    if (empty($axe_uri)) {
-        throw new Exception('axe-core URI is not entered. Please add the URI in the integration settings.');
+    // Require equalify_scan_uri
+    $equalify_scan_uri = DataAccess::get_meta_value('equalify_scan_uri');
+    if (empty($equalify_scan_uri)) {
+        throw new Exception('equalify-scan URI is not entered. Please add the URI in the integration settings.');
     } else {
         return [
             'method' => 'GET',
-            'uri'  => $axe_uri . $page_url,
+            'uri'  => $equalify_scan_uri . $page_url,
         ];
     }
 }
 
 /**
- * Axe Alerts
+ * Equalify Scan Alerts
  * @param string response_body
  * @param string page_url
  */
-function axe_single_page_alerts($response_body, $page_url)
+function equalify_scan_single_page_alerts($response_body, $page_url)
 {
 
     // Our goal is to return alerts.
-    $axe_alerts = [];
-    $axe_json = $response_body;
+    $equalify_scan_alerts = [];
+    $equalify_scan_json = $response_body;
 
     // Decode JSON.
-    $axe_json_decoded = json_decode($axe_json);
+    $equalify_scan_json_decoded = json_decode($equalify_scan_json);
 
-    // Sometimes Axe can't read the json.
-    if (!empty($axe_json_decoded)) {
+    // Sometimes Equalify Scan can't read the json.
+    if (!empty($equalify_scan_json_decoded)) {
 
         // We add violations to this array.
-        $axe_violations = array();
+        $equalify_scan_violations = array();
 
-        // Show axe violations
-        foreach ($axe_json_decoded[0]->violations as $violation) {
+        // Show violations
+        foreach ($equalify_scan_json_decoded[0]->violations as $violation) {
 
             // Only show violations.
-            $axe_violations[] = $violation;
+            $equalify_scan_violations[] = $violation;
         }
 
         // Add alerts.
-        if (!empty($axe_violations)) {
+        if (!empty($equalify_scan_violations)) {
 
             // Setup alert variables.
-            foreach ($axe_violations as $violation) {
+            foreach ($equalify_scan_violations as $violation) {
 
                 // Default variables.
                 $alert = array();
-                $alert['source'] = 'axe';
+                $alert['source'] = 'equalify_scan';
                 $alert['url'] = $page_url;
 
                 // Setup tags.
@@ -161,7 +161,7 @@ function axe_single_page_alerts($response_body, $page_url)
                     $tags = $violation->tags;
                     $copy = $tags;
                     foreach ($tags as $tag) {
-                        $alert['tags'] .= str_replace('.', '', 'axe_' . $tag);
+                        $alert['tags'] .= str_replace('.', '', 'equalify_scan_' . $tag);
                         if (next($copy))
                             $alert['tags'] .= ',';
                     }
@@ -176,10 +176,10 @@ function axe_single_page_alerts($response_body, $page_url)
                     $alert['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
 
                 // Push alert.
-                $axe_alerts[] = $alert;
+                $equalify_scan_alerts[] = $alert;
             }
         }
     }
     // Return alerts.
-    return $axe_alerts;
+    return $equalify_scan_alerts;
 }
