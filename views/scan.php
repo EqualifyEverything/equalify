@@ -1,3 +1,5 @@
+<a href="action/delete_report.php"></a>
+
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>

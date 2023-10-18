@@ -39,8 +39,6 @@ require_once 'install.php';
 // We also check to see if we can run the scan on every
 // page load.
 require_once 'actions/run_scheduled_scan.php';
-require_once(__DIR__ . '/helpers/bootstrap.inc');
-
 ?>
 
 <!DOCTYPE html>
@@ -64,9 +62,9 @@ require_once(__DIR__ . '/helpers/bootstrap.inc');
 
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=alert_editor" class="nav-link <?php the_active_class('alert_editor');?>">Add Alert</a></li>
-                <li class="nav-item"><a href="#" class="nav-link" aria-current="page">Reports</a></li>
+                <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="nav-link <?php the_active_class('settings');?>">Settings</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">My Account</a></li>
+                <li class="nav-item"><a href="#" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
             </ul>
         </div>
     </header>
