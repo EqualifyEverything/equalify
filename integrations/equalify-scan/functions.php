@@ -2,49 +2,8 @@
 
 /**
  * Name: Equalify Scan
- * Description: Sitemap and single page automated accessibility scan.
+ * Description: An automated accessibility scan.
  */
-
-/**
- * Equalify Scan Fields
- */
-function equalify_scan_fields()
-{
-
-    $equalify_scan_fields = array(
-
-        // These fields are added to the database.
-        'db' => [
-
-            // Meta values.
-            'meta' => [
-                array(
-                    'name'     => 'equalify_scan_uri',
-                    'value'     => '',
-                )
-            ]
-
-        ],
-
-        // These fields are HTML fields on the settings view.
-        'settings' => [
-
-            // Meta settings.
-            'meta' => [
-                array(
-                    'name'     => 'equalify_scan_uri',
-                    'label'    => 'equalify-scan URI (ie- https://scan.equalify.app/?url=)',
-                    'type'     => 'text',
-                )
-            ]
-
-        ]
-
-    );
-
-    // Return fields
-    return $equalify_scan_fields;
-}
 
 /**
  * Equalify Scan Tags

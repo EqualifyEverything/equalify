@@ -20,8 +20,9 @@ $GLOBALS['DB_SOCKET'] = '/var/run/mysqld/mysqld.sock';
 //`which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 
-// Visit https://github.com/EqualifyEverything/scan.equalify.app for more info.
-$GLOBALS['equalify_scan_uri'] = '';
+// Visit https://github.com/EqualifyEverything/Sample-Scanner
+// to create your own scan URI
+$GLOBALS['sample_scanner_uri'] = '';
 
 // Additional options.
 $GLOBALS['scan_concurrency'] = '6';

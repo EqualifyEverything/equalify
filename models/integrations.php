@@ -65,8 +65,8 @@ function get_integration_meta( $file ) {
     // Set headers.
     $headers = array(
 		'name'        => 'name',
-		'description' => 'description',
-        'status'      => 'status'
+        'status'      => 'status',
+		'description' => 'description'
 	);
 	foreach ( $headers as $field => $regex ) {
 		if ( preg_match( '/^(?:[ \t]*<\?php)?[ \t\/*#@]*' . preg_quote( $regex, '/' ) . ':(.*)$/mi', $file_data, $match ) && $match[1] ) {

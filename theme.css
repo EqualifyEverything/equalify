@@ -4,14 +4,25 @@ body{
 .container{
     max-width: 960px;
 }
+#content{
+    display: grid;
+    grid-template-areas: "sidebar main";
+    grid-template-columns: 1fr 5fr;
+    gap: 1.5rem;
+}
+aside{
+    grid-area: sidebar;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 5rem;
+    display: block !important;
+    height: calc(100vh - 6rem);
+    padding-left: .25rem;
+    margin-left: -.25rem;
+    overflow-y: auto;
+}
 main{
-    display: flex;
-    flex-wrap: nowrap;
-    height: 100vh;
-    height: -webkit-fill-available;
-    min-height: 100vh;
-    overflow-x: auto;
-    overflow-y: scroll;
+    grid-area: main;
 }
 .bi{
     vertical-align: -.125em;
