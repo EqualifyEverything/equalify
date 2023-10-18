@@ -14,4 +14,4 @@ test.html
 node_modules
 package.json
 package-lock.json
-.phpunit.result.cache
+composer.lock
