@@ -1,6 +1,6 @@
 <?php
 //Setting up alert editor variables//
-$viewTitle = "Alert Editor";
+$viewTitle = "Notice Editor";
 $message = "This is a sample message";
 $status = 'Status';
 $statusArray = [
@@ -30,8 +30,6 @@ $hasVisualizer = false;
 ?>
 
 <main class="container">
-    <h1>Add Alert</h1>
-
     <title><?php echo $viewTitle ?></title>
     <div class="container mt-5">
         <div class="row mb-3">
@@ -49,7 +47,6 @@ $hasVisualizer = false;
             <div class="form-row mb-3">
                 <div class="col-md-5 mb-4">
                     <label class="col-form-label-lg font-weight-bold" for="alertMessageInput">Message</label>
-                    {# @TODO: value only presenting first word of string... #}
                     <input type="text" class="form-control" id="alertMessageInput" placeholder="Message" value=<?php echo $message ?> required>
                 </div>
                 <div class="col-md-3 ml-3 mb-4">
