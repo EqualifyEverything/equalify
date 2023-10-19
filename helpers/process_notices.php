@@ -111,13 +111,13 @@ function process_notices( array $integration_output) {
         $rows = [];
         foreach($new_notices as $notice){
             $new_row = array(
-                'url'       => $notice->url,
+                'related_url'       => $notice->url,
                 'message'   => $notice->message,
                 'status'    => $notice->status,
                 'property_id'   => $notice->property_id,
                 'tags'      => $notice->tags,
                 'source'    => $notice->source,
-                'more_info' => $notice->more_info
+                'meta' => $notice->meta
             );
             array_push($rows, $new_row);
         };

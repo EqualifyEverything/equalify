@@ -178,6 +178,7 @@ function sample_scanner_single_page_notices($response_body, $page_url)
 
                 // Push notice.
                 $sample_scanner_notices[] = $notice;
+                
             }
         }
     }

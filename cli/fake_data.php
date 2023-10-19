@@ -92,7 +92,7 @@ function generate_notices(){
     $rows = array();
 
     // Create 1,111 notices.
-    for ($i = 0; $i < 11; $i++) {
+    for ($i = 0; $i < 1; $i++) {
         // Randomly pick a property.
         $random_property = $existing_properties[array_rand($existing_properties)];
 
@@ -107,12 +107,13 @@ function generate_notices(){
 
         // Create the notice.
         $new_row = array(
-            'source_url'   => $random_property->url,
-            'property_id'  => $random_property->id,
             'status'       => $random_status,
-            'tags'         => "faked_data",
+            'related_url'  => $random_property->url,
+            'source'       => 'cli/faked_data.php',
+            'property_id'  => $random_property->id,
             'message'      => $random_message,
-            'meta'         => "",
+            'tags'         => 'faked_data',
+            'meta'         => '',
             'archived'     => false
         );
 
