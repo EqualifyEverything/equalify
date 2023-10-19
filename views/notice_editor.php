@@ -8,7 +8,7 @@ $statusArray = [
   'Active',
   'Ignored',
 ];
-$sourceURL = 'www.sampleurl.com/example';
+$relatedURL = 'www.sampleurl.com/example';
 $property = 'Sample Property';
 $propertiesArray = [
   'sampleProperty1',
@@ -43,7 +43,7 @@ $hasVisualizer = false;
       endif;
       ?>
     </div>
-    <form>
+    <form action="actions/save_notice.php">
       <!-- First row -->
 
       <div class="row mb-3">
@@ -63,8 +63,8 @@ $hasVisualizer = false;
           </select>
         </div>
         <div class="col-md-3 ml-3 mb-4">
-          <label class="col-form-label-lg font-weight-bold" for="sourceURLInput">Source URL</label>
-          <input type="url" class="form-control" id="sourceURLInput" placeholder="Source URL:" value=<?php echo $sourceURL ?> required>
+          <label class="col-form-label-lg font-weight-bold" for="relatedURLInput">Related URL</label>
+          <input type="url" class="form-control" id="relatedURLInput" placeholder="Related URL:" value=<?php echo $relatedURL ?> required>
         </div>
       </div>
       <!-- Second row -->
