@@ -25,7 +25,7 @@ $snippetArray = [
 ];
 $moreInfoURL = 'www.moreinfo.com/example';
 $notes = 'this is a sample note, with markdown';
-$hasBulkImporter = true;
+$hasBulkImporter = false;
 $hasVisualizer = false;
 ?>
 
@@ -73,15 +73,17 @@ $hasVisualizer = false;
                 <div class="col-md-3 mb-4">
                     <label class="col-form-label-lg font-weight-bold" for="relatedPropertyInput">Related Property</label>
                     <select class="custom-select mr-sm-2" id="relatedPropertyInput">
-                        {% for property in propertiesArray %}
-                        <option value=<?php echo $property ?>><?php echo $property ?></option>
-                        {% endfor %}
+                        <?php 
+                        // Populate Properties Array
+                        foreach ($propertiesArray as $property)
+                        echo '<option value='.$property.'>'.$property.'</option>';
+                        ?>
                     </select>
                 </div>
                 <div class="col-md-5 ml-md-3 mb-4">
                     <label class="col-form-label-lg font-weight-bold" for="metaCodeSnippetInput">Meta:Code Snippet</label>
                     <ul class="list-group mb-3">
-                        {% for snippet in codeSnippetArray %}
+                        <?php foreach( $snippetArray as $snippet):?> 
                         <li class="list-group-item d-flex align-items-start">
                             <code id="metaCodeSnippetInput"><?php echo $snippet ?></code>
                             <a href="#" class="ml-3 justify-content-end">
@@ -90,12 +92,14 @@ $hasVisualizer = false;
                                 </svg>
                             </a>
                         </li>
-                        {% endfor %}
+                        <?php 
+                            endforeach;
+                        ?> 
                     </ul>
                     <a href="add_report" class="btn btn-secondary">Add</a>
-                    <?php if ($hasVisualizer) ?>
+                    <?php if ($hasVisualizer): ?>
                     <a href="add_report" class="btn btn-secondary">Visualizer</a>
-                    {% endif %}
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-3 ml-md-3 mb-4">
                     <label class="col-form-label-lg font-weight-bold" for="moreInfoURLInput">Meta: More Info URL</label>
