@@ -16,8 +16,8 @@ $propertiesArray = [
     'sampleProperty3',
     'sampleProperty4',
 ];
-$codeSnippet = '<h1>This is a sample code snippet,/h1>';
-$codeSnippetArray = [
+$nippet = '<h1>This is a sample code snippet,/h1>';
+$snippetArray = [
     '<h1>This is a sample code snippet,</h1>',
     '<h1>This is a sample code snippet,</h1>',
     '<h1>This is a sample code snippet,</h1>',
@@ -55,9 +55,12 @@ $hasVisualizer = false;
                 <div class="col-md-3 ml-3 mb-4">
                     <label class="col-form-label-lg font-weight-bold" for="alertStatusSelectInput">Status</label>
                     <select class="custom-select mr-sm-2" id="alertStatusSelectInput">
-                        {% for status in statusArray %}
-                        <option value=<?php echo $status ?>><?php echo $status ?></option>
-                        {% endfor %}
+                        <?php
+                        // Populate Status Dropdown
+                        foreach ($statusArray as $status): 
+                            echo '<option value='.$status.'>'.$status.'</option>';
+                        endforeach;
+                        ?>
                     </select>
                 </div>
                 <div class="col-md-3 ml-3 mb-4">
