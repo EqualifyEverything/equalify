@@ -58,10 +58,13 @@ function generate_properties() {
         $existing_urls[] = $property->url;
     }
 
+    $count = 0;
     foreach ($properties as $property) {
+        
         // Check if the property URL already exists
         if (in_array($property['url'], $existing_urls)) {
             continue;  // skip if URL already exists in the database
+            $count++;
         }
 
         $fields = array(
@@ -76,7 +79,7 @@ function generate_properties() {
         DataAccess::add_db_entry('properties', $fields);
     }
 
-    echo 'Added '.count($properties).' properties. /n';
+    echo "Added ".$count." properties. \n";
 
 }
 
@@ -84,46 +87,55 @@ function generate_properties() {
 generate_notices();
 function generate_notices(){
 
-    // Fetch the properties.
-    $properties_filter = array();  // empty filter to get all rows.
+    // Get all properties
+    $properties_filter = array();
     $existing_properties = DataAccess::get_db_rows('properties', $properties_filter, 1, 10000)['content'];
 
-    // Initialize the array to hold the notices.
-    $rows = array();
+    $statuses = ["active", "ignored", "equalified"];
+    $messages = [
+        "lorem sic ipsum dalor",
+        "sic lorem dalor ipsum",
+        "ipsum dalor lorem sic",
+        "dalor sic ipsum lorem",
+        "lorem ipsum sic dalor"
+    ];
 
-    // Create 1,111 notices.
-    for ($i = 0; $i < 1; $i++) {
-        // Randomly pick a property.
+    $new_notices = [];
+    for ($i = 0; $i < 11; $i++) {
         $random_property = $existing_properties[array_rand($existing_properties)];
 
-        // Generate a random status.
-        $statuses = array("active", "ignored", "equalified");
-        $random_status = $statuses[array_rand($statuses)];
+        $notice = new stdClass();
+        $notice->related_url = $random_property->url;
+        $notice->property_id = $random_property->id;
+        $notice->source = 'faked_data.php';
+        $notice->status = $statuses[array_rand($statuses)];
+        $notice->tags = 'faked_data';
+        $notice->message = $messages[array_rand($messages)];
+        $notice->meta = '';  // Leaving meta blank
+        $notice->archived = 0;
 
-        // Generate a random message based on "lorem ipsum sic dalor".
-        $words = explode(" ", "lorem ipsum sic dalor");
-        shuffle($words);
-        $random_message = implode(" ", $words);
+        $new_notices[] = $notice;
+    }
 
-        // Create the notice.
+    // Add notices to database
+    $rows = [];
+    foreach ($new_notices as $notice) {
         $new_row = array(
-            'status'       => $random_status,
-            'related_url'  => $random_property->url,
-            'source'       => 'cli/faked_data.php',
-            'property_id'  => $random_property->id,
-            'message'      => $random_message,
-            'tags'         => 'faked_data',
-            'meta'         => '',
-            'archived'     => false
+            'related_url' => $notice->related_url,
+            'property_id' => $notice->property_id,
+            'source' => $notice->source,
+            'status' => $notice->status,
+            'tags' => $notice->tags,
+            'message' => $notice->message,
+            'meta' => $notice->meta,
+            'archived' => $notice->archived
         );
-
         array_push($rows, $new_row);
     }
 
-    // Insert the notices into the database.
     DataAccess::add_db_rows('notices', $rows);
 
     // Add message.
-    echo 'Added 1,111 notices. /n';
+    echo "Added 1,111 notices. \n";
 
 }
