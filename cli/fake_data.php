@@ -64,8 +64,8 @@ function generate_properties() {
         // Check if the property URL already exists
         if (in_array($property['url'], $existing_urls)) {
             continue;  // skip if URL already exists in the database
-            $count++;
         }
+            $count++;
 
         $fields = array(
             array('name' => 'url', 'value' => $property['url']),
