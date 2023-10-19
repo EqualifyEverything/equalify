@@ -72,15 +72,15 @@ function equalify_scan_single_page_request($page_url)
 }
 
 /**
- * Equalify Scan Alerts
+ * Equalify Scan Notices
  * @param string response_body
  * @param string page_url
  */
-function equalify_scan_single_page_alerts($response_body, $page_url)
+function equalify_scan_single_page_notices($response_body, $page_url)
 {
 
-    // Our goal is to return alerts.
-    $equalify_scan_alerts = [];
+    // Our goal is to return notices.
+    $equalify_scan_notices = [];
     $equalify_scan_json = $response_body;
 
     // Decode JSON.
@@ -99,19 +99,19 @@ function equalify_scan_single_page_alerts($response_body, $page_url)
             $equalify_scan_violations[] = $violation;
         }
 
-        // Add alerts.
+        // Add notices.
         if (!empty($equalify_scan_violations)) {
 
-            // Setup alert variables.
+            // Setup notice variables.
             foreach ($equalify_scan_violations as $violation) {
 
                 // Default variables.
-                $alert = array();
-                $alert['source'] = 'equalify_scan';
-                $alert['url'] = $page_url;
+                $notice = array();
+                $notice['source'] = 'equalify_scan';
+                $notice['url'] = $page_url;
 
                 // Setup tags.
-                $alert['tags'] = '';
+                $notice['tags'] = '';
                 if (!empty($violation->tags)) {
 
                     // We need to get rid of periods so Equalify
@@ -120,25 +120,25 @@ function equalify_scan_single_page_alerts($response_body, $page_url)
                     $tags = $violation->tags;
                     $copy = $tags;
                     foreach ($tags as $tag) {
-                        $alert['tags'] .= str_replace('.', '', 'equalify_scan_' . $tag);
+                        $notice['tags'] .= str_replace('.', '', 'equalify_scan_' . $tag);
                         if (next($copy))
-                            $alert['tags'] .= ',';
+                            $notice['tags'] .= ',';
                     }
                 }
 
                 // Setup message.
-                $alert['message'] = '"' . $violation->id . '" violation: ' . $violation->help;
+                $notice['message'] = '"' . $violation->id . '" violation: ' . $violation->help;
 
                 // Setup more info.
-                $alert['more_info'] = '';
+                $notice['more_info'] = '';
                 if ($violation->nodes)
-                    $alert['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
+                    $notice['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
 
-                // Push alert.
-                $equalify_scan_alerts[] = $alert;
+                // Push notice.
+                $equalify_scan_notices[] = $notice;
             }
         }
     }
-    // Return alerts.
-    return $equalify_scan_alerts;
+    // Return notices.
+    return $equalify_scan_notices;
 }

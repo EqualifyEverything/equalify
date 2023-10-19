@@ -17,8 +17,8 @@ if(!empty($_POST['last_view'])){
     $last_view = $_POST['last_view'];
 }else{
 
-    // If no view is specified, we'll return to scan profiles.
-    $last_view = 'scan_profiles';
+    // If no view is specified, we'll return to properties.
+    $last_view = 'properties';
 
 }
 

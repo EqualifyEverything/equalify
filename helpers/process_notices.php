@@ -1,7 +1,7 @@
 <?php
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This doc deals with the alerts in a process.
+ * This doc deals with the notices in a process.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -9,13 +9,13 @@
 **********************************************************/
 
 /**
- * Process Alerts
+ * Process Notices
  * @param array integration_output
  */
-function process_alerts( array $integration_output) {
+function process_notices( array $integration_output) {
 
     // Let's log our process for the CLI.
-    update_scan_log("\n\n\n> Processing alerts...");
+    update_scan_log("\n\n\n> Processing notices...");
     $time_pre = microtime(true);
 
     // From the previous process, we should have
@@ -36,7 +36,7 @@ function process_alerts( array $integration_output) {
     require_once(__ROOT__.'/config.php');
     require_once(__ROOT__.'/models/db.php');
 
-    // Now let's get our existing alerts, filtered to the
+    // Now let's get our existing notices, filtered to the
     // pages we're interested in.
     $urls_to_filter = array();
     foreach ( $processed_urls as $url){
@@ -46,7 +46,7 @@ function process_alerts( array $integration_output) {
             'condition'=> 'OR'
         ));
     };
-    $existing_alert_filters = array(
+    $existing_notice_filters = array(
         array(
             'name'  => 'archived',
             'value' => 0
@@ -56,32 +56,32 @@ function process_alerts( array $integration_output) {
             'value' => $urls_to_filter
         )
     );
-    $existing_alerts = DataAccess::get_db_rows(
-        'alerts', $existing_alert_filters, 1, 1000000
+    $existing_notices = DataAccess::get_db_rows(
+        'notices', $existing_notice_filters, 1, 1000000
     )['content'];
-    if(empty($existing_alerts))
-        $existing_alerts = array();
+    if(empty($existing_notices))
+        $existing_notices = array();
 
-    // Let's find equalified alerts.
-    $equalified_alerts =  DataAccess::get_joined_db(
-        'equalified_alerts', $processed_sites
+    // Let's find equalified notices.
+    $equalified_notices =  DataAccess::get_joined_db(
+        'equalified_notices', $processed_sites
     );
 
-    // Let's mark the status of these alerts "Equalified".
-    if(!empty($equalified_alerts)){
+    // Let's mark the status of these notices "Equalified".
+    if(!empty($equalified_notices)){
 
         // We need to create filters to equalify.
         $filters = [];
-        foreach($equalified_alerts as $alert){
+        foreach($equalified_notices as $notice){
             $new_filter = array(
                 'name' => 'id',
-                'value' => $alert->id,
+                'value' => $notice->id,
                 'condition' => 'OR'
             );
             array_push($filters, $new_filter);
         };
 
-        // Now let's update the rows in alerts.
+        // Now let's update the rows in notices.
         $fields = array(
             array(
                 'name' => 'status',
@@ -89,53 +89,53 @@ function process_alerts( array $integration_output) {
             )
         );
         DataAccess::update_db_rows(
-            'alerts', $fields, $filters
+            'notices', $fields, $filters
         );
 
-        // And let's remove equalified alerts from the queue.
+        // And let's remove equalified notices from the queue.
         DataAccess::delete_db_entries(
-            'queued_alerts', $filters
+            'queued_notices', $filters
         );
 
     };
 
-    // Let's find new alerts from queued alerts.
-    $new_alerts =  DataAccess::get_joined_db(
-        'new_alerts'
+    // Let's find new notices from queued notices.
+    $new_notices =  DataAccess::get_joined_db(
+        'new_notices'
     );
 
-    // Let's move new alerts into the alerts table.
-    if(!empty($new_alerts)){
+    // Let's move new notices into the notices table.
+    if(!empty($new_notices)){
 
         // We need to update fields to add.
         $rows = [];
-        foreach($new_alerts as $alert){
+        foreach($new_notices as $notice){
             $new_row = array(
-                'url'       => $alert->url,
-                'message'   => $alert->message,
-                'status'    => $alert->status,
-                'site_id'   => $alert->site_id,
-                'tags'      => $alert->tags,
-                'source'    => $alert->source,
-                'more_info' => $alert->more_info
+                'url'       => $notice->url,
+                'message'   => $notice->message,
+                'status'    => $notice->status,
+                'property_id'   => $notice->property_id,
+                'tags'      => $notice->tags,
+                'source'    => $notice->source,
+                'more_info' => $notice->more_info
             );
             array_push($rows, $new_row);
         };
 
-        // Now let's update the rows in alerts.
+        // Now let's update the rows in notices.
         DataAccess::add_db_rows(
-            'alerts', $rows
+            'notices', $rows
         );
 
     };
 
-    // Finally, we clear the queued alerts table.
-    DataAccess::delete_db_entries('queued_alerts');
+    // Finally, we clear the queued notices table.
+    DataAccess::delete_db_entries('queued_notices');
     
-    // Let's log the total alerts.
-    $equalified_count = number_format(count($equalified_alerts));
-    $new_count = number_format(count($new_alerts));
-    update_scan_log("\n>>> $equalified_count alert(s) equalified and $new_count new alert(s).");
+    // Let's log the total notices.
+    $equalified_count = number_format(count($equalified_notices));
+    $new_count = number_format(count($new_notices));
+    update_scan_log("\n>>> $equalified_count notice(s) equalified and $new_count new notice(s).");
 
     // Let's also log the time it took.
     $time_post = microtime(true);

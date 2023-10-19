@@ -39,6 +39,7 @@
                     </a>
                 </p>
             </div>
+
         </section>
         <section id="integrations">
             <h2 class="mt-5 mb-4">Integrations</h2>
@@ -47,7 +48,7 @@
                 <?php
                 // Get list of active integrations to use in the integrations list.
                 $active_integrations = unserialize(DataAccess::get_meta_value('active_integrations'));
-
+                
                 // Begin Integrations List
                 $integrations = uploaded_integrations('integrations');
                 foreach($integrations as $integration):

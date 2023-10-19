@@ -24,7 +24,7 @@ if(!empty($_GET['report'])){
     // We need to unserialize the meta from the report.
     $report_meta = unserialize($report['meta_value']);
 
-    // No archived alerts are shown in reports.
+    // No archived notices are shown in reports.
     array_push($report_meta, array(
         'name' => 'archived',
         'value' => 0
@@ -54,14 +54,14 @@ if(!empty($_GET['report'])){
 // We also have special presets.
 }elseif(!empty($_GET['preset'])){
 
-    // The active preset contains all alerts.
+    // The active preset contains all notices.
     if($_GET['preset'] == 'all'){
         $report = array(
             'meta_name' => 'report_all',
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'All Alerts'
+                    'value' => 'All Notices'
                 ), array(
                     'name' => 'archived',
                     'value' => 0
@@ -70,14 +70,14 @@ if(!empty($_GET['report'])){
         );
         $report_meta = $report['meta_value'];    
 
-    // The ignored preset contains all 'ignored' alerts.
+    // The ignored preset contains all 'ignored' notices.
     }elseif($_GET['preset'] == 'ignored'){
         $report = array(
             'meta_name' => 'report_ignored',
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Ignored Alerts'
+                    'value' => 'Ignored Notices'
                 ),
                 array(
                     'name' => 'status',
@@ -91,14 +91,14 @@ if(!empty($_GET['report'])){
         $report_meta = $report['meta_value'];
 
     // The equalified preset contains all 'equalified' 
-    // alerts.
+    // notices.
     }elseif($_GET['preset'] == 'equalified'){
         $report = array(
             'meta_name' => 'report_equalified',
             'meta_value' => array(
                 array(
                     'name' => 'title',
-                    'value' => 'Equalified Alerts'
+                    'value' => 'Equalified Notices'
                 ),
                 array(
                     'name' => 'status',
@@ -118,13 +118,13 @@ if(!empty($_GET['report'])){
 
 }else{
 
-    // When there's no report data, we get active alerts.
+    // When there's no report data, we get active notices.
     $report = array(
         'meta_name' => 'report_active',
         'meta_value' => array(
             array(
                 'name' => 'title',
-                'value' => 'Active Alerts'
+                'value' => 'Active Notices'
             ),
             array(
                 'name' => 'status',
@@ -145,7 +145,7 @@ if(!empty($_GET['report'])){
 
 // Let's extract the "title" meta, so we can use it 
 // later and so we can use any report's meta_values to
-// filter the alerts.
+// filter the notices.
 foreach($report_meta as $k => $val) {
     if($val['name'] == 'title') {
         $the_title = $val['value'];
@@ -162,12 +162,12 @@ foreach($report_meta as $k => $val) {
 if(!empty($_GET['format'])){
     // JSON version of View
     $filters = $report_meta;
-    $alerts = DataAccess::get_db_rows( 'alerts',
+    $notices = DataAccess::get_db_rows( 'notices',
         $filters, get_current_page_number()
     );
-    if( count($alerts['content']) > 0 ): 
-        foreach($alerts['content'] as $alert):   
-            echo json_encode( $alert ); 
+    if( count($notices['content']) > 0 ): 
+        foreach($notices['content'] as $notice):   
+            echo json_encode( $notice ); 
         endforeach;
     endif;
 } else {
@@ -235,46 +235,46 @@ if(!empty($_GET['format'])){
         // We need to setup the different filters from the
         // all report meta.
         $filters = $report_meta;
-        $alerts = DataAccess::get_db_rows( 'alerts',
+        $notices = DataAccess::get_db_rows( 'notices',
             $filters, get_current_page_number()
         );
-        if( count($alerts['content']) > 0 ): 
-            foreach($alerts['content'] as $alert):    
+        if( count($notices['content']) > 0 ): 
+            foreach($notices['content'] as $notice):    
         ?>
 
         <tr>
-            <td><?php echo $alert->time;?></td>
-            <td><?php echo $alert->url;?></td>
-            <td><?php echo covert_code_shortcode($alert->message);?></td>
+            <td><?php echo $notice->time;?></td>
+            <td><?php echo $notice->url;?></td>
+            <td><?php echo covert_code_shortcode($notice->message);?></td>
             <td style="min-width: 200px;">
 
                 <?php
                 // Conditionally show "More Info".
-                if(!empty($alert->more_info)){
+                if(!empty($notice->more_info)){
                 ?>
 
-                <a href="?view=single_alert&id=<?php echo $alert->id;?>" class="btn btn-outline-primary btn-sm">
+                <a href="?view=single_notice&id=<?php echo $notice->id;?>" class="btn btn-outline-primary btn-sm">
                     More Info
                 </a>
 
                 <?php
                 }
 
-                // Active alerts can be ignored.
-                if( $alert->status == 'active' && $alert->archived != 1 ){
+                // Active notices can be ignored.
+                if( $notice->status == 'active' && $notice->archived != 1 ){
                 ?>
 
-                <a href="actions/ignore_alert.php?id=<?php echo $alert->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
-                    Ignore Alert
+                <a href="actions/ignore_notice.php?id=<?php echo $notice->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-secondary btn-sm">
+                    Ignore Notice
                 </a>
 
                 <?php
-                // Ignored alerts can be activated.
-                }elseif( $alert->status == 'ignored' ){
+                // Ignored notices can be activated.
+                }elseif( $notice->status == 'ignored' ){
                 ?>
 
-                <a href="actions/activate_alert.php?id=<?php echo $alert->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-success btn-sm">
-                    Activate Alert
+                <a href="actions/activate_notice.php?id=<?php echo $notice->id; if(isset($_GET['report'])) echo '&report='.$_GET['report']; if(isset($_GET['preset'])) echo '&preset='.$_GET['preset'];?>" class="btn btn-outline-success btn-sm">
+                    Activate Notice
                 </a>
 
                 <?php
@@ -293,7 +293,7 @@ if(!empty($_GET['format'])){
             <td colspan="6">
                 <?php ob_start(); ?>
                 <p class="text-center my-2 lead">
-                    No alerts found.<br>
+                    No notices found.<br>
                 </p>
                 <p class="text-center my-2">
                     <img src="plumeria.png" alt="Three frangipani flowers. The flowers have five petals. Color emanates from the center of the flower before becoming colorless at the tip of each petal."  ><br>
@@ -301,14 +301,14 @@ if(!empty($_GET['format'])){
                 </p>
                 <?php
 					// @TODO: run the new hooks system instead
-					//echo $hook_system->apply_filters('no_alerts_fallback', ob_get_clean());
+					//echo $hook_system->apply_filters('no_notices_fallback', ob_get_clean());
 					echo ob_get_clean();
 				?>
             </td>
         </tr>
 
         <?php 
-        // End Alerts
+        // End Notices
         endif;
         ?>
 
@@ -316,7 +316,7 @@ if(!empty($_GET['format'])){
 
     <?php
     // The pagination
-    the_pagination($alerts['total_pages']);
+    the_pagination($notices['total_pages']);
     ?>
 
 </section>

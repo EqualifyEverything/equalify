@@ -78,8 +78,8 @@ if($old_status == 'Active'){
         );
     }
 
-    // Now we can archive alerts.
-    update_alerts(1, $integration_uri);
+    // Now we can archive notices.
+    update_notices(1, $integration_uri);
 
 
 }elseif($old_status == 'Disabled'){
@@ -142,8 +142,8 @@ if($old_status == 'Active'){
         'active_integrations', $new_active_integrations
     );
 
-    // Now we can unarchive alerts.
-    update_alerts(0, $integration_uri);
+    // Now we can unarchive notices.
+    update_notices(0, $integration_uri);
 
 }else{
     throw new Exception(
@@ -153,36 +153,36 @@ if($old_status == 'Active'){
 
 // Redirect.
 header(
-    'Location: ../index.php?view=integrations&id='.$integration_uri
+    'Location: ../index.php?view=settings&id='.$integration_uri
 );
 
 /**
- * Update Alerts
+ * Update Notices
  * @param string newstatus
  * @param string integration_uri
  */
-function update_alerts($new_status, $integration_uri) {
+function update_notices($new_status, $integration_uri) {
 
-    // Get active scan profiles.
-    $scan_profiles_filter = array(
+    // Get active properties.
+    $properties_filter = array(
         array(
             'name' => 'status',
             'value' => 'active'
         )
     );
-    $active_scan_profiles = DataAccess::get_db_rows(
-        'scan_profiles', $scan_profiles_filter, 1, 10000
+    $active_properties = DataAccess::get_db_rows(
+        'properties', $properties_filter, 1, 10000
     );
 
-    // Create active scan profiles to alerts filter.
+    // Create active properties to notices filter.
     $scan_profile_ids = NULL;
-    if(!empty($active_scan_profiles['content'])){
+    if(!empty($active_properties['content'])){
         $scan_profile_ids = array();
-        foreach ($active_scan_profiles['content'] as $scan_profile){
+        foreach ($active_properties['content'] as $scan_profile){
             array_push(
                 $scan_profile_ids,
                 array(
-                    'name' => 'site_id',
+                    'name' => 'property_id',
                     'value' => $scan_profile->id,
                     'operator' => '=',
                     'condition' => 'OR'
@@ -191,15 +191,15 @@ function update_alerts($new_status, $integration_uri) {
         }
     }
 
-    // Create filter to select alerts with the current 
-    // integration and active scan profiles.
-    $alerts_filters = array(
+    // Create filter to select notices with the current 
+    // integration and active properties.
+    $notices_filters = array(
         array(
             'name' => 'source',
             'value' => $integration_uri 
         ),
         array(
-            'name' => 'site_id',
+            'name' => 'property_id',
             'value' => $scan_profile_ids
         )
     );
@@ -212,7 +212,7 @@ function update_alerts($new_status, $integration_uri) {
         )
     );
     DataAccess::update_db_rows(
-        'alerts', $updated_fields, $alerts_filters
+        'notices', $updated_fields, $notices_filters
     );
 
 }

@@ -21,13 +21,13 @@ Support a more accessible web!
 - **Request early access** of our managed version, [equalify.app](http://equalify.app).
 
 ## Features
-Equalify is designed to manage large amounts of accessibility alerts. The following features make it easier for you to do that:
-- **Dynamic Reporting**: Filter custom reports to alerts around specific sites, issue types, code snippets, and messages.
+Equalify is designed to manage large amounts of accessibility notices. The following features make it easier for you to do that:
+- **Dynamic Reporting**: Filter custom reports to notices around specific sites, issue types, code snippets, and messages.
 - **Historic Analysis**: View your fixes and issues over time.
-- **Automatic Status Updates**: When you resolve an automated alert, it's automatically marked it "equalified".
-- **Multi-page Scan**: Scan many pages on a website for accessibility alerts.
+- **Automatic Status Updates**: When you resolve an automated notice, it's automatically marked it "equalified".
+- **Multi-page Scan**: Scan many pages on a website for accessibility notices.
 - **Extendable Integrations**: Create or activate existing integrations to add new A11y features to Equalify.
-- **Manual Alert Creation**: Manually add and update alerts. That means you can add alerts from your user tests!
+- **Manual Notice Creation**: Manually add and update notices. That means you can add notices from your user tests!
 
 ## Easy Install
 1. Download or clone [the latest release](https://github.com/EqualifyEverything/equalify/releases).

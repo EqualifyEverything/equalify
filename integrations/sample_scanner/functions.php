@@ -114,15 +114,15 @@ function sample_scanner_single_page_request($page_url)
 }
 
 /**
- * Sample Scan Alerts
+ * Sample Scan Notices
  * @param string response_body
  * @param string page_url
  */
-function sample_scanner_single_page_alerts($response_body, $page_url)
+function sample_scanner_single_page_notices($response_body, $page_url)
 {
 
-    // Our goal is to return alerts.
-    $sample_scanner_alerts = [];
+    // Our goal is to return notices.
+    $sample_scanner_notices = [];
     $sample_scanner_json = $response_body;
 
     // Decode JSON.
@@ -141,19 +141,19 @@ function sample_scanner_single_page_alerts($response_body, $page_url)
             $sample_scanner_violations[] = $violation;
         }
 
-        // Add alerts.
+        // Add notices.
         if (!empty($sample_scanner_violations)) {
 
-            // Setup alert variables.
+            // Setup notice variables.
             foreach ($sample_scanner_violations as $violation) {
 
                 // Default variables.
-                $alert = array();
-                $alert['source'] = 'sample_scan';
-                $alert['url'] = $page_url;
+                $notice = array();
+                $notice['source'] = 'sample_scan';
+                $notice['url'] = $page_url;
 
                 // Setup tags.
-                $alert['tags'] = '';
+                $notice['tags'] = '';
                 if (!empty($violation->tags)) {
 
                     // We need to get rid of periods so Sample
@@ -162,25 +162,25 @@ function sample_scanner_single_page_alerts($response_body, $page_url)
                     $tags = $violation->tags;
                     $copy = $tags;
                     foreach ($tags as $tag) {
-                        $alert['tags'] .= str_replace('.', '', 'sample_scanner_' . $tag);
+                        $notice['tags'] .= str_replace('.', '', 'sample_scanner_' . $tag);
                         if (next($copy))
-                            $alert['tags'] .= ',';
+                            $notice['tags'] .= ',';
                     }
                 }
 
                 // Setup message.
-                $alert['message'] = '"' . $violation->id . '" violation: ' . $violation->help;
+                $notice['message'] = '"' . $violation->id . '" violation: ' . $violation->help;
 
                 // Setup more info.
-                $alert['more_info'] = '';
+                $notice['more_info'] = '';
                 if ($violation->nodes)
-                    $alert['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
+                    $notice['more_info'] = json_encode($violation->nodes, JSON_PRETTY_PRINT);
 
-                // Push alert.
-                $sample_scanner_alerts[] = $alert;
+                // Push notice.
+                $sample_scanner_notices[] = $notice;
             }
         }
     }
-    // Return alerts.
-    return $sample_scanner_alerts;
+    // Return notices.
+    return $sample_scanner_notices;
 }
