@@ -136,6 +136,7 @@ function generate_notices(){
     DataAccess::add_db_rows('notices', $rows);
 
     // Add message.
-    echo "Added 1,111 notices. \n";
+    $count_notices = count($new_notices);
+    echo "Added $count_notices notices. \n";
 
 }
