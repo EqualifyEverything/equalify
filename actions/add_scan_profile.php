@@ -49,8 +49,8 @@ $fields = array(
     )
 );
 DataAccess::add_db_entry(
-    'scan_profiles', $fields
+    'properties', $fields
 );
 
 // Back home we go.
-header('Location: ../index.php?view=scan_profiles&status=success');
+header('Location: ../index.php?view=properties&status=success');

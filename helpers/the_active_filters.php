@@ -34,7 +34,7 @@ function the_active_filters(){
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows( 'scan_profiles',
+    $active_sites = DataAccess::get_db_rows( 'properties',
         $filtered_to_active_sites, 1, 10000
     )['content'];
 
@@ -56,7 +56,7 @@ function the_active_filters(){
             array_push(
                 $output,
                 array(
-                    'name' => 'site_id',
+                    'name' => 'property_id',
                     'value' => $site->id
                 )
             );

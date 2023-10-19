@@ -24,7 +24,7 @@ $title = 'Untitled';
 $status = '';
 $type   = '';
 $name   = '';
-$site_id = '';
+$property_id = '';
 $preset = FALSE;
 
 // We use this view to customize reports if a id is 
@@ -48,19 +48,19 @@ if(!empty($_GET['meta_name'])){
         DataAccess::get_meta_value($name)
     );
 
-    // Some reports, like Equalified alerts, won't
+    // Some reports, like Equalified notices, won't
     // have data, so we'll have to prepare variables
     if(empty($existing_report)){
 
         // Set the default title field.
         if($name == 'report_equalified'){
-            $title = 'Equalified Alerts';
+            $title = 'Equalified Notices';
         }elseif($name == 'report_ignored'){
-            $title = 'Ignored Alerts';
+            $title = 'Ignored Notices';
         }elseif($name == 'report_all'){
-            $title = 'All Alerts';
+            $title = 'All Notices';
         }elseif($name == 'report_active'){
-            $title = 'Active Alerts';
+            $title = 'Active Notices';
         }
 
         // Set the default status field.
@@ -85,8 +85,8 @@ if(!empty($_GET['meta_name'])){
                 $type = $report['value'];
             }elseif($report['name'] == 'status'){
                 $status = $report['value'];
-            }elseif($report['name'] == 'site_id'){
-                $site_id = $report['value'];
+            }elseif($report['name'] == 'property_id'){
+                $property_id = $report['value'];
             }else{
                 $dynamic_meta[] = $report['name'];
             }
@@ -136,21 +136,21 @@ if(!empty($_GET['meta_name'])){
         <div class="mb-3 row">
             <div class="col">
                 <label for="statusSelect" class="form-label fw-semibold">Site</label>
-                <select id="statusSelect" class="form-select" name="site_id">
+                <select id="statusSelect" class="form-select" name="property_id">
                     <option value="">Any</option>
 
                     <?php 
-                    // Get the scan_profiles.
-                    $scan_profiles = DataAccess::get_db_rows( 'scan_profiles',
+                    // Get the properties.
+                    $properties = DataAccess::get_db_rows( 'properties',
                         array(), 1, 10000000
                     )['content'];
 
                     // Build options.
-                    if(!empty($scan_profiles)){
-                        foreach ($scan_profiles as $site_option){
+                    if(!empty($properties)){
+                        foreach ($properties as $site_option){
 
                             // A site may already be saved. 
-                            if($site_option->id == $site_id){
+                            if($site_option->id == $property_id){
                                 $selected_attribute = 'selected';
                             }else{
                                 $selected_attribute = '';
@@ -168,7 +168,7 @@ if(!empty($_GET['meta_name'])){
                 </select>
             </div>
             <div class="col">
-                <label for="statusSelect" class="form-label fw-semibold">Alert Status</label>
+                <label for="statusSelect" class="form-label fw-semibold">Notice Status</label>
                 <select id="statusSelect" class="form-select" name="status">
                     <option value="">Any</option>
 
@@ -218,8 +218,8 @@ if(!empty($_GET['meta_name'])){
         if(!empty($tags)):
         ?>
 
-        <div id="alert_tags" class="mb-3">
-            <h2>Show Alerts Tagged</h2>
+        <div id="notice_tags" class="mb-3">
+            <h2>Show Notices Tagged</h2>
             <div class="d-flex flex-wrap">
 
             <?php

@@ -78,7 +78,7 @@ function the_success_message(){
     if(strpos($_SERVER['REQUEST_URI'], 'success')){
 ?>
 
-    <div class="alert alert-success" role="alert">
+    <div class="notice notice-success" role="notice">
         Update was successful!
     </div>
 

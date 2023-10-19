@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document ignores an alert.
+ * This document activates a notice.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -27,19 +27,19 @@ if (isset($_GET['preset'])){
     $redirect = '&report='.$_GET['report'];
 }
 
-// Set the entry to "ignored".
-$alert_arguments = array(
+// Set the entry to "active".
+$notice_arguments = array(
     array(
 
         // What else? You can add arrays if you
         // want.
         'name' => 'status',
-        'value'=> 'ignored'
+        'value'=> 'active'
 
     )
 );
 DataAccess::update_db_entry(
-    'alerts', $id, $alert_arguments
+    'notices', $id, $notice_arguments
 );
 
 // If a "referrer" session was create

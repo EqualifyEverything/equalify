@@ -21,9 +21,9 @@ Pull requests (PRs) are only merged into an official release if the reviewer can
 
 Also, if your contribution adds a significant amount of unique code, you will be asked to sign a contributor agreement. These agreements protect both contributors and Equalify. Our contributor agreement uses language in the [Apache Contributor Agreement](https://www.apache.org/licenses/icla.pdf). 
 
-## Why PHP? Why are the WordPress and Drupal communities a model?
+## Why PHP? Why is WordPress a model?
 
-Equalify is built for folks who work with web content. Since PHP is arguably the most popular web programming language and since WordPress + Drupal are the most popular content management systems, Equalify is designed to work with that language and appeal to WordPress + Drupal users.
+Equalify is built for folks who work with web content. Since PHP is arguably the most popular web programming language and since WordPress is the most popular content management system, Equalify is designed to work with that language and appeal to WordPress users.
 
 ## Why aren't we using a framework like Laravel?
 

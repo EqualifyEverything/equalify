@@ -129,4 +129,5 @@ $hasVisualizer = false;
   </div>
 
   <!-- create button for adding reports -->
+
 </main>

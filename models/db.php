@@ -281,24 +281,24 @@ class DataAccess {
     /**
      * Get Joined DB
      * @param string requesting
-     * @param array site_ids
+     * @param array property_ids
      */
     public static function get_joined_db(
         $requesting, $sites = []){
 
-            // TODO: Add "WHERE" with site id, so that we only equalify active site alerts.
+            // TODO: Add "WHERE" with site id, so that we only equalify active site notices.
 
         // Set conditions based on type.
-        if($requesting == 'equalified_alerts'){
-            $table1 = 'alerts';
-            $table2 = 'queued_alerts';
+        if($requesting == 'equalified_notices'){
+            $table1 = 'notices';
+            $table2 = 'queued_notices';
             $selected_columns = "DISTINCT $table1.id";
-        }elseif($requesting == 'new_alerts'){
-            $table1 = 'queued_alerts';
-            $table2 = 'alerts';
+        }elseif($requesting == 'new_notices'){
+            $table1 = 'queued_notices';
+            $table2 = 'notices';
             $selected_columns = "DISTINCT $table1.id, ";
             $selected_columns.= "$table1.url, $table1.message, ";
-            $selected_columns.= "$table1.status, $table1.site_id, ";
+            $selected_columns.= "$table1.status, $table1.property_id, ";
             $selected_columns.= "$table1.source, $table1.tags, ";
             $selected_columns.= "$table1.more_info, $table1.more_info";
         }
@@ -308,12 +308,12 @@ class DataAccess {
         $sql.= "LEFT JOIN $table2 ";
         $sql.= "ON $table1.url=$table2.url ";
         $sql.= "AND $table1.message=$table2.message ";
-        $sql.= "AND $table1.site_id=$table2.site_id ";
+        $sql.= "AND $table1.property_id=$table2.property_id ";
         $sql.= "AND $table1.source=$table2.source ";
         $sql.= "WHERE $table2.id IS NULL AND $table1.archived = 0 ";
         if(!empty($sites)){
             foreach($sites as $site){
-                $sql.= "AND $table1.site_id = $site->id ";
+                $sql.= "AND $table1.property_id = $site->id ";
             }
         }
         $params = array();
@@ -715,22 +715,22 @@ class DataAccess {
     }
     
     /**
-     * Create Alerts Table
+     * Create Notices Table
      */
-    public static function create_alerts_table(){
+    public static function create_notices_table(){
     
         // SQL
         $sql = 
-            "CREATE TABLE `alerts` (
+            "CREATE TABLE `notices` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `status` varchar(200) NOT NULL DEFAULT 'active',
+                `related_url` text COLLATE utf8mb4_bin NOT NULL,
                 `source` varchar(200) NOT NULL,
-                `site_id` bigint(20) NOT NULL,
-                `url` text,
+                `property_id` bigint(20) NOT NULL,
                 `message` text,
                 `tags` text,
-                `more_info` longtext,
+                `meta` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -757,37 +757,25 @@ class DataAccess {
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $params = array();
         $result = self::query($sql, $params, false);
-
-        // Now we need to register integration tags, since
-        // the plugin is activated by default.
-        require_once 'integrations.php';
-        require_once 'helpers/register_tags.php';
-        $integration_tags = get_integration_tags(
-            'axe'
-        );
-        if( !empty($integration_tags) ){
-            register_tags($integration_tags);
-        }
-
     }
 
     /**
-     * Create Queued Alerts Table
+     * Create Queued Notices Table
      */
-    public static function create_queued_alerts_table(){
+    public static function create_queued_notices_table(){
     
         // SQL
         $sql = 
-            "CREATE TABLE `queued_alerts` (
+            "CREATE TABLE `queued_notices` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `status` varchar(200) NOT NULL DEFAULT 'active',
+                `related_url` text COLLATE utf8mb4_bin NOT NULL,
                 `source` varchar(200) NOT NULL,
-                `site_id` bigint(20) NOT NULL,
-                `url` text,
+                `property_id` bigint(20) NOT NULL,
                 `message` text,
                 `tags` text,
-                `more_info` text,
+                `meta` text,
                 `archived` BOOLEAN NOT NULL DEFAULT 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -824,14 +812,6 @@ class DataAccess {
 
         // Optionally set global meta variables.
         $added_sql = '';
-        if(isset($GLOBALS['a11ywatch_key'])){
-            $added_sql.= "('a11ywatch_key', ?),";
-            $params[] = $GLOBALS['a11ywatch_key'];
-        }
-        if(isset($GLOBALS['axe_uri'])){
-            $added_sql.= "('axe_uri', ?),";
-            $params[] = $GLOBALS['axe_uri'];
-        }
 
         // Now, create the content in the meta table
         // with axe, since it's on by default. 
@@ -848,7 +828,7 @@ class DataAccess {
         ";
         
         // Default active_integrations.
-        $params[] = serialize(array('axe'));
+        $params[] = serialize(array());
 
         // Default scan_status.
         $params[] = '';
@@ -871,16 +851,19 @@ class DataAccess {
     }
     
     /**
-     * Create Scan Profiles Table
+     * Create Properties Table
      */
-    public static function create_scan_profiles_table(){
+    public static function create_properties_table(){
 
         // SQL
         $sql = 
-            "CREATE TABLE `scan_profiles` (
+            "CREATE TABLE `properties` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `url` text COLLATE utf8mb4_bin NOT NULL,
-                `type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
+                `name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
+                `crawl_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
+                `frequency` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
+                `automated_tests` longtext COLLATE utf8mb4_bin,
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'active',
                 `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
                 PRIMARY KEY (`id`)

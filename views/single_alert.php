@@ -1,18 +1,18 @@
 <?php
-// Get alert ID.
-$alert_id = $_GET['id'];
-if(empty($alert_id))
-    throw new Exception('You have not supplied an alert id');
+// Get notice ID.
+$notice_id = $_GET['id'];
+if(empty($notice_id))
+    throw new Exception('You have not supplied a notice id');
 
-// Now lets get the alert.
-$filtered_to_alert = array(
+// Now lets get the notice.
+$filtered_to_notice = array(
     array(
         'name' => 'id',
-        'value' => $alert_id
+        'value' => $notice_id
     )
 );
 $report = (array)DataAccess::get_db_rows(
-    'alerts', $filtered_to_alert
+    'notices', $filtered_to_notice
 )['content'][0];
 ?>
 
@@ -22,7 +22,7 @@ $report = (array)DataAccess::get_db_rows(
         
             <?php 
             // Name
-            echo 'Alert '.$report['id'].' Details';
+            echo 'Notice '.$report['id'].' Details';
             ?>
 
         </h1>

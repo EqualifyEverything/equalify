@@ -8,12 +8,12 @@
 **********************************************************/
 
 // All the tables are created with this action.
-if(DataAccess::table_exists('alerts') == false)
-    DataAccess::create_alerts_table();
-if(DataAccess::table_exists('queued_alerts') == false)
-    DataAccess::create_queued_alerts_table();
-if(DataAccess::table_exists('scan_profiles') == false)
-    DataAccess::create_scan_profiles_table();
+if(DataAccess::table_exists('notices') == false)
+    DataAccess::create_notices_table();
+if(DataAccess::table_exists('queued_notices') == false)
+    DataAccess::create_queued_notices_table();
+if(DataAccess::table_exists('properties') == false)
+    DataAccess::create_properties_table();
 if(DataAccess::table_exists('tags') == false)
     DataAccess::create_tags_table();
 if(DataAccess::table_exists('meta') == false)
