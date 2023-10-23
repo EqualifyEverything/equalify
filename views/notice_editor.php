@@ -166,7 +166,7 @@ if (!empty($_GET['notice_id'])) {
           <select class="form-select custom-select mr-sm-2" id="relatedPropertyInput">
             <?php
             // Populate Properties Array
-            foreach ($propertiesArray as $property)
+            foreach ($propertiesArrayDummy as $property)
               echo '<option value=' . $property . '>' . $property . '</option>';
             ?>
           </select>
