@@ -19,15 +19,10 @@ $propertiesArrayDummy = [
   'sampleProperty4',
 ];
 $propertiesArray = array();
-$snippet = '<h1>This is a sample code snippet,/h1>';
-$snippetArray = [
-  '<h1>This is a sample code snippet,</h1>',
-  '<h1>This is a sample code snippet,</h1>',
-  '<h1>This is a sample code snippet,</h1>',
-  '<h1>This is a sample code snippet that is quite a bit larger to show the overflow...</h1>',
-];
-$moreInfoURL = 'www.moreinfo.com/example';
-$notes = 'this is a sample note, with markdown';
+$snippet = 'There are currently no snippets';
+$snippetArray = [$snippet];
+$moreInfoURL = 'No info URL available';
+$notes = 'There are currently no notes';
 $hasBulkImporter = false;
 $hasVisualizer = false;
 ?>
@@ -62,25 +57,18 @@ if (!empty($_GET['notice_id'])) {
     $status = $currentNotice->status;
     $relatedURL = $currentNotice->related_url;
     $property = $currentNotice->property_id;
+    $propertiesArray=[$property];
+    
     //!!!These variables will be included under meta when updated!!!
     // $snippetArray = $currentNotice->meta->snippets;
     // $moreInfoURL = $currentNotice->meta->more_info_url;
     // $notes = $currentNotice->meta->notes;
 
     // Use $itemId and $itemName as needed
-    echo "Item ID: $noticeId, Item Message: $message";
   } else {
     echo "Item with ID $notice_id not found.";
   }
-  // Some reports are preset. Presets have restricted fields
-  // you can edit and special naming rules.
-  // $presets = array(
-  //     'report_equalified', 'report_ignored', 'report_all',
-  //     'report_active', 'report_active'
-  // );
-  // if(in_array($name, $presets))
-  //     $preset = TRUE;
-
+  
   // Let's load in predefined variables for the report.
 
   // Some reports, like Equalified notices, won't
@@ -147,7 +135,7 @@ if (!empty($_GET['notice_id'])) {
       endif;
       ?>
     </div>
-    <form action="actions/save_notice.php">
+    <form action="actions/save_notice.php" method="post">
       <!-- First row -->
 
       <div class="row mb-3">
@@ -218,14 +206,15 @@ if (!empty($_GET['notice_id'])) {
         <div class="col-md-4 mb-4">
           <label class="col-form-label-lg font-weight-bold" for="metaNotesInput">Meta: Notes</label>
 
-          <textarea type="text" class="form-control" id="metaNotesInput" placeholder="Notes:" aria-label="notes" value=<?php echo $notes ?>></textarea>
+          <textarea type="text" class="form-control" id="metaNotesInput" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
         </div>
       </div>
       <!-- Fourth row -->
 
       <div class="row">
         <div class="col-md-4 mb-4">
-          <a href="save_notice" class="btn btn-primary">Save Notice</a>
+          <a class="btn btn-primary" type="submit">Save Notice</a>
+          <!-- <a href="save_notice" class="btn btn-primary" type="submit">Save Notice</a> -->
           <a href="delete_notice" class="btn btn-danger">Delete Notice</a>
         </div>
       </div>

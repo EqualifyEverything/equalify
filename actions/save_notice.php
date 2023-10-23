@@ -14,10 +14,9 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // First, let's create an array that we'll use to update 
-// the meta from.
-$updated_meta = array();
-// creating separate array for new notice construction
-$updated_notice=array();
+// the notice from.
+
+$updated_notice = array();
 
 // The array is populated with URL parameters.
 if(!empty($_POST)){
@@ -35,6 +34,7 @@ if(!empty($_POST)){
             );
 
     }
+    echo $updated_notice;
 }
 
 // Depending on if the name is present, we'll either save
@@ -42,18 +42,20 @@ if(!empty($_POST)){
 if(empty($_POST['name'])){
 
     // No ID means we need to generate an id by counting
-    // all the rows in meta 
-    $name = 'notice_'.bin2hex(openssl_random_pseudo_bytes(8));
+    // all the rows in notices 
+    $notice_id = 'notice_'.bin2hex(openssl_random_pseudo_bytes(8));
+    // $notice_id = '23';
 
-    // Now we can create the meta.
+
+    // Now we can create the notice.
     $fields = array(
         array(
-            'name' => 'notice_name',
-            'value' => $name
+            'name' => 'id',
+            'value' => $notice_id
         ),
         array(
-            'name' => 'notice_value',
-            'value' => serialize($updated_notice)
+            'name' => 'message',
+            'value' => serialize('this is a test message')
         )
     );
     DataAccess::add_db_entry('notices', $fields);
@@ -73,6 +75,10 @@ if(empty($_POST['name'])){
         array(
             'name' => 'notice_name',
             'value' => $_POST['name']
+        ),
+        array(
+            'name' => 'message',
+            'value' => serialize('this is a test message if the fields empty')
         )
     );
     DataAccess::update_db_rows(
@@ -80,12 +86,13 @@ if(empty($_POST['name'])){
     );
 
     // And let's set the name with the post variable.
-    $name = $_POST['name'];
+    $notice_id = $_POST['name'];
 
 }
 
 // When done, we can checkout the saved report.
-header('Location: ../index.php?view=notice_editor&status=success&notice='.$name);
+// header('Location: ../index.php?view=notice_editor&notice_id='.$notice_id);
+header('Location: ../index.php?view=notice_editor&status=success&notice_id='.$notice_id);
 
 ?>
 </pre>
