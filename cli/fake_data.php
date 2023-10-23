@@ -27,7 +27,7 @@ function generate_properties() {
             'crawl_type' => 'xml',
             'frequency' => 'manually',
             'status' => 'archived',
-            'automated_tests' => ''
+            'tests' => ''
         ),
         array(
             'url' => 'https://equalify.app',
@@ -35,7 +35,7 @@ function generate_properties() {
             'crawl_type' => 'single_page',
             'frequency' => 'hourly',
             'status' => 'active',
-            'automated_tests' => ''
+            'tests' => ''
         ),
         array(
             'url' => 'https://decubing.com',
@@ -43,7 +43,7 @@ function generate_properties() {
             'crawl_type' => 'wordpress',
             'frequency' => 'hourly',
             'status' => 'active',
-            'automated_tests' => ''
+            'tests' => ''
         )
     );
 
@@ -64,8 +64,8 @@ function generate_properties() {
         // Check if the property URL already exists
         if (in_array($property['url'], $existing_urls)) {
             continue;  // skip if URL already exists in the database
-            $count++;
         }
+            $count++;
 
         $fields = array(
             array('name' => 'url', 'value' => $property['url']),
@@ -73,7 +73,7 @@ function generate_properties() {
             array('name' => 'crawl_type', 'value' => $property['crawl_type']),
             array('name' => 'frequency', 'value' => $property['frequency']),
             array('name' => 'status', 'value' => $property['status']),
-            array('name' => 'automated_tests', 'value' => $property['automated_tests'])
+            array('name' => 'tests', 'value' => $property['tests'])
         );
 
         DataAccess::add_db_entry('properties', $fields);
@@ -136,6 +136,7 @@ function generate_notices(){
     DataAccess::add_db_rows('notices', $rows);
 
     // Add message.
-    echo "Added 1,111 notices. \n";
+    $count_notices = count($new_notices);
+    echo "Added $count_notices notices. \n";
 
 }
