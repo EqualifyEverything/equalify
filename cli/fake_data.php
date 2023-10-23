@@ -27,7 +27,7 @@ function generate_properties() {
             'crawl_type' => 'xml',
             'frequency' => 'manually',
             'status' => 'archived',
-            'automated_tests' => ''
+            'tests' => ''
         ),
         array(
             'url' => 'https://equalify.app',
@@ -35,7 +35,7 @@ function generate_properties() {
             'crawl_type' => 'single_page',
             'frequency' => 'hourly',
             'status' => 'active',
-            'automated_tests' => ''
+            'tests' => ''
         ),
         array(
             'url' => 'https://decubing.com',
@@ -43,7 +43,7 @@ function generate_properties() {
             'crawl_type' => 'wordpress',
             'frequency' => 'hourly',
             'status' => 'active',
-            'automated_tests' => ''
+            'tests' => ''
         )
     );
 
@@ -73,7 +73,7 @@ function generate_properties() {
             array('name' => 'crawl_type', 'value' => $property['crawl_type']),
             array('name' => 'frequency', 'value' => $property['frequency']),
             array('name' => 'status', 'value' => $property['status']),
-            array('name' => 'automated_tests', 'value' => $property['automated_tests'])
+            array('name' => 'tests', 'value' => $property['tests'])
         );
 
         DataAccess::add_db_entry('properties', $fields);

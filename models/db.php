@@ -863,7 +863,7 @@ class DataAccess {
                 `name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
                 `crawl_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
                 `frequency` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
-                `automated_tests` longtext COLLATE utf8mb4_bin,
+                `tests` longtext COLLATE utf8mb4_bin,
                 `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'active',
                 `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
                 PRIMARY KEY (`id`)

@@ -244,7 +244,7 @@ if(!empty($_GET['format'])){
 
         <tr>
             <td><?php echo $notice->time;?></td>
-            <td><?php echo $notice->url;?></td>
+            <td><?php echo $notice->related_url;?></td>
             <td><?php echo covert_code_shortcode($notice->message);?></td>
             <td style="min-width: 200px;">
 
