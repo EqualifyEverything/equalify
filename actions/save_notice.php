@@ -111,7 +111,7 @@ if (empty($_POST['notice_id'])) {
     );
     DataAccess::add_db_entry(
         'notices',
-        sanitize($fields)
+        $fields
     );
 } else {
 
