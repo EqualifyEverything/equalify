@@ -117,14 +117,14 @@ function update_notices($new_status, $property_id) {
     );
 
     // Now let's update fields.
-    $updated_fields = array(
+    $updated_notice_fields = array(
         array(
             'name' => 'archived',
             'value' => $new_status
         )
     );
     DataAccess::update_db_rows(
-        'notices', $updated_fields, $notices_filters
+        'notices', $updated_notice_fields, $notices_filters
     );
 
 }

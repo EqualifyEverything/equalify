@@ -30,29 +30,6 @@ if(empty($old_status))
 // Conditional operations based on status:
 if($old_status == 'Active'){
 
-    // Remove fields.
-    $integration_fields = get_integration_fields(
-        $integration_uri
-    );
-    if (!empty($integration_fields['db'])){
-        $integration_db_fields = $integration_fields['db'];
-
-        // Delete "meta" fields.
-        if (!empty($integration_db_fields['meta']) ){
-            foreach(
-                $integration_db_fields['meta'] 
-                as $integration_meta_field
-            ){
-                if (!DataAccess::get_meta_value($integration_meta_field['name'])) {
-                    DataAccess::delete_meta(
-                        $integration_meta_field['name']
-                    );
-                }
-            }
-        }
-        
-    }
-
     // Remove tags.
     $integration_tags = get_integration_tags(
         $integration_uri
@@ -83,46 +60,6 @@ if($old_status == 'Active'){
 
 
 }elseif($old_status == 'Disabled'){
-
-    // Set up fields.
-    $integration_fields = get_integration_fields(
-        $integration_uri
-    );
-    if( !empty($integration_fields['db']) ){
-        $integration_db_fields = $integration_fields['db'];
-
-        // Set up "meta" fields.
-        if( !empty($integration_db_fields['meta']) ){
-            foreach(
-                $integration_db_fields['meta']
-                as $integration_meta_field
-            ){
-                // prevent checking empty strings for integrations
-                if (empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
-                    DataAccess::add_meta(
-                        $integration_meta_field['name'], 
-                        $integration_meta_field['value']
-                    );
-                }
-            }
-        }
-
-        // Set up "pages" fields.
-        if( !empty($integration_db_fields['pages']) ){
-            foreach(
-                $integration_db_fields['pages'] 
-                as $integration_pages_field
-            ){
-                if(!DataAccess::db_column_exists( 'pages', $integration_pages_field['name'] )) {
-                    DataAccess::add_db_column(
-                        'pages', $integration_pages_field['name'], 
-                        $integration_pages_field['type']
-                    );
-                }
-            }
-        }
-
-    }
 
     // Register tags.
     $integration_tags = get_integration_tags(
@@ -205,14 +142,14 @@ function update_notices($new_status, $integration_uri) {
     );
 
     // Now let's update fields.
-    $updated_fields = array(
+    $updated_notice_fields = array(
         array(
             'name' => 'archived',
             'value' => $new_status
         )
     );
     DataAccess::update_db_rows(
-        'notices', $updated_fields, $notices_filters
+        'notices', $updated_notice_fields, $notices_filters
     );
 
 }
