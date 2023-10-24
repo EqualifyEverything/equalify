@@ -42,7 +42,7 @@
     endforeach; else:
     ?>
 
-        <p>No reports exist.</p>
+        <p class="lead">No reports exist.</p>
 
     <?php 
     // End Reports
