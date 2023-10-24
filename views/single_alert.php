@@ -1,4 +1,12 @@
 <?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the single alert view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
 // Get notice ID.
 $notice_id = $_GET['id'];
 if(empty($notice_id))

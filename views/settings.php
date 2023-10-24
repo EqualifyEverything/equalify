@@ -1,3 +1,13 @@
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the scan setting's view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+?>
+
 <main class="container">
     <h1>Equalify Settings</h1>
     <section id="properties">
