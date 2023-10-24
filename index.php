@@ -53,7 +53,7 @@ require_once 'actions/run_scheduled_scan.php';
     <link href="theme.css" rel="stylesheet">
 </head>
 <body>
-    <header class="py-3 mb-4 border-bottom">
+    <header class="py-3 mb-4 border-bottom bg-body-tertiary">
         <div class="container-xxl d-flex flex-wrap justify-content-center">
             <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
@@ -81,8 +81,8 @@ require_once 'actions/run_scheduled_scan.php';
     }
     ?>
 
-    <footer class="py-4 mt-4 border-top text-center">
-        MVP Version 1
+    <footer class="py-4 mt-4 border-top text-center bg-body-tertiary">
+        Equalify Release Candidate 2
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

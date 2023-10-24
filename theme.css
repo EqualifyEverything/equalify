@@ -1,28 +1,5 @@
-body{
-    min-height: 100vh;
-}
 .container{
     max-width: 960px;
-}
-#content{
-    display: grid;
-    grid-template-areas: "sidebar main";
-    grid-template-columns: 1fr 5fr;
-    gap: 1.5rem;
-}
-aside{
-    grid-area: sidebar;
-    position: -webkit-sticky;
-    position: sticky;
-    top: 5rem;
-    display: block !important;
-    height: calc(100vh - 6rem);
-    padding-left: .25rem;
-    margin-left: -.25rem;
-    overflow-y: auto;
-}
-main{
-    grid-area: main;
 }
 .bi{
     vertical-align: -.125em;
@@ -31,24 +8,6 @@ main{
 }
 .me-2{
     margin-right: .5rem !important;
-}
-.sites tbody tr, .sites tbody td{
-    border: 0;
-    padding-top: 0;
-}
-.sites tbody tr{
-    opacity: .5;
-    font-size: .8em;
-}
-.sites tbody tr.parent{
-    font-weight: bold;
-    border-top: 1px solid;
-    opacity: 1;
-    font-size: 1em;
-}
-.sites tbody tr.parent td{
-    padding-top: .5rem;
-
 }
 pre code{
     white-space: break-spaces;
@@ -78,10 +37,3 @@ pre code{
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
-.screen-reader-only {
-    position: absolute;
-    width: 1px;
-    clip: rect(0 0 0 0);
-    overflow: hidden;
-    white-space: nowrap;
-  }

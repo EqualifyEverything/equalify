@@ -6,47 +6,6 @@
  */
 
 /**
- * Default Scan Fields
- */
-function sample_scanner_fields()
-{
-
-    $sample_scanner_fields = array(
-
-        // These fields are added to the database.
-        'db' => [
-
-            // Meta values.
-            'meta' => [
-                array(
-                    'name'     => 'sample_scanner_uri',
-                    'value'     => '',
-                )
-            ]
-
-        ],
-
-        // These fields are HTML fields on the settings view.
-        'settings' => [
-
-            // Meta settings.
-            'meta' => [
-                array(
-                    'name'     => 'sample_scanner_uri',
-                    'label'    => 'Sample-scan URI (ie- https://scan.Sample.app/?url=)',
-                    'type'     => 'text',
-                )
-            ]
-
-        ]
-
-    );
-
-    // Return fields
-    return $sample_scanner_fields;
-}
-
-/**
  * Sample Scan Tags
  */
 function sample_scanner_tags()
@@ -102,7 +61,7 @@ function sample_scanner_single_page_request($page_url)
 
     // Require sample_scanner_uri - if you don't already have a scanner built,
     // checkout https://github.com/EqualifyEverything/Sample-Scanner
-    $sample_scanner_uri = DataAccess::get_meta_value('sample_scanner_uri');
+    $sample_scanner_uri = 'URL_GOES_HERE';
     if (empty($sample_scanner_uri)) {
         throw new Exception('Sample-scan URI is not entered. Please add the URI in the integration settings.');
     } else {

@@ -38,7 +38,7 @@ function equalify_scan_tags()
                     'category' => $equalify_scan_tag['category'],
                     'description' => $description,
 
-                    // equalify-scan uses periods, which get screwed up
+                    // equalify_scan uses periods, which get screwed up
                     // when equalify serializes them, so we're
                     // just not going to use periods
                     'slug' => str_replace('.', '', $equalify_scan_tag['slug'])
@@ -60,9 +60,9 @@ function equalify_scan_single_page_request($page_url)
 {
 
     // Require equalify_scan_uri
-    $equalify_scan_uri = DataAccess::get_meta_value('equalify_scan_uri');
+    $equalify_scan_uri = 'https://scan.equalify.com/';
     if (empty($equalify_scan_uri)) {
-        throw new Exception('equalify-scan URI is not entered. Please add the URI in the integration settings.');
+        throw new Exception('Equalify Scan URI is not entered. Please add the URI in the integration settings.');
     } else {
         return [
             'method' => 'GET',

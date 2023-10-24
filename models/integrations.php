@@ -81,23 +81,6 @@ function get_integration_meta( $file ) {
 }
 
 /**
- * Get Integration Fields
- */
-function get_integration_fields( $uri ){
-
-	// Get integration file.
-	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
-    require_once $integration_path;
-    $integration_db_fields = $uri.'_fields';
-    if( function_exists( $integration_db_fields ) ){
-		return $integration_db_fields();
-	}else{
-		false;
-	}
-
-}
-
-/**
  * Get Integration Tags
  */
 function get_integration_tags( $uri ){

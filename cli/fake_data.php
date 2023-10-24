@@ -17,6 +17,24 @@ if(!defined('__ROOT__'))
 require_once(__ROOT__.'/config.php');
 require_once(__ROOT__.'/models/db.php');
 
+// Random text helper.
+function generate_random_text($length = 20) {
+    $words = [
+        'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 
+        'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 
+        'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'
+    ];
+
+    $generateSentence = function ($length) use ($words) {
+        shuffle($words);
+        return ucfirst(implode(' ', array_slice($words, 0, $length)));
+    };
+
+    $random_text = $generateSentence($length);
+
+    return  $random_text;
+}
+
 // Generate properties.
 generate_properties();
 function generate_properties() {
@@ -83,7 +101,7 @@ function generate_properties() {
 
 }
 
-/// Generate notices.
+// Generate notices.
 generate_notices();
 function generate_notices(){
 
@@ -92,13 +110,6 @@ function generate_notices(){
     $existing_properties = DataAccess::get_db_rows('properties', $properties_filter, 1, 10000)['content'];
 
     $statuses = ["active", "ignored", "equalified"];
-    $messages = [
-        "lorem sic ipsum dalor",
-        "sic lorem dalor ipsum",
-        "ipsum dalor lorem sic",
-        "dalor sic ipsum lorem",
-        "lorem ipsum sic dalor"
-    ];
 
     $new_notices = [];
     for ($i = 0; $i < 11; $i++) {
@@ -110,7 +121,7 @@ function generate_notices(){
         $notice->source = 'faked_data.php';
         $notice->status = $statuses[array_rand($statuses)];
         $notice->tags = 'faked_data';
-        $notice->message = $messages[array_rand($messages)];
+        $notice->message = generate_random_text(6).'.';
         $notice->meta = '';  // Leaving meta blank
         $notice->archived = 0;
 
@@ -138,5 +149,37 @@ function generate_notices(){
     // Add message.
     $count_notices = count($new_notices);
     echo "Added $count_notices notices. \n";
+
+}
+
+// Generate reports.
+generate_reports();
+function generate_reports(){
+    
+    $new_reports = [];
+    for ($i = 0; $i < 11; $i++) {
+
+        $report = new stdClass();
+        $report->title = generate_random_text(3);
+        $report->description = generate_random_text(20);
+
+        $new_reports[] = $report;
+    }
+
+    // Add reports to database
+    $rows = [];
+    foreach ($new_reports as $report) {
+        $new_row = array(
+            'title' => $report->title,
+            'description' => $report->description
+        );
+        array_push($rows, $new_row);
+    }
+
+    DataAccess::add_db_rows('reports', $rows);
+
+    // Add message.
+    $count_reports = count($new_reports);
+    echo "Added $count_reports reports. \n";
 
 }
