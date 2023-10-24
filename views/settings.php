@@ -116,6 +116,7 @@
             // End integrations list.
             endforeach;
             ?>
+            
             <div id="status" aria-live="assertive" class="visually-hidden"></div>
         </div>
         <h3 class="h5">
