@@ -874,6 +874,26 @@ class DataAccess {
         $result = self::query($sql, $params, false);
         
     }
+
+    /**
+     * Create Reports Table
+     */
+    public static function create_reports_table(){
+
+        // SQL
+        $sql = 
+            "CREATE TABLE `reports` (
+                `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `title` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
+                `description` text COLLATE utf8mb4_bin NOT NULL,
+                PRIMARY KEY (`id`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
+        $params = array();
+        
+        // Query
+        $result = self::query($sql, $params, false);
+        
+    }
     
     /**
      * Table Exists

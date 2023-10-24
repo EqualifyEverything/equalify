@@ -18,3 +18,5 @@ if(DataAccess::table_exists('tags') == false)
     DataAccess::create_tags_table();
 if(DataAccess::table_exists('meta') == false)
     DataAccess::create_meta_table();
+if(DataAccess::table_exists('reports') == false)
+    DataAccess::create_reports_table();
