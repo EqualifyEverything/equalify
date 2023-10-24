@@ -1,3 +1,6 @@
+.container{
+    max-width: 960px;
+}
 .bi{
     vertical-align: -.125em;
     pointer-events: none;
