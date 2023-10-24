@@ -14,24 +14,24 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // Let's set up error handling for incomplete notice forms
-$id = $_POST['id'];
-if ($id == false)
-    throw new Exception('Property id is missing.');
+// $id = $_POST['id'];
+// if ($id == false)
+//     throw new Exception('Property id is missing.');
 $status = $_POST['status'];
 if ($status == false)
     throw new Exception('Property status is missing.');
 $related_url = $_POST['related_url'];
 if ($related_url == false)
     throw new Exception('Property related_url is missing.');
-$source = $_POST['source'];
-if ($source == false)
-    throw new Exception('Property source is missing.');
+// $source = $_POST['source'];
+// if ($source == false)
+//     throw new Exception('Property source is missing.');
 $property_id = $_POST['property_id'];
 if ($property_id == false)
     throw new Exception('Property property_id is missing.');
-$archived = $_POST['archived'];
-if ($archived == false)
-    throw new Exception('Property archived is missing.');
+// $archived = $_POST['archived'];
+// if ($archived == false)
+//     throw new Exception('Property archived is missing.');
 
 // Let's set up the nonrequired variables
 if (isset($_POST['message'])) {
@@ -61,7 +61,7 @@ if (!empty($_POST)) {
                 )
             );
     }
-    echo $updated_notice;
+   print_r($updated_notice);
 }
 
 // Depending on if the name is present, we'll either save
@@ -70,8 +70,10 @@ if (empty($_POST['notice_id'])) {
 
     // No ID means we need to generate an id by counting
     // all the rows in notices 
-    $notice_id = 'notice_' . bin2hex(openssl_random_pseudo_bytes(8));
-    // $notice_id = '23';
+    // $notice_id = 'notice_' . bin2hex(openssl_random_pseudo_bytes(8));
+    $notice_id = number_format(DataAccess::count_db_rows('notices',[])) + 1;
+    $source='manual';
+    $archived = 0;
 
 
     // Now we can create the notice.
@@ -79,6 +81,10 @@ if (empty($_POST['notice_id'])) {
         array(
             'name' => 'id',
             'value' => $notice_id
+        ),
+        array(
+            'name' => 'message',
+            'value' => $message
         ),
         array(
             'name' => 'status',
@@ -101,7 +107,10 @@ if (empty($_POST['notice_id'])) {
             'value' => $archived
         )
     );
-    DataAccess::add_db_entry('notices', $fields);
+    DataAccess::add_db_entry(
+        'notices', $fields
+    );
+
 } else {
 
     // Otherwise, we can update the fields.
@@ -130,7 +139,7 @@ if (empty($_POST['notice_id'])) {
     );
 
     // And let's set the name with the post variable.
-    $notice_id = $_POST['name'];
+    // $notice_id = $_POST['name'];
 }
 
 // When done, we can checkout the saved report.
