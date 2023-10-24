@@ -30,7 +30,7 @@ $hasVisualizer = false;
 <?php
 // This checks for an id in the url and populates field if one exists
 if (empty($_GET['notice_id'])) {
-  echo 'no notice id provided';
+  // echo 'no notice id provided';
 }
 
 if (!empty($_GET['notice_id'])) {
@@ -68,7 +68,7 @@ if (!empty($_GET['notice_id'])) {
 
     // Use $itemId and $itemName as needed
   } else {
-    echo "Item with ID $notice_id not found.";
+    // echo "Item with ID $notice_id not found.";
   }
 
 ?>
