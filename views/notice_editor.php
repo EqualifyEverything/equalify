@@ -156,7 +156,8 @@ if (!empty(get_object_vars($currentNotice))) {
 
               <?php echo '<code  id="meta_code_snippet" name="meta_code_snippet">' . htmlspecialchars($snippet) . '</code>' ?>
 
-              <a href="#" class="ml-3 justify-content-end">
+              <a onclick=(deleteField()) class="ml-3 justify-content-end">
+              <!-- <a href="#" class="ml-3 justify-content-end"> -->
                 <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewbox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                   <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
                 </svg>
@@ -171,12 +172,12 @@ if (!empty(get_object_vars($currentNotice))) {
 
         <!-- <span> -->
         <!-- <button onclick="addField()" class="btn btn-secondary">Add Snippet</button> -->
-        <a onclick="addField()" class=""><span aria-hidden="true">Add Snippet</span>
+        <button onclick="addField()" class="btn"><span aria-hidden="true">Add Snippet</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
           </svg>
           <!-- </span> -->
-        </a>
+        </button>
         <?php if ($hasVisualizer) : ?>
           <a href="add_report" class="btn btn-secondary">Visualizer</a>
         <?php endif; ?>
@@ -219,18 +220,12 @@ if (!empty(get_object_vars($currentNotice))) {
     let snippets = document.getElementById("snippets");
 
     let newSnippet = document.createElement("li");
-    newSnippet.className = "Snippet";
+    newSnippet.className = "";
 
     let inputField = document.createElement("input");
     inputField.type = "text";
     inputField.name = "snippet"; // Assign a unique name if needed
-
-    // let editButton = document.createElement("button");
-    // editButton.className = "edit";
-    // editButton.innerHTML = "Edit";
-    // editButton.onclick = function() {
-    //   editField(this);
-    // };
+    inputField.className = "list-group-item d-flex align-items-start"; // Assign a unique name if needed
 
     let deleteButton = document.createElement("button");
     deleteButton.className = "delete";
@@ -240,7 +235,6 @@ if (!empty(get_object_vars($currentNotice))) {
     };
 
     newSnippet.appendChild(inputField);
-    // newSnippet.appendChild(editButton);
     newSnippet.appendChild(deleteButton);
 
     snippets.appendChild(newSnippet);
