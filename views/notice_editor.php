@@ -19,8 +19,25 @@ $propertiesArrayDummy = [
   3,
   4,
 ];
+// Get property info.
+// $properties_filter = array(
+//   array(
+//     'name' => 'id',
+//     'value' => $_SESSION['property_id']
+//   ),
+//   array(
+//     'name' => 'id',
+//     'value' => $_SESSION['property_id']
+//   )
+// );
+// $properties = DataAccess::get_db_rows(
+//   'properties',
+//   $properties_filter,
+//   1,
+//   100000
+// )['content'];
 $propertiesArray  = DataAccess::get_db_rows(
-  'notices',
+  'properties',
   [],
   1,
   1000000
@@ -124,15 +141,16 @@ if (!empty(get_object_vars($currentNotice))) {
         <select class="form-select custom-select mr-sm-2" id="property_id" name="property_id">
           <?php
           // Populate Properties Array
-          foreach ($propertiesArrayDummy as $property)
-            echo '<option name="property_id" value=' . $property . '>' . $property . '</option>';
+          foreach ($propertiesArray as $property)
+          // foreach ($propertiesArrayDummy as $property)
+            echo '<option name="property_id" value=' . $property->name . '>' . $property->name . '</option>';
           ?>
         </select>
       </div>
       <div class="col-md-5 ml-md-3 mb-4">
         <!-- <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet">Meta:Code Snippet</label> -->
         <ul id="snippets" class="list-group mb-3">
-        <!-- <div id="snippets" class="list-group mb-3"> -->
+          <!-- <div id="snippets" class="list-group mb-3"> -->
           <?php foreach ($snippetArray as $snippet) : ?>
             <li class="list-group-item d-flex align-items-start">
 
@@ -147,18 +165,18 @@ if (!empty(get_object_vars($currentNotice))) {
           <?php
           endforeach;
           ?>
-        <!-- </div> -->
+          <!-- </div> -->
         </ul>
         <!-- <a href="add_snippet" name="add_snippet" class="btn btn-secondary">Add</a> -->
-        
+
         <!-- <span> -->
-          <!-- <button onclick="addField()" class="btn btn-secondary">Add Snippet</button> -->
-          <a onclick="addField()" class=""><span aria-hidden="true">Add Snippet</span>
+        <!-- <button onclick="addField()" class="btn btn-secondary">Add Snippet</button> -->
+        <a onclick="addField()" class=""><span aria-hidden="true">Add Snippet</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
           </svg>
-        <!-- </span> -->
-      </a>
+          <!-- </span> -->
+        </a>
         <?php if ($hasVisualizer) : ?>
           <a href="add_report" class="btn btn-secondary">Visualizer</a>
         <?php endif; ?>
@@ -201,42 +219,63 @@ if (!empty(get_object_vars($currentNotice))) {
     let snippets = document.getElementById("snippets");
 
     let newSnippet = document.createElement("li");
-    newSnippet.className = "snippet";
+    newSnippet.className = "Snippet";
 
     let inputField = document.createElement("input");
     inputField.type = "text";
-    inputField.name = "fieldName"; // Assign a unique name if needed
+    inputField.name = "snippet"; // Assign a unique name if needed
 
-    let editButton = document.createElement("button");
-    editButton.className = "edit";
-    editButton.innerHTML = "Edit";
-    editButton.onclick = function() { editField(this); };
+    // let editButton = document.createElement("button");
+    // editButton.className = "edit";
+    // editButton.innerHTML = "Edit";
+    // editButton.onclick = function() {
+    //   editField(this);
+    // };
 
     let deleteButton = document.createElement("button");
     deleteButton.className = "delete";
     deleteButton.innerHTML = "Delete";
-    deleteButton.onclick = function() { deleteField(this); };
+    deleteButton.onclick = function() {
+      deleteField(this);
+    };
 
     newSnippet.appendChild(inputField);
-    newSnippet.appendChild(editButton);
+    // newSnippet.appendChild(editButton);
     newSnippet.appendChild(deleteButton);
 
     snippets.appendChild(newSnippet);
-}
+  }
 
-function editField(button) {
-    var field = button.parentElement;
-    var inputField = field.querySelector("input");
+  // function editField(button) {
+  //   var field = button.parentElement;
+  //   var inputField = field.querySelector("input");
 
-    var newValue = prompt("Enter new value:", inputField.value);
-    if (newValue !== null) {
-        inputField.value = newValue;
-    }
-}
+  //   var newValue = prompt("Enter new value:", inputField.value);
+  //   if (newValue !== null) {
+  //     inputField.value = newValue;
+  //   }
+  // }
 
-function deleteField(button) {
+  function deleteField(button) {
     var field = button.parentElement;
     field.remove();
-}
-
+  }
 </script>
+<!-- // Add helper text to URL field.
+    function updateHelper(helperText, helperPlaceholder) {
+        document.getElementById('url_helper').innerHTML = helperText;
+        document.getElementById('url').placeholder = helperPlaceholder;
+    }
+    xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
+    if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ){
+        updateHelper(xmlHelperText, 'http://www.pih.org/')
+    }else{
+        updateHelper('', 'https://equalify.app/')
+    }
+    document.getElementById('crawl_type').addEventListener('change', function () {
+        if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ) {
+            updateHelper(xmlHelperText, 'http://www.pih.org/')
+        } else {
+            updateHelper('', 'https://equalify.app/')
+        }
+    }); -->
