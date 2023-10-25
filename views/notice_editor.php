@@ -166,18 +166,18 @@ if (!empty(get_object_vars($currentNotice))) {
         <?php endif; ?>
       </div>
       <div class="col-md-3 ml-md-3 mb-4">
-        <label class="col-form-label-lg font-weight-bold" for="moreInfoURLInput">Meta: More Info URL</label>
+        <label class="col-form-label-lg font-weight-bold" for="meta_more_info_url">Meta: More Info URL</label>
 
-        <input type="url" class="form-control" id="moreInfoURLInput" name="moreInfoURLInput" placeholder="More Info URL:" value="<?php echo $moreInfoURL ?>" required>
+        <input type="url" class="form-control" id="meta_more_info_url" name="meta_more_info_url" placeholder="More Info URL:" value="<?php echo $moreInfoURL ?>" required>
       </div>
     </div>
     <!-- Third row -->
 
     <div class="row">
       <div class="col-md-4 mb-4">
-        <label class="col-form-label-lg font-weight-bold" for="metaNotesInput">Meta: Notes</label>
+        <label class="col-form-label-lg font-weight-bold" for="meta_notes">Meta: Notes</label>
 
-        <textarea type="text" class="form-control" id="metaNotesInput" name="metaNotesInput" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
+        <textarea type="text" class="form-control" id="meta_notes" name="meta_notes" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
       </div>
     </div>
     <!-- Fourth row -->
