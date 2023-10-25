@@ -131,7 +131,7 @@ if (!empty(get_object_vars($currentNotice))) {
         </select>
       </div>
       <div class="col-md-5 ml-md-3 mb-4">
-        <!-- <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet">Meta:Code Snippet</label> -->
+        <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet">Meta:Code Snippet</label>
         <ul id="snippets" class="list-group mb-3">
           <!-- <div id="snippets" class="list-group mb-3"> -->
           <?php foreach ($snippetArray as $snippet) : ?>
@@ -154,13 +154,13 @@ if (!empty(get_object_vars($currentNotice))) {
         <!-- <a href="add_snippet" name="add_snippet" class="btn btn-secondary">Add</a> -->
 
         <!-- <span> -->
-        <!-- <button onclick="addField()" class="btn btn-secondary">Add Snippet</button> -->
-        <button onclick="addField()" class="btn"><span aria-hidden="true">Add Snippet</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+        <a onclick="addField()" class="btn btn-secondary">Add Snippet</button>
+        <!-- <button onclick="addField()" class="btn btn-primary"><span aria-hidden="true">Add Snippet</span> -->
+          <!-- <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-          </svg>
+          </svg> -->
           <!-- </span> -->
-        </button>
+        </a>
         <?php if ($hasVisualizer) : ?>
           <a href="add_report" class="btn btn-secondary">Visualizer</a>
         <?php endif; ?>
