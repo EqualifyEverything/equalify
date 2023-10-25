@@ -54,69 +54,70 @@ if(!empty($_GET['id'])){
 
 ?>
 
-<h1>Property Settings</h1>
-<form action="actions/save_property.php" method="post" id="site_form">
-    <div class="row my-4">
-        <div class="col">
-            <label for="name" class="form-label h4 ">Property Name</label>
-            <input id="name"  name="name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
-        </div>
-        <div class="col-3">
-            <label for="status" class="form-label h4">Status</label>
-            <select id="status" name="status" class="form-select form-select-lg">
-                <option value="active" <?php if($status == 'active') echo 'selected';?>>Active</option>
-                <option value="archived" <?php if($status == 'archived') echo 'selected';?>>Archived</option>
-            </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <label for="crawl_type" class="form-label h4">Crawl Type</label>
-            <select id="crawl_type" name="crawl_type" class="form-select">
-                <option value="xml" <?php if($crawl_type == 'xml') echo 'selected';?>>XML Sitemap</option>
-                <option value="single_page" <?php if($crawl_type == 'single_page') echo 'selected';?>>Single Page</option>
-            </select>
-        </div>
-        <div class="col">
-            <label for="frequency" class="form-label h4">Scan Frequency</label>
-            <select id="frequency" name="frequency" class="form-select">
-                <option value="manually" <?php if($frequency == 'manually') echo 'selected';?>>Manually</option>
-                <option value="hourly" <?php if($frequency == 'hourly') echo 'selected';?>>Hourly</option>
-                <option value="daily" <?php if($frequency == 'daily') echo 'selected';?>>Daily</option>
-                <option value="weekly" <?php if($frequency == 'weekly') echo 'selected';?>>Weekly</option>
-                <option value="monthly" <?php if($frequency == 'monthly') echo 'selected';?>>Monthly</option>
-            </select>
-        </div>
-        <div class="col">
-            <label for="url" class="form-label h4">URL</label>
-            <input id="url"  name="url" type="url" class="form-control" placeholder="https://equalify.app" aria-describedby="url_helper" value="<?php echo $url;?>" required>
-            <div id="url_helper" class="form-text"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <p class="h4 mb-1">Automated Tests</p>
-            <div class="form-check pb-1">
-                <input class="form-check-input" type="checkbox" name="automated_scan" id="automated_scan" <?php if(in_array('automated_scan', $tests)) echo 'checked';?>>
-                <label class="form-check-label" for="automated_scan" >
-                    Automated Scan
-                </label>
+<div class="card  bg-white p-4 my-2">
+    <h1>Property Settings</h1>
+    <form action="actions/save_property.php" method="post" id="site_form">
+        <div class="row my-4">
+            <div class="col">
+                <label for="name" class="form-label h4 ">Property Name</label>
+                <input id="name"  name="name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
             </div>
-            <div class="form-check pb-1">
-                <input class="form-check-input" type="checkbox" name="ai_scan" id="ai_scan" <?php if(in_array('ai_scan', $tests)) echo 'checked';?>>
-                <label class="form-check-label" for="ai_scan">
-                    AI Scan - Experimental
-                </label>
+            <div class="col-3">
+                <label for="status" class="form-label h4">Status</label>
+                <select id="status" name="status" class="form-select form-select-lg">
+                    <option value="active" <?php if($status == 'active') echo 'selected';?>>Active</option>
+                    <option value="archived" <?php if($status == 'archived') echo 'selected';?>>Archived</option>
+                </select>
             </div>
         </div>
-    </div>
-    <div class=" my-3">
-        <button type="submit" id="submit" class="btn btn-primary">
-            Save Property
-        </button>
-    </div>
-</form> 
-
+        <div class="row">
+            <div class="col">
+                <label for="crawl_type" class="form-label h4">Crawl Type</label>
+                <select id="crawl_type" name="crawl_type" class="form-select">
+                    <option value="xml" <?php if($crawl_type == 'xml') echo 'selected';?>>XML Sitemap</option>
+                    <option value="single_page" <?php if($crawl_type == 'single_page') echo 'selected';?>>Single Page</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="frequency" class="form-label h4">Scan Frequency</label>
+                <select id="frequency" name="frequency" class="form-select">
+                    <option value="manually" <?php if($frequency == 'manually') echo 'selected';?>>Manually</option>
+                    <option value="hourly" <?php if($frequency == 'hourly') echo 'selected';?>>Hourly</option>
+                    <option value="daily" <?php if($frequency == 'daily') echo 'selected';?>>Daily</option>
+                    <option value="weekly" <?php if($frequency == 'weekly') echo 'selected';?>>Weekly</option>
+                    <option value="monthly" <?php if($frequency == 'monthly') echo 'selected';?>>Monthly</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="url" class="form-label h4">URL</label>
+                <input id="url"  name="url" type="url" class="form-control" placeholder="https://equalify.app" aria-describedby="url_helper" value="<?php echo $url;?>" required>
+                <div id="url_helper" class="form-text"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p class="h4 mb-1">Automated Tests</p>
+                <div class="form-check pb-1">
+                    <input class="form-check-input" type="checkbox" name="automated_scan" id="automated_scan" <?php if(in_array('automated_scan', $tests)) echo 'checked';?>>
+                    <label class="form-check-label" for="automated_scan" >
+                        Automated Scan
+                    </label>
+                </div>
+                <div class="form-check pb-1">
+                    <input class="form-check-input" type="checkbox" name="ai_scan" id="ai_scan" <?php if(in_array('ai_scan', $tests)) echo 'checked';?>>
+                    <label class="form-check-label" for="ai_scan">
+                        AI Scan - Experimental
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class=" my-3">
+            <button type="submit" id="submit" class="btn btn-primary">
+                Save Property
+            </button>
+        </div>
+    </form> 
+</div>
 <script>
 
 // Add spinny wheel to button

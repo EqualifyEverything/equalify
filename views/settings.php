@@ -8,17 +8,16 @@
 **********************************************************/
 ?>
 
-<main>
-    <h1>Equalify Settings</h1>
-    <section id="properties">
-        <h2 class="mt-5">Properties</h2>
-
+<h1 class="visually-hidden">Equalify Settings</h1>
+<div class="card bg-white p-4 my-2">
+    <section>
+        <h2>Properties</h2>
         <?php
         // Start properties query.
         $existing_properties = DataAccess::get_db_rows('properties', array(), 1, 10000)['content'];
         if(!empty($existing_properties)): foreach($existing_properties as $property):
         ?>
-
+        
         <div class="border-bottom px-2 py-3">
             <p class="h5 m-0"> 
                 
@@ -51,9 +50,9 @@
 
         <a class="btn btn-primary mt-3" href="index.php?view=property_settings">Add Property</a>
     </section>
-    <section id="integrations">
-        <h2 class="mt-5 mb-4">Integrations</h2>
-        <div class="row row-cols-3 g-4 pb-4">
+    <section class="mt-4">
+        <h2>Integrations</h2>
+        <div class="row row-cols-4 g-4 pb-4">
 
             <?php
             // Get list of active integrations to use in the integrations list.
@@ -136,8 +135,7 @@
             Request new integrations via <a href="https://github.com/bbertucc/equalify/issues" target="_blank">Equalify's GitHub repo</a>.
         </p>
     </section>
-
-</main>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.integration-btn');
