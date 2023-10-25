@@ -49,7 +49,7 @@ if (isset($_POST['tags'])) {
 }
 // Catching all meta posts
 if (isset($_POST['meta_code_snippet'])) {
-    $meta['code_snippets'] = $_POST['meta_snippets'];
+    $meta['code_snippets'] = $_POST['meta_code_snippet'];
 }
 if (isset($_POST['meta_more_info_url'])) {
     $meta['more_info_url'] = $_POST['meta_more_info_url'];
@@ -112,7 +112,7 @@ if (empty($_POST['notice_id'])) {
         ),
         array(
             'name' => 'meta',
-            'value' => $meta
+            'value' => serialize($meta)
         )
     );
     DataAccess::add_db_entry(

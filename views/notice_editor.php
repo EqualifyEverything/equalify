@@ -21,7 +21,7 @@ $propertiesArray  = DataAccess::get_db_rows(
   1000000
 )['content'];;
 // $snippet = 'There are currently no snippets';
-$snippetArray = [];
+$snippetArray = ['test snippet'];
 $moreInfoURL = '';
 $notes = '';
 $hasBulkImporter = false;
@@ -71,8 +71,6 @@ if (!empty(get_object_vars($currentNotice))) {
       $notes = $meta['notes'];
     }
   }
-
-
 } else {
   // echo "Item with ID $notice_id not found.";
 }
@@ -132,30 +130,26 @@ if (!empty(get_object_vars($currentNotice))) {
       </div>
       <div class="col-md-5 ml-md-3 mb-4">
         <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet">Meta:Code Snippet</label>
-        <ul id="snippets" class="list-group mb-3">
-          <!-- <div id="snippets" class="list-group mb-3"> -->
+        <div id="snippets" class="list-group mb-3">
           <?php foreach ($snippetArray as $snippet) : ?>
-            <li class="list-group-item d-flex align-items-start">
-
-              <?php echo '<code  id="meta_code_snippet" name="meta_code_snippet">' . htmlspecialchars($snippet) . '</code>' ?>
-
-              <a onclick=(deleteField()) class="ml-3 justify-content-end">
-                <!-- <a href="#" class="ml-3 justify-content-end"> -->
-                <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewbox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+            <div class="position-relative">
+              <input class="list-group-item pr-5" name="meta_code_snippet" value="<?php echo $snippet ?>" />
+              <a onclick="deleteField()" class="position-absolute end-0 top-50 translate-middle-y">
+                <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 448 512">
                   <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
                 </svg>
               </a>
-            </li>
+            </div>
+            <!-- </li> -->
           <?php
           endforeach;
           ?>
-          <!-- </div> -->
-        </ul>
+        </div>
         <!-- <a href="add_snippet" name="add_snippet" class="btn btn-secondary">Add</a> -->
 
         <!-- <span> -->
         <a onclick="addField()" class="btn btn-secondary">Add Snippet</button>
-        <!-- <button onclick="addField()" class="btn btn-primary"><span aria-hidden="true">Add Snippet</span> -->
+          <!-- <button onclick="addField()" class="btn btn-primary"><span aria-hidden="true">Add Snippet</span> -->
           <!-- <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
           </svg> -->
@@ -199,23 +193,31 @@ if (!empty(get_object_vars($currentNotice))) {
 
 </main>
 <script>
-  function addField() {
+  function addField($snippet_text) {
     let snippets = document.getElementById("snippets");
-
-    let newSnippet = document.createElement("li");
-    newSnippet.className = "";
+    let newSnippet = document.createElement("div");
+    newSnippet.className = "position-relative";
 
     let inputField = document.createElement("input");
     inputField.type = "text";
-    inputField.name = "snippet"; // Assign a unique name if needed
-    inputField.className = "list-group-item d-flex align-items-start"; // Assign a unique name if needed
+    inputField.name = "meta_code_snippet";
+    inputField.className = "list-group-item pr-5";
 
-    let deleteButton = document.createElement("button");
-    deleteButton.className = "delete";
-    deleteButton.innerHTML = "Delete";
+    let deleteButton = document.createElement("a");
+    deleteButton.className = "delete position-absolute end-0 top-50 translate-middle-y";
     deleteButton.onclick = function() {
       deleteField(this);
     };
+    let svgIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svgIcon.setAttribute("height", "1.25em");
+    svgIcon.setAttribute("viewBox", "0 0 448 512");
+
+    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z");
+
+    svgIcon.appendChild(path);
+    deleteButton.appendChild(svgIcon);
 
     newSnippet.appendChild(inputField);
     newSnippet.appendChild(deleteButton);
@@ -223,15 +225,6 @@ if (!empty(get_object_vars($currentNotice))) {
     snippets.appendChild(newSnippet);
   }
 
-  // function editField(button) {
-  //   var field = button.parentElement;
-  //   var inputField = field.querySelector("input");
-
-  //   var newValue = prompt("Enter new value:", inputField.value);
-  //   if (newValue !== null) {
-  //     inputField.value = newValue;
-  //   }
-  // }
 
   function deleteField(button) {
     var field = button.parentElement;
