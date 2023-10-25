@@ -11,7 +11,7 @@
 // We're going to use the DB in this document.
 require_once '../config.php';
 require_once '../models/db.php';
-
+session_start();
 // Let's set up error handling for incomplete user defined fields notice forms
 $status = $_POST['status'];
 if ($status == false)
@@ -22,19 +22,9 @@ if ($related_url == false)
 $property_id = $_POST['property_id'];
 if ($property_id == false)
     throw new Exception('Property property_id is missing.');
-
-// These items are required but will be assigned 
-
-// $id = $_POST['id'];
-// if ($id == false)
-//     throw new Exception('Property id is missing.');
-// $archived = $_POST['archived'];
-// if ($archived == false)
-//     throw new Exception('Property archived is missing.');
-
-// $source = $_POST['source'];
-// if ($source == false)
-//     throw new Exception('Property source is missing.');
+$source = $_SESSION['source'];
+if (empty($source))
+    throw new Exception('Property source is missing.');
 
 // Let's set up the nonrequired variables
 
@@ -58,63 +48,56 @@ if (isset($_POST['meta_notes'])) {
     $meta['notes'] = $_POST['meta_notes'];
 }
 
-$updated_notice = [];
+$fields = array(
+    array(
+        'name' => 'message',
+        'value' => $message
+    ),
+    array(
+        'name' => 'status',
+        'value' => $status
+    ),
+    array(
+        'name' => 'related_url',
+        'value' => $related_url
+    ),
+    array(
+        'name' => 'property_id',
+        'value' => $property_id
+    ),
 
+    array(
+        'name' => 'source',
+        'value' => $source
+    ),
+
+    array(
+        'name' => 'meta',
+        'value' => serialize($meta)
+    )
+);
 // The array is populated with URL parameters.
-if (!empty($_POST)) {
-    foreach ($_POST as $key => $value) {
-
-        // We'll push every value but the name,
-        // which receive special treatment later.
-        if ($key != 'name' && !empty($value))
-            array_push(
-                $updated_notice,
-                array(
-                    'name' => $key,
-                    'value' => strip_tags($value)
-                )
-            );
-    }
-    // print_r($updated_notice);
-}
+// if (!empty($_POST)) {
+//     foreach ($_POST as $key => $value) {
+//         // We'll push every value but the name,
+//         // which receive special treatment later.
+//         if (!empty($value))
+//             array_push(
+//                 $updated_notice,
+//                 array(
+//                     'name' => $key,
+//                     'value' => strip_tags($value)
+//                 )
+//             );
+//     }
+// }
 
 // Depending on if the name is present, we'll either save
 // or update the report.
-if (empty($_POST['notice_id'])) {
-
-    $source = 'manually_created';
-    $archived = 0;
+if (empty($_SESSION['notice_id'])) {
+    $fields['source'] = 'manually created';
+    $fields['archived'] = 0;
     // Now we can create the notice.
-    $fields = array(
-        array(
-            'name' => 'message',
-            'value' => $message
-        ),
-        array(
-            'name' => 'status',
-            'value' => $status
-        ),
-        array(
-            'name' => 'related_url',
-            'value' => $related_url
-        ),
-        array(
-            'name' => 'source',
-            'value' => $source
-        ),
-        array(
-            'name' => 'property_id',
-            'value' => $property_id
-        ),
-        array(
-            'name' => 'archived',
-            'value' => $archived
-        ),
-        array(
-            'name' => 'meta',
-            'value' => serialize($meta)
-        )
-    );
     DataAccess::add_db_entry(
         'notices',
         $fields
@@ -122,18 +105,18 @@ if (empty($_POST['notice_id'])) {
 } else {
 
     // Otherwise, we can update the fields.
-    $fields = array(
-        array(
-            'name' => 'notice_value',
-            'value' => serialize($updated_notice)
-        )
-    );
+    // $fields = array(
+    //     array(
+    //         'name' => 'notice_value',
+    //         'value' => serialize($updated_notice)
+    //     )
+    // );
 
     // All fields are filtered to the current post.
     $filtered_to_notice = array(
         array(
             'name' => 'id',
-            'value' => $notice_id
+            'value' => $_SESSION['notice_id']
         ),
     );
     DataAccess::update_db_rows(
