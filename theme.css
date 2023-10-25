@@ -1,5 +1,8 @@
-.container{
-    max-width: 960px;
+body{
+    background-color: var(--bs-secondary-bg);
+}
+#reports_content{
+    min-height: 60vh;
 }
 .bi{
     vertical-align: -.125em;
@@ -8,6 +11,9 @@
 }
 .me-2{
     margin-right: .5rem !important;
+}
+a.active{
+    background-color: var(--bs-secondary-color) !important;
 }
 pre code{
     white-space: break-spaces;
@@ -37,3 +43,4 @@ pre code{
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+

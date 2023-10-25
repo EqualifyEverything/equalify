@@ -8,7 +8,7 @@
 **********************************************************/
 ?>
 
-<main class="container">
+<main>
     <h1>Equalify Settings</h1>
     <section id="properties">
         <h2 class="mt-5">Properties</h2>
