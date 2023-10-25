@@ -111,7 +111,6 @@ if(!empty($_GET['id'])){
                 </div>
             </div>
         </div>
-        <div class=" my-3">
             <button type="submit" id="submit" class="btn btn-primary">
                 Save Property
             </button>
