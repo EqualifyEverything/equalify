@@ -12,7 +12,26 @@
 require_once '../config.php';
 require_once '../models/db.php';
 session_start();
+// First let's check if this is a new notice or an existing one
+
+if (empty($_SESSION['notice_id'])) {
+
+    $archived =  array(
+         'name' => 'archived',
+         'value' => 0
+    );
+    $source =  array(
+        'name' => 'source',
+        'value' => 'manually_created'
+   );
+} else {
+    $source = $_SESSION['source'];
+    $notice_id = $_SESSION['notice_id'];
+
+}
 // Let's set up error handling for incomplete user defined fields notice forms
+// $source = '';
+
 $status = $_POST['status'];
 if ($status == false)
     throw new Exception('Property status is missing.');
@@ -22,31 +41,26 @@ if ($related_url == false)
 $property_id = $_POST['property_id'];
 if ($property_id == false)
     throw new Exception('Property property_id is missing.');
-$source = $_SESSION['source'];
-if (empty($source))
-    throw new Exception('Property source is missing.');
-
+// if (empty($_SESSION['source']) && empty($_SESSION('notice_id'))) {
+//     $source = 'manually created';
+// }    
+// if (isset($_SESSION['source'])) $source = $_SESSION['source'];
 // Let's set up the nonrequired variables
 
-if (isset($_POST['notice_id'])) {
-    $notice_id = $_POST['notice_id'];
-}
-if (isset($_POST['message'])) {
-    $message = $_POST['message'];
-}
-if (isset($_POST['tags'])) {
-    $tags = $_POST['tags'];
-}
+
+if (isset($_POST['notice_id'])) $notice_id = $_POST['notice_id'];
+
+if (isset($_POST['message'])) $message = $_POST['message'];
+
+if (isset($_POST['tags'])) $tags = $_POST['tags'];
+
 // Catching all meta posts
-if (isset($_POST['meta_code_snippet'])) {
-    $meta['code_snippets'] = $_POST['meta_code_snippet'];
-}
-if (isset($_POST['meta_more_info_url'])) {
-    $meta['more_info_url'] = $_POST['meta_more_info_url'];
-}
-if (isset($_POST['meta_notes'])) {
-    $meta['notes'] = $_POST['meta_notes'];
-}
+if (isset($_POST['meta_code_snippet'])) $meta['code_snippets'] = $_POST['meta_code_snippet'];
+
+if (isset($_POST['meta_more_info_url'])) $meta['more_info_url'] = $_POST['meta_more_info_url'];
+
+if (isset($_POST['meta_notes'])) $meta['notes'] = $_POST['meta_notes'];
+
 
 $fields = array(
     array(
@@ -76,43 +90,25 @@ $fields = array(
         'value' => serialize($meta)
     )
 );
-// The array is populated with URL parameters.
-// if (!empty($_POST)) {
-//     foreach ($_POST as $key => $value) {
-//         // We'll push every value but the name,
-//         // which receive special treatment later.
-//         if (!empty($value))
-//             array_push(
-//                 $updated_notice,
-//                 array(
-//                     'name' => $key,
-//                     'value' => strip_tags($value)
-//                 )
-//             );
-//     }
-// }
 
-// Depending on if the name is present, we'll either save
-// or update the report.
+// Check for session ID to add values for new notices
 if (empty($_SESSION['notice_id'])) {
-    $fields['source'] = 'manually created';
-    $fields['archived'] = 0;
+
+       $archived =  array(
+            'name' => 'archived',
+            'value' => 0
+       );
+       array_push($fields, $archived);
+
     // Now we can create the notice.
     DataAccess::add_db_entry(
         'notices',
         $fields
     );
+    unset($_SESSION['notice_id']);
+    unset($_SESSION['source']);
 } else {
-
-    // Otherwise, we can update the fields.
-    // $fields = array(
-    //     array(
-    //         'name' => 'notice_value',
-    //         'value' => serialize($updated_notice)
-    //     )
-    // );
-
-    // All fields are filtered to the current post.
+    // Use session ID to update db 
     $filtered_to_notice = array(
         array(
             'name' => 'id',
@@ -124,6 +120,9 @@ if (empty($_SESSION['notice_id'])) {
         $fields,
         $filtered_to_notice
     );
+    unset($_SESSION['notice_id']);
+    unset($_SESSION['source']);
+
 }
 
 // When done, we can checkout the saved notice.
@@ -131,3 +130,4 @@ header('Location: ../index.php?view=reports&status=success');
 
 ?>
 </pre>
+

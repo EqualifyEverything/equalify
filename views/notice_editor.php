@@ -2,9 +2,7 @@
 //Setting up notice editor variables//
 $currentNotice = new stdClass();
 $viewTitle = "Notice Editor";
-// $id = -1;
 $message = '';
-// $status = 'Status';
 $statusArray = [
   'Equalified',
   'Active',
@@ -19,17 +17,17 @@ $propertiesArray  = DataAccess::get_db_rows(
   1,
   1000000
 )['content'];;
-// $snippet = 'There are currently no snippets';
 $snippetArray = ['test snippet'];
 $moreInfoURL = '';
 $notes = '';
 $hasBulkImporter = false;
 $hasVisualizer = false;
-?>
-<?php
+
 // This checks for an id in the url and populates field if one exists
+
 if (!empty($_GET['notice_id'])) {
   session_start();
+
   $_SESSION['notice_id'] = $_GET['notice_id'];
   $notice_filter = array(
     array(
@@ -46,6 +44,7 @@ if (!empty($_GET['notice_id'])) {
 
   // Let's find the item in the array with the matching id
   $currentNotice = $existing_notices[0];
+  // Add source from notice for updating db
   $_SESSION['source'] = $currentNotice->source;
 }
 
@@ -73,10 +72,7 @@ if (!empty(get_object_vars($currentNotice))) {
       $notes = $meta['notes'];
     }
   }
-} else {
-  // echo "Item with ID $notice_id not found.";
 }
-
 ?>
 
 <title><?php echo $viewTitle ?></title>
@@ -98,7 +94,7 @@ if (!empty(get_object_vars($currentNotice))) {
   <div class="row mb-3">
     <div class="col-md-5 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="message">Message</label>
-      <input type="text" class="form-control" id="message" name="message" placeholder="Message" value="<?php echo $message ?>" required>
+      <input type="text" class="form-control" id="message" name="message" placeholder="Message" value="<?php echo $message ?>">
     </div>
     <div class="col-md-3 ml-3 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="status">Status</label>
@@ -113,14 +109,15 @@ if (!empty(get_object_vars($currentNotice))) {
     </div>
     <div class="col-md-3 ml-3 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="related_url">Related URL</label>
-      <input type="url" class="form-control" id="related_url" name="related_url" placeholder="Related URL:" value="<?php echo $relatedURL ?>" required>
+      <input type="url" class="form-control" id="related_url" name="related_url" aria-describedby="url_helper" placeholder="Related URL:" value="<?php echo $relatedURL ?>" required>
     </div>
+    <div id="url_helper" class="form-text"></div>
   </div>
   <!-- Second row -->
   <div class="row">
     <div class="col-md-3 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="property_id">Related Property</label>
-      <select class="form-select custom-select mr-sm-2" id="property_id" name="property_id">
+      <select class="form-select custom-select mr-sm-2" id="property_id" name="property_id" required>
         <?php
         // Populate Properties Array
         foreach ($propertiesArray as $property)
@@ -162,7 +159,7 @@ if (!empty(get_object_vars($currentNotice))) {
     <div class="col-md-3 ml-md-3 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="meta_more_info_url">Meta: More Info URL</label>
 
-      <input type="url" class="form-control" id="meta_more_info_url" name="meta_more_info_url" placeholder="More Info URL:" value="<?php echo $moreInfoURL ?>" required>
+      <input type="url" class="form-control" id="meta_more_info_url" name="meta_more_info_url" placeholder="More Info URL:" value="<?php echo $moreInfoURL ?>">
     </div>
   </div>
   <!-- Third row -->
@@ -229,22 +226,24 @@ if (!empty(get_object_vars($currentNotice))) {
     var field = button.parentElement;
     field.remove();
   }
+  // Add helper text to URL field.
+  function updateHelper(helperText, helperPlaceholder) {
+    document.getElementById('url_helper').innerHTML = helperText;
+    document.getElementById('related_url').placeholder = helperPlaceholder;
+  }
+  xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
+  if (document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap') {
+    updateHelper(xmlHelperText, 'http://www.pih.org/')
+  } else {
+    updateHelper('', 'https://equalify.app/')
+  }
+  document.getElementById('crawl_type').addEventListener('change', function() {
+    if (document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap') {
+      updateHelper(xmlHelperText, 'http://www.pih.org/')
+    } else {
+      updateHelper('', 'https://equalify.app/')
+    }
+  });
 </script>
-<!-- // Add helper text to URL field.
-    function updateHelper(helperText, helperPlaceholder) {
-        document.getElementById('url_helper').innerHTML = helperText;
-        document.getElementById('url').placeholder = helperPlaceholder;
-    }
-    xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
-    if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ){
-        updateHelper(xmlHelperText, 'http://www.pih.org/')
-    }else{
-        updateHelper('', 'https://equalify.app/')
-    }
-    document.getElementById('crawl_type').addEventListener('change', function () {
-        if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ) {
-            updateHelper(xmlHelperText, 'http://www.pih.org/')
-        } else {
-            updateHelper('', 'https://equalify.app/')
-        }
-    }); -->
+
+
