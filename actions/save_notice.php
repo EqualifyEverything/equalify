@@ -11,48 +11,45 @@
 // We're going to use the DB in this document.
 require_once '../config.php';
 require_once '../models/db.php';
+
 session_start();
+
 // First let's check if this is a new notice or an existing one
 
 if (empty($_SESSION['notice_id'])) {
-
+    // Archived will be removed when added to view
     $archived =  array(
-         'name' => 'archived',
-         'value' => 0
+        'name' => 'archived',
+        'value' => 0
     );
-    $source =  array(
-        'name' => 'source',
-        'value' => 'manually_created'
-   );
+    $source = 'manually_created';
+
 } else {
     $source = $_SESSION['source'];
     $notice_id = $_SESSION['notice_id'];
-
 }
 // Let's set up error handling for incomplete user defined fields notice forms
-// $source = '';
 
 $status = $_POST['status'];
 if ($status == false)
-    throw new Exception('Property status is missing.');
+throw new Exception('Property status is missing.');
+
 $related_url = $_POST['related_url'];
 if ($related_url == false)
-    throw new Exception('Property related_url is missing.');
+throw new Exception('Property related_url is missing.');
+
 $property_id = $_POST['property_id'];
 if ($property_id == false)
-    throw new Exception('Property property_id is missing.');
-// if (empty($_SESSION['source']) && empty($_SESSION('notice_id'))) {
-//     $source = 'manually created';
-// }    
-// if (isset($_SESSION['source'])) $source = $_SESSION['source'];
-// Let's set up the nonrequired variables
+throw new Exception('Property property_id is missing.');
 
+if (isset($_POST['notice_id']))
+    $notice_id = $_POST['notice_id'];
 
-if (isset($_POST['notice_id'])) $notice_id = $_POST['notice_id'];
+if (isset($_POST['message']))
+    $message = $_POST['message'];
 
-if (isset($_POST['message'])) $message = $_POST['message'];
-
-if (isset($_POST['tags'])) $tags = $_POST['tags'];
+if (isset($_POST['tags']))
+    $tags = $_POST['tags'];
 
 // Catching all meta posts
 if (isset($_POST['meta_code_snippet'])) $meta['code_snippets'] = $_POST['meta_code_snippet'];
@@ -93,14 +90,6 @@ $fields = array(
 
 // Check for session ID to add values for new notices
 if (empty($_SESSION['notice_id'])) {
-
-       $archived =  array(
-            'name' => 'archived',
-            'value' => 0
-       );
-       array_push($fields, $archived);
-
-    // Now we can create the notice.
     DataAccess::add_db_entry(
         'notices',
         $fields
@@ -122,7 +111,6 @@ if (empty($_SESSION['notice_id'])) {
     );
     unset($_SESSION['notice_id']);
     unset($_SESSION['source']);
-
 }
 
 // When done, we can checkout the saved notice.
@@ -130,4 +118,3 @@ header('Location: ../index.php?view=reports&status=success');
 
 ?>
 </pre>
-
