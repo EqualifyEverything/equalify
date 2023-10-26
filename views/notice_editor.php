@@ -20,6 +20,7 @@ $propertiesArray  = DataAccess::get_db_rows(
 $snippetArray = ['test snippet'];
 $moreInfoURL = '';
 $notes = '';
+$archived = 1;
 $hasBulkImporter = false;
 $hasVisualizer = false;
 
@@ -43,9 +44,9 @@ if (!empty($_GET['notice_id'])) {
   )['content'];
 
   // Let's find the item in the array with the matching id
-  foreach($existing_notices as $notice) {
+  foreach ($existing_notices as $notice) {
     if ($notice->id == $_SESSION['notice_id']) {
-      $currentNotice = $notice; // Set the flag to true if the id is found
+      $currentNotice = $notice; 
       break; // Exit the loop once a match is found
     }
   }
@@ -95,7 +96,7 @@ if (!empty(get_object_vars($currentNotice))) {
       endif;
       ?>
   </div>
-  <!-- First row -->
+  <!-- First row: Message, Status, Related URL -->
 
   <div class="row mb-3">
     <div class="col-md-5 mb-4">
@@ -119,7 +120,7 @@ if (!empty(get_object_vars($currentNotice))) {
     </div>
     <div id="url_helper" class="form-text"></div>
   </div>
-  <!-- Second row -->
+  <!-- Second row: Related Property, Meta Code Snippets, Meta More Info URL   -->
   <div class="row">
     <div class="col-md-3 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="property_id">Related Property</label>
@@ -127,7 +128,6 @@ if (!empty(get_object_vars($currentNotice))) {
         <?php
         // Populate Properties Array
         foreach ($propertiesArray as $property)
-          // foreach ($propertiesArrayDummy as $property)
           echo '<option name="property_id" value=' . $property->id . '>' . $property->name . '</option>';
         ?>
       </select>
@@ -161,16 +161,21 @@ if (!empty(get_object_vars($currentNotice))) {
       <input type="url" class="form-control" id="meta_more_info_url" name="meta_more_info_url" placeholder="More Info URL:" value="<?php echo $moreInfoURL ?>">
     </div>
   </div>
-  <!-- Third row -->
-
+  <!-- Third row:  Meta Notes, Achive Notice-->
   <div class="row">
     <div class="col-md-4 mb-4">
       <label class="col-form-label-lg font-weight-bold" for="meta_notes">Meta: Notes</label>
 
       <textarea type="text" class="form-control" id="meta_notes" name="meta_notes" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
     </div>
+    <div class="col-md-4 mb-4">
+      <label class="col-form-label-lg font-weight-bold" for="isArchived">Archive Notice:</label>
+      <div class="form-check form-switch text-center ml-4">
+        <input class="form-check-input  ml-4"name="isArchived" type="checkbox" id="isArchived" aria-label="Toggle Button" aria-checked="true"<?php if($archived) echo 'checked'; ?>>
+      </div>
+    </div>
   </div>
-  <!-- Fourth row -->
+  <!-- Fourth row: Save Notice, Delete Notice-->
 
   <div class="row">
     <div class="col-md-4 mb-4">
@@ -181,6 +186,8 @@ if (!empty(get_object_vars($currentNotice))) {
         Delete Notice
       </button>
     </div>
+    <!-- <div class="col-md-4 mb-4">
+    </div> -->
   </div>
   </form>
 </div>

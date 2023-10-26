@@ -37,3 +37,7 @@ pre code{
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+#isArchived{
+    min-height: 1.5em;
+    min-width: 2.5em;
+}
