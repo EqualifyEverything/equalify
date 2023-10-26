@@ -43,7 +43,13 @@ if (!empty($_GET['notice_id'])) {
   )['content'];
 
   // Let's find the item in the array with the matching id
-  $currentNotice = $existing_notices[0];
+  foreach($existing_notices as $notice) {
+    if ($notice->id == $_SESSION['notice_id']) {
+      $currentNotice = $notice; // Set the flag to true if the id is found
+      break; // Exit the loop once a match is found
+    }
+  }
+
   // Add source from notice for updating db
   $_SESSION['source'] = $currentNotice->source;
 }
@@ -142,15 +148,8 @@ if (!empty(get_object_vars($currentNotice))) {
         endforeach;
         ?>
       </div>
-      <!-- <a href="add_snippet" name="add_snippet" class="btn btn-secondary">Add</a> -->
-
-      <!-- <span> -->
       <a onclick="addField()" class="btn btn-secondary">Add Snippet</button>
-        <!-- <button onclick="addField()" class="btn btn-primary"><span aria-hidden="true">Add Snippet</span> -->
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-          </svg> -->
-        <!-- </span> -->
+
       </a>
       <?php if ($hasVisualizer) : ?>
         <a href="add_report" class="btn btn-secondary">Visualizer</a>
@@ -245,5 +244,3 @@ if (!empty(get_object_vars($currentNotice))) {
     }
   });
 </script>
-
-
