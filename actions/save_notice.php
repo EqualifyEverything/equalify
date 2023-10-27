@@ -23,7 +23,6 @@ if (empty($_SESSION['notice_id'])) {
         'value' => 0
     );
     $source = 'manually_created';
-
 } else {
     $source = $_SESSION['source'];
     $notice_id = $_SESSION['notice_id'];
@@ -32,18 +31,21 @@ if (empty($_SESSION['notice_id'])) {
 
 $status = $_POST['status'];
 if ($status == false)
-throw new Exception('Property status is missing.');
+    throw new Exception('Property status is missing.');
 
 $related_url = $_POST['related_url'];
 if ($related_url == false)
-throw new Exception('Property related_url is missing.');
+    throw new Exception('Property related_url is missing.');
 
 $property_id = $_POST['property_id'];
 if ($property_id == false)
-throw new Exception('Property property_id is missing.');
+    throw new Exception('Property property_id is missing.');
 
 if (isset($_POST['notice_id']))
     $notice_id = $_POST['notice_id'];
+
+$archived = isset($_POST['archived']) ? $_POST['archived'] : 0;
+    $archived = $archived ? 1 : 0;
 
 if (isset($_POST['message']))
     $message = $_POST['message'];
@@ -80,6 +82,11 @@ $fields = array(
     array(
         'name' => 'source',
         'value' => $source
+    ),
+
+    array(
+        'name' => 'archived',
+        'value' => $archived
     ),
 
     array(

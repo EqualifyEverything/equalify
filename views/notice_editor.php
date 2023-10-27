@@ -20,7 +20,7 @@ $propertiesArray  = DataAccess::get_db_rows(
 $snippetArray = ['test snippet'];
 $moreInfoURL = '';
 $notes = '';
-$archived = 1;
+$archived = 0;
 $hasBulkImporter = false;
 $hasVisualizer = false;
 
@@ -169,9 +169,9 @@ if (!empty(get_object_vars($currentNotice))) {
       <textarea type="text" class="form-control" id="meta_notes" name="meta_notes" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
     </div>
     <div class="col-md-4 mb-4">
-      <label class="col-form-label-lg font-weight-bold" for="isArchived">Archive Notice:</label>
+      <label class="col-form-label-lg font-weight-bold" for="archived">Archive Notice:</label>
       <div class="form-check form-switch text-center ml-4">
-        <input class="form-check-input  ml-4"name="isArchived" type="checkbox" id="isArchived" aria-label="Toggle Button" aria-checked="true"<?php if($archived) echo 'checked'; ?>>
+        <input class="form-check-input  ml-4" name="archived" type="checkbox" id="archived" aria-label="Toggle Button" aria-checked="true"<?php if($archived) echo 'checked'; ?>>
       </div>
     </div>
   </div>
