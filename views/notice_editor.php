@@ -1,6 +1,7 @@
 <?php
 //Setting up notice editor variables//
 $currentNotice = new stdClass();
+$noticeID = '';
 $viewTitle = "Notice Editor";
 $message = '';
 $statusArray = [
@@ -26,9 +27,9 @@ $hasVisualizer = false;
 
 // This checks for an id in the url and populates field if one exists
 
+session_start();
 if (!empty($_GET['notice_id'])) {
-  session_start();
-
+  $noticeID = $_GET['notice_id']; 
   $_SESSION['notice_id'] = $_GET['notice_id'];
   $notice_filter = array(
     array(
@@ -181,9 +182,9 @@ if (!empty(get_object_vars($currentNotice))) {
         <button type="submit" id="submit" class="btn btn-primary" aria-label="Save Notice">
           Save notice
         </button>
-        <button type="submit" id="submit" class="btn btn-danger"aria-label="Delete Notice">
-          Delete Notice
-        </button>
+          <a href="actions/delete_notice.php?notice_id=<?php echo $_SESSION['notice_id']?>" class="btn btn-danger" aria-label="Delete Notice">
+            Delete Notice
+          </a>
       </div>
     </div>
   </form>
@@ -203,7 +204,7 @@ if (!empty(get_object_vars($currentNotice))) {
 
     let deleteButton = document.createElement("a");
     deleteButton.className = "delete snippet-delete position-absolute end-0 top-50 translate-middle-y";
-    deleteButton.setAttribute("aria-label","Remove Notice")
+    deleteButton.setAttribute("aria-label", "Remove Notice")
     deleteButton.onclick = function() {
       deleteField(this);
     };
