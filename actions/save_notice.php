@@ -45,7 +45,7 @@ if (isset($_POST['notice_id']))
     $notice_id = $_POST['notice_id'];
 
 $archived = isset($_POST['archived']) ? $_POST['archived'] : 0;
-    $archived = $archived ? 1 : 0;
+$archived = $archived ? 1 : 0;
 
 if (isset($_POST['message']))
     $message = $_POST['message'];
@@ -54,7 +54,9 @@ if (isset($_POST['tags']))
     $tags = $_POST['tags'];
 
 // Catching all meta posts
-if (isset($_POST['meta_code_snippet'])) $meta['code_snippets'] = $_POST['meta_code_snippet'];
+if (isset($_POST['meta_code_snippet'])) {
+    $meta['code_snippets'] = $_POST['meta_code_snippet'];
+}
 
 if (isset($_POST['meta_more_info_url'])) $meta['more_info_url'] = $_POST['meta_more_info_url'];
 

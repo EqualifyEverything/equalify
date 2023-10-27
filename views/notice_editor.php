@@ -17,7 +17,7 @@ $propertiesArray  = DataAccess::get_db_rows(
   1,
   1000000
 )['content'];;
-$snippetArray = ['test snippet'];
+$snippetArray = [];
 $moreInfoURL = '';
 $notes = '';
 $archived = 0;
@@ -69,8 +69,8 @@ if (!empty(get_object_vars($currentNotice))) {
   // and assign them as needed
   $meta = unserialize($currentNotice->meta);
   if (is_array($meta)) {
-    if (isset($meta['snippets'])) {
-      $snippetArray = $meta['snippets'];
+    if (isset($meta['code_snippets'])) {
+      $snippetArray = $meta['code_snippets'];
     }
     if (isset($meta['more_info_url'])) {
       $moreInfoURL = $meta['more_info_url'];
@@ -132,14 +132,13 @@ if (!empty(get_object_vars($currentNotice))) {
           ?>
         </select>
       </div>
-      <!-- <div id="input_test"></div> -->
       <div class="col-md-5 ml-md-3 mb-4">
         <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet[]">Meta:Code Snippet</label>
         <div id="snippets" class="list-group mb-3">
           <?php foreach ($snippetArray as $snippet) : ?>
             <div class="position-relative">
-              <input class="list-group-item pr-5" name="meta_code_snippet[]" value="<?php echo $snippet ?>" />
-              <a onclick="deleteField()" class="position-absolute end-0 top-50 translate-middle-y">
+              <input class="snippet-input list-group-item" name="meta_code_snippet[]" value="<?php echo $snippet ?>" />
+              <a onclick="deleteField(this)" class="delete snippet-delete position-absolute end-0 top-50 translate-middle-y" aria-label="Remove Notice">
                 <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 448 512">
                   <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
                 </svg>
@@ -166,7 +165,6 @@ if (!empty(get_object_vars($currentNotice))) {
     <div class="row">
       <div class="col-md-4 mb-4">
         <label class="col-form-label-lg font-weight-bold" for="meta_notes">Meta: Notes</label>
-
         <textarea type="text" class="form-control" id="meta_notes" name="meta_notes" placeholder="Notes:" aria-label="notes" value="<?php echo $notes ?>"><?php echo $notes ?></textarea>
       </div>
       <div class="col-md-4 mb-4">
@@ -180,15 +178,13 @@ if (!empty(get_object_vars($currentNotice))) {
 
     <div class="row">
       <div class="col-md-4 mb-4">
-        <button type="submit" id="submit" class="btn btn-primary">
+        <button type="submit" id="submit" class="btn btn-primary" aria-label="Save Notice">
           Save notice
         </button>
-        <button type="submit" id="submit" class="btn btn-danger">
+        <button type="submit" id="submit" class="btn btn-danger"aria-label="Delete Notice">
           Delete Notice
         </button>
       </div>
-      <!-- <div class="col-md-4 mb-4">
-    </div> -->
     </div>
   </form>
 </div>
@@ -200,15 +196,14 @@ if (!empty(get_object_vars($currentNotice))) {
     let snippets = document.getElementById("snippets");
     let newSnippet = document.createElement("div");
     newSnippet.className = "position-relative";
-    // newSnippet.className = "position-relative";
 
     let inputField = document.createElement("input");
-    // inputField.type = "text";
     inputField.name = "meta_code_snippet[]";
-    inputField.className = "list-group-item pr-5";
+    inputField.className = "snippet-input list-group-item pr-5";
 
     let deleteButton = document.createElement("a");
-    deleteButton.className = "delete position-absolute end-0 top-50 translate-middle-y";
+    deleteButton.className = "delete snippet-delete position-absolute end-0 top-50 translate-middle-y";
+    deleteButton.setAttribute("aria-label","Remove Notice")
     deleteButton.onclick = function() {
       deleteField(this);
     };
@@ -228,7 +223,6 @@ if (!empty(get_object_vars($currentNotice))) {
 
     snippets.appendChild(newSnippet);
   }
-
 
   function deleteField(button) {
     var field = button.parentElement;
