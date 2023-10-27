@@ -1,0 +1,1 @@
+This view will include all the information that someone will need to equalify a notice

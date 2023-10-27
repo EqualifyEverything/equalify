@@ -24,7 +24,7 @@ if( count($reports['content']) > 0 ):
     <div class="col">
         <div class="card">
             <div class="card-body">
-                <h2 class="h5"><a href="index.php?view=single_report&id=<?php echo $report->id;?>"><?php echo $report->title;?></a></h2>
+                <h2 class="h5"><a href="index.php?view=single_report-temp&id=<?php echo $report->id;?>"><?php echo $report->title;?></a></h2>
                 <p class="text-secondary my-0"><?php echo $report->description;?></p>
             </div>
         </div>
