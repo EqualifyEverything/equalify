@@ -87,6 +87,7 @@ if (!empty(get_object_vars($currentNotice))) {
   <div class="row mb-3">
     <h1 class="col-md-9"><?php echo $viewTitle ?></h1>
     <form action="actions/save_notice.php" method="post">
+      <div id="input_test"></div>
       <!--Check for bulk importer-->
       <?php if ($hasBulkImporter) : ?>
         <div class="col-md-3 ">
@@ -133,20 +134,21 @@ if (!empty(get_object_vars($currentNotice))) {
       </select>
     </div>
     <div class="col-md-5 ml-md-3 mb-4">
-      <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet">Meta:Code Snippet</label>
+      <label class="col-form-label-lg font-weight-bold" for="meta_code_snippet[]">Meta:Code Snippet</label>
       <div id="snippets" class="list-group mb-3">
         <?php foreach ($snippetArray as $snippet) : ?>
           <div class="position-relative">
-            <input class="list-group-item pr-5" name="meta_code_snippet" value="<?php echo $snippet ?>" />
+            <input class="list-group-item pr-5" name="meta_code_snippet[]" value="<?php echo $snippet ?>" />
             <a onclick="deleteField()" class="position-absolute end-0 top-50 translate-middle-y">
               <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 448 512">
                 <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
               </svg>
             </a>
           </div>
-        <?php
+          <?php
         endforeach;
         ?>
+        <input class="list-group-item pr-5" name="meta_code_snippet_new[]" value="<?php echo $snippet ?>" />
       </div>
       <a onclick="addField()" class="btn btn-secondary">Add Snippet</button>
 
@@ -196,13 +198,15 @@ if (!empty(get_object_vars($currentNotice))) {
 
 <script>
   function addField($snippet_text) {
-    let snippets = document.getElementById("snippets");
+    let snippets = document.getElementById("input_test");
+    // let snippets = document.getElementById("snippets");
     let newSnippet = document.createElement("div");
     newSnippet.className = "position-relative";
+    // newSnippet.className = "position-relative";
 
     let inputField = document.createElement("input");
-    inputField.type = "text";
-    inputField.name = "meta_code_snippet";
+    // inputField.type = "text";
+    inputField.name = "meta_code_snippet[]";
     inputField.className = "list-group-item pr-5";
 
     let deleteButton = document.createElement("a");
