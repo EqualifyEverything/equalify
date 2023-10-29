@@ -34,24 +34,60 @@
 </div>
 <!-- #active_searches is only seen if a search was created -->
 <div id="active_searches">
-    <small class="d-inline-flex mb-3 ps-2 pe-1 py-1 fw-semibold text-success-emphasis bg-body-tertiary border rounded-2 align-items-center">
-        <span class="text-success">URL:</span> //tulane
+    <!-- Filter added when selected in search -->
+    <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Small button group">
+        <!-- Main button pops up search w/ loaded variable -->
+        <button type="button" class="btn btn-outline-secondary"><span class="fw-semibold pe-1">URL:</span> //tulane</button>
         <!-- Close button removes filter -->
-        <button class="btn btn-sm btn-outline-secondary ms-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>
+        <button type="button" class="btn btn-outline-secondary">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            <span class="visually-hidden">Remove Filter</span>
         </button>
-    </small>
-    <small class="d-inline-flex mb-3 ps-2 pe-1 py-1 fw-semibold text-success-emphasis bg-body-tertiary border rounded-2 align-items-center">
-        <span class="text-success">Tag:</span> WCAG
+    </div>
+    <!-- Filter added when selected in search -->
+    <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Small button group">
+        <!-- Main button pops up search w/ loaded variable -->
+        <button type="button" class="btn btn-outline-secondary">
+            <span class="fw-semibold pe-1">Tag:</span> WCAG
+        </button>
         <!-- Close button removes filter -->
-        <button class="btn btn-sm btn-outline-secondary ms-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>
+        <button type="button" class="btn btn-outline-secondary">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            <span class="visually-hidden">Remove Filter</span>
         </button>
-    </small>
+    </div>
+    <!-- Filter added when selected in search -->
+    <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Small button group">
+        <!-- Main button pops up search w/ loaded variable -->
+        <button type="button" class="btn btn-outline-secondary">
+            <span class="fw-semibold pe-1">Message:</span> Hello World
+        </button>
+        <!-- Close button removes filter -->
+        <button type="button" class="btn btn-outline-secondary">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            <span class="visually-hidden">Remove Filter</span>
+        </button>
+    </div>
+    <!-- Filter added when selected in search -->
+    <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Small button group">
+        <!-- Main button pops up search w/ loaded variable -->
+        <button type="button" class="btn btn-outline-secondary">
+            <span class="fw-semibold pe-1">Code:</span> <code class="text-secondary">&lt;p&gt;Sampl</code>
+        </button>
+        <!-- Close button removes filter -->
+        <button type="button" class="btn btn-outline-secondary">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            <span class="visually-hidden">Remove Filter</span>
+        </button>
+    </div>
 </div>
 <div id="reports_filter" class="my-2 rounded-3 bg-secondary text-center p-2 border">
     <ul class="nav d-flex justify-content-around" aria-label="Click to toggle any of these statuses. Toggling a status will hide/show related data.">

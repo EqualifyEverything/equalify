@@ -51,6 +51,11 @@ pre code{
     position: relative;
     background: transparent !important;
 }
+@media (max-width: 768px) {
+    #reports_filter a{
+        width: auto;
+    }
+}
 #reports_filter a:before{
     position: absolute;
     content: '';
@@ -65,7 +70,7 @@ pre code{
     bottom: -1em;
 }
 #reports_filter a:hover:before{
-    bottom: -1.2em;
+    bottom: -1.25em;
 }
 #reports_filter a#equalified:before{
     background: rgb(11, 101, 21);
@@ -75,4 +80,7 @@ pre code{
 }
 #reports_filter a#ignored:before{
     background: rgb(52, 57, 61);
+}
+.btn-outline-secondary:hover code{
+    color: white !important;
 }
