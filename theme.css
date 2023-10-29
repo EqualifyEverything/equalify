@@ -43,4 +43,36 @@ pre code{
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
-
+#reports_filter {
+    overflow: hidden;
+}
+#reports_filter a{
+    width: 200px;
+    position: relative;
+    background: transparent !important;
+}
+#reports_filter a:before{
+    position: absolute;
+    content: '';
+    bottom: -2em;
+    left: 0;
+    width: 100%;
+    height: 1em;
+    border-radius: 6px;
+    transition: bottom .4s;
+}
+#reports_filter a.active:before{
+    bottom: -1em;
+}
+#reports_filter a:hover:before{
+    bottom: -1.2em;
+}
+#reports_filter a#equalified:before{
+    background: rgb(11, 101, 21);
+}
+#reports_filter a#active:before{
+    background: rgb(171, 39, 12);
+}
+#reports_filter a#ignored:before{
+    background: rgb(52, 57, 61);
+}
