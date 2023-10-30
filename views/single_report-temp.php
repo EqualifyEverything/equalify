@@ -146,7 +146,6 @@
                         ]
                     },
                     options: {
-                        responsive: true,
                         plugins: {
                             legend: {
                                 display: false
@@ -231,7 +230,7 @@
                         Missing form labels
                     </span>
                     <span class="col-4">
-                        <code>&lt;h2&gt;Another sample &lt;h3&gt;can be&lt;/h3&gt; put on th&lt;/h2&gt;</code>...
+                        <code>&lt;h2&gt;Another sample &lt;h3&gt;can be&lt;/h3&gt; put on th&lt;/h2&gt;...</code>
                     </span>
                     <span class="col-2" aria-label="Status">
                         Active
@@ -245,7 +244,7 @@
                         Empty headings
                     </span>
                     <span class="col-4">
-                        <code>Hello world&lt;br&gt;&lt;p&gt;Text goes here to demo a concre</code>...
+                        <code>Hello world&lt;br&gt;&lt;p&gt;Text goes here to demo a concre...</code>
                     </span>
                     <span class="col-2" aria-label="Status">
                         Active
