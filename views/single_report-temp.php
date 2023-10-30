@@ -184,7 +184,7 @@
                         Occurances
                     </strong>
                 </div>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Image lacks alt text
                     </span>
@@ -198,7 +198,7 @@
                         38
                     </span>
                 </a>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Image lacks alt text
                     </span>
@@ -212,7 +212,7 @@
                         38
                     </span>
                 </a>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Insufficient color contrast
                     </span>
@@ -226,7 +226,7 @@
                         22
                     </span>
                 </a>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Missing form labels
                     </span>
@@ -240,7 +240,7 @@
                         16
                     </span>
                 </a>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Empty headings
                     </span>
@@ -254,7 +254,7 @@
                         12
                     </span>
                 </a>
-                <a class="row text-body py-2 border-bottom" href="">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_notice&id=">
                     <span class="col-4">
                         Missing document language
                     </span>
@@ -269,8 +269,8 @@
                     </span>
                 </a>
             </div>
-            <div class="d-flex">
-                <p class="text-secondary fs-6 my-0">
+            <div class="d-flex align-items-center">
+                <p class="text-secondary fs-6 my-0 me-3">
                     1,239 Notices
                 </p>
                 <!-- Toggle buttons only if there are over 5 items, and toggle disabled if no prev/next items -->
@@ -347,8 +347,8 @@
                     </span>
                 </a>
             </div>
-            <div class="d-flex">
-                <p class="text-secondary fs-6 my-0">
+            <div class="d-flex align-items-center">
+                <p class="text-secondary fs-6 my-0 me-3">
                     34 Tags
                 </p>
                 <!-- Toggle buttons only if there are over 5 items, and toggle disabled if no prev/next items -->
@@ -423,8 +423,8 @@
                     </span>
                 </a>
             </div>
-            <div class="d-flex">
-                <p class="text-secondary fs-6 my-0">
+            <div class="d-flex align-items-center">
+                <p class="text-secondary fs-6 my-0 me-3">
                     1,200 Pages
                 </p>
                 <!-- Toggle buttons only if there are over 5 items, and toggle disabled if no prev/next items -->
