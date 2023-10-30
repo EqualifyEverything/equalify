@@ -166,51 +166,109 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="card p-4 my-2 table-responsive">
+        <div class="card py-2 px-4 my-2 table-responsive">
             <h2 class="visually-hidden">Notices</h2>
             <!-- Only show notices with status that are toggled (e.g.- all notices, but ignored notices are shown now) -->
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                    <th scope="col">Message</th>
-                    <th scope="col">Code</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Occurrences</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Image lacks alt text</td>
-                        <td class="text-truncate"><code>&lt;img src="https://tulane.edu/logo.jgp"></code></td>
-                        <td>Active</td>
-                        <td>38</td>
-                    </tr>
-                    <tr>
-                        <td>Insufficient color contrast</td>
-                        <td class="text-truncate"><code>&lt;p&gt;Sample text here...&lt;/p&gt;&lt;p&gt;Some more sample&lt;/p&gt;</code></td>
-                        <td>Active</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>Missing form labels</td>
-                        <td><code>&lt;h2&gt;Another sample &lt;h3&gt;can be&lt;/h3&gt; put on th&lt;/h2&gt;</code>...</td>
-                        <td>Active</td>
-                        <td>16</td>
-                    </tr>
-                    <tr>
-                        <td>Empty headings</td>
-                        <td><code>Hello world&lt;br&gt;&lt;p&gt;Text goes here to demo a concre</code>...</td>
-                        <td>Active</td>
-                        <td>12</td>
-                    </tr>
-                    <tr>
-                        <td>Missing document language</td>
-                        <td><code>&lt;p&gt;Sample text here...&lt;/p&gt;</code></td>
-                        <td>Active</td>
-                        <td>4</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="mb-2">
+                <div class="row border-bottom py-2" aria-hidden="true">
+                    <strong class="col-4">
+                        Message
+                    </strong>
+                    <strong class="col-4">
+                        Code
+                    </strong>
+                    <strong class="col-2">
+                        Status
+                    </strong>
+                    <strong class="col-2">
+                        Occurances
+                    </strong>
+                </div>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Image lacks alt text
+                    </span>
+                    <span class="col-4" aria-label="code">
+                        <code>&lt;img src="https://tulane.edu/logo.jgp"></code>
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="occurances">
+                        38
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Image lacks alt text
+                    </span>
+                    <span class="col-4" aria-label="code">
+                        <code>&lt;img src="https://tulane.edu/logo.jgp"></code>
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="occurances">
+                        38
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Insufficient color contrast
+                    </span>
+                    <span class="col-4">
+                        <code>&lt;p&gt;Sample text here...&lt;/p&gt;&lt;p&gt;Some more sample&lt;/p&gt;</code>
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="Occurances">
+                        22
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Missing form labels
+                    </span>
+                    <span class="col-4">
+                        <code>&lt;h2&gt;Another sample &lt;h3&gt;can be&lt;/h3&gt; put on th&lt;/h2&gt;</code>...
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="Occurances">
+                        16
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Empty headings
+                    </span>
+                    <span class="col-4">
+                        <code>Hello world&lt;br&gt;&lt;p&gt;Text goes here to demo a concre</code>...
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="Occurances">
+                        12
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="">
+                    <span class="col-4">
+                        Missing document language
+                    </span>
+                    <span class="col-4">
+                        <code>&lt;p&gt;Sample text here...&lt;/p&gt;</code>
+                    </span>
+                    <span class="col-2" aria-label="Status">
+                        Active
+                    </span>
+                    <span class="col-2" aria-label="Occurances">
+                        4
+                    </span>
+                </a>
+            </div>
             <div class="d-flex">
                 <p class="text-secondary fs-6 my-0">
                     1,239 Notices
@@ -236,39 +294,59 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="card p-4 my-2 ">
+        <div class="card py-2 px-4 my-2 ">
             <!-- Only show tags belonging to notices that are visible (e.g.- all notices, but ignored notices are shown now) -->
             <h2 class="visually-hidden">Tags</h2>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">Tag</th>
-                        <th scope="col">Occurrences</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>WCAG 1.2.2</td>
-                        <td>123</td>
-                    </tr>
-                    <tr>
-                        <td>WCAG 2.2.2</td>
-                        <td>119</td>
-                    </tr>
-                    <tr>
-                        <td>WCAG 1.1.2</td>
-                        <td>112</td>
-                    </tr>
-                    <tr>
-                        <td>WCAG 2.1.2</td>
-                        <td>88</td>
-                    </tr>
-                    <tr>
-                        <td>WCAG 2.1.2</td>
-                        <td>73</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="mb-2">
+                <div class="row border-bottom py-2" aria-hidden="true">
+                    <strong class="col-7">
+                        Tag
+                    </strong>
+                    <strong class="col-3">
+                        Occurances
+                    </strong>
+                </div>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_tag&id=">
+                    <span class="col-7">
+                        WCAG 2.1.8
+                    </span>
+                    <span class="col-3" aria-label="Occurances">
+                        129
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_tag&id=">
+                    <span class="col-7">
+                        WCAG 1.2.2
+                    </span>
+                    <span class="col-3" aria-label="Occurances">
+                        108
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_tag&id=">
+                    <span class="col-7">
+                        WCAG 3.2.1
+                    </span>
+                    <span class="col-3" aria-label="Occurances">
+                        39
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_tag&id=">
+                    <span class="col-7">
+                        WCAG 1.2.4
+                    </span>
+                    <span class="col-3" aria-label="Occurances">
+                        37
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_tag&id=">
+                    <span class="col-7">
+                        WCAG 2.1.1
+                    </span>
+                    <span class="col-3" aria-label="Occurances">
+                        30
+                    </span>
+                </a>
+            </div>
             <div class="d-flex">
                 <p class="text-secondary fs-6 my-0">
                     34 Tags
@@ -292,39 +370,59 @@
         </div>
     </div>
     <div class="col">
-        <div class="card p-4 my-2 table-responsive">
+        <div class="card py-2 px-4 my-2 table-responsive">
             <!-- Only show pages that have notices that are visible (e.g.- all notices, but ignored notices are shown now) -->
             <h2 class="visually-hidden">Pages</h2>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">URL</th>
-                        <th scope="col">Equalified</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>tulane.edu/home</td>
-                        <td>3%</td>
-                    </tr>
-                    <tr>
-                        <td>tulane.edu/visit</td>
-                        <td>13%</td>
-                    </tr>
-                    <tr>
-                        <td>tulane.edu/events</td>
-                        <td>48%</td>
-                    </tr>
-                    <tr>
-                        <td>tulane.edu/apply</td>
-                        <td>58%</td>
-                    </tr>
-                    <tr>
-                        <td>giving.tulane.edu/s/1586/Giving/</td>
-                        <td>78%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="mb-2">
+                <div class="row border-bottom py-2" aria-hidden="true">
+                    <strong class="col-7">
+                        URL
+                    </strong>
+                    <strong class="col-3">
+                        Equalified
+                    </strong>
+                </div>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_page&id=">
+                    <span class="col-7">
+                        tulane.edu/home
+                    </span>
+                    <span class="col-3" aria-label="Equalified">
+                        3%
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_page&id=">
+                    <span class="col-7">
+                        tulane.edu/visit
+                    </span>
+                    <span class="col-3" aria-label="Equalified">
+                        13%
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_page&id=">
+                    <span class="col-7">
+                    tulane.edu/apply
+                    </span>
+                    <span class="col-3" aria-label="Equalified">
+                       53%
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_page&id=">
+                    <span class="col-7">
+                    tulane.edu/events
+                    </span>
+                    <span class="col-3" aria-label="Equalified">
+                        61%
+                    </span>
+                </a>
+                <a class="row text-body py-2 border-bottom" href="index.php?view=single_page&id=">
+                    <span class="col-7">
+                        giving.tulane.edu/s/1586/Giving/	
+                    </span>
+                    <span class="col-3" aria-label="Equalified">
+                        73%
+                    </span>
+                </a>
+            </div>
             <div class="d-flex">
                 <p class="text-secondary fs-6 my-0">
                     1,200 Pages

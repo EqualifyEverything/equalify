@@ -84,3 +84,9 @@ pre code{
 .btn-outline-secondary:hover code{
     color: white !important;
 }
+a.row{
+    text-decoration: none;
+}
+a.row:hover{
+    background-color: var(--bs-secondary-bg)
+}
