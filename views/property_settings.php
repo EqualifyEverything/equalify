@@ -53,7 +53,8 @@ if(!empty($_GET['id'])){
 }
 
 ?>
-<main class="container">
+
+<div class="card  bg-white p-4 my-2">
     <h1>Property Settings</h1>
     <form action="actions/save_property.php" method="post" id="site_form">
         <div class="row my-4">
@@ -110,40 +111,37 @@ if(!empty($_GET['id'])){
                 </div>
             </div>
         </div>
-        <div class=" my-3">
             <button type="submit" id="submit" class="btn btn-primary">
                 Save Property
             </button>
         </div>
     </form> 
+</div>
+<script>
 
-    <script>
+// Add spinny wheel to button
+document.getElementById('site_form').addEventListener('submit', function () {
+    document.getElementById('submit').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding Content..';
+    document.getElementById("submit").disabled = true;
+});
 
-    // Add spinny wheel to button
-    document.getElementById('site_form').addEventListener('submit', function () {
-        document.getElementById('submit').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding Content..';
-        document.getElementById("submit").disabled = true;
-    });
-
-    // Add helper text to URL field.
-    function updateHelper(helperText, helperPlaceholder) {
-        document.getElementById('url_helper').innerHTML = helperText;
-        document.getElementById('url').placeholder = helperPlaceholder;
-    }
-    xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
-    if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ){
+// Add helper text to URL field.
+function updateHelper(helperText, helperPlaceholder) {
+    document.getElementById('url_helper').innerHTML = helperText;
+    document.getElementById('url').placeholder = helperPlaceholder;
+}
+xmlHelperText = 'URL must have an associated <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML sitemap</a>.';
+if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ){
+    updateHelper(xmlHelperText, 'http://www.pih.org/')
+}else{
+    updateHelper('', 'https://equalify.app/')
+}
+document.getElementById('crawl_type').addEventListener('change', function () {
+    if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ) {
         updateHelper(xmlHelperText, 'http://www.pih.org/')
-    }else{
+    } else {
         updateHelper('', 'https://equalify.app/')
     }
-    document.getElementById('crawl_type').addEventListener('change', function () {
-        if ( document.getElementById('crawl_type').options[document.getElementById('crawl_type').selectedIndex].text == 'XML Sitemap' ) {
-            updateHelper(xmlHelperText, 'http://www.pih.org/')
-        } else {
-            updateHelper('', 'https://equalify.app/')
-        }
-    });
+});
 
-    </script>
-
-</main>
+</script>

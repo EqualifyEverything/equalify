@@ -79,7 +79,6 @@ $fields = array(
 // Existing properties are declared via the
 // session variable.
 session_start();
-$proper =$_SESSION['property_id'];
 if(!empty($_SESSION['property_id'])){
     DataAccess::update_db_entry('properties', $_SESSION['property_id'], $fields);
 }else{

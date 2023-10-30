@@ -53,13 +53,12 @@ require_once 'actions/run_scheduled_scan.php';
     <link href="theme.css" rel="stylesheet">
 </head>
 <body>
-    <header class="py-3 mb-4 border-bottom bg-body-tertiary">
-        <div class="container-xxl d-flex flex-wrap justify-content-center">
+    <header class="py-3 mb-4">
+        <div class="container d-flex flex-wrap justify-content-center">
             <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
                 <span class="fs-4 visually-hidden">Equalify</span>
             </a>
-
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=notice_editor" class="nav-link <?php the_active_class('notice_editor');?>">Add Notice</a></li>
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
@@ -68,6 +67,7 @@ require_once 'actions/run_scheduled_scan.php';
             </ul>
         </div>
     </header>
+    <main class="container">
 
     <?php
     // Success Message
@@ -81,10 +81,10 @@ require_once 'actions/run_scheduled_scan.php';
     }
     ?>
 
-    <footer class="py-4 mt-4 border-top text-center bg-body-tertiary">
+    </main>
+    <footer class="py-4 mt-4 text-center">
         Equalify Release Candidate 2
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
