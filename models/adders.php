@@ -45,7 +45,7 @@ function single_page_adder($site_url){
 
 }
 
-// handle updating alert records with results.
+// handle updating notice records with results.
 function processItem($item)
 {
     print_r($item);

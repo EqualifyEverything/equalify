@@ -1,0 +1,284 @@
+[
+  {
+    "slug": "equalify_scan_wcag2a",
+    "title": "WCAG 2.0 Level A",
+    "description": "",
+    "category": "WCAG Axe Tags"
+  },
+  {
+    "slug": "equalify_scan_wcag2aa", 
+    "title": "WCAG 2.0 Level AA",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag2aaa", 
+    "title": "WCAG 2.0 Level AAA",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag21a", 
+    "title": "WCAG 2.1 Level A",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag21aa", 
+    "title": "WCAG 2.1 Level AA",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag21aaa", 
+    "title": "WCAG 2.1 Level AAA",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag111", 
+    "title": "WCAG Success Criteria 1.1.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag121", 
+    "title": "WCAG Success Criteria 1.2.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag122", 
+    "title": "WCAG Success Criteria 1.2.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag131", 
+    "title": "WCAG Success Criteria 1.3.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag141", 
+    "title": "WCAG Success Criteria 1.4.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag143", 
+    "title": "WCAG Success Criteria 1.4.3",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag144", 
+    "title": "WCAG Success Criteria 1.4.4",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag211", 
+    "title": "WCAG Success Criteria 2.1.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag221", 
+    "title": "WCAG Success Criteria 2.2.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag222", 
+    "title": "WCAG Success Criteria 2.2.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag241", 
+    "title": "WCAG Success Criteria 2.4.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag242", 
+    "title": "WCAG Success Criteria 2.4.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag244", 
+    "title": "WCAG Success Criteria 2.4.4",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag311", 
+    "title": "WCAG Success Criteria 3.1.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag312", 
+    "title": "WCAG Success Criteria 3.1.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag332", 
+    "title": "WCAG Success Criteria 3.3.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag411", 
+    "title": "WCAG Success Criteria 4.1.1",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_wcag412", 
+    "title": "WCAG Success Criteria 4.1.2",
+    "category": "WCAG Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section508", 
+    "title": "Section 508",
+    "category": "Other Axe Tags",
+    "description": "Section 508 is part of a 1998 amendment to the Rehabilitation Act of 1973. It requires all Federal electronic content to be accessible"
+  },
+  {
+    "slug": "equalify_scan_section50822a", 
+    "title": "Section 508.22.a",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822f", 
+    "title": "Section 508.22.f",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822g", 
+    "title": "Section 508.22.g",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822i", 
+    "title": "Section 508.22.i",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822j", 
+    "title": "Section 508.22.j",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822n", 
+    "title": "Section 508.22.n",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_section50822o", 
+    "title": "Section 508.22.o",
+    "category": "Other Axe Tags",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_ACT", 
+    "title": "ACT",
+    "category": "Other Axe Tags",
+    "description": "ACT Rules are designed to harmonize how edge cases for WCAG and other accessibility guidance are tested."
+  },
+  {
+    "slug": "equalify_scan_best-practice", 
+    "title": "Best Practices",
+    "category": "Other Axe Tags",
+    "description": "Common accessibility best practices."
+  },
+  {
+    "slug": "equalify_scan_cat.aria",
+    "title": "Aria",
+    "category": "Axe Categories",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_cat.color",
+    "title": "Color",
+    "category": "Axe Categories",
+    "description": ""
+  },
+  {
+    "slug": "equalify_scan_cat.forms",
+    "title": "Forms",
+    "category": "Axe Categories",
+    "description": "axe/forms contains accessibility rules from the axe forms category."
+  },
+  {
+    "slug": "equalify_scan_cat.keyboard",
+    "title": "Keyboard",
+    "category": "Axe Categories",
+    "description": "axe/keyboard contains accessibility rules from the axe keyboard category."
+  },
+  {
+    "slug": "equalify_scan_cat.language",
+    "title": "Language",
+    "category": "Axe Categories",
+    "description": "axe/language contains accessibility rules from the axe language category."
+  },
+  {
+    "slug": "equalify_scan_cat.name-role-value",
+    "title": "Name Role Value",
+    "category": "Axe Categories",
+    "description": "axe/name-role-value contains accessibility rules from the axe name-role-value category."
+  },
+  {
+    "slug": "equalify_scan_cat.parsing",
+    "title": "Parsing",
+    "category": "Axe Categories",
+    "description": "axe/parsing contains accessibility rules from the axe parsing category."
+  },
+  {
+    "slug": "equalify_scan_cat.semantics",
+    "title": "Semantics",
+    "category": "Axe Categories",
+    "description": "axe/semantics contains accessibility rules from the axe semantics category."
+  },
+  {
+    "slug": "equalify_scan_cat.sensory-and-visual-cues",
+    "title": "Sensory and Visual Cues",
+    "category": "Axe Categories",
+    "description": "axe/sensory-and-visual-cues contains accessibility rules from the axe sensory-and-visual-cues category."
+  },
+  {
+    "slug": "equalify_scan_cat.structure",
+    "title": "Structure",
+    "category": "Axe Categories",
+    "description": "axe/structure contains accessibility rules from the axe structure category."
+  },
+  {
+    "slug": "equalify_scan_cat.tables",
+    "title": "Tables",
+    "category": "Axe Categories",
+    "description": "axe/tables contains accessibility rules from the axe tables category."
+  },
+  {
+    "slug": "equalify_scan_cat.text-alternatives",
+    "title": "Text Alternatives",
+    "category": "Axe Categories",
+    "description": "axe/text-alternatives contains accessibility rules from the axe text-alternatives category."
+  },
+  {
+    "slug": "equalify_scan_cat.time-and-media",
+    "title": "Time and Media",
+    "category": "Axe Categories",
+    "description": "axe/time-and-media contains accessibility rules from the axe time-and-media category."
+  }
+]

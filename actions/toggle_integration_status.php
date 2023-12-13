@@ -30,29 +30,6 @@ if(empty($old_status))
 // Conditional operations based on status:
 if($old_status == 'Active'){
 
-    // Remove fields.
-    $integration_fields = get_integration_fields(
-        $integration_uri
-    );
-    if (!empty($integration_fields['db'])){
-        $integration_db_fields = $integration_fields['db'];
-
-        // Delete "meta" fields.
-        if (!empty($integration_db_fields['meta']) ){
-            foreach(
-                $integration_db_fields['meta'] 
-                as $integration_meta_field
-            ){
-                if (!DataAccess::get_meta_value($integration_meta_field['name'])) {
-                    DataAccess::delete_meta(
-                        $integration_meta_field['name']
-                    );
-                }
-            }
-        }
-        
-    }
-
     // Remove tags.
     $integration_tags = get_integration_tags(
         $integration_uri
@@ -78,51 +55,11 @@ if($old_status == 'Active'){
         );
     }
 
-    // Now we can archive alerts.
-    update_alerts(1, $integration_uri);
+    // Now we can archive notices.
+    update_notices(1, $integration_uri);
 
 
 }elseif($old_status == 'Disabled'){
-
-    // Set up fields.
-    $integration_fields = get_integration_fields(
-        $integration_uri
-    );
-    if( !empty($integration_fields['db']) ){
-        $integration_db_fields = $integration_fields['db'];
-
-        // Set up "meta" fields.
-        if( !empty($integration_db_fields['meta']) ){
-            foreach(
-                $integration_db_fields['meta']
-                as $integration_meta_field
-            ){
-                // prevent checking empty strings for integrations
-                if (empty(DataAccess::get_meta_value($integration_meta_field['name'], true))) {
-                    DataAccess::add_meta(
-                        $integration_meta_field['name'], 
-                        $integration_meta_field['value']
-                    );
-                }
-            }
-        }
-
-        // Set up "pages" fields.
-        if( !empty($integration_db_fields['pages']) ){
-            foreach(
-                $integration_db_fields['pages'] 
-                as $integration_pages_field
-            ){
-                if(!DataAccess::db_column_exists( 'pages', $integration_pages_field['name'] )) {
-                    DataAccess::add_db_column(
-                        'pages', $integration_pages_field['name'], 
-                        $integration_pages_field['type']
-                    );
-                }
-            }
-        }
-
-    }
 
     // Register tags.
     $integration_tags = get_integration_tags(
@@ -142,8 +79,8 @@ if($old_status == 'Active'){
         'active_integrations', $new_active_integrations
     );
 
-    // Now we can unarchive alerts.
-    update_alerts(0, $integration_uri);
+    // Now we can unarchive notices.
+    update_notices(0, $integration_uri);
 
 }else{
     throw new Exception(
@@ -153,36 +90,36 @@ if($old_status == 'Active'){
 
 // Redirect.
 header(
-    'Location: ../index.php?view=integrations&id='.$integration_uri
+    'Location: ../index.php?view=settings&id='.$integration_uri
 );
 
 /**
- * Update Alerts
+ * Update Notices
  * @param string newstatus
  * @param string integration_uri
  */
-function update_alerts($new_status, $integration_uri) {
+function update_notices($new_status, $integration_uri) {
 
-    // Get active scan profiles.
-    $scan_profiles_filter = array(
+    // Get active properties.
+    $properties_filter = array(
         array(
             'name' => 'status',
             'value' => 'active'
         )
     );
-    $active_scan_profiles = DataAccess::get_db_rows(
-        'scan_profiles', $scan_profiles_filter, 1, 10000
+    $active_properties = DataAccess::get_db_rows(
+        'properties', $properties_filter, 1, 10000
     );
 
-    // Create active scan profiles to alerts filter.
+    // Create active properties to notices filter.
     $scan_profile_ids = NULL;
-    if(!empty($active_scan_profiles['content'])){
+    if(!empty($active_properties['content'])){
         $scan_profile_ids = array();
-        foreach ($active_scan_profiles['content'] as $scan_profile){
+        foreach ($active_properties['content'] as $scan_profile){
             array_push(
                 $scan_profile_ids,
                 array(
-                    'name' => 'site_id',
+                    'name' => 'property_id',
                     'value' => $scan_profile->id,
                     'operator' => '=',
                     'condition' => 'OR'
@@ -191,28 +128,28 @@ function update_alerts($new_status, $integration_uri) {
         }
     }
 
-    // Create filter to select alerts with the current 
-    // integration and active scan profiles.
-    $alerts_filters = array(
+    // Create filter to select notices with the current 
+    // integration and active properties.
+    $notices_filters = array(
         array(
             'name' => 'source',
             'value' => $integration_uri 
         ),
         array(
-            'name' => 'site_id',
+            'name' => 'property_id',
             'value' => $scan_profile_ids
         )
     );
 
     // Now let's update fields.
-    $updated_fields = array(
+    $updated_notice_fields = array(
         array(
             'name' => 'archived',
             'value' => $new_status
         )
     );
     DataAccess::update_db_rows(
-        'alerts', $updated_fields, $alerts_filters
+        'notices', $updated_notice_fields, $notices_filters
     );
 
 }

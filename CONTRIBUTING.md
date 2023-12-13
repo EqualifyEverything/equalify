@@ -21,10 +21,12 @@ Pull requests (PRs) are only merged into an official release if the reviewer can
 
 Also, if your contribution adds a significant amount of unique code, you will be asked to sign a contributor agreement. These agreements protect both contributors and Equalify. Our contributor agreement uses language in the [Apache Contributor Agreement](https://www.apache.org/licenses/icla.pdf). 
 
-## Why PHP? Why are the WordPress and Drupal communities a model?
-Equalify is built for folks who work with web content. Since PHP is arguably the most popular web programming language and since WordPress + Drupal are the most popular content management systems, Equalify is designed to work with that language and appeal to WordPress + Drupal users.
+## Why PHP? Why is WordPress a model?
+
+Equalify is built for folks who work with web content. Since PHP is arguably the most popular web programming language and since WordPress is the most popular content management system, Equalify is designed to work with that language and appeal to WordPress users.
 
 ## Why aren't we using a framework like Laravel?
+
 Equalify is intended to be a platform of its own. We want users to quickly be able to start creating their own integrations and update Equalify's core codebase. To satisfy that mission, Equalify was coded using basic PHP. Any user who knows basic PHP should be able to contribute to Equalify.
 
 ## Coding Standards
@@ -34,9 +36,6 @@ Most of the contributors to the project have done WordPress development, so we f
 ## Coding an Integration
 
 Integrations process URLs that Equalify scans. Use our [guide to coding an integration](https://github.com/EqualifyEverything/equalify/wiki/Coding-an-Integration) to build your integration.
-
-## Testing
-The unit tests are located in the `tests` directory. To run them, navigate to the root of the project and run the following command in a terminal: `./vendor/bin/phpunit tests`
 
 ## Progress Depends on Issues
 
