@@ -1,7 +1,6 @@
 .DS_Store
 .vscode
 login/
-config.php
 config-server.php
 vendor/
 test/
