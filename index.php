@@ -28,7 +28,7 @@
 define('EQUALIFY_ROOT', getcwd());
 
 // Add dependencies.
-require_once 'config.php';
+require_once 'init.php';
 require_once 'models/db.php';
 require_once 'models/view_components.php';
 require_once 'models/integrations.php';

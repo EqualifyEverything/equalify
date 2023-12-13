@@ -21,7 +21,7 @@ function delete_tags(array $tags){
         define('__ROOT__', dirname(dirname(__FILE__)));
 
     // We'll use the directory to include required files.
-    require_once(__ROOT__.'/config.php');
+    require_once(__ROOT__.'/init.php');
     require_once(__ROOT__.'/models/db.php');
 
     // To make sure select the entries to delete, we must 
