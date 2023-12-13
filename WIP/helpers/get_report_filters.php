@@ -1,12 +1,12 @@
 <?php
 
 
-So now  I have to:
+// So now  I have to:
 
-Compare dbFilters with cookieFilters and..
-1. remove any filter with the "filter_change" "remove"
-2. add any filter with the "filter_change" "add"
-3. create an array of the final result
+// Compare dbFilters with cookieFilters and..
+// 1. remove any filter with the "filter_change" "remove"
+// 2. add any filter with the "filter_change" "add"
+// 3. create an array of the final result
 
 // Returns the report filters
 function get_report_filters($report_id) {

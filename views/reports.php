@@ -30,36 +30,10 @@ if( count($reports['content']) > 0 ):
     <div class="col">
         <div class="card">
             <div class="card-body">
-d                <h2 class="h5 card-title p-2 my-2">
-                    <?php echo $report->title;?>
+                <h2 class="h5 card-title p-2 my-2">
+                    <?php echo $report->report_title;?>
                 </h2>
-                <table class="table table-borderless table-hover ">
-                    <thead class="visually-hidden">
-                        <tr>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        <th scope="row">Mark</th>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        </tr>
-                        <tr>
-                        <th scope="row">Jacob</th>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        </tr>
-                        <tr>
-                        <th scope="row">Larry</th>
-                        <td>Thornton</td>
-                        <td>@twitter</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <a href="index.php?view=report&id=<?php echo $report->id;?>" class="btn btn-secondary m-2">
+                <a href="index.php?view=report&id=<?php echo $report->report_id;?>" class="btn btn-secondary m-2">
                     View Report
                 </a>
             </div>
