@@ -9,7 +9,7 @@
 **********************************************************/
 
 // Configure database.
-$GLOBALS['DB_HOST'] = 'ddev-equalify-db';
+$GLOBALS['DB_HOST'] = 'ddev-equalify-v1-db';
 $GLOBALS['DB_USERNAME'] = 'root';
 $GLOBALS['DB_PASSWORD'] = 'root';
 $GLOBALS['DB_NAME'] = 'equalify';
@@ -20,11 +20,9 @@ $GLOBALS['DB_SOCKET'] = '/var/run/mysqld/mysqld.sock';
 //`which php` in a terminal.
 $GLOBALS['PHP_PATH'] = '/usr/bin/php';
 
-// Visit https://github.com/EqualifyEverything/scan.equalify.app for more info.
-$GLOBALS['axe_uri'] = '';
-
-// Visit https://a11ywatch.com/api-info to get a A11yWatch key.
-$GLOBALS['a11ywatch_key'] = '';
+// Visit https://github.com/EqualifyEverything/Sample-Scanner
+// to create your own scan URI
+$GLOBALS['sample_scanner_uri'] = '';
 
 // Additional options.
 $GLOBALS['scan_concurrency'] = '6';

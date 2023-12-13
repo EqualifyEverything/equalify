@@ -17,3 +17,4 @@ package-lock.json
 .phpunit.result.cache
 .env
 .env-**
+composer.lock

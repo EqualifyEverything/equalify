@@ -18,7 +18,7 @@ require_once(__ROOT__.'/models/db.php');
 require_once(__ROOT__.'/helpers/process_sites.php');
 require_once(__ROOT__.'/helpers/scan.php');
 require_once(__ROOT__.'/helpers/process_integrations.php');
-require_once(__ROOT__.'/helpers/process_alerts.php');
+require_once(__ROOT__.'/helpers/process_notices.php');
 require_once(
     __ROOT__.'/helpers/process_integrations.php'
 );
@@ -55,14 +55,14 @@ catch(Exception $error) {
 
 // Our third process.
 try {
-    $alerts_output = process_alerts($integration_output);
+    $notices_output = process_notices($integration_output);
 }
 catch(Exception $error) {
     kill_scan($error->getMessage());
 }
 
 // We initiate our processes.
-if(!empty($alerts_output)){
+if(!empty($notices_output)){
 
     // We're updating the scanned time of each site. 
     $fields = array(
@@ -74,7 +74,7 @@ if(!empty($alerts_output)){
 
     // We find sites that match the URL.
     $filters = array();
-    foreach ($alerts_output as $site){
+    foreach ($notices_output as $site){
         array_push( $filters,
             array(
                 'name' => 'url',
@@ -86,7 +86,7 @@ if(!empty($alerts_output)){
 
     // Let's update the site!
     DataAccess::update_db_rows(
-        'scan_profiles', $fields, $filters
+        'properties', $fields, $filters
     );
 
 }

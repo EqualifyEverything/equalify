@@ -38,7 +38,7 @@ function process_sites(){
             'value' => 'active'
         )
     );
-    $active_sites = DataAccess::get_db_rows( 'scan_profiles',
+    $active_sites = DataAccess::get_db_rows( 'properties',
         $filtered_to_active_sites, 1, 10000
     )['content'];
 
@@ -99,7 +99,7 @@ function process_sites(){
 
         // Update log for CLI.
         $formatted_pages_count = number_format($pages_count);
-        update_scan_log("\n> Found $formatted_pages_count scan profiles.");
+        update_scan_log("\n> Found $formatted_pages_count properties.");
                 
     // Without active sites, we kill the scan.
     }else{

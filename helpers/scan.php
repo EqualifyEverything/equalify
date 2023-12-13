@@ -2,7 +2,7 @@
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * This document includes a function to help users add 
- * alerts.
+ * notices.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 

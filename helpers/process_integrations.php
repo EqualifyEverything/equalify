@@ -86,7 +86,7 @@ function process_integrations(array $sites_output){
 
         // Let's log our progress and time for CLI.
         update_scan_log(
-            "\n>>> Running \"$integration\" against scan profiles:\n"
+            "\n>>> Running \"$integration\" against properties:\n"
         );
         $time_pre = microtime(true);
 
@@ -94,10 +94,10 @@ function process_integrations(array $sites_output){
         foreach ($integrations_output['processed_sites'] as $site) {
             // Every integration needs to define two functions per supported scan type:
             // One to map site URLs to integration requests
-            // Another to map integration responses to an array of Equalify alerts
+            // Another to map integration responses to an array of Equalify notices
             $scan_type = $site->type;
             $integration_request_builder = "${integration}_${scan_type}_request";
-            $integration_alerts = "${integration}_${scan_type}_alerts";
+            $integration_notices = "${integration}_${scan_type}_notices";
             
             // Skip the integration if we fail to find either.
             if (!function_exists($integration_request_builder)) {
@@ -106,9 +106,9 @@ function process_integrations(array $sites_output){
                 );
                 continue;
             }
-            if (!function_exists($integration_alerts)) {
+            if (!function_exists($integration_notices)) {
                 update_scan_log(
-                    "\n>>> WARNING: Alerts function for '$integration' integration not found for '$scan_type' scan type.\n"
+                    "\n>>> WARNING: Notices function for '$integration' integration not found for '$scan_type' scan type.\n"
                 );
                 continue;
             }
@@ -128,7 +128,7 @@ function process_integrations(array $sites_output){
                 $site,
                 $scannable_pages,
                 $integration_request_builder,
-                $integration_alerts, 
+                $integration_notices, 
                 $integrations_output
             );
 
@@ -153,7 +153,7 @@ function process_integrations(array $sites_output){
     }
 
     // We can kill the process if no urls were processed
-    // because we'll have nothing to add alerts for.
+    // because we'll have nothing to add notices for.
     if(empty($integrations_output['processed_urls']))
         kill_scan("Integrations processed no urls.");
 
@@ -179,7 +179,7 @@ function build_integration_connection_pool(
     $site,
     array $page_urls, 
     callable $integration_request_builder,
-    callable $integration_alerts,
+    callable $integration_notices,
     array &$output
 ) {
 
@@ -188,8 +188,8 @@ function build_integration_connection_pool(
 
     // NOTE: need to batch DB inserts, because this happened:
     // Failed: Prepared statement contains too many placeholders
-    // ^ and that was with alerts from 100 pages
-    // for comparison: pantheon had ~3k alerts from 10 pages
+    // ^ and that was with notices from 100 pages
+    // for comparison: pantheon had ~3k notices from 10 pages
     
     // Makes sense to stop the pool and bulk insert before that
     // anyway to keep memory usage low (and give the integration
@@ -216,34 +216,34 @@ function build_integration_connection_pool(
     };
 
     // Happy path: run the integration, log the index, and update the output
-    $on_fulfilled = function (Response $response, $page_url) use ($site, $integration_alerts, &$output) {
+    $on_fulfilled = function (Response $response, $page_url) use ($site, $integration_notices, &$output) {
         try {
 
             // Update log with URL
             update_scan_log("- $page_url ($site->type)\n");
 
-            // Process any new alerts.
-            $new_alerts = $integration_alerts(
+            // Process any new notices.
+            $new_notices = $integration_notices(
                 $response->getBody(), $page_url
             );
-            if (!empty($new_alerts)) {
+            if (!empty($new_notices)) {
                 
-                foreach ($new_alerts as &$alert) {
-                    // We need to add the site ID to all the alerts.
-                    $alert['site_id'] = $site->id;
+                foreach ($new_notices as &$notice) {
+                    // We need to add the site ID to all the notices.
+                    $notice['property_id'] = $site->id;
 
                     // Trim more_info if needed. 
                     // (current hardcoded limit is arbitrary)
-                    if (array_key_exists('more_info', $alert)) {
-                        if (strlen($alert['more_info']) > 3000) {
-                            $alert['more_info'] = substr($alert['more_info'], 0, 2997).'...';
+                    if (array_key_exists('more_info', $notice)) {
+                        if (strlen($notice['more_info']) > 3000) {
+                            $notice['more_info'] = substr($notice['more_info'], 0, 2997).'...';
                         }
                     }
                 }
 
-                // Now let's queue the alerts.
+                // Now let's queue the notices.
                 DataAccess::add_db_rows(
-                    'queued_alerts', $new_alerts
+                    'queued_notices', $new_notices
                 );
                 
             }
