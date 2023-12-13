@@ -77,7 +77,7 @@ function run_scan(){
         );
 
         // Initiate scan.
-        exec($GLOBALS['PHP_PATH'].' '.__ROOT__.'/cli/scan.php > /dev/null &', $output, $retval);
+        exec($_ENV['PHP_PATH'].' '.__ROOT__.'/cli/scan.php > /dev/null &', $output, $retval);
         //echo "Returned with status $retval and output:\n";
 
     // Finish condition.

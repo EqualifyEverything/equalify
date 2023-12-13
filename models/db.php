@@ -21,12 +21,12 @@ class DataAccess {
             return self::$conn;
         } else {
             self::$conn = new mysqli(
-                $GLOBALS['DB_HOST'], 
-                $GLOBALS['DB_USERNAME'], 
-                $GLOBALS['DB_PASSWORD'], 
-                $GLOBALS['DB_NAME'],  
-                $GLOBALS['DB_PORT'],
-                $GLOBALS['DB_SOCKET']
+                $_ENV['DB_HOST'], 
+                $_ENV['DB_USERNAME'], 
+                $_ENV['DB_PASSWORD'], 
+                $_ENV['DB_NAME'],  
+                $_ENV['DB_PORT'],
+                //$_ENV['DB_SOCKET']
             ); 
             if(self::$conn->connect_error){
                 throw new Exception(
@@ -824,13 +824,13 @@ class DataAccess {
 
         // Optionally set global meta variables.
         $added_sql = '';
-        if(isset($GLOBALS['a11ywatch_key'])){
+        if(isset($_ENV['a11ywatch_key'])){
             $added_sql.= "('a11ywatch_key', ?),";
-            $params[] = $GLOBALS['a11ywatch_key'];
+            $params[] = $_ENV['a11ywatch_key'];
         }
-        if(isset($GLOBALS['axe_uri'])){
+        if(isset($_ENV['axe_uri'])){
             $added_sql.= "('axe_uri', ?),";
-            $params[] = $GLOBALS['axe_uri'];
+            $params[] = $_ENV['axe_uri'];
         }
 
         // Now, create the content in the meta table
@@ -898,7 +898,7 @@ class DataAccess {
     public static function table_exists($table_name){
     
         // SQL
-        $db_name = $GLOBALS['DB_NAME'];
+        $db_name = $_ENV['DB_NAME'];
         $sql = "
             SELECT * 
             FROM information_schema.tables

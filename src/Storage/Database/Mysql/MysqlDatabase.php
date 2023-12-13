@@ -25,12 +25,12 @@ class MysqlDatabase implements IDatabase {
         }
         else {
             $this->conn = new mysqli(
-                $GLOBALS['DB_HOST'], 
-                $GLOBALS['DB_USERNAME'], 
-                $GLOBALS['DB_PASSWORD'], 
-                $GLOBALS['DB_NAME'],  
-                $GLOBALS['DB_PORT'],
-                $GLOBALS['DB_SOCKET']
+                $_ENV['DB_HOST'], 
+                $_ENV['DB_USERNAME'], 
+                $_ENV['DB_PASSWORD'], 
+                $_ENV['DB_NAME'],  
+                $_ENV['DB_PORT'],
+                //$_ENV['DB_SOCKET']
             ); 
             if($this->conn->connect_error){
                 throw new Exception(
