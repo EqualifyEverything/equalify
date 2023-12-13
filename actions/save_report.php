@@ -10,7 +10,7 @@
 
 
 // We're going to use the DB in this document.
-require_once '../config.php';
+require_once '../init.php';
 require_once '../models/db.php';
 
 // First, let's create an array that we'll use to update 

@@ -10,7 +10,7 @@
 
 
 // Add DB info and required functions.
-require_once '../config.php';
+require_once '../init.php';
 require_once '../models/integrations.php';
 require_once '../models/db.php';
 require_once '../helpers/register_tags.php';
