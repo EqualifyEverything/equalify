@@ -13,8 +13,8 @@ require_once '../config.php';
 require_once '../models/db.php';
 
 // Get URL variables and fallbacks.
-$site_id = $_GET['id'];
-if(empty($site_id))
+$property_id = $_GET['id'];
+if(empty($property_id))
     throw new Exception('Site is not specified');
 $old_status = $_GET['old_status'];
 if(empty($old_status))
@@ -29,7 +29,7 @@ if($old_status == 'active'){
     $filtered_to_id = array(
         array(
             'name' => 'id',
-            'value'=> $site_id
+            'value'=> $property_id
         )
     );
     $fields_to_update = array(
@@ -39,11 +39,11 @@ if($old_status == 'active'){
         )
     );
     DataAccess::update_db_rows(
-        'scan_profiles', $fields_to_update, $filtered_to_id
+        'properties', $fields_to_update, $filtered_to_id
     );
 
-    // Now we can archive alerts.
-    update_alerts(1, $site_id);
+    // Now we can archive notices.
+    update_notices(1, $property_id);
 
 }
 if($old_status == 'archived'){
@@ -52,7 +52,7 @@ if($old_status == 'archived'){
     $filtered_to_id = array(
         array(
             'name' => 'id',
-            'value'=> $site_id
+            'value'=> $property_id
         )
     );
     $fields_to_update = array(
@@ -62,31 +62,31 @@ if($old_status == 'archived'){
         )
     );
     DataAccess::update_db_rows(
-        'scan_profiles', $fields_to_update, $filtered_to_id
+        'properties', $fields_to_update, $filtered_to_id
     );
 
-    // Now we can unarchive alerts.
-    update_alerts(0, $site_id);
+    // Now we can unarchive notices.
+    update_notices(0, $property_id);
 
 }
 
 
 // Redirect
-header('Location: ../index.php?view=scan_profiles');
+header('Location: ../index.php?view=properties');
 
 /**
- * Update Alerts
+ * Update Notices
  * @param string newstatus
- * @param string site_id
+ * @param string property_id
  */
-function update_alerts($new_status, $site_id) {
+function update_notices($new_status, $property_id) {
 
     // Get active inteagartions.
     $active_integrations = unserialize(
         DataAccess::get_meta_value('active_integrations')
     );
 
-    // Create active scan profiles to alerts filter.
+    // Create active properties to notices filter.
     $integration_uris = NULL;
     if(!empty($active_integrations)){
         $integration_uris = array();
@@ -103,12 +103,12 @@ function update_alerts($new_status, $site_id) {
         }
     }
 
-    // Create filter to select alerts with the current 
-    // integration and active scan profiles.
-    $alerts_filters = array(
+    // Create filter to select notices with the current 
+    // integration and active properties.
+    $notices_filters = array(
         array(
-            'name' => 'site_id',
-            'value' => $site_id 
+            'name' => 'property_id',
+            'value' => $property_id 
         ),
         array(
             'name' => 'source',
@@ -117,14 +117,14 @@ function update_alerts($new_status, $site_id) {
     );
 
     // Now let's update fields.
-    $updated_fields = array(
+    $updated_notice_fields = array(
         array(
             'name' => 'archived',
             'value' => $new_status
         )
     );
     DataAccess::update_db_rows(
-        'alerts', $updated_fields, $alerts_filters
+        'notices', $updated_notice_fields, $notices_filters
     );
 
 }

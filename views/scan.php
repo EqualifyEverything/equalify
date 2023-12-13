@@ -1,3 +1,15 @@
+<?php
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the scan view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+?>
+
+<a href="action/delete_report.php"></a>
+
 <section>
     <div class="mb-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
@@ -109,11 +121,11 @@
 
     }
 
-    // Get the alert count.
-    async function getAlertCount(){
-        console.log('getAlertCount');
+    // Get the notice count.
+    async function getNoticeCount(){
+        console.log('getNoticeCount');
 
-        const response = await fetch('actions/get_alert_count.php', {
+        const response = await fetch('actions/get_notice_count.php', {
             method: 'GET', 
             cache: 'no-cache',
             headers: {
@@ -123,15 +135,15 @@
         return response.text();
     }
 
-    // Update alert count.
-    async function updateAlertCount(data) {
-        console.log('updateAlertCount');
+    // Update notice count.
+    async function updateNoticeCount(data) {
+        console.log('updateNoticeCount');
 
-        // We update #alert_count.
-        alertCount = document.getElementById('alert_count');
+        // We update #notice_count.
+        noticeCount = document.getElementById('notice_count');
 
-        // Update alert count.
-        alertCount.innerHTML = data;
+        // Update notice count.
+        noticeCount.innerHTML = data;
 
     }
 
@@ -181,8 +193,8 @@
 
         getScanLog()
         .then(updateScanLog)
-        .then(getAlertCount)
-        .then(updateAlertCount)
+        .then(getNoticeCount)
+        .then(updateNoticeCount)
         .then(getScanStatus)
         .then(updateScanButton)
     }

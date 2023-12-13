@@ -65,8 +65,8 @@ function get_integration_meta( $file ) {
     // Set headers.
     $headers = array(
 		'name'        => 'name',
-		'description' => 'description',
-        'status'      => 'status'
+        'status'      => 'status',
+		'description' => 'description'
 	);
 	foreach ( $headers as $field => $regex ) {
 		if ( preg_match( '/^(?:[ \t]*<\?php)?[ \t\/*#@]*' . preg_quote( $regex, '/' ) . ':(.*)$/mi', $file_data, $match ) && $match[1] ) {
@@ -78,23 +78,6 @@ function get_integration_meta( $file ) {
 	}
 
 	return $headers;
-}
-
-/**
- * Get Integration Fields
- */
-function get_integration_fields( $uri ){
-
-	// Get integration file.
-	$integration_path = __DIR__.'/../integrations/'.$uri.'/functions.php';
-    require_once $integration_path;
-    $integration_db_fields = $uri.'_fields';
-    if( function_exists( $integration_db_fields ) ){
-		return $integration_db_fields();
-	}else{
-		false;
-	}
-
 }
 
 /**
