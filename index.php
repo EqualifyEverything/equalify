@@ -39,22 +39,7 @@ require_once 'install.php';
 // We also check to see if we can run the scan on every
 // page load.
 require_once 'actions/run_scheduled_scan.php';
-require_once(__DIR__ . '/helpers/bootstrap.inc');
-
-// This basically sets $_GET['q']
-//equalify_environment_initialize();
-
-/* if (!empty($_GET['q'])) {
-	require_once(__DIR__ . '/helpers/routing.inc');
-	$routing = new Routing(__DIR__ . '/routing.json');
-	$info = $routing->getRoute($_GET['q']);
-	if (!empty($info['controller']['class']) && !empty($info['controller']['method']) && class_exists($info['controller']['class'])) {
-		$obj = new $info['controller']['class']();
-		$method = $info['controller']['method'];
-		$obj->$method();
-		exit;
-	}
-} */
+//require_once(__DIR__ . '/helpers/bootstrap.inc');
 
 // PoC of adding basic JSON option
 if(!empty($_GET['format'])){

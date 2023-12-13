@@ -9,7 +9,7 @@
 
 
 // Info on DB must be declared to use db.php models.
-require_once '../config.php';
+require_once '../init.php';
 require_once '../models/db.php';
 
 // Let's get the ID that powers this action.

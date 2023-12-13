@@ -9,7 +9,7 @@
 
 
 // Add DB Info
-require_once '../config.php';
+require_once '../init.php';
 require_once '../models/db.php';
 
 // Get URL variables and fallbacks.

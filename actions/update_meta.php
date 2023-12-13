@@ -9,7 +9,7 @@
 
 
 // Add DB Info
-require_once '../config.php';
+require_once '../init.php';
 require_once '../models/db.php';
 
 // We need the last view, so we can redirect on success.

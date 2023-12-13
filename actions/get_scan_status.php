@@ -14,7 +14,7 @@ if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
 
 // Info on DB must be declared to use db.php models.
-require_once(__ROOT__.'/config.php');
+require_once(__ROOT__.'/init.php');
 require_once(__ROOT__.'/models/db.php');
 
 // Return the scan log.

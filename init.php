@@ -9,7 +9,7 @@
  * https://github.com/bbertucc/equalify/issues/40
  **********************************************************/
 require __DIR__ . '/vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env-remote');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
 $dotenv->load();
 
 if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') { // if we're in managed mode, initialize auth0
