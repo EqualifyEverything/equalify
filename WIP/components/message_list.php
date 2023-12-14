@@ -26,7 +26,9 @@ function the_message_list($filters = '')
                 </strong>
             </div>
         </div>
-        <div id="messagesContainer" aria-live="polite"><!-- Messages will be loaded here --></div>
+        <div id="messagesContainer" aria-live="polite">
+            <!-- Messages will be loaded here -->
+        </div>
         <div class="d-flex align-items-center mt-2" id="paginationControls">
             <!-- Pagination will be dynamically updated here -->
         </div>
