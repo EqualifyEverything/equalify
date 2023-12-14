@@ -62,7 +62,7 @@ function the_message_list($filters = '')
             messages.forEach(message => {
                 // Add HTML for each message
                 html += `
-            <a class="row text-body py-2 border-bottom" href="index.php?view=occurrence&id=${message.message_id}">
+            <a class="row text-body py-2 border-bottom" href="index.php?view=message&id=${message.message_id}">
                 <span class="col-7">${message.message_title}</span>
                 <span class="col-1" aria-label="Equalified Occurrences Total">${message.equalified_count}</span>
                 <span class="col-1" aria-label="Active Occurrences Total">${message.active_count}</span>

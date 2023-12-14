@@ -1,6 +1,6 @@
 <?php
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
- * This document composes the single notice view.
+ * This document composes the single message view.
  * 
  * "Equalify" means fixing accessibility issues, and so 
  * every aspect of this page should be designed designed
@@ -19,13 +19,13 @@
     <div class="ms-md-auto">
         <!-- If the date filter, search, or the toggled statuses change, show save button. Save button Saves current view. -->
         <button class="btn btn-primary">Save</button>
-        <!-- Search button toggles search popup, where a user can search for tags, notice messages, and page URLs. -->
+        <!-- Search button toggles search popup, where a user can search for tags, messages, and page URLs. -->
         <button class="btn btn-outline-secondary">
             <span class="visually-hidden">Toggle Search</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
             </svg>
-            <!-- Note: Search cannot include notice because we are already on a notice page. -->
+            <!-- Note: Search cannot include message because we are already on a message page. -->
         </button>
         <button type="button" class="btn btn-outline-secondary" aria-label="Update Date"> 
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
@@ -145,7 +145,7 @@
     </div>
     <div class="col-6">
         <div class="card p-4 h-100">
-            <h2 class="visually-hidden">Notices Over Time</h2>
+            <h2 class="visually-hidden">Occurrences Over Time</h2>
             <canvas id="equalifiedByTime" class="" style="height: 300px"></canvas>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
