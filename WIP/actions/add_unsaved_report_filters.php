@@ -42,7 +42,7 @@ if (is_array($filtersArray)) {
 }
 
 // Set or update the cookie
-setcookie($cookie_name, json_encode($filters), time() + 86400, '/');
+setcookie($cookie_name, json_encode($filters),  time() + strtotime( '+30 days' ), '/');
 
 // Redirect the user to the report page with the report ID
 header("Location: ../index.php?view=report&report_id=" . urlencode($report_id));

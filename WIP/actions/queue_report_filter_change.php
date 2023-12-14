@@ -42,7 +42,7 @@ foreach ($filters_array as $filter_string) {
 }
 
 // Update the cookie with the latest filters
-setcookie($cookie_name, json_encode(array_values($latest_filters)), time() + 86400, '/');
+setcookie($cookie_name, json_encode(array_values($latest_filters)), time() + strtotime( '+30 days' ), '/');
 
 // Redirect the user to the report page with the report ID
 header("Location: ../index.php?view=report&report_id=" . urlencode($report_id));

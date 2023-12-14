@@ -26,7 +26,7 @@ if (isset($_COOKIE[$cookie_name])) {
             }
         }
         // Update the cookie
-        setcookie($cookie_name, json_encode(array_values($filters)), time() + 86400, '/');
+        setcookie($cookie_name, json_encode(array_values($filters)),  time() + strtotime( '+30 days' ), '/');
     }
 }
 

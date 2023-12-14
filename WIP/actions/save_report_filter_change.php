@@ -18,7 +18,7 @@ $update_stmt->execute();
 
 // Remove the cookie
 $cookie_name = 'queue_report_' . $report_id . '_filter_change';
-setcookie($cookie_name, '', time() - 3600, '/');
+setcookie($cookie_name, '',  time() + strtotime( '+30 days' ), '/');
 
 // Redirect the user to the report page with the report ID
 header("Location: ../index.php?view=report&report_id=$report_id");
