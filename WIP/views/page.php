@@ -26,10 +26,11 @@ require_once('../components/footer.php');
 require_once('../components/search.php');
 require_once('../components/chart_of_status.php');
 require_once('../components/occurrence_table.php');
+require_once('db.php');
+require_once('../helpers/get_page_url.php');
 
 // Let's get the parameters on the page.
-require_once('../helpers/get_page_url.php');
-$page_url = get_page_url($page_id);
+$page_url = get_page_url($pdo, $page_id);
 
 ?>
 

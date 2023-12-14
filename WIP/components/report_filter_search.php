@@ -95,11 +95,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function submitFilter(filterType, filterValue, filterID) {
-        // Construct the URL with query parameters
-        var url = "actions/add_unsaved_report_filters.php?report_id=" + reportId + "&filter_type=" + filterType + "&filter_value=" + filterValue + "&filter_id=" + filterID;
-        
+
+        // Helper function to build a query string from an object
+        function buildQueryString(params) {
+            return Object.keys(params).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&');
+        }
+
+        // Construct the filter parameters
+        var filterParams = {
+            'filter_type': filterType,
+            'filter_value': filterValue,
+            'filter_id': filterID,
+            'filter_change': 'add'
+        };
+
+        // Build the filter string from the filter parameters
+        var filterString = buildQueryString(filterParams);
+
+        // Construct the full URL with the report ID and the filter string
+        var url = "actions/queue_report_filter_change.php?report_id=" + encodeURIComponent(reportId) + "&filters[]=" + encodeURIComponent(filterString);
+
         // Navigate to the URL
         window.location.href = url;
+        
     }
 
     selectElement.addEventListener('change', function() {

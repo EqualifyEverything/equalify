@@ -7,11 +7,8 @@
  * @return string The page URL.
  * @throws Exception if no URL is found for the given page ID.
  */
-function get_page_url($page_id) {
+function get_page_url($pdo, $page_id) {
     
-    // Include the database connection and utility functions
-    require_once('../db.php');
-
     // Prepare the SQL query to prevent SQL injection
     $stmt = $pdo->prepare("SELECT page_url FROM pages WHERE page_id = :page_id");
 

@@ -1,57 +1,57 @@
 <?php
-
-
-// So now  I have to:
-
-// Compare dbFilters with cookieFilters and..
-// 1. remove any filter with the "filter_change" "remove"
-// 2. add any filter with the "filter_change" "add"
-// 3. create an array of the final result
-
 // Returns the report filters
-function get_report_filters($report_id) {
+function get_report_filters($pdo, $report_id) {
 
-    // Include the database connection and utility functions
-    require_once('db.php');
-    
     // Fetch filters from database
     $stmt = $pdo->prepare("SELECT report_filters FROM reports WHERE report_id = :report_id");
     $stmt->execute(['report_id' => $report_id]);
-    $dbRawFilters = $stmt->fetchColumn();
-    $dbRawFilters = $dbRawFilters ? json_decode($dbRawFilters, true) : [];
-    $dbFilters = [];
-    foreach ($dbRawFilters as $filter) {
-        $filter['filter_source'] = 'db'; // Add a source key
-        $dbFilters[] = $filter;
+    $db_raw_filters = $stmt->fetchColumn();
+    $db_raw_filters = $db_raw_filters ? json_decode($db_raw_filters, true) : [];
+    $db_filters = [];
+    foreach ($db_raw_filters as $filter) {
+        $db_filters[] = $filter;
     }
 
     // Cookie Name
-    $cookieName = 'queue_report_' . $report_id . '_filter_change';
+    $cookie_name = 'queue_report_' . $report_id . '_filter_change';
 
     // Fetch filters from cookie
-    $cookieRawFilters = isset($_COOKIE[$cookieName]) ? json_decode($_COOKIE[$cookieName], true) : [];
-    $cookieFilters = [];
-    foreach ($cookieRawFilters as $filter) {
-        $filter['filter_source'] = 'cookie'; // Add a source key
-        $cookieFilters[] = $filter;
-    }
-    
+    $cookie_filters = isset($_COOKIE[$cookie_name]) ? json_decode($_COOKIE[$cookie_name], true) : [];
+
     // Merged cookie filters and DB filters
-    $result_as_array = array_merge($dbFilters, $cookieFilters);
+    $merged_filters = array_merge($db_filters, $cookie_filters);
+
+    // Build a map of the latest filter_change directives for each unique filter
+    $latest_directives = [];
+    foreach ($merged_filters as $item) {
+        if (isset($item['filter_change'])) {
+            $key = $item['filter_type'] . '_' . $item['filter_id'] . '_' . $item['filter_value'];
+            $latest_directives[$key] = $item['filter_change'];
+        }
+    }
+
+    // Apply the latest directives
+    $result_as_array = [];
+    foreach ($merged_filters as $item) {
+        $key = $item['filter_type'] . '_' . $item['filter_id'] . '_' . $item['filter_value'];
+        if (!isset($latest_directives[$key]) || $latest_directives[$key] === 'add') {
+            unset($item['filter_change']);
+            $result_as_array[] = $item;
+        }
+    }
 
     // Grouping for string representation
     $grouped = [];
-
     foreach ($result_as_array as $item) {
         $grouped[$item['filter_type']][] = $item['filter_id'];
     }
 
     // Building the query string
-    $queryStringParts = [];
+    $query_string_parts = [];
     foreach ($grouped as $type => $ids) {
-        $queryStringParts[] = $type . '=' . implode(',', $ids);
+        $query_string_parts[] = $type . '=' . implode(',', $ids);
     }
-    $result_as_string = implode('&', $queryStringParts);
+    $result_as_string = implode('&', $query_string_parts);
 
     // Return results
     return array(
