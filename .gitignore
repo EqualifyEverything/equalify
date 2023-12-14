@@ -1,5 +1,6 @@
 .DS_Store
 .vscode
+
 login/
 config-server.php
 vendor/
@@ -14,6 +15,7 @@ node_modules
 package.json
 package-lock.json
 .phpunit.result.cache
-.env
 .env-**
+.env
 composer.lock
+
