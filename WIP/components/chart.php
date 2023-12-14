@@ -4,7 +4,7 @@ function the_chart($filters = '')
 {
 ?>
 
-<div class="card my-2 p-4">
+<div class="card p-4 h-100">
     <h2 class="visually-hidden">Status Occurrences Over Time</h2>
     <canvas id="statusChart" width="400" height="200" style="display: none;"></canvas>
     <div id="noDataMessage"></div>
@@ -49,6 +49,7 @@ function the_chart($filters = '')
                             display: false
                         }
                     }
+
                 }
             });
         }

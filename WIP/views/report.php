@@ -2,7 +2,12 @@
 // Temporary testing text
 $report_id = 1;
 
+// The DB can be used by required info
+require_once('db.php');
+
 // Let's get the various components we need to create the view.
+require_once('components/title.php');
+require_once('components/save_filters_button.php');
 require_once('components/report_filter_search.php');
 require_once('components/active_filters.php');
 require_once('components/status_toggle.php');
@@ -14,13 +19,17 @@ require_once('components/save_filters_button.php');
 
 // Lets get helpers we're using.
 require_once('helpers/get_report_filters.php');
-require_once('db.php');
 
 $report_filters = get_report_filters($pdo, $report_id);
 ?>
 
 <div class="d-flex flex-column flex-md-row align-items-center mt-4 mb-2">
-    <h1>Tulane Accessibility</h1>
+
+    <?php
+    // Page Title
+    the_title($pdo, $report_id, 'report');
+    ?>
+
     <div class="ms-md-auto">
 
         <?php

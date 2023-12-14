@@ -34,7 +34,6 @@ if (isset($_GET['statuses'])) {
     $filters['statuses'] = explode(',', $_GET['statuses']);
 }
 
-
 // Determine the file and function to call based on the request type
 $request_file = REQUEST_BASE_PATH . $request . '.php';
 
