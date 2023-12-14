@@ -19,7 +19,7 @@ function the_active_filters(){
         define('__ROOT__', dirname(dirname(__FILE__)));
 
     // We'll use the directory to include required files.
-    require_once(__ROOT__.'/config.php');
+    require_once(__ROOT__.'/init.php');
     require_once(__ROOT__.'/models/db.php');
 
     // Now let's get active integrations.

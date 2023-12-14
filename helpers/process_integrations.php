@@ -45,7 +45,7 @@ function process_integrations(array $sites_output){
         define('__ROOT__', dirname(dirname(__FILE__)));
 
     // We'll use the directory to include required files.
-    require_once(__ROOT__.'/config.php');
+    require_once(__ROOT__.'/init.php');
     require_once(__ROOT__.'/models/db.php');
 
     // This process runs active integrations.
@@ -265,8 +265,8 @@ function build_integration_connection_pool(
     };
 
     return new Pool($client, $requests($page_urls), [
-        'concurrency' => $GLOBALS['scan_concurrency'],
-        'timeout' => $GLOBALS['scan_timeout'],
+        'concurrency' => $_ENV['scan_concurrency'],
+        'timeout' => $_ENV['scan_timeout'],
         'fulfilled' => $on_fulfilled,
         'rejected' => $on_rejected,
     ]);

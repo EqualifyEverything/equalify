@@ -2,7 +2,7 @@
 
 /**************!!EQUALIFY IS FOR EVERYONE!!***************
  * This document includes a function to help users add 
- * notices.
+ * occurrences.
  * 
  * As always, we must remember that every function should 
  * be designed to be as efficient as possible so that 
@@ -11,7 +11,7 @@
 
 /**
  * Register Tags
- * @param string tags [ array('slug' => $value, 'name' => 
+ * @param string tags [ array('tag_slug' => $value, 'tag_name' => 
  * * $value, 'description' => $value) ]
  */
 function register_tags(array $tags){
@@ -22,7 +22,7 @@ function register_tags(array $tags){
         define('__ROOT__', dirname(dirname(__FILE__)));
 
     // We'll use the directory to include required files.
-    require_once(__ROOT__.'/config.php');
+    require_once(__ROOT__.'/init.php');
     require_once(__ROOT__.'/models/db.php');
 
     // To make sure all the slugs are unique, we need to 
@@ -34,8 +34,8 @@ function register_tags(array $tags){
         foreach($tags as $tag):
             array_push( 
                 $filters, array(
-                    'name' => 'slug',
-                    'value' => $tag['slug'],
+                    'name' => 'tag_slug',
+                    'value' => $tag['tag_slug'],
                     'condition' => 'OR'
                 )
             );
@@ -59,10 +59,8 @@ function register_tags(array $tags){
         foreach($tags as $tag):
             array_push( 
                 $data, array(
-                    'slug' => $tag['slug'],
-                    'title' => $tag['title'],
-                    'description' => $tag['description'],
-                    'category' => $tag['category']
+                    'tag_slug' => $tag['tag_slug'],
+                    'tag_name' => $tag['tag_name']
                 )
             );
         endforeach;

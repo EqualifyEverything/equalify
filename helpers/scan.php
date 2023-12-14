@@ -15,7 +15,7 @@ if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
 
 // We'll use the directory to include required files.
-require_once(__ROOT__.'/config.php');
+require_once(__ROOT__.'/init.php');
 require_once(__ROOT__.'/models/db.php');
 
 /**
@@ -77,7 +77,7 @@ function run_scan(){
         );
 
         // Initiate scan.
-        exec($GLOBALS['PHP_PATH'].' '.__ROOT__.'/cli/scan.php > /dev/null &', $output, $retval);
+        exec($_ENV['PHP_PATH'].' '.__ROOT__.'/cli/scan.php > /dev/null &', $output, $retval);
         //echo "Returned with status $retval and output:\n";
 
     // Finish condition.
