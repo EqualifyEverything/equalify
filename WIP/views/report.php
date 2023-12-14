@@ -19,8 +19,6 @@ require_once('db.php');
 $report_filters = get_report_filters($pdo, $report_id);
 ?>
 
-<pre><?php print_r($report_filters);?></pre>
-
 <div class="d-flex flex-column flex-md-row align-items-center mt-4 mb-2">
     <h1>Tulane Accessibility</h1>
     <div class="ms-md-auto">

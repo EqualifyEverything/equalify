@@ -9,7 +9,7 @@ function the_status_toggle($report_id, $report_filters) {
         $active_statuses = explode(',', $parsed_flters['statuses']);
     }
 
-    function generateStatusLink($status, $active_statuses, $count, $report_id) {
+    function generateStatusLink($status, $active_statuses, $report_id) {
         $all_statuses = ['equalified', 'active', 'ignored'];
         $is_active = in_array($status, $active_statuses);
         $query = "report_id=$report_id";
@@ -40,7 +40,7 @@ function the_status_toggle($report_id, $report_filters) {
         }
     
         return "<a id='$status' class='nav-link text-white $class' href='actions/queue_report_filter_change.php?$query'>
-                    <span class='h1' id='{$status}_count'>$count</span><br>" . ucfirst($status) . "</span>
+                    <span class='h1' id='{$status}_count'></span><br>" . ucfirst($status) . "</span>
                 </a>";
     }
     
@@ -50,13 +50,13 @@ function the_status_toggle($report_id, $report_filters) {
 <div id="reports_filter" class="my-2 rounded-3 bg-secondary text-center p-2 border">
     <ul class="nav d-flex justify-content-around" aria-label="Click to toggle any of these statuses. Toggling a status will hide/show related data.">
         <li class="nav-item">
-            <?php echo generateStatusLink('equalified', $active_statuses, 0, $report_id); ?>
+            <?php echo generateStatusLink('equalified', $active_statuses, $report_id); ?>
         </li>
         <li class="nav-item">
-            <?php echo generateStatusLink('active', $active_statuses, 0, $report_id); ?>
+            <?php echo generateStatusLink('active', $active_statuses, $report_id); ?>
         </li>
         <li class="nav-item">
-            <?php echo generateStatusLink('ignored', $active_statuses, 0, $report_id); ?>
+            <?php echo generateStatusLink('ignored', $active_statuses, $report_id); ?>
         </li>
     </ul>
 </div>
@@ -69,10 +69,9 @@ function the_status_toggle($report_id, $report_filters) {
             if (xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
                 const statuses = response.statuses;
-
-                document.getElementById('equalified_count').textContent = statuses.equalified || 0;
-                document.getElementById('active_count').textContent = statuses.active || 0;
-                document.getElementById('ignored_count').textContent = statuses.ignored || 0;
+                document.getElementById('equalified_count').textContent = statuses.equalified !== undefined ? statuses.equalified : 0;
+                document.getElementById('active_count').textContent = statuses.active !== undefined ? statuses.active : 0;
+                document.getElementById('ignored_count').textContent = statuses.ignored !== undefined ? statuses.ignored : 0;
             } else {
                 console.error('Error loading status counts.');
             }
