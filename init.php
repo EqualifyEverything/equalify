@@ -10,33 +10,7 @@
  **********************************************************/
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
-$dotenv->safeLoad(); // Safeload so we don't get an error when there's no .env file
-
-echo '********';
-echo $_ENV['MODE'];
-echo '********';
-
-/* if($dotenv == []){ // if we don't have a dotenv, look for DO environment variables
-
-$MODE
-$DB_HOST
-$DB_USERNAME
-$DB_PASSWORD
-$DB_PORT
-
-
-$PHP_PATH
-
-$scan_concurrency
-$scan_timeout
-
-$AUTH0_CLIENT_ID
-$AUTH0_DOMAIN
-$AUTH0_CLIENT_SECRET
-$AUTH0_COOKIE_SECRET
-$AUTH0_BASE_URL
-
-} */
+$dotenv->safeLoad(); // Safeload so we don't get an error when there's no .env file on production
 
 $managed_mode = false;
 if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') { 
@@ -46,9 +20,9 @@ if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') {
 if($managed_mode){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
-    define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '?view=login');
-    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '?view=auth_callback');
-    define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '?view=logout');
+    define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?view=login');
+    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?view=auth_callback');
+    define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '/?view=logout');
 
     echo ROUTE_URL_CALLBACK;
 
