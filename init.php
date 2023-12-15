@@ -17,6 +17,10 @@ if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') {
     $managed_mode = true;
 };
 
+if(!empty($_GET['view']) && $_GET['view'] == ( 'login'|'auth_callback'|'logout' ) ){
+    require_once 'views/'.$_GET['view'].'.php';
+}
+
 if($managed_mode && !isset($session)){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
