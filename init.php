@@ -17,14 +17,12 @@ if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') {
     $managed_mode = true;
 };
 
-if($managed_mode && !isset($session)){ // if we're in managed mode, initialize auth0
+if($managed_mode){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
     define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?view=login');
     define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?view=auth_callback');
     define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '/?view=logout');
-
-    echo ROUTE_URL_CALLBACK;
 
     $auth0 = new \Auth0\SDK\Auth0([
         'domain' => $_ENV['AUTH0_DOMAIN'],
