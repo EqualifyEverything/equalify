@@ -75,7 +75,7 @@ require_once 'actions/run_scheduled_scan.php';
     the_success_message();
 
     // Show View
-    if(!empty($_GET['view']) && $_GET['view'] !== ( 'login'|'auth_callback'|'logout' )){
+    if(!empty($_GET['view'])){
         require_once 'views/'.$_GET['view'].'.php';
     }else{
         require_once get_default_view();

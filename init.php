@@ -17,16 +17,12 @@ if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') {
     $managed_mode = true;
 };
 
-if(!empty($_GET['view']) && $_GET['view'] == ( 'login'|'auth_callback'|'logout' ) ){
-    require_once 'views/'.$_GET['view'].'.php';
-}
-
-if($managed_mode && !isset($session)){ // if we're in managed mode, initialize auth0
+if($managed_mode){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
-    define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?view=login');
-    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?view=auth_callback');
-    define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '/?view=logout');
+    define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?auth=login');
+    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?auth=auth_callback');
+    define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '/?auth=logout');
 
     $auth0 = new \Auth0\SDK\Auth0([
         'domain' => $_ENV['AUTH0_DOMAIN'],
@@ -38,12 +34,17 @@ if($managed_mode && !isset($session)){ // if we're in managed mode, initialize a
     $session = $auth0->getCredentials();
 
     if ($session === null) {  // The user isn't logged in.      
-        echo '<p>Please <a href="/?view=login">log in</a>.</p>';
+        echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
     } else {
         echo '<pre>';
         print_r($session);
         echo '</pre>';
       
-        echo '<p>You can now <a href="/?view=logout">log out</a>.</p>';
+        echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';
     }
+
+    if (!empty($_GET['auth'])){
+        require_once 'auth/'.$_GET['auth'].'.php';
+    }
+    
 }
