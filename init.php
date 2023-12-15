@@ -21,7 +21,7 @@ if($managed_mode){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
     define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?view=login');
-    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?view=auth_callback&scope=equalify_databases');
+    define('ROUTE_URL_CALLBACK', ROUTE_URL_INDEX . '/?view=auth_callback');
     define('ROUTE_URL_LOGOUT', ROUTE_URL_INDEX . '/?view=logout');
 
     $auth0 = new \Auth0\SDK\Auth0([
@@ -37,7 +37,7 @@ if($managed_mode){ // if we're in managed mode, initialize auth0
         echo '<p>Please <a href="/?view=login">log in</a>.</p>';
     } else {
         echo '<pre>';
-        print_r($session->user);
+        print_r($session);
         echo '</pre>';
       
         echo '<p>You can now <a href="/?view=logout">log out</a>.</p>';
