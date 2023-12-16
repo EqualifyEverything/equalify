@@ -60,16 +60,14 @@ require_once 'actions/run_scheduled_scan.php';
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
                 <span class="fs-4 visually-hidden">Equalify</span>
             </a>
-            <ul class="nav nav-pills">
+            <ul class="nav navbar nav-pills">
                 <li class="nav-item"><a href="index.php?view=notice_editor" class="nav-link <?php the_active_class('notice_editor');?>">Add Notice</a></li>
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="nav-link <?php the_active_class('settings');?>">Settings</a></li>
                 <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="media">
-                            <img src="<?php echo $user_picture; ?>" class="nav-link-avatar align-self-center mr-3"/>
-                            <div class="media-body">Account</div>
-                        </div> 
+                    <a href="#" class="nav-link dropdown-toggle navbar-brand" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Account
+                        <img src="<?php echo $user_picture; ?>" class="nav-link-avatar align-self-center mr-3" style="max-width: 32px; border-radius: 32px" /> 
                     </a>
                     <div class="dropdown-menu" aria-labelledby="accountDropdown">
                         <a class="dropdown-item" href="index.php?view=account">Account Info</a>
