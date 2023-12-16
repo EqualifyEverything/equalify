@@ -25,7 +25,11 @@
                 <th scope="row">Equalify Databases</th>
                 <td><?php 
                 foreach ($session->user['equalify_databases'] as $key=>$item){
+                    if($key == 0){
+                        '<span class="badge bg-primary">'; // highlight the active (hardcoded) database
+                    }else{
                     echo '<span class="badge bg-light text-dark">';
+                    }
                     echo $item;
                     echo '</span>';
                 }
