@@ -64,7 +64,19 @@ require_once 'actions/run_scheduled_scan.php';
                 <li class="nav-item"><a href="index.php?view=notice_editor" class="nav-link <?php the_active_class('notice_editor');?>">Add Notice</a></li>
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="nav-link <?php the_active_class('settings');?>">Settings</a></li>
-                <li class="nav-item"><a href="#" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <div class="media">
+                            <img src="$user_picture" class="nav-link-avatar align-self-center mr-3"/>
+                            <div class="media-body">Account</div>
+                        </div> 
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="index.php?view=account">Account Info</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="index.php?auth=logout">Logout</a>
+                    </div>
+                </li>
             </ul>
         </div>
     </header>
