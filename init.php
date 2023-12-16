@@ -38,7 +38,8 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
     }
     
     if ($session === null) {  // The user isn't logged in.      
-        echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
+        //echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
+        require_once 'auth/login.php';
     } else {
         
         $GLOBALS["ACTIVE_DB"] = $session->user->equalify_databases[0]; // TODO: currently just takes first from DBs array, should be switchable
