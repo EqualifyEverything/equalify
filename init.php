@@ -50,10 +50,10 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
         $user_picture = $session->user['picture'];
         $user_last_updated = $session->user['updated_at'];
         
-        /* echo '<pre>';
+        echo '<!--';
         print_r($session->user);
-        echo '</pre>';
-      
-        echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>'; */
+        echo '-->';
+     
+        /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
     }
 }
