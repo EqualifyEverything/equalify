@@ -12,12 +12,12 @@ require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
 $dotenv->safeLoad(); // Safeload so we don't get an error when there's no .env file on production
 
-$managed_mode = false;
+$GLOBALS["managed_mode"] = false;
 if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') { 
-    $managed_mode = true;
+    $GLOBALS["managed_mode"] = true;
 };
 
-if($managed_mode){ // if we're in managed mode, initialize auth0
+if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
 
     define('ROUTE_URL_INDEX', rtrim($_ENV['AUTH0_BASE_URL'], '/'));
     define('ROUTE_URL_LOGIN', ROUTE_URL_INDEX . '/?auth=login');
@@ -33,18 +33,26 @@ if($managed_mode){ // if we're in managed mode, initialize auth0
 
     $session = $auth0->getCredentials();
 
-    if ($session === null) {  // The user isn't logged in.      
-        echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
-    } else {
-        echo '<pre>';
-        print_r($session);
-        echo '</pre>';
-      
-        echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';
-    }
-
-    if (!empty($_GET['auth'])){
+    if (!empty($_GET['auth'])){ // Router for auth endpoints
         require_once 'auth/'.$_GET['auth'].'.php';
     }
     
+    if ($session === null) {  // The user isn't logged in.      
+        echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
+    } else {
+        
+        $GLOBALS["ACTIVE_DB"] = $session->user->equalify_databases[0]; // TODO: currently just takes first from DBs array, should be switchable
+        $user_title = $session->user->title;
+        $user_name =  $session->user->name;
+        $user_email =  $session->user->email;
+        $user_nickname = $session->user->nickname;
+        $user_picture = $session->user->picture;
+        $user_last_updated = $session->user->updated_at;
+        
+        /* echo '<pre>';
+        print_r($session->user);
+        echo '</pre>';
+      
+        echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>'; */
+    }
 }

@@ -14,7 +14,6 @@ class DataAccess
 
     // Set the records per page.
     private const ITEMS_PER_PAGE = 10;
-
     // Connect to MySQL.
     private static $conn = null;
     private static function connect()
@@ -22,11 +21,16 @@ class DataAccess
         if (self::$conn) {
             return self::$conn;
         } else {
+            if($GLOBALS["managed_mode"]){ 
+                $current_db = $GLOBALS["ACTIVE_DB"]; // if we're in managed mode, use the db name we get from auth0
+            }else{
+                $current_db = $_ENV['DB_NAME'];
+            }
             self::$conn = new mysqli(
                 $_ENV['DB_HOST'], 
                 $_ENV['DB_USERNAME'], 
                 $_ENV['DB_PASSWORD'], 
-                $_ENV['DB_NAME'],  
+                $current_db,  
                 $_ENV['DB_PORT'],
                 //$_ENV['DB_SOCKET']
             ); 
