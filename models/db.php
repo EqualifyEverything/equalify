@@ -1026,7 +1026,12 @@ class DataAccess
     {
 
         // SQL
-        $db_name = $_ENV['DB_NAME'];
+        if($GLOBALS["managed_mode"]){ 
+            $db_name = $GLOBALS["ACTIVE_DB"]; // if we're in managed mode, use the db name we get from auth0
+        }else{
+            $db_name = $_ENV['DB_NAME'];
+        }
+        //$db_name = $_ENV['DB_NAME'];
         $sql = "
             SELECT * 
             FROM information_schema.tables
