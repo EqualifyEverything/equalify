@@ -812,79 +812,6 @@ class DataAccess
     }
 
     /**
-     * Create Notices Table
-     */
-    public static function create_notices_table()
-    {
-
-        // SQL
-        $sql =
-            "CREATE TABLE `notices` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) NOT NULL DEFAULT 'active',
-                `related_url` text COLLATE utf8mb4_bin NOT NULL,
-                `source` varchar(200) NOT NULL,
-                `property_id` bigint(20) NOT NULL,
-                `message` text,
-                `tags` text,
-                `meta` text,
-                `archived` BOOLEAN NOT NULL DEFAULT 0,
-                PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-        $params = array();
-
-        // Query
-        $result = self::query($sql, $params, false);
-    }
-
-    /**
-     * Create Tags Table
-     */
-    public static function create_tags_table()
-    {
-
-        // Let's create the tags table.
-        $sql =
-            "CREATE TABLE `tags` (
-                `slug` varchar(255) NOT NULL,
-                `title` varchar(255) NOT NULL,
-                `category` varchar(255) DEFAULT NULL,
-                `description` text DEFAULT NULL,
-                PRIMARY KEY (slug)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-        $params = array();
-        $result = self::query($sql, $params, false);
-    }
-
-    /**
-     * Create Queued Notices Table
-     */
-    public static function create_queued_notices_table()
-    {
-
-        // SQL
-        $sql =
-            "CREATE TABLE `queued_notices` (
-                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `status` varchar(200) NOT NULL DEFAULT 'active',
-                `related_url` text COLLATE utf8mb4_bin NOT NULL,
-                `source` varchar(200) NOT NULL,
-                `property_id` bigint(20) NOT NULL,
-                `message` text,
-                `tags` text,
-                `meta` text,
-                `archived` BOOLEAN NOT NULL DEFAULT 0,
-                PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-        $params = array();
-
-        // Query
-        $result = self::query($sql, $params, false);
-    }
-
-    /**
      * Create Meta Table
      */
     public static function create_meta_table()
@@ -902,50 +829,9 @@ class DataAccess
         ";
         $params = array();
 
-        // Query 1
-        self::query($sql_1, $params, false);
+        // Query
+        $result = self::query($sql_1, $params, false);
 
-        // Let's create the params first, so we can do special
-        // things with them and global meta variables.
-        $params = array();
-
-        // Optionally set global meta variables.
-        $added_sql = '';
-
-        // Now, create the content in the meta table
-        // with axe, since it's on by default. 
-        $sql_2 = "
-            INSERT INTO `meta` (meta_name, meta_value)
-            VALUES" .
-            $added_sql .
-            "('active_integrations', ?),
-            ('scan_status', ?),
-            ('scan_schedule', ?),
-            ('scan_log', ?),
-            ('scannable_pages', ?),
-            ('last_scan_time', ?);
-        ";
-
-        // Default active_integrations.
-        $params[] = serialize(array());
-
-        // Default scan_status.
-        $params[] = '';
-
-        // Default scan_schedule.
-        $params[] = 'manually';
-
-        // Default scan_log.
-        $params[] = '';
-
-        // Default scannable_pages.
-        $params[] = serialize(array());
-
-        // Default last_scan_time.
-        $params[] = '';
-
-        // Query 2
-        self::query($sql_2, $params, false);
     }
 
     /**
@@ -957,16 +843,167 @@ class DataAccess
         // SQL
         $sql =
             "CREATE TABLE `properties` (
-                `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                `url` text COLLATE utf8mb4_bin NOT NULL,
-                `name` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
-                `crawl_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
-                `frequency` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
-                `tests` longtext COLLATE utf8mb4_bin,
-                `status` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'active',
-                `scanned` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
+                `property_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `property_name` text NOT NULL,
+                `property_archived` tinyint(1) DEFAULT NULL,
+                `property_crawl_type` varchar(220) NOT NULL,
+                `scan_frequency` varchar(220) NOT NULL,
+                `property_url` text NOT NULL,
+                `property_automated_scans` varchar(220) DEFAULT NULL,
+                `property_scanned` datetime DEFAULT NULL,
+                PRIMARY KEY (`property_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Occurrences Table
+     */
+    public static function create_occurrences_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `occurrences` (
+                `occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `occurrence_message_id` bigint(20) NOT NULL,
+                `occurrence_property_id` bigint(20) NOT NULL,
+                `occurrence_status` varchar(220) NOT NULL,
+                `occurrence_page_id` bigint(20) NOT NULL,
+                `occurrence_source` bigint(20) NOT NULL,
+                `occurrence_code_snippet` longtext DEFAULT NULL,
+                `occurrence_archived` tinyint(1) DEFAULT NULL,
+                PRIMARY KEY (`occurrence_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+
+    /**
+     * Create Queued Occurrences Table
+     */
+    public static function create_queued_occurrences_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `queued_occurrences` (
+                `queued_occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `queued_occurrence_message_id` bigint(20) NOT NULL,
+                `queued_occurrence_property_id` bigint(20) NOT NULL,
+                `queued_occurrence_status` varchar(220) NOT NULL,
+                `queued_occurrence_page_id` bigint(20) NOT NULL,
+                `queued_occurrence_source` bigint(20) NOT NULL,
+                `queued_occurrence_code_snippet` longtext DEFAULT NULL,
+                `queued_occurrence_archived` tinyint(1) DEFAULT NULL,
+                PRIMARY KEY (`queued_occurrence_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Updates Table
+     */
+    public static function create_updates_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `updates` (
+                `update_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `update_created` datetime NOT NULL,
+                `update_occurrence_id` bigint(20) NOT NULL,
+                `update_message_id` bigint(20) NOT NULL,
+                PRIMARY KEY (`update_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Messages Table
+     */
+    public static function create_messages_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE IF NOT EXISTS messages (
+                message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                message_title TEXT NOT NULL,
+                message_body LONGTEXT DEFAULT NULL,
+                PRIMARY KEY (message_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Pages Table
+     */
+    public static function create_pages_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `pages` (
+                `page_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `page_url` text NOT NULL,
+                PRIMARY KEY (`page_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create  Table
+     */
+    public static function create_tags_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `tags` (
+                `tag_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `tag_name` varchar(220) NOT NULL,
+                `tag_slug` varchar(220) NOT NULL,
+                PRIMARY KEY (`tag_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create  Table
+     */
+    public static function create_tag_relationships_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `tag_relationships` (
+                `relationship_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `relationship_occurrence_id` bigint(20) NOT NULL,
+                `relationship_tag_id` bigint(20) NOT NULL,
+                PRIMARY KEY (`relationship_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
@@ -982,33 +1019,12 @@ class DataAccess
         // SQL
         $sql =
             "CREATE TABLE `reports` (
-                `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                `title` varchar(191) COLLATE utf8mb4_unicode_520_ci NOT NULL DEFAULT '',
-                `visibility` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'static',
-                `filters` longtext COLLATE utf8mb4_unicode_520_ci,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
-        $params = array();
-
-        // Query
-        $result = self::query($sql, $params, false);
-    }
-
-    /**
-     * Create logs Table
-     */
-    public static function create_logs_table()
-    {
-
-        // SQL
-        $sql =
-            "CREATE TABLE `logs` (
-                `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `notice_id` bigint(11) NOT NULL,
-                `action` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT 'active',
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
+                `report_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                `report_title` text NOT NULL,
+                `report_visibility` varchar(220) DEFAULT NULL,
+                `report_filters` text DEFAULT NULL,
+                PRIMARY KEY (`report_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
