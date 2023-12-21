@@ -897,7 +897,6 @@ class DataAccess
                 `queued_occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `queued_occurrence_message_id` bigint(20) NOT NULL,
                 `queued_occurrence_property_id` bigint(20) NOT NULL,
-                `queued_occurrence_status` varchar(220) NOT NULL,
                 `queued_occurrence_page_id` bigint(20) NOT NULL,
                 `queued_occurrence_source` bigint(20) NOT NULL,
                 `queued_occurrence_code_snippet` longtext DEFAULT NULL,
@@ -999,11 +998,10 @@ class DataAccess
         // SQL
         $sql =
             "CREATE TABLE `tag_relationships` (
-                `relationship_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                `relationship_occurrence_id` bigint(20) NOT NULL,
-                `relationship_tag_id` bigint(20) NOT NULL,
-                PRIMARY KEY (`relationship_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+                `occurrence_id` bigint(20) DEFAULT NULL,
+                `tag_id` bigint(20) unsigned NOT NULL,
+                `queued_occurrence_id` bigint(20) DEFAULT NULL
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
@@ -1025,6 +1023,44 @@ class DataAccess
                 `report_filters` text DEFAULT NULL,
                 PRIMARY KEY (`report_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Queued Scans Table
+     */
+    public static function create_queued_scans_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `queued_scans` (
+                `scan_job_id` bigint(20) unsigned NOT NULL,
+                `scan_url` text NOT NULL,
+                PRIMARY KEY (`scan_job_id`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+        $params = array();
+
+        // Query
+        $result = self::query($sql, $params, false);
+    }
+
+    /**
+     * Create Queued Scans Table
+     */
+    public static function create_queued_sitemaps_table()
+    {
+
+        // SQL
+        $sql =
+            "CREATE TABLE `queued_sitemaps` (
+                `queued_sitemap_id` bigint(22) unsigned NOT NULL AUTO_INCREMENT,
+                `queued_sitemap_url` text NOT NULL,
+                PRIMARY KEY (`queued_sitemap_id`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
