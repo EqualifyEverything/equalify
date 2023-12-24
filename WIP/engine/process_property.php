@@ -49,7 +49,7 @@ function get_next_property_to_process() {
         NOT EXISTS (
             SELECT 1 FROM properties WHERE property_processing = 1
         )
-    ORDER BY property_processed ASC, property_id ASC
+    ORDER BY property_processed ASC
     LIMIT 1;
     ";
 
