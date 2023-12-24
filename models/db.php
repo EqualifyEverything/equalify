@@ -848,9 +848,10 @@ class DataAccess
                 `property_archived` tinyint(1) DEFAULT NULL,
                 `property_crawl_type` varchar(220) NOT NULL,
                 `property_url` text NOT NULL,
-                `property_scanned` datetime DEFAULT NULL,
+                `property_processed` datetime DEFAULT NULL,
+                `property_processing` tinyint(1) DEFAULT NULL,
                 PRIMARY KEY (`property_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+              ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
@@ -1041,27 +1042,6 @@ class DataAccess
                 `queued_scan_running` tinyint(1) DEFAULT NULL,
                 PRIMARY KEY (`queued_scan_job_id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-        $params = array();
-
-        // Query
-        $result = self::query($sql, $params, false);
-    }
-
-    /**
-     * Create Queued Sitemap Table
-     */
-    public static function create_queued_sitemaps_table()
-    {
-
-        // SQL
-        $sql =
-            "CREATE TABLE `queued_sitemaps` (
-                `queued_sitemap_id` bigint(22) unsigned NOT NULL AUTO_INCREMENT,
-                `queued_sitemap_url` text NOT NULL,
-                `queued_sitemap_property_id` bigint(22) NOT NULL,
-                `queued_sitemap_processing` tinyint(1) DEFAULT NULL,
-                PRIMARY KEY (`queued_sitemap_id`)
-              ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 
         // Query
