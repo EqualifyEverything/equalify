@@ -7,7 +7,7 @@ function build_where_clauses_for_properties($filters = []) {
     }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
-        $whereClauses[] = "o.page_id IN ($pageIds)";
+        $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
@@ -15,7 +15,7 @@ function build_where_clauses_for_properties($filters = []) {
     }
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "o.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = $filters['statuses'];
@@ -23,14 +23,14 @@ function build_where_clauses_for_properties($filters = []) {
         $sanitizedStatuses = array_map(function($status) {
             return preg_replace("/[^a-zA-Z0-9_\-]+/", "", $status);
         }, $statuses);
-        $whereClauses[] = "o.status IN ('" . implode("', '", $sanitizedStatuses) . "')";
+        $whereClauses[] = "o.occurrence_status IN ('" . implode("', '", $sanitizedStatuses) . "')";
     }
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
 function count_total_properties($pdo, $filters = []) {
     $whereClauses = build_where_clauses_for_properties($filters);
-    $count_sql = "SELECT COUNT(DISTINCT p.property_id) FROM properties p LEFT JOIN occurrences o ON p.property_id = o.property_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
+    $count_sql = "SELECT COUNT(DISTINCT p.property_id) FROM properties p LEFT JOIN occurrences o ON p.property_id = o.occurrence_property_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
@@ -44,7 +44,7 @@ function fetch_properties($pdo, $results_per_page, $offset, $filters = []) {
         FROM 
             properties p
         LEFT JOIN 
-            occurrences o ON p.property_id = o.property_id
+            occurrences o ON p.property_id = o.occurrence_property_id
         LEFT JOIN 
             tag_relationships tr ON o.occurrence_id = tr.occurrence_id
         $whereClauses
