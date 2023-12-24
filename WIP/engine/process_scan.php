@@ -5,10 +5,10 @@ try {
 
     $next = get_queued_scan();
 
-    if(!empty($next) && ($next['queued_scan_running'] !== 1)){
+    if(!empty($next) && ($next['queued_scan_processing'] !== 1)){
 
-        // Mark the scan as running
-        mark_scan_as_running($next['queued_scan_job_id']);
+        // Mark the scan as processing
+        mark_scan_as_processing($next['queued_scan_job_id']);
 
         // If scan needs to be processed, let's go!
         get_job_results($next['queued_scan_job_id'], $next['queued_scan_property_id']);
@@ -32,16 +32,16 @@ try {
 // Function to get next scan.
 function get_queued_scan() {
     global $pdo;
-    $query = "SELECT queued_scan_property_id, queued_scan_job_id, queued_scan_running FROM queued_scans ORDER BY queued_scan_job_id ASC LIMIT 1";
+    $query = "SELECT queued_scan_property_id, queued_scan_job_id, queued_scan_processing FROM queued_scans ORDER BY queued_scan_job_id ASC LIMIT 1";
     $statement = $pdo->prepare($query);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC); // Fetch only the first row
 }
 
-// Mark Scan as running
-function mark_scan_as_running($scan_job_id) {
+// Mark Scan as processing
+function mark_scan_as_processing($scan_job_id) {
     global $pdo;
-    $updateQuery = "UPDATE queued_scans SET queued_scan_running = 1 WHERE queued_scan_job_id = :scan_job_id";
+    $updateQuery = "UPDATE queued_scans SET queued_scan_processing = 1 WHERE queued_scan_job_id = :scan_job_id";
     $updateStmt = $pdo->prepare($updateQuery);
     $updateStmt->execute([':scan_job_id' => $scan_job_id]);
 }
