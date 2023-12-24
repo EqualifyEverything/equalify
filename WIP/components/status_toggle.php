@@ -47,7 +47,7 @@ function the_status_toggle($report_id, $report_filters) {
     
 ?>
 
-<div id="reports_filter" class="my-2 rounded-3 bg-secondary text-center p-2 border">
+<div id="reports_filter" class="my-2 rounded-3 bg-dark text-center p-2 border">
     <ul class="nav d-flex justify-content-around" aria-label="Click to toggle any of these statuses. Toggling a status will hide/show related data.">
         <li class="nav-item">
             <?php echo generateStatusLink('equalified', $active_statuses, $report_id); ?>

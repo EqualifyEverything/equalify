@@ -83,13 +83,13 @@ pre code{
     bottom: -1.25em;
 }
 #reports_filter a#equalified:before{
-    background: rgb(11, 101, 21);
+    background: green;
 }
 #reports_filter a#active:before{
-    background: rgb(171, 39, 12);
+    background: red;
 }
 #reports_filter a#ignored:before{
-    background: rgb(52, 57, 61);
+    background: gray;
 }
 .btn-outline-secondary:hover code{
     color: white !important;

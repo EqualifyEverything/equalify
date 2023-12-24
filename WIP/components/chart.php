@@ -44,9 +44,14 @@ function the_chart($filters = '')
                 type: 'line',
                 data: data,
                 options: {
-                    scales: {
-                        y: {
+                    plugins: {
+                        legend: {
                             display: false
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 8
                         }
                     }
 
