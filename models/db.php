@@ -1038,9 +1038,10 @@ class DataAccess
         // SQL
         $sql =
             "CREATE TABLE `queued_scans` (
-                `scan_job_id` bigint(20) unsigned NOT NULL,
-                `scan_url` text NOT NULL,
-                PRIMARY KEY (`scan_job_id`)
+                `queued_scan_job_id` bigint(22) NOT NULL,
+                `queued_scan_property_id` bigint(22) NOT NULL,
+                `queued_scan_running` tinyint(1) DEFAULT NULL,
+                PRIMARY KEY (`queued_scan_job_id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 

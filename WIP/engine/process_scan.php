@@ -5,14 +5,21 @@ try {
 
     $next = get_queued_scan();
 
-    if(!empty($next)){
+    if(!empty($next) && ($next['queued_scan_running'] !== 1)){
+
+        // Mark the scan as running
+        mark_scan_as_running($next['queued_scan_job_id']);
+
         // If scan needs to be processed, let's go!
         get_job_results($next['queued_scan_job_id'], $next['queued_scan_property_id']);
 
+        // Log success.
         echo "Processed scan with Job ID ".$next['queued_scan_job_id']."\n";
 
-        // On success, remove sitemap from db.
+        // On success, remove sitemap from db and rerun script.
         remove_scan_from_queue($next['queued_scan_job_id']);
+        rerun_script();
+        exit;
 
     }else{
         echo "No scans to process.\n";
@@ -26,10 +33,18 @@ try {
 // Function to get all active scan IDs
 function get_queued_scan() {
     global $pdo;
-    $query = "SELECT queued_scan_property_id, queued_scan_job_id FROM queued_scans ORDER BY queued_scan_job_id ASC LIMIT 1";
+    $query = "SELECT queued_scan_property_id, queued_scan_job_id, queued_scan_running FROM queued_scans ORDER BY queued_scan_job_id ASC LIMIT 1";
     $statement = $pdo->prepare($query);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC); // Fetch only the first row
+}
+
+// Mark Scan as running
+function mark_scan_as_running($scan_job_id) {
+    global $pdo;
+    $updateQuery = "UPDATE queued_scans SET queued_scan_running = 1 WHERE queued_scan_job_id = :scan_job_id";
+    $updateStmt = $pdo->prepare($updateQuery);
+    $updateStmt->execute([':scan_job_id' => $scan_job_id]);
 }
 
 // Function to get results for a specific job ID
@@ -247,5 +262,9 @@ function remove_scan_from_queue($scan_id) {
     $deletedRows = $statement->rowCount();
 
     return $deletedRows; // Returns the number of rows deleted
+}
+
+function rerun_script() {
+    exec("php process_scan.php > /dev/null 2>&1 &");
 }
 ?>
