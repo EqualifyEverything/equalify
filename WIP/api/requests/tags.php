@@ -7,15 +7,15 @@ function build_where_clauses_for_tags($filters = []) {
     }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
-        $whereClauses[] = "o.page_id IN ($pageIds)";
+        $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
-        $whereClauses[] = "o.property_id IN ($propertyIds)";
+        $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
     }
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "o.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = $filters['statuses'];
@@ -23,7 +23,7 @@ function build_where_clauses_for_tags($filters = []) {
         $sanitizedStatuses = array_map(function($status) {
             return preg_replace("/[^a-zA-Z0-9_\-]+/", "", $status);
         }, $statuses);
-        $whereClauses[] = "o.status IN ('" . implode("', '", $sanitizedStatuses) . "')";
+        $whereClauses[] = "o.occurrence_status IN ('" . implode("', '", $sanitizedStatuses) . "')";
     }
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }

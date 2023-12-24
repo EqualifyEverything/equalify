@@ -11,11 +11,11 @@ function build_where_clauses_for_pages($filters = []) {
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
-        $whereClauses[] = "o.property_id IN ($propertyIds)";
+        $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
     }
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "o.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = $filters['statuses'];
@@ -23,14 +23,14 @@ function build_where_clauses_for_pages($filters = []) {
         $sanitizedStatuses = array_map(function($status) {
             return preg_replace("/[^a-zA-Z0-9_\-]+/", "", $status);
         }, $statuses);
-        $whereClauses[] = "o.status IN ('" . implode("', '", $sanitizedStatuses) . "')";
+        $whereClauses[] = "o.occurrence_status IN ('" . implode("', '", $sanitizedStatuses) . "')";
     }
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
 function count_total_pages($pdo, $filters = []) {
     $whereClauses = build_where_clauses_for_pages($filters);
-    $count_sql = "SELECT COUNT(DISTINCT p.page_id) FROM pages p LEFT JOIN occurrences o ON p.page_id = o.page_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
+    $count_sql = "SELECT COUNT(DISTINCT p.page_id) FROM pages p LEFT JOIN occurrences o ON p.page_id = o.occurrence_page_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
@@ -41,11 +41,11 @@ function fetch_pages($pdo, $results_per_page, $offset, $filters = []) {
         SELECT 
             p.page_id,
             p.page_url,
-            COALESCE(SUM(o.status = 'equalified') / COUNT(o.status) * 100, 0) AS equalified_percentage
+            COALESCE(SUM(o.occurrence_status = 'equalified') / COUNT(o.occurrence_status) * 100, 0) AS equalified_percentage
         FROM 
             pages p
         LEFT JOIN 
-            occurrences o ON p.page_id = o.page_id
+            occurrences o ON p.page_id = o.occurrence_page_id
         LEFT JOIN 
             tag_relationships tr ON o.occurrence_id = tr.occurrence_id
         $whereClauses

@@ -5,15 +5,15 @@ function build_where_clauses_for_chart($filters = []) {
 
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "o.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
-        $whereClauses[] = "o.property_id IN ($propertyIds)";
+        $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
     }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
-        $whereClauses[] = "o.page_id IN ($pageIds)";
+        $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = is_array($filters['statuses']) ? $filters['statuses'] : explode(',', $filters['statuses']);

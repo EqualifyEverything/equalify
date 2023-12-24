@@ -12,15 +12,15 @@ function build_where_clauses_for_statuses($filters = []) {
     // Other filters
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
-        $whereClauses[] = "o.page_id IN ($pageIds)";
+        $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
-        $whereClauses[] = "o.property_id IN ($propertyIds)";
+        $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
     }
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "o.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
 
     $whereSql = !empty($whereClauses) ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
@@ -33,13 +33,13 @@ function fetch_statuses($pdo, $filters = []) {
     
     $sql = "
         SELECT 
-            o.status,
+            o.occurrence_status,
             COUNT(*) AS count
         FROM 
             occurrences o
             $joinClauses
             $whereClauses
-        GROUP BY o.status
+        GROUP BY o.occurrence_status
     ";
 
     $stmt = $pdo->prepare($sql); // Use prepare instead of query when using variables
@@ -52,7 +52,7 @@ function get_results($pdo, $results_per_page = '', $offset = '', $filters = []) 
 
     $statuses = [];
     foreach ($statusCounts as $row) {
-        $statuses[$row['status']] = (int)$row['count'];
+        $statuses[$row['occurrence_status']] = (int)$row['count'];
     }
 
     return [
