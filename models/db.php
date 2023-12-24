@@ -847,9 +847,7 @@ class DataAccess
                 `property_name` text NOT NULL,
                 `property_archived` tinyint(1) DEFAULT NULL,
                 `property_crawl_type` varchar(220) NOT NULL,
-                `scan_frequency` varchar(220) NOT NULL,
                 `property_url` text NOT NULL,
-                `property_automated_scans` varchar(220) DEFAULT NULL,
                 `property_scanned` datetime DEFAULT NULL,
                 PRIMARY KEY (`property_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
