@@ -3,18 +3,22 @@ include '../db.php';
 
 try {
 
-    $queued_sitemap = get_queued_sitemap();
+    $next = get_queued_sitemap();
 
-    if(!empty($queued_sitemap[0])){
+    // When there's a sitemap and that sitemap isn't currently processing.
+    if(!empty($next) && ($next['queued_sitemap_processing'] !== 1)){
+
+        // Mark the scan as running
+        mark_sitemap_as_processing($next['queued_sitemap_id']);
         
         // We'll generate the sitemap
-        $next = $queued_sitemap[0];
         $results = get_sitemap_results($next['queued_sitemap_url']);
         save_to_database($results, $next['queued_sitemap_property_id']);
-        echo "Success!".$next['queued_sitemap_url']." processed.\n";   
+        echo "Success! ".$next['queued_sitemap_url']." processed.\n";   
 
         // On success, remove sitemap from db.
-        remove_sitemap_from_queue($next['queued_sitemap_url']);
+        remove_sitemap_from_queue($next['queued_sitemap_id']);
+        exit;        
 
     }else{
         echo "No sitemaps to process.\n";
@@ -25,13 +29,20 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 
-// Function to get all queued sitemaps
 function get_queued_sitemap() {
     global $pdo;
-    $query = "SELECT queued_sitemap_url, queued_sitemap_property_id FROM queued_sitemaps ORDER BY queued_sitemap_id ASC";
+    $query = "SELECT queued_sitemap_url, queued_sitemap_property_id, queued_sitemap_id, queued_sitemap_processing FROM queued_sitemaps ORDER BY queued_sitemap_id ASC LIMIT 1";
     $statement = $pdo->prepare($query);
     $statement->execute();
-    return $statement->fetchAll(PDO::FETCH_ASSOC);
+    return $statement->fetch(PDO::FETCH_ASSOC); // Fetch only the first row
+}
+
+// Mark Scan as running
+function mark_sitemap_as_processing($queued_sitemap_id) {
+    global $pdo;
+    $updateQuery = "UPDATE queued_sitemaps SET queued_sitemap_processing = 1 WHERE queued_sitemap_id = :queued_sitemap_id";
+    $updateStmt = $pdo->prepare($updateQuery);
+    $updateStmt->execute([':queued_sitemap_id' => $queued_sitemap_id]);
 }
 
 function get_sitemap_results($queued_sitemap_url) {
@@ -105,12 +116,12 @@ function save_to_database($results, $property_id) {
     }
 }
 
-function remove_sitemap_from_queue($sitemap_url) {
+function remove_sitemap_from_queue($sitemap_id) {
     global $pdo;
 
-    $query = "DELETE FROM queued_sitemaps WHERE queued_sitemap_url = :sitemap_url";
+    $query = "DELETE FROM queued_sitemaps WHERE queued_sitemap_id = :sitemap_id";
     $statement = $pdo->prepare($query);
-    $statement->execute([':sitemap_url' => $sitemap_url]);
+    $statement->execute([':sitemap_id' => $sitemap_id]);
 
     // You can check the number of affected rows if needed
     $deletedRows = $statement->rowCount();

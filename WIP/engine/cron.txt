@@ -1,2 +1,2 @@
-*/2 * * * * php /var/www/html/WIP/engine/process_scan.php
-*/2 * * * * php /var/www/html/WIP/engine/process_sitemap.php
+*/1 * * * * php /var/www/html/WIP/engine/process_sitemap.php
+*/1 * * * * php /var/www/html/WIP/engine/process_scan.php

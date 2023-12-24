@@ -18,7 +18,6 @@ try {
 
         // On success, remove sitemap from db and rerun script.
         remove_scan_from_queue($next['queued_scan_job_id']);
-        rerun_script();
         exit;
 
     }else{
@@ -30,7 +29,7 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 
-// Function to get all active scan IDs
+// Function to get next scan.
 function get_queued_scan() {
     global $pdo;
     $query = "SELECT queued_scan_property_id, queued_scan_job_id, queued_scan_running FROM queued_scans ORDER BY queued_scan_job_id ASC LIMIT 1";
@@ -72,7 +71,14 @@ function get_job_results($job_id, $property_id) {
     // Decode JSON response
     $response = json_decode($response, true);
 
-    // Handle different statuses
+    // Properly formatted scans have a status
+    if(empty($response['status'])){
+        remove_scan_from_queue($job_id);
+        throw new Exception("Scan $job_id skipped. Scan status is invalid.");
+        exit;
+    }
+
+    // Different statuses required different action.
     switch ($response['status']) {
         case 'waiting':
         case 'active':
@@ -262,9 +268,5 @@ function remove_scan_from_queue($scan_id) {
     $deletedRows = $statement->rowCount();
 
     return $deletedRows; // Returns the number of rows deleted
-}
-
-function rerun_script() {
-    exec("php process_scan.php > /dev/null 2>&1 &");
 }
 ?>
