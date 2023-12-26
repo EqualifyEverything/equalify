@@ -883,31 +883,6 @@ class DataAccess
         $result = self::query($sql, $params, false);
     }
 
-
-    /**
-     * Create Queued Occurrences Table
-     */
-    public static function create_queued_occurrences_table()
-    {
-
-        // SQL
-        $sql =
-            "CREATE TABLE `queued_occurrences` (
-                `queued_occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                `queued_occurrence_message_id` bigint(20) NOT NULL,
-                `queued_occurrence_property_id` bigint(20) NOT NULL,
-                `queued_occurrence_page_id` bigint(20) NOT NULL,
-                `queued_occurrence_source` bigint(20) NOT NULL,
-                `queued_occurrence_code_snippet` longtext DEFAULT NULL,
-                `queued_occurrence_archived` tinyint(1) DEFAULT NULL,
-                PRIMARY KEY (`queued_occurrence_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-        $params = array();
-
-        // Query
-        $result = self::query($sql, $params, false);
-    }
-
     /**
      * Create Updates Table
      */

@@ -27,7 +27,3 @@ if (DataAccess::table_exists('reports') == false)
     DataAccess::create_reports_table();
 if (DataAccess::table_exists('updates') == false)
     DataAccess::create_updates_table();
-if (DataAccess::table_exists('queued_scans') == false)
-    DataAccess::create_queued_sitemaps_table();
-if (DataAccess::table_exists('queued_sitemaps') == false)
-    DataAccess::create_queued_sitemaps_table();

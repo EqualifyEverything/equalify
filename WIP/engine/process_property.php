@@ -1,5 +1,9 @@
 <?php
-include '../db.php'; 
+// Since this file can run in cron, we must set the 
+// directory if it isn't already set.
+if(!defined('__ROOT__'))
+    define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/db.php'); 
 
 try {
 
@@ -18,19 +22,22 @@ try {
 
         // On success, 
         update_property_processing_data($next['property_id'], NULL);
-        echo "Success! Property ".$next['property_id']." processed.\n";   
+        echo date('Y-m-d H:i:s').": Success! Property ".$next['property_id']." processed.\n";   
         exit;        
 
     }else{
-        echo "No properties to process.\n";
+
+        // Log process to cron
+        echo date('Y-m-d H:i:s').": No properties to process.\n";
         exit;
+        
     }
 
 } catch (Exception $e) {
 
     // Clear out processing data and post error
     update_property_processing_data($next['property_id'], NULL);
-    echo 'Error: ' . $e->getMessage();
+    echo date('Y-m-d H:i:s').': ' . $e->getMessage();
 
 }
 

@@ -7,4 +7,16 @@ This is a private version of Equalify.
 We'll keep V1 code private until we're successfully sustaining our open-source development with paid users.
 
 ## Setup
-- Make sure you have the cron running to support `process_scan.php` and `process_sitemap.php`. See `/WIP/engine/cron.txt`
+- Create `.env` with
+```
+DB_HOST='YOUR_HOST'
+DB_USERNAME='YOUR_USERNAME'
+DB_PASSWORD='YOUR_PASSWORD'
+DB_NAME='YOUR_USER'
+DB_PORT='YOUR_PORT'
+```
+- Make sure you have the cron running to support `process_scan.php` and `process_sitemap.php`. The cron file should include something like:
+```
+*/2 * * * * php /var/www/html/WIP/engine/process_scan.php >> /var/www/html/WIP/engine/cron.log 2>&1
+*/2 * * * * php /var/www/html/WIP/engine/process_property.php >> /var/www/html/WIP/engine/cron.log 2>&1
+```

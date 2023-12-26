@@ -7,13 +7,6 @@ require_once(__ROOT__.'/db.php');
 
 try {
 
-    // Check for any processing scans
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM queued_scans WHERE queued_scan_processing = 1");
-    $stmt->execute();
-    if ($stmt->fetchColumn() > 0) {
-        throw new Exception("A scan is already processing.");
-    }
-
     // Fetch the next job ID
     $stmt = $pdo->prepare("SELECT queued_scan_job_id FROM queued_scans LIMIT 1");
     $stmt->execute();
@@ -25,8 +18,168 @@ try {
     $job_id = $row['queued_scan_job_id'];
 
     // Perform the API GET request
-    $api_url = "http://198.211.98.156/results/" . $job_id;
-    $json = file_get_contents($api_url);
+    $json = '{
+        "status": "completed",
+        "result": {
+            "_id": "65886d8cdef5aa77b8b3639a",
+            "createdDate": "2023-12-24T17:42:36.392Z",
+            "results": {
+                "testEngine": {
+                    "name": "axe-core",
+                    "version": "4.8.2"
+                },
+                "testRunner": {
+                    "name": "axe"
+                },
+                "testEnvironment": {
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/118.0.0.0 Safari/537.36",
+                    "windowWidth": 800,
+                    "windowHeight": 600,
+                    "orientationAngle": 0,
+                    "orientationType": "portrait-primary"
+                },
+                "timestamp": "2023-12-24T17:42:33.894Z",
+                "url": "https://decubing.com/felt-test/",
+                "toolOptions": {
+                    "reporter": "v1"
+                },
+                "violations": [
+                    {
+                        "id": "landmark-contentinfo-is-top-level",
+                        "impact": "moderate",
+                        "tags": [
+                            "cat.semantics",
+                            "best-practice"
+                        ],
+                        "description": "Ensures the contentinfo landmark is at top level",
+                        "help": "Contentinfo landmark should not be contained in another landmark",
+                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/landmark-contentinfo-is-top-level?application=axe-puppeteer",
+                        "nodes": [
+                            {
+                                "any": [
+                                    {
+                                        "id": "landmark-is-top-level",
+                                        "data": {
+                                            "role": null
+                                        },
+                                        "relatedNodes": [],
+                                        "impact": "moderate",
+                                        "message": "The null landmark is contained in another landmark."
+                                    }
+                                ],
+                                "all": [],
+                                "none": [],
+                                "impact": "moderate",
+                                "html": "<footer class=\"c-jizsbi\">",
+                                "target": [
+                                    "iframe",
+                                    "footer"
+                                ],
+                                "failureSummary": "Fix any of the following:\n  The null landmark is contained in another landmark."
+                            }
+                        ]
+                    },
+                    {
+                        "id": "landmark-unique",
+                        "impact": "moderate",
+                        "tags": [
+                            "cat.semantics",
+                            "best-practice"
+                        ],
+                        "help": "Ensures landmarks are unique",
+                        "description": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/landmark-unique?application=axe-puppeteer",
+                        "nodes": [
+                            {
+                                "any": [
+                                    {
+                                        "id": "landmark-is-unique",
+                                        "data": {
+                                            "role": "banner",
+                                            "accessibleText": null
+                                        },
+                                        "relatedNodes": [
+                                            {
+                                                "html": "<header class=\"c-bQDGwG c-bQDGwG-lohOMY-screen-embed\">",
+                                                "target": [
+                                                    "iframe",
+                                                    "header"
+                                                ]
+                                            }
+                                        ],
+                                        "impact": "moderate",
+                                        "message": "The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+                                    }
+                                ],
+                                "all": [],
+                                "none": [],
+                                "impact": "moderate",
+                                "html": "<header class=\"wp-block-template-part\">",
+                                "target": [
+                                    "header"
+                                ],
+                                "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "link-name",
+                        "impact": "serious",
+                        "tags": [
+                            "cat.name-role-value",
+                            "wcag2a",
+                            "wcag244",
+                            "wcag412",
+                            "section508",
+                            "section508.22.a",
+                            "TTv5",
+                            "TT6.a",
+                            "EN-301-549",
+                            "EN-9.2.4.4",
+                            "EN-9.4.1.2",
+                            "ACT"
+                        ],
+                        "description": "Ensures links have discernible text",
+                        "help": "Links must have discernible text",
+                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/link-name?application=axe-puppeteer",
+                        "nodes": [
+                            {
+                                "any": [
+                                    {
+                                        "id": "non-empty-title",
+                                        "data": {
+                                            "messageKey": "noAttr"
+                                        },
+                                        "relatedNodes": [],
+                                        "impact": "serious",
+                                        "message": "Element has no title attribute"
+                                    }
+                                ],
+                                "all": [],
+                                "none": [
+                                    {
+                                        "id": "focusable-no-name",
+                                        "data": null,
+                                        "relatedNodes": [],
+                                        "impact": "serious",
+                                        "message": "Element is in tab order and does not have accessible text"
+                                    }
+                                ],
+                                "impact": "serious",
+                                "html": "<a href=\"/\" target=\"_blank\" rel=\"noopener\">",
+                                "target": [
+                                    "iframe",
+                                    "a[href=\"/\"]"
+                                ],
+                                "failureSummary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "jobID": "55254"
+        }
+    }';
     if ($json === false) {
         throw new Exception("Failed to fetch data from API for job ID $job_id.");
     }
