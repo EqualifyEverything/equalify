@@ -1,6 +1,0 @@
-{
-    "require": {
-        "bbertucc/accessible-autocomplete": "dev-main",
-        "twbs/bootstrap": "^5.3.2"
-    }
-}
