@@ -11,64 +11,80 @@ try {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM queued_scans WHERE queued_scan_processing = 1");
     $stmt->execute();
     if ($stmt->fetchColumn() > 0) {
-        echo("A scan is already processing.\n");
+        // Stop process if a scan is processing.
+        echo date('Y-m-d H:i:s').": Killing scan. Scan is processing.\n";
+        exit;
     }
 
-    // Fetch the next job ID
-    $stmt = $pdo->prepare("SELECT queued_scan_job_id FROM queued_scans LIMIT 1");
+    // Fetch the next scan
+    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL LIMIT 1;");
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
-        throw new Exception("No scans to process.");
+        // Stop process if there is no scan.
+        echo date('Y-m-d H:i:s').": No scans to process.\n";
+        exit;
     }
 
+    // Define property id and job id.
+    $property_id = $row['queued_scan_property_id'];
     $job_id = $row['queued_scan_job_id'];
+
+    // Set the scan as processing
+    $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = 1 WHERE queued_scan_job_id = ?");
+    $stmt->execute([$job_id]);
 
     // Perform the API GET request
     $api_url = "http://198.211.98.156/results/" . $job_id;
     $json = file_get_contents($api_url);
     if ($json === false) {
-        throw new Exception("Failed to fetch data from API for job ID $job_id.");
+        delete_scan($job_id);
+        throw new Exception(date('Y-m-d H:i:s').": Failed to fetch data from API for job ID $job_id. Scan deleted.");
     }
 
     // Decode the JSON response
     $data = json_decode($json, true);
     if (!isset($data['result']) || !isset($data['result']['results']['violations'])) {
-        throw new Exception("Invalid result format for job ID $job_id.");
+        delete_scan($job_id);
+        throw new Exception(date('Y-m-d H:i:s').": Invalid result format for job ID $job_id. Scan deleted.");
     }
 
+    // Setup variables from decoded json
     $new_occurrences = [];
-    $page_url = $data['result']['results']['url'] ?? 'Unknown URL';
-    $page_id = get_page_id($page_url);
-    $property_id = get_property_id("http://example.com"); // This will be set later
+    $page_url = $data['result']['results']['url'] ?? '';
 
-    // Check if violations exist and are not empty
+    // Setup page id
+    $page_id = get_page_id($page_url);
+
+    // Check if violations are formatted correctly and set them up
     if (isset($data['result']['results']['violations']) && !empty($data['result']['results']['violations'])) {
-        // Process violations
         foreach ($data['result']['results']['violations'] as $violation) {
             if (!isset($violation['id'], $violation['tags'], $violation['help'], $violation['nodes'])) {
-                throw new Exception("Invalid violation format for job ID $job_id.");
+                delete_scan($job_id);
+                throw new  Exception(date('Y-m-d H:i:s').": Invalid violation format for job ID $job_id. Scan deleted.");
             }
 
             foreach ($violation['nodes'] as $node) {
                 if (!isset($node['html'])) {
-                    throw new Exception("Invalid node format in violations for job ID $job_id.");
+                    delete_scan($job_id);
+                    throw new  Exception(date('Y-m-d H:i:s').": Invalid node format in violations for job ID $job_id. Scan deleted");
                 }
 
                 foreach (['any', 'all', 'none'] as $key) {
                     if (isset($node[$key]) && is_array($node[$key])) {
                         foreach ($node[$key] as $item) {
                             if (!isset($item['message'])) {
-                                throw new Exception("Invalid '$key' format in node for job ID $job_id.");
+                                delete_scan($job_id);
+                                throw new  Exception(date('Y-m-d H:i:s').": Invalid '$key' format in node for job ID $job_id. Scan deleted.");
                             }
 
                             // Construct the occurrence data
                             $new_occurrences[] = [
                                 "occurrence_message_id" => get_message_id($item['message'],$violation['help']),
                                 "occurrence_code_snippet" => $node['html'],
-                                "occurrence_page_id" => get_page_id($page_url),
+                                "occurrence_page_id" => $page_id,
                                 "occurrence_source" => "scan.equalify.app",
-                                "occurrence_property_id" => get_property_id("http://example.com"), // Note: This will be set later
+                                "occurrence_property_id" => $property_id,
                                 "tag_ids" => get_tag_ids($violation['tags'])
                             ];
                         }
@@ -90,7 +106,6 @@ try {
         $grouped_occurrences[$page_id . '_scan.equalify.app'] = [];
     }
 
-    
     $reactivated_occurrences = [];
     $equalified_occurrences = [];
     $to_save_occurrences = [];
@@ -125,17 +140,21 @@ try {
             }
         }
 
-        // Mark as 'equalified' occurrences that are in the database but not in new occurrences
+        // Mark as 'equalified' occurrences that are in the database without the status "equalfied" but not in new occurrences
         foreach ($existing_occurrences as $existing_occurrence) {
-            if (!in_array($existing_occurrence['occurrence_id'], $existing_ids_in_group)) {
+            if (!in_array($existing_occurrence['occurrence_id'], $existing_ids_in_group) && $existing_occurrence['occurrence_status'] !== 'equalified') {
                 $equalified_occurrences[] = $existing_occurrence['occurrence_id'];
             }
         }
+
     }
 
     // Save new occurrences as 'activated'
     $new_occurrence_ids = [];
+    $new_occurrence_tag_relationships = [];
     foreach ($to_save_occurrences as $occurrence) {
+
+        // Insert occurrences into db.
         $insert_stmt = $pdo->prepare("INSERT INTO occurrences (occurrence_message_id, occurrence_code_snippet, occurrence_page_id, occurrence_source, occurrence_property_id, occurrence_status) VALUES (?, ?, ?, ?, ?, 'active')");
         $insert_stmt->execute([
             $occurrence['occurrence_message_id'],
@@ -145,7 +164,15 @@ try {
             $occurrence['occurrence_property_id']
         ]);
         $new_occurrence_ids[] = $pdo->lastInsertId();
+        $new_occurrence_tag_relationships[] = array(
+            'occurrence_id' => $pdo->lastInsertId(),
+            'occurrence_tag_ids' => $occurrence['tag_ids']
+        );
+
     }
+
+    // Insert tags relationships into db
+    add_tag_relationships($new_occurrence_tag_relationships);
 
     // Update statuses in the database
     $update_stmt = $pdo->prepare("UPDATE occurrences SET occurrence_status = ? WHERE occurrence_id = ?");
@@ -168,39 +195,28 @@ try {
     }
 
     // On success delete scan
-    $query = "DELETE FROM queued_scans WHERE queued_scan_job_id = :queued_scan_job_id";
-    $statement = $pdo->prepare($query);
-    $statement->execute([':queued_scan_job_id' => $scan_id]);
+    delete_scan($job_id);
+    $count_reactivated_occurrences = count($reactivated_occurrences);
+    $count_equalified_occurrences = count($equalified_occurrences);
+    $count_new_occurrence_ids = count($new_occurrence_ids);
+    echo date('Y-m-d H:i:s').": Success! Scan $job_id processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.\n";
 
 } catch (Exception $e) {
+
     // Handle the exception
     error_log($e->getMessage());
 
-    // Remove processing
-    $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = NULL WHERE queued_scan_job_id = ?");
-    $stmt->execute([$job_id]);
+    // Remove processing if a job was processing.
+    if(!empty($job_id)){
+        $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = NULL WHERE queued_scan_job_id = ?");
+        $stmt->execute([$job_id]);
+    }
 
     exit;
-    
+
 }
 
-// Help Functions:
-function get_property_id($url) {
-    global $pdo;
-
-    // Check if the page exists
-    $pageQuery = "SELECT property_id FROM properties WHERE property_url = :url";
-    $pageStmt = $pdo->prepare($pageQuery);
-    $pageStmt->execute([':url' => $url]);
-    $pageRow = $pageStmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($pageRow) {
-        return $pageRow['property_id']; // Return existing ID
-    } else {
-        throw new Exception("No property id found for $url");
-    }
-}
-
+// Helper Functions
 function get_message_id($title, $body) {
     global $pdo;
 
@@ -268,4 +284,50 @@ function get_tag_ids($tags) {
     return $tagIds; // Return concatenated tag IDs
 }
 
+function add_tag_relationships($new_occurrence_tag_relationships) {
+    global $pdo;
+
+    // Start transaction
+    $pdo->beginTransaction();
+
+    try {
+        $query = "INSERT INTO tag_relationships (tag_id, occurrence_id) VALUES ";
+
+        $insertValues = [];
+        $params = [];
+        $index = 0;
+
+        foreach ($new_occurrence_tag_relationships as $tag_relationship) {
+            foreach ($tag_relationship['occurrence_tag_ids'] as $tag_id) {
+                $insertValues[] = "(:tag_id{$index}, :occurrence_id{$index})";
+                $params[":tag_id{$index}"] = $tag_id;
+                $params[":occurrence_id{$index}"] = $tag_relationship['occurrence_id'];
+                $index++;
+            }
+        }
+
+        if(!empty($insertValues)) {
+            $query .= implode(', ', $insertValues);
+            $statement = $pdo->prepare($query);
+            $statement->execute($params);
+        }
+
+        // Commit the transaction
+        $pdo->commit();
+    } catch (PDOException $e) {
+        // Rollback the transaction on error
+        $pdo->rollBack();
+        throw $e;
+    }
+}
+
+function delete_scan($job_id){
+
+    global $pdo;
+
+    $query = "DELETE FROM queued_scans WHERE queued_scan_job_id = :queued_scan_job_id";
+    $statement = $pdo->prepare($query);
+    $statement->execute([':queued_scan_job_id' => $job_id]);
+
+}
 ?>

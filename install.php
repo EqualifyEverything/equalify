@@ -11,8 +11,6 @@
 // All the tables are created with this action.
 if (DataAccess::table_exists('occurrences') == false)
     DataAccess::create_occurrences_table();
-if (DataAccess::table_exists('queued_occurrences') == false)
-    DataAccess::create_queued_occurrences_table();
 if (DataAccess::table_exists('properties') == false)
     DataAccess::create_properties_table();
 if (DataAccess::table_exists('pages') == false)

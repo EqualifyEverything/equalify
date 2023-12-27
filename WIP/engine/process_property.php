@@ -27,7 +27,7 @@ try {
 
     }else{
 
-        // Log process to cron
+        // Kill process if no properties to process.
         echo date('Y-m-d H:i:s').": No properties to process.\n";
         exit;
         
@@ -133,7 +133,7 @@ function results_are_valid_format($results) {
 
     // First heck if JSON decoding was successful and is an array
     if ($results === null || !is_array($results)) {
-        throw new Exception("Results are not formatted correctly");
+        throw new Exception("Property results are not formatted correctly");
     }
 
     // Validate each element in the array

@@ -973,8 +973,7 @@ class DataAccess
         $sql =
             "CREATE TABLE `tag_relationships` (
                 `occurrence_id` bigint(20) DEFAULT NULL,
-                `tag_id` bigint(20) unsigned NOT NULL,
-                `queued_occurrence_id` bigint(20) DEFAULT NULL
+                `tag_id` bigint(20) unsigned NOT NULL
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
 

@@ -7,221 +7,60 @@ require_once(__ROOT__.'/db.php');
 
 try {
 
-    // Fetch the next job ID
-    $stmt = $pdo->prepare("SELECT queued_scan_job_id FROM queued_scans LIMIT 1");
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row) {
-        throw new Exception("No scans to process.");
-    }
-
-    $job_id = $row['queued_scan_job_id'];
+    // Define property id and job id.
+    $property_id = 3;
+    $job_id = 1;
 
     // Perform the API GET request
-    $json = '{
-        "status": "completed",
-        "result": {
-            "_id": "65886d8cdef5aa77b8b3639a",
-            "createdDate": "2023-12-24T17:42:36.392Z",
-            "results": {
-                "testEngine": {
-                    "name": "axe-core",
-                    "version": "4.8.2"
-                },
-                "testRunner": {
-                    "name": "axe"
-                },
-                "testEnvironment": {
-                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/118.0.0.0 Safari/537.36",
-                    "windowWidth": 800,
-                    "windowHeight": 600,
-                    "orientationAngle": 0,
-                    "orientationType": "portrait-primary"
-                },
-                "timestamp": "2023-12-24T17:42:33.894Z",
-                "url": "https://decubing.com/felt-test/",
-                "toolOptions": {
-                    "reporter": "v1"
-                },
-                "violations": [
-                    {
-                        "id": "landmark-contentinfo-is-top-level",
-                        "impact": "moderate",
-                        "tags": [
-                            "cat.semantics",
-                            "best-practice"
-                        ],
-                        "description": "Ensures the contentinfo landmark is at top level",
-                        "help": "Contentinfo landmark should not be contained in another landmark",
-                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/landmark-contentinfo-is-top-level?application=axe-puppeteer",
-                        "nodes": [
-                            {
-                                "any": [
-                                    {
-                                        "id": "landmark-is-top-level",
-                                        "data": {
-                                            "role": null
-                                        },
-                                        "relatedNodes": [],
-                                        "impact": "moderate",
-                                        "message": "The null landmark is contained in another landmark."
-                                    }
-                                ],
-                                "all": [],
-                                "none": [],
-                                "impact": "moderate",
-                                "html": "<footer class=\"c-jizsbi\">",
-                                "target": [
-                                    "iframe",
-                                    "footer"
-                                ],
-                                "failureSummary": "Fix any of the following:\n  The null landmark is contained in another landmark."
-                            }
-                        ]
-                    },
-                    {
-                        "id": "landmark-unique",
-                        "impact": "moderate",
-                        "tags": [
-                            "cat.semantics",
-                            "best-practice"
-                        ],
-                        "help": "Ensures landmarks are unique",
-                        "description": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
-                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/landmark-unique?application=axe-puppeteer",
-                        "nodes": [
-                            {
-                                "any": [
-                                    {
-                                        "id": "landmark-is-unique",
-                                        "data": {
-                                            "role": "banner",
-                                            "accessibleText": null
-                                        },
-                                        "relatedNodes": [
-                                            {
-                                                "html": "<header class=\"c-bQDGwG c-bQDGwG-lohOMY-screen-embed\">",
-                                                "target": [
-                                                    "iframe",
-                                                    "header"
-                                                ]
-                                            }
-                                        ],
-                                        "impact": "moderate",
-                                        "message": "The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
-                                    }
-                                ],
-                                "all": [],
-                                "none": [],
-                                "impact": "moderate",
-                                "html": "<header class=\"wp-block-template-part\">",
-                                "target": [
-                                    "header"
-                                ],
-                                "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
-                            }
-                        ]
-                    },
-                    {
-                        "id": "link-name",
-                        "impact": "serious",
-                        "tags": [
-                            "cat.name-role-value",
-                            "wcag2a",
-                            "wcag244",
-                            "wcag412",
-                            "section508",
-                            "section508.22.a",
-                            "TTv5",
-                            "TT6.a",
-                            "EN-301-549",
-                            "EN-9.2.4.4",
-                            "EN-9.4.1.2",
-                            "ACT"
-                        ],
-                        "description": "Ensures links have discernible text",
-                        "help": "Links must have discernible text",
-                        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/link-name?application=axe-puppeteer",
-                        "nodes": [
-                            {
-                                "any": [
-                                    {
-                                        "id": "non-empty-title",
-                                        "data": {
-                                            "messageKey": "noAttr"
-                                        },
-                                        "relatedNodes": [],
-                                        "impact": "serious",
-                                        "message": "Element has no title attribute"
-                                    }
-                                ],
-                                "all": [],
-                                "none": [
-                                    {
-                                        "id": "focusable-no-name",
-                                        "data": null,
-                                        "relatedNodes": [],
-                                        "impact": "serious",
-                                        "message": "Element is in tab order and does not have accessible text"
-                                    }
-                                ],
-                                "impact": "serious",
-                                "html": "<a href=\"/\" target=\"_blank\" rel=\"noopener\">",
-                                "target": [
-                                    "iframe",
-                                    "a[href=\"/\"]"
-                                ],
-                                "failureSummary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "jobID": "55254"
-        }
-    }';
+    $json = file_get_contents(__ROOT__ . '/engine/sample_results.json');
     if ($json === false) {
-        throw new Exception("Failed to fetch data from API for job ID $job_id.");
+        delete_scan($job_id);
+        throw new Exception(date('Y-m-d H:i:s').": Failed to fetch data from API for job ID $job_id. Scan deleted.");
     }
 
     // Decode the JSON response
     $data = json_decode($json, true);
     if (!isset($data['result']) || !isset($data['result']['results']['violations'])) {
-        throw new Exception("Invalid result format for job ID $job_id.");
+        delete_scan($job_id);
+        throw new Exception(date('Y-m-d H:i:s').": Invalid result format for job ID $job_id. Scan deleted.");
     }
 
+    // Setup variables from decoded json
     $new_occurrences = [];
-    $page_url = $data['result']['results']['url'] ?? 'Unknown URL';
-    $page_id = get_page_id($page_url);
-    $property_id = get_property_id("http://example.com"); // This will be set later
+    $page_url = $data['result']['results']['url'] ?? '';
 
-    // Check if violations exist and are not empty
+    // Setup page id
+    $page_id = get_page_id($page_url);
+
+    // Check if violations are formatted correctly and set them up
     if (isset($data['result']['results']['violations']) && !empty($data['result']['results']['violations'])) {
-        // Process violations
         foreach ($data['result']['results']['violations'] as $violation) {
             if (!isset($violation['id'], $violation['tags'], $violation['help'], $violation['nodes'])) {
-                throw new Exception("Invalid violation format for job ID $job_id.");
+                delete_scan($job_id);
+                throw new  Exception(date('Y-m-d H:i:s').": Invalid violation format for job ID $job_id. Scan deleted.");
             }
 
             foreach ($violation['nodes'] as $node) {
                 if (!isset($node['html'])) {
-                    throw new Exception("Invalid node format in violations for job ID $job_id.");
+                    delete_scan($job_id);
+                    throw new  Exception(date('Y-m-d H:i:s').": Invalid node format in violations for job ID $job_id. Scan deleted");
                 }
 
                 foreach (['any', 'all', 'none'] as $key) {
                     if (isset($node[$key]) && is_array($node[$key])) {
                         foreach ($node[$key] as $item) {
                             if (!isset($item['message'])) {
-                                throw new Exception("Invalid '$key' format in node for job ID $job_id.");
+                                delete_scan($job_id);
+                                throw new  Exception(date('Y-m-d H:i:s').": Invalid '$key' format in node for job ID $job_id. Scan deleted.");
                             }
 
                             // Construct the occurrence data
                             $new_occurrences[] = [
                                 "occurrence_message_id" => get_message_id($item['message'],$violation['help']),
                                 "occurrence_code_snippet" => $node['html'],
-                                "occurrence_page_id" => get_page_id($page_url),
+                                "occurrence_page_id" => $page_id,
                                 "occurrence_source" => "scan.equalify.app",
-                                "occurrence_property_id" => get_property_id("http://example.com"), // Note: This will be set later
+                                "occurrence_property_id" => $property_id,
                                 "tag_ids" => get_tag_ids($violation['tags'])
                             ];
                         }
@@ -243,7 +82,6 @@ try {
         $grouped_occurrences[$page_id . '_scan.equalify.app'] = [];
     }
 
-    
     $reactivated_occurrences = [];
     $equalified_occurrences = [];
     $to_save_occurrences = [];
@@ -278,16 +116,18 @@ try {
             }
         }
 
-        // Mark as 'equalified' occurrences that are in the database but not in new occurrences
+        // Mark as 'equalified' occurrences that are in the database without the status "equalfied" but not in new occurrences
         foreach ($existing_occurrences as $existing_occurrence) {
-            if (!in_array($existing_occurrence['occurrence_id'], $existing_ids_in_group)) {
+            if (!in_array($existing_occurrence['occurrence_id'], $existing_ids_in_group) && $existing_occurrence['occurrence_status'] !== 'equalified') {
                 $equalified_occurrences[] = $existing_occurrence['occurrence_id'];
             }
         }
+
     }
 
     // Save new occurrences as 'activated'
     $new_occurrence_ids = [];
+    $new_occurrence_tag_relationships = [];
     foreach ($to_save_occurrences as $occurrence) {
         $insert_stmt = $pdo->prepare("INSERT INTO occurrences (occurrence_message_id, occurrence_code_snippet, occurrence_page_id, occurrence_source, occurrence_property_id, occurrence_status) VALUES (?, ?, ?, ?, ?, 'active')");
         $insert_stmt->execute([
@@ -298,7 +138,14 @@ try {
             $occurrence['occurrence_property_id']
         ]);
         $new_occurrence_ids[] = $pdo->lastInsertId();
+        $new_occurrence_tag_relationships[] = array(
+            'occurrence_id' => $pdo->lastInsertId(),
+            'occurrence_tag_ids' => $occurrence['tag_ids']
+        );
     }
+
+    // Insert tags relationships into db
+    add_tag_relationships($new_occurrence_tag_relationships);
 
     // Update statuses in the database
     $update_stmt = $pdo->prepare("UPDATE occurrences SET occurrence_status = ? WHERE occurrence_id = ?");
@@ -319,37 +166,30 @@ try {
     foreach ($equalified_occurrences as $id) {
         $insert_update_stmt->execute([$id, 'equalified']);
     }
-    
+
+    // On success delete scan
+    delete_scan($job_id);
+    $count_reactivated_occurrences = count($reactivated_occurrences);
+    $count_equalified_occurrences = count($equalified_occurrences);
+    $count_new_occurrence_ids = count($new_occurrence_ids);
+    echo date('Y-m-d H:i:s').": Success! Scan $job_id processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.\n";
 
 } catch (Exception $e) {
+
     // Handle the exception
     error_log($e->getMessage());
 
-    // Remove processing
-    $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = NULL WHERE queued_scan_job_id = ?");
-    $stmt->execute([$job_id]);
+    // Remove processing if a job was processing.
+    if(!empty($job_id)){
+        $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = NULL WHERE queued_scan_job_id = ?");
+        $stmt->execute([$job_id]);
+    }
 
     exit;
-    
+
 }
 
-// Help Functions:
-function get_property_id($url) {
-    global $pdo;
-
-    // Check if the page exists
-    $pageQuery = "SELECT property_id FROM properties WHERE property_url = :url";
-    $pageStmt = $pdo->prepare($pageQuery);
-    $pageStmt->execute([':url' => $url]);
-    $pageRow = $pageStmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($pageRow) {
-        return $pageRow['property_id']; // Return existing ID
-    } else {
-        throw new Exception("No property id found for $url");
-    }
-}
-
+// Helper Functions
 function get_message_id($title, $body) {
     global $pdo;
 
@@ -417,4 +257,51 @@ function get_tag_ids($tags) {
     return $tagIds; // Return concatenated tag IDs
 }
 
+function add_tag_relationships($new_occurrence_tag_relationships) {
+    global $pdo;
+
+    // Start transaction
+    $pdo->beginTransaction();
+
+    try {
+        $query = "INSERT INTO tag_relationships (tag_id, queued_occurrence_id) VALUES ";
+
+        $insertValues = [];
+        $params = [];
+        $index = 0;
+
+        foreach ($new_occurrence_tag_relationships as $tag_relationship) {
+            foreach ($tag_relationship['occurrence_tag_ids'] as $tag_id) {
+                $insertValues[] = "(:tag_id{$index}, :occurrence_id{$index})";
+                $params[":tag_id{$index}"] = $tag_id;
+                $params[":occurrence_id{$index}"] = $tag_relationship['occurrence_id'];
+                $index++;
+            }
+        }
+
+        if(!empty($insertValues)) {
+            $query .= implode(', ', $insertValues);
+            $statement = $pdo->prepare($query);
+            $statement->execute($params);
+        }
+
+        // Commit the transaction
+        $pdo->commit();
+    } catch (PDOException $e) {
+        // Rollback the transaction on error
+        $pdo->rollBack();
+        throw $e;
+    }
+}
+
+
+function delete_scan($job_id){
+
+    global $pdo;
+
+    $query = "DELETE FROM queued_scans WHERE queued_scan_job_id = :queued_scan_job_id";
+    $statement = $pdo->prepare($query);
+    $statement->execute([':queued_scan_job_id' => $job_id]);
+
+}
 ?>
