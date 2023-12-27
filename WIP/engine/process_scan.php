@@ -31,22 +31,29 @@ try {
     $job_id = $row['queued_scan_job_id'];
 
     // Set the scan as processing
-    $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = 1 WHERE queued_scan_job_id = ?");
-    $stmt->execute([$job_id]);
+    update_processing_value($job_id, 1);
 
     // Perform the API GET request
     $api_url = "http://198.211.98.156/results/" . $job_id;
     $json = file_get_contents($api_url);
     if ($json === false) {
         delete_scan($job_id);
-        throw new Exception(date('Y-m-d H:i:s').": Failed to fetch data from API for job ID $job_id. Scan deleted.");
+        throw new Exception(date('Y-m-d H:i:s').": Failed to fetch data from API for job ID $job_id. Scan deleted from queue.");
     }
 
     // Decode the JSON response
     $data = json_decode($json, true);
     if (!isset($data['result']) || !isset($data['result']['results']['violations'])) {
         delete_scan($job_id);
-        throw new Exception(date('Y-m-d H:i:s').": Invalid result format for job ID $job_id. Scan deleted.");
+        throw new Exception(date('Y-m-d H:i:s').": Invalid result format for job ID $job_id. Scan deleted from queue.");
+    }
+
+    // Make sure scan is completed before proceeding.
+    if($data['status'] !== 'completed'){
+        // Reset Processing value and log status
+        update_processing_value($job_id, NULL);
+        $status = $data['status'];
+        throw new Exception(date('Y-m-d H:i:s').": Scan $job_id not completed. Current Status: $status. Will check again in 2 min.");
     }
 
     // Setup variables from decoded json
@@ -208,8 +215,7 @@ try {
 
     // Remove processing if a job was processing.
     if(!empty($job_id)){
-        $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = NULL WHERE queued_scan_job_id = ?");
-        $stmt->execute([$job_id]);
+        update_processing_value($job_id, NULL);
     }
 
     exit;
@@ -217,6 +223,13 @@ try {
 }
 
 // Helper Functions
+function update_processing_value($job_id, $new_value){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE queued_scans SET queued_scan_processing = ? WHERE queued_scan_job_id = ?");
+    $stmt->execute([$new_value, $job_id]);
+}
+
 function get_message_id($title, $body) {
     global $pdo;
 
