@@ -27,7 +27,7 @@ $report_filters = get_report_filters($pdo, $report_id);
 
     <?php
     // Page Title
-    the_title($pdo, $report_id, 'report');
+    the_title($report_id, 'report');
     ?>
 
     <div class="ms-md-auto">
@@ -79,7 +79,7 @@ the_status_toggle($report_id, $report_filters['as_string']);
     </div>
 </div>
 <div class="row my-4">
-    <div class="col">
+    <div class="col col-6">
 
         <?php
         // Tag component.
@@ -87,7 +87,7 @@ the_status_toggle($report_id, $report_filters['as_string']);
         ?>
 
     </div>
-    <div class="col">
+    <div class="col col-6">
 
         <?php
         // Page list component.

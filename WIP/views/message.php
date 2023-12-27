@@ -1,6 +1,11 @@
 <?php
-// Message ID
-$message_id = $_GET['message_id'] ?? '';
+// The page_id URL parameter defines the page.
+$message_id = $_GET['message_id'] ;
+if($message_id == ''){
+    throw new Exception(
+        'message_id is missing'
+    );
+}
 
 // The DB can be used by required info
 require_once('db.php');
@@ -16,7 +21,7 @@ require_once('components/chart.php');
 
     <?php
     // Messsage Title
-    the_title($pdo, $message_id, 'message');
+    the_title($message_id, 'message');
     ?>
 
 </div>
@@ -26,7 +31,7 @@ require_once('components/chart.php');
 
         <?php
         // Message Title
-        the_body($pdo, $message_id, 'message');
+        the_body($message_id, 'message');
         ?>
 
     </div>

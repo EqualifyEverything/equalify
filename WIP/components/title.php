@@ -1,6 +1,7 @@
 <?php
 // Shows the title
-function the_title($pdo, $id, $view){
+function the_title($id, $view){
+    global $pdo;
 
     $title = '';
 
@@ -17,6 +18,13 @@ function the_title($pdo, $id, $view){
         $stmt = $pdo->prepare("SELECT message_title FROM messages WHERE message_id = :message_id");
         $stmt->execute(['message_id' => $id]);
         $title = $stmt->fetchColumn() ?: 'Message Not Found';
+
+    } elseif($view == 'page'){
+
+        // Query to fetch page title
+        $stmt = $pdo->prepare("SELECT page_url FROM pages WHERE page_id = :page_id");
+        $stmt->execute(['page_id' => $id]);
+        $title = $stmt->fetchColumn() ?: 'Page Not Found';
     }
 
     echo '<h1 style="max-width:800px">' . $title . '</h1>';

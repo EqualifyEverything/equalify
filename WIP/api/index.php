@@ -33,6 +33,9 @@ if (isset($_GET['properties'])) {
 if (isset($_GET['statuses'])) {
     $filters['statuses'] = explode(',', $_GET['statuses']);
 }
+if (isset($_GET['occurrences'])) {
+    $filters['occurrences'] = explode(',', $_GET['occurrences']);
+}
 
 // Determine the file and function to call based on the request type
 $request_file = REQUEST_BASE_PATH . $request . '.php';

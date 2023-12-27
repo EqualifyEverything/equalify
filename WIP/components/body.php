@@ -1,6 +1,7 @@
 <?php
 // Shows the body
-function the_body($pdo, $id, $view){
+function the_body($id, $view){
+    global $pdo;
 
     $body = '';
 
