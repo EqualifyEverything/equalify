@@ -1,3 +1,4 @@
+Find the issue with the page count https://chat.openai.com/share/7c112e4a-a9df-43f5-a21f-cd53aa6db850
 <?php
 // Creates a list of occurrences.
 function the_occurrence_list($filters = '')
