@@ -1,4 +1,3 @@
-Find the issue with the page count https://chat.openai.com/share/7c112e4a-a9df-43f5-a21f-cd53aa6db850
 <?php
 // Creates a list of occurrences.
 function the_occurrence_list($filters = '')
@@ -9,11 +8,14 @@ function the_occurrence_list($filters = '')
     <h2 class="visually-hidden">Occurrences</h2>
     <div>
         <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-6">
+            <strong class="col-5">
                 Message
             </strong>
-            <strong class="col-6">
+            <strong class="col-5">
                 Code Snippet
+            </strong>
+            <strong class="col-2">
+                Status
             </strong>
         </div>
     </div>
@@ -53,8 +55,9 @@ function the_occurrence_list($filters = '')
             let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             html += `
                 <a class="row text-body py-2 border-bottom" href="index.php?view=message&message_id=${occurrence.message_id}">
-                    <span class="col-6" aria-label="Message">${occurrence.message_title}</span>
-                    <span class="col-6" aria-label="Code Snippet"><code><pre>${codeSnippet}</pre></code></span>
+                    <span class="col-5" aria-label="Message">${occurrence.message_title}</span>
+                    <span class="col-5" aria-label="Code Snippet"><code><pre>${codeSnippet}</pre></code></span>
+                    <span class="col-2 text-capitalize" aria-label="Status">${occurrence.occurrence_status}</span>
                 </a>
             `;
         });

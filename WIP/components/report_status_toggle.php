@@ -1,6 +1,6 @@
 <?php
 // Toggle statuses
-function the_status_toggle($report_id, $report_filters) {
+function the_report_status_toggle($report_id, $report_filters) {
 
     // Parse $report_filters to check active statuses
     $active_statuses = [];

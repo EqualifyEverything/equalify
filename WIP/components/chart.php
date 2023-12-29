@@ -6,7 +6,7 @@ function the_chart($filters = '')
 
 <div class="card p-4 h-100">
     <h2 class="visually-hidden">Status Occurrences Over Time</h2>
-    <canvas id="statusChart" width="400" height="200" style="display: none;"></canvas>
+    <canvas id="statusChart" width="400" height="160" style="display: none;"></canvas>
     <div id="noDataMessage"></div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

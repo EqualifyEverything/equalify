@@ -10,7 +10,7 @@ require_once('components/title.php');
 require_once('components/save_filters_button.php');
 require_once('components/report_filter_search.php');
 require_once('components/active_filters.php');
-require_once('components/status_toggle.php');
+require_once('components/report_status_toggle.php');
 require_once('components/chart.php');
 require_once('components/message_list.php');
 require_once('components/page_list.php');
@@ -55,7 +55,7 @@ $report_filters = get_report_filters($pdo, $report_id);
 
 <?php
 // Status toggle
-the_status_toggle($report_id, $report_filters['as_string']);
+the_report_status_toggle($report_id, $report_filters['as_string']);
 ?>
 
 <div class="row">

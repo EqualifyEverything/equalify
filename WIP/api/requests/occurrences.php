@@ -1,4 +1,13 @@
 <?php
+function build_join_clauses($filters = []) {
+    $joinClauses = "";
+    if (!empty($filters['tags'])) {
+        // Add join with tag_relationships table only if tags filter is used
+        $joinClauses .= " LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id";
+    }
+    return $joinClauses;
+}
+
 function build_where_clauses($filters = []) {
     $whereClauses = [];
     if (!empty($filters['tags'])) {
@@ -29,12 +38,17 @@ function build_where_clauses($filters = []) {
 }
 
 function count_total_occurrences($pdo, $filters = []) {
+    $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
 
     $count_sql = "
-        SELECT COUNT(DISTINCT o.occurrence_id)
-        FROM occurrences o 
-        LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id
+        SELECT 
+            COUNT(DISTINCT o.occurrence_id)
+        FROM 
+            occurrences o
+        $joinClauses
+        LEFT JOIN 
+            messages m ON o.occurrence_message_id = m.message_id
         $whereClauses
     ";
 
@@ -43,21 +57,24 @@ function count_total_occurrences($pdo, $filters = []) {
 }
 
 function fetch_occurrences($pdo, $results_per_page, $offset, $filters = []) {
+    $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
 
     $sql = "
         SELECT 
             o.occurrence_id,
             o.occurrence_code_snippet,
-            m.message_title,
-            m.message_id
+            o.occurrence_status,
+            m.message_id,
+            m.message_title
         FROM 
             occurrences o
+        $joinClauses
         LEFT JOIN 
             messages m ON o.occurrence_message_id = m.message_id
-        LEFT JOIN 
-            tag_relationships tr ON o.occurrence_id = tr.occurrence_id
         $whereClauses
+        ORDER BY
+            o.occurrence_status ASC
         LIMIT $results_per_page OFFSET $offset
     ";
 
