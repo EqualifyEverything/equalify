@@ -13,7 +13,7 @@ require_once('db.php');
 // Let's get the various components we need to create the view.
 require_once('components/title.php');
 require_once('components/chart.php');
-require_once('components/occurrence_list.php');
+require_once('components/page_occurrences_list.php');
 require_once('components/chart.php');
 
 ?>
