@@ -14,6 +14,7 @@ require_once('db.php');
 require_once('components/title.php');
 require_once('components/body.php');
 require_once('components/chart.php');
+require_once('components/occurrence_list.php');
 
 ?>
 
@@ -28,12 +29,12 @@ require_once('components/chart.php');
 
 <div class="row">
     <div class="col-6">
-
-        <?php
-        // Message Title
-        the_body($message_id, 'message');
-        ?>
-
+        <div class="card p-4 h-100">
+            <h2 >AI Analysis <span class="badge bg-secondary">Experimental</span></h2>
+            <p class="lead">Your code is missing alt text.</p>
+            <p>From available Equalify data on this message, lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium aspernatur sint minima non, dolores consectetur veritatis eos iusto fugit totam nobis veniam officia modi accusantium amet sequi, incidunt porro iste.</p>
+            <p class="text-body-secondary border-top pt-2"><strong>NOTE: This feature is experimental.</strong> We're testing how large language models interpret your scan results. <a href="#" class="link-secondary">Contact us</a> to let us know what you think.</p>
+        </div>
     </div>
     <div class="col-6">
         <div class="card p-4">
@@ -93,7 +94,6 @@ require_once('components/chart.php');
             <th scope="col">Code Snippet</th>
             <th scope="col">Status</th>
             <th scope="col">Source</th>
-            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -102,28 +102,24 @@ require_once('components/chart.php');
             <td><code>&lt;img src=&quot;images/solar_system.jpg&quot; alt=&quot;Solar System&quot; width=&quot;472&quot;</code></td>
             <td>Active</td>
             <td>Equalify Scan</td>
-            <td><button class="btn btn-sm btn-outline-secondary">Edit</button></td>
         </tr>
         <tr>
             <td><a href="index.php?view=page&id=">giving.tulane.edu/example-of-a-long-url</td>
             <td><code>&lt;area shape=&quot;rect&quot; coords=&quot;115,158,276,192&quot; href=&quot;</code></td>
             <td>Equalified</td>
             <td>Equalify Scan</td>
-            <td><button class="btn btn-sm btn-outline-secondary">Edit</button></td>
         </tr>
         <tr>
             <td><a href="index.php?view=page&id=">giving.tulane.edu/example-of-a-long-url</td>
             <td><code>&lt;area shape=&quot;rect&quot; coords=&quot;115,193,276,234&quot; href=&quot;http://en.wikipedia.org/wi</code></td>
             <td>Ignored</td>
             <td>Equalify Scan</td>
-            <td><button class="btn btn-sm btn-outline-secondary">Edit</button></td>
         </tr>
         <tr>
             <td><a href="index.php?view=page&id=">giving.tulane.edu/example-of-a-long-url</td>
             <td><code>&lt;area shape=&quot;rect&quot; coords=&quot;115,193,276,234&quot; href=&quot;http://en.wikipedia.org/wi</code></td>
             <td>Ignored</td>
             <td>Manually Added</td>
-            <td><button class="btn btn-sm btn-outline-secondary">Edit</button></td>
         </tr>
     </tbody>
     </table>
