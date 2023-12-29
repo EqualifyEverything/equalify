@@ -14,7 +14,7 @@ require_once('db.php');
 require_once('components/title.php');
 require_once('components/body.php');
 require_once('components/chart.php');
-require_once('components/occurrence_list.php');
+require_once('components/message_occurrences_list.php');
 
 ?>
 
