@@ -13,7 +13,7 @@ require_once('components/active_filters.php');
 require_once('components/report_status_toggle.php');
 require_once('components/chart.php');
 require_once('components/message_list.php');
-require_once('components/page_list.php');
+require_once('components/pages_equalified_list.php');
 require_once('components/tag_list.php');
 require_once('components/save_filters_button.php');
 

@@ -18,7 +18,7 @@ function the_page_list($filters = '')
     <script>
         function fetchPages(page) {
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=pages&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api?request=pages_equalified&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {
