@@ -40,6 +40,10 @@ $report_filters = get_report_filters($pdo, $report_id);
         the_report_filter_search($report_id);
         ?>
 
+        <a class="btn btn-secondary" href="?view=report_settings&report_id=<?php echo $report_id;?>">
+            Edit Report
+        </a>
+
     </div>
 </div>
 <div class="row">
