@@ -28,14 +28,18 @@ function build_where_clauses_for_pages($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_pages($pdo, $filters = []) {
+function count_total_pages($filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_pages($filters);
     $count_sql = "SELECT COUNT(DISTINCT p.page_id) FROM pages p LEFT JOIN occurrences o ON p.page_id = o.occurrence_page_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
 
-function fetch_pages($pdo, $results_per_page, $offset, $filters = []) {
+function fetch_pages($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_pages($filters);
     $sql = "
         SELECT 
@@ -58,7 +62,9 @@ function fetch_pages($pdo, $results_per_page, $offset, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page, $offset, $filters = []) {
+function get_results($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $total_pages = count_total_pages($pdo, $filters);
     $pages = fetch_pages($pdo, $results_per_page, $offset, $filters);
     $total_pages_count = ceil($total_pages / $results_per_page);

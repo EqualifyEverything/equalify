@@ -28,14 +28,18 @@ function build_where_clauses_for_properties($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_properties($pdo, $filters = []) {
+function count_total_properties($filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_properties($filters);
     $count_sql = "SELECT COUNT(DISTINCT p.property_id) FROM properties p LEFT JOIN occurrences o ON p.property_id = o.occurrence_property_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
 
-function fetch_properties($pdo, $results_per_page, $offset, $filters = []) {
+function fetch_properties($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_properties($filters);
     $sql = "
         SELECT 

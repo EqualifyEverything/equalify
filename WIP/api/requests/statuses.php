@@ -28,7 +28,9 @@ function build_where_clauses_for_statuses($filters = []) {
     return [$joinClauses, $whereSql];
 }
 
-function fetch_statuses($pdo, $filters = []) {
+function fetch_statuses($filters = []) {
+    global $pdo;
+
     list($joinClauses, $whereClauses) = build_where_clauses_for_statuses($filters);
     
     $sql = "
@@ -47,7 +49,9 @@ function fetch_statuses($pdo, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page = '', $offset = '', $filters = []) {
+function get_results($results_per_page = '', $offset = '', $filters = []) {
+    global $pdo;
+
     $statusCounts = fetch_statuses($pdo, $filters);
 
     $statuses = [];

@@ -28,7 +28,9 @@ function build_where_clauses_for_tags($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_tags($pdo, $filters = []) {
+function count_total_tags($filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_tags($filters);
     $count_sql = "
         SELECT COUNT(DISTINCT t.tag_id)
@@ -41,7 +43,9 @@ function count_total_tags($pdo, $filters = []) {
     return $stmt->fetchColumn();
 }
 
-function fetch_tags($pdo, $results_per_page, $offset, $filters = []) {
+function fetch_tags($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses_for_tags($filters);
     $sql = "
         SELECT 
@@ -64,7 +68,9 @@ function fetch_tags($pdo, $results_per_page, $offset, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page, $offset, $filters = []) {
+function get_results( $results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $total_tags = count_total_tags($pdo, $filters);
     $tags = fetch_tags($pdo, $results_per_page, $offset, $filters);
     $total_pages = ceil($total_tags / $results_per_page);

@@ -35,7 +35,9 @@ function build_where_clauses_for_chart($filters = []) {
     return [$joinClauses, $whereSql];
 }
 
-function get_results($pdo, $results_per_page = '', $offset = '', $filters = []) {
+function get_results($results_per_page = '', $offset = '', $filters = []) {
+    global $pdo;
+    
     list($joinClauses, $whereClauses) = build_where_clauses_for_chart($filters);
 
     // Construct the SQL query with filters

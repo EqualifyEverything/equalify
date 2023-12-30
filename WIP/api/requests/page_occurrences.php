@@ -37,7 +37,9 @@ function build_where_clauses($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_occurrences($pdo, $filters = []) {
+function count_total_occurrences($filters = []) {
+    global $pdo;
+
     $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
 
@@ -56,7 +58,9 @@ function count_total_occurrences($pdo, $filters = []) {
     return $stmt->fetchColumn();
 }
 
-function fetch_occurrences($pdo, $results_per_page, $offset, $filters = []) {
+function fetch_occurrences($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
 
@@ -82,7 +86,9 @@ function fetch_occurrences($pdo, $results_per_page, $offset, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page, $offset, $filters = []) {
+function get_results($results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $total_occurrences = count_total_occurrences($pdo, $filters);
     $occurrences = fetch_occurrences($pdo, $results_per_page, $offset, $filters);
     $total_pages = ceil($total_occurrences / $results_per_page);

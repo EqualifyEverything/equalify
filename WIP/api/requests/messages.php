@@ -28,7 +28,9 @@ function build_where_clauses($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_messages($pdo, $filters = []) {
+function count_total_messages($filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses($filters);
 
     $count_sql = "
@@ -43,7 +45,9 @@ function count_total_messages($pdo, $filters = []) {
     return $stmt->fetchColumn();
 }
 
-function fetch_messages($pdo, $results_per_page, $offset, $filters = []) {
+function fetch_messages( $results_per_page, $offset, $filters = []) {
+    global $pdo;
+
     $whereClauses = build_where_clauses($filters);
 
     $sql = "
