@@ -43,7 +43,7 @@ function the_message_occurrences_list($filters = '')
                 let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 html += `
                     <tr>
-                        <td><a class="text-truncate" href="index.php?view=page&id=${occurrence.page_id}">${occurrence.page_url}</td>
+                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${occurrence.page_url}</td>
                         <td><code>${codeSnippet}</code></td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>

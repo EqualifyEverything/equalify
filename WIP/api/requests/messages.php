@@ -74,9 +74,9 @@ function fetch_messages( $results_per_page, $offset, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page, $offset, $filters = []) {
-    $total_messages = count_total_messages($pdo, $filters);
-    $messages = fetch_messages($pdo, $results_per_page, $offset, $filters);
+function get_results($results_per_page, $offset, $filters = []) {
+    $total_messages = count_total_messages($filters);
+    $messages = fetch_messages($results_per_page, $offset, $filters);
     $total_pages = ceil($total_messages / $results_per_page);
 
     return [

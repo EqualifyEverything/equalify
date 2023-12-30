@@ -60,9 +60,9 @@ function fetch_properties($results_per_page, $offset, $filters = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_results($pdo, $results_per_page, $offset, $filters = []) {
-    $total_properties = count_total_properties($pdo, $filters);
-    $properties = fetch_properties($pdo, $results_per_page, $offset, $filters);
+function get_results($results_per_page, $offset, $filters = []) {
+    $total_properties = count_total_properties($filters);
+    $properties = fetch_properties($results_per_page, $offset, $filters);
     $total_pages = ceil($total_properties / $results_per_page);
 
     return [

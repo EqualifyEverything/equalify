@@ -50,9 +50,7 @@ function fetch_statuses($filters = []) {
 }
 
 function get_results($results_per_page = '', $offset = '', $filters = []) {
-    global $pdo;
-
-    $statusCounts = fetch_statuses($pdo, $filters);
+    $statusCounts = fetch_statuses($filters);
 
     $statuses = [];
     foreach ($statusCounts as $row) {

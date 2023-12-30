@@ -87,10 +87,9 @@ function fetch_occurrences($results_per_page, $offset, $filters = []) {
 }
 
 function get_results($results_per_page, $offset, $filters = []) {
-    global $pdo;
 
-    $total_occurrences = count_total_occurrences($pdo, $filters);
-    $occurrences = fetch_occurrences($pdo, $results_per_page, $offset, $filters);
+    $total_occurrences = count_total_occurrences($filters);
+    $occurrences = fetch_occurrences($results_per_page, $offset, $filters);
     $total_pages = ceil($total_occurrences / $results_per_page);
 
     return [

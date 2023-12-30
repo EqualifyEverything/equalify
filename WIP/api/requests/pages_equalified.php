@@ -63,10 +63,8 @@ function fetch_pages($results_per_page, $offset, $filters = []) {
 }
 
 function get_results($results_per_page, $offset, $filters = []) {
-    global $pdo;
-
-    $total_pages = count_total_pages($pdo, $filters);
-    $pages = fetch_pages($pdo, $results_per_page, $offset, $filters);
+    $total_pages = count_total_pages($filters);
+    $pages = fetch_pages($results_per_page, $offset, $filters);
     $total_pages_count = ceil($total_pages / $results_per_page);
 
     return [

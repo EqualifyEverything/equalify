@@ -69,10 +69,8 @@ function fetch_tags($results_per_page, $offset, $filters = []) {
 }
 
 function get_results( $results_per_page, $offset, $filters = []) {
-    global $pdo;
-
-    $total_tags = count_total_tags($pdo, $filters);
-    $tags = fetch_tags($pdo, $results_per_page, $offset, $filters);
+    $total_tags = count_total_tags($filters);
+    $tags = fetch_tags($results_per_page, $offset, $filters);
     $total_pages = ceil($total_tags / $results_per_page);
 
     return [
