@@ -5,7 +5,7 @@ function the_message_occurrences_list($filters = '')
 ?>
 <div class="card my-2 p-4 table-responsive">
     <h2 class="visually-hidden">Occurrences</h2>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">Page</th>
@@ -41,9 +41,10 @@ function the_message_occurrences_list($filters = '')
             let html = occurrences.length ? '' : '<tr><td colspan="3">No pages found.</td></tr>';
             occurrences.forEach(occurrence => {
                 let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                let pageUrl = occurrence.page_url.length > 35 ? occurrence.page_url.substring(0, 35) + '...' : occurrence.page_url;
                 html += `
                     <tr>
-                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${occurrence.page_url}</td>
+                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${pageUrl}</td>
                         <td><code>${codeSnippet}</code></td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>
