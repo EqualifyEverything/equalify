@@ -23,7 +23,7 @@ function the_message_occurrences_list($filters = '')
     <script>
         function fetchPages(page) {
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=occurrences&columns[]=occurrence_code_snippet,occurrence_status&joined_columns[]=page_url,page_id&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api?request=occurrences&columns[]=occurrence_code_snippet,occurrence_status&joined_columns[]=page_url,page_id&results_per_page=6&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {

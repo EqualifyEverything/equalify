@@ -56,29 +56,15 @@ $report_filters = get_report_filters($pdo, $report_id);
 <?php
 // Status toggle
 the_report_status_toggle($report_id, $report_filters['as_string']);
+
+// Chart component.
+the_chart($report_filters['as_string']);
+
+// Message List component.
+the_message_list($report_filters['as_string']);
 ?>
 
 <div class="row">
-    <div class="col">
-
-        <?php
-        // Chart component.
-        the_chart($report_filters['as_string']);
-        ?>
-
-    </div>
-</div>
-<div class="row my-2">
-    <div class="col">
-
-        <?php
-        // Message List component.
-        the_message_list($report_filters['as_string']);
-        ?>
-
-    </div>
-</div>
-<div class="row my-4">
     <div class="col col-6">
 
         <?php

@@ -25,6 +25,14 @@ function the_title($id, $view){
         $stmt = $pdo->prepare("SELECT page_url FROM pages WHERE page_id = :page_id");
         $stmt->execute(['page_id' => $id]);
         $title = $stmt->fetchColumn() ?: 'Page Not Found';
+
+    } elseif($view == 'tag'){
+
+        // Query to fetch page title
+        $stmt = $pdo->prepare("SELECT tag_name FROM tags WHERE tag_id = :tag_id");
+        $stmt->execute(['tag_id' => $id]);
+        $title = $stmt->fetchColumn() ?: 'Page Not Found';
+
     }
 
     echo '<h1 style="max-width:800px">' . $title . '</h1>';

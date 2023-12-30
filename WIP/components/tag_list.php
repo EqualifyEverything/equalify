@@ -44,12 +44,12 @@ function the_tag_list($filters = '')
         function updateTagsContainer(tags) {
             let html = tags.length ? '' : '<p class="my-2">No tags found.</p>';
             tags.forEach(tag => {
-                html += `
-            <div class="row text-body py-2 border-bottom">
-                <span class="col-7">${tag.tag_name}</span>
-                <span class="col-3">${tag.tag_reference_count}</span>
-            </div>
-        `;
+            html += `
+                <a href="?view=tag&tag_id=${tag.tag_id}" class="row text-body py-2 border-bottom">
+                    <span class="col-7 text-truncate">${tag.tag_name}</span>
+                    <span class="col-3 text-truncate">${tag.tag_reference_count}</span>
+                </a>
+            `;
             });
             document.getElementById('tagsContainer').innerHTML = html;
         }
