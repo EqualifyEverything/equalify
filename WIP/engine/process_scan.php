@@ -66,7 +66,7 @@ try {
     // Check if violations are formatted correctly and set them up
     if (isset($data['result']['results']['violations']) && !empty($data['result']['results']['violations'])) {
         foreach ($data['result']['results']['violations'] as $violation) {
-            if (!isset($violation['id'], $violation['tags'], $violation['help'], $violation['nodes'])) {
+            if (!isset($violation['id'], $violation['tags'], $violation['nodes'])) {
                 delete_scan($job_id);
                 throw new  Exception(date('Y-m-d H:i:s').": Invalid violation format for job ID $job_id. Scan deleted.");
             }
@@ -87,7 +87,7 @@ try {
 
                             // Construct the occurrence data
                             $new_occurrences[] = [
-                                "occurrence_message_id" => get_message_id($item['message'],$violation['help']),
+                                "occurrence_message_id" => get_message_id($item['message']),
                                 "occurrence_code_snippet" => $node['html'],
                                 "occurrence_page_id" => $page_id,
                                 "occurrence_source" => "scan.equalify.app",
@@ -230,22 +230,22 @@ function update_processing_value($job_id, $new_value){
     $stmt->execute([$new_value, $job_id]);
 }
 
-function get_message_id($title, $body) {
+function get_message_id($title) {
     global $pdo;
 
     // Check if the message exists
-    $query = "SELECT message_id FROM messages WHERE message_title = :title AND message_body = :body";
+    $query = "SELECT message_id FROM messages WHERE message_title = :title";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([':title' => $title, ':body' => $body]);
+    $stmt->execute([':title' => $title]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
         return $row['message_id']; // Return existing ID
     } else {
         // Insert the new message
-        $insertQuery = "INSERT INTO messages (message_title, message_body) VALUES (:title, :body)";
+        $insertQuery = "INSERT INTO messages (message_title) VALUES (:title)";
         $insertStmt = $pdo->prepare($insertQuery);
-        $insertStmt->execute([':title' => $title, ':body' => $body]);
+        $insertStmt->execute([':title' => $title]);
         return $pdo->lastInsertId(); // Return new ID
     }
 }

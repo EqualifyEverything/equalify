@@ -915,7 +915,6 @@ class DataAccess
             "CREATE TABLE IF NOT EXISTS messages (
                 message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 message_title TEXT NOT NULL,
-                message_body LONGTEXT DEFAULT NULL,
                 PRIMARY KEY (message_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
         $params = array();
