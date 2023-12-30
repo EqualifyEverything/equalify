@@ -17,6 +17,7 @@ DB_PORT='YOUR_PORT'
 ```
 - Make sure you have the cron running to support `process_scan.php` and `process_sitemap.php`. The cron file should include something like this:
 ```
-*/2 * * * * php /var/www/html/WIP/engine/process_scan.php >> /var/www/html/WIP/engine/cron.log 2>&1
+*/1 * * * * php /var/www/html/WIP/engine/process_scan.php >> /var/www/html/WIP/engine/cron.log 2>&1
 11 11 * * 0 php /var/www/html/WIP/engine/process_property.php >> /var/www/html/WIP/engine/cron.log 2>&1
 ```
+(we aim to process 10k scans over 7 days)
