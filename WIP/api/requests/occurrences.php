@@ -12,7 +12,7 @@ function build_join_and_select_clauses($filters, $columns = [], $joined_columns 
     foreach ($joined_columns as $fullColumnName) {
         list($tableSingular, $column) = explode('_', $fullColumnName, 2);
         $table = $tableSingular . 's'; // Pluralize the table name
-        $alias = substr($tableSingular, 0, 1); // Use the first letter as an alias
+        $alias = substr($tableSingular, 0, 2); // Use the first two letters as an alias
 
         // Add join clause only if this table hasn't been joined yet
         if (!isset($joinedTables[$table])) {
@@ -42,7 +42,7 @@ function build_where_clauses($filters = []) {
     }
     if (!empty($filters['messages'])) {
         $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "m.message_id IN ($messageIds)";
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));

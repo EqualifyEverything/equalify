@@ -1,56 +1,60 @@
 <?php
 // Creates a list of pages with the percent equalfied.
-function the_page_list($filters = '')
+function the_message_occurrences_list($filters = '')
 {
 ?>
-    <div class="card pt-2 px-4 my-2 h-100">
-        <h2 class="visually-hidden">Pages</h2>
-        <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-7">URL</strong>
-            <strong class="col-3">Equalified</strong>
-        </div>
-        <div id="pagesContainer" aria-live="polite"><!-- Pages will be loaded here --></div>
-        <div class="d-flex align-items-center mt-2" id="paginationControlsPages">
-            <!-- Pagination for pages will be dynamically updated here -->
-        </div>
+<div class="card my-2 p-4 table-responsive">
+    <h2 class="visually-hidden">Occurrences</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Page</th>
+                <th scope="col">Code Snippet</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody id="messageOcurrencesContainer" aria-live="polite"><!-- Ocurrences will be loaded here --></tbody>
+    </table>
+    <div class="d-flex align-items-center mt-2" id="messageOccurrencesPaginationControls">
+        <!-- Pagination for pages will be dynamically updated here -->
     </div>
+</div>
 
     <script>
         function fetchPages(page) {
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=message_occurrences&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api?request=occurrences&columns[]=occurrence_code_snippet,occurrence_status&joined_columns[]=page_url,page_id&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    updatePagesContainer(response.pages);
-                    updatePaginationControlsPages(page, response.totalPages);
+                    updateMessageOccurrencesContainer(response.occurrences);
+                    updateMessageOccurrencesPagination(page, response.totalPages);
                 } else {
-                    document.getElementById('pagesContainer').innerHTML = 'Error loading pages.';
+                    document.getElementById('messageOcurrencesContainer').innerHTML = 'Error loading pages.';
                 }
             };
             xhr.send();
         }
 
-        function updatePagesContainer(pages) {
-            let html = pages.length ? '' : '<p class="my-2">No pages found.</p>';
-            pages.forEach(page => {
-                // Check if equalified_percentage is a number
-                const equalifiedPercentage = parseFloat(page.equalified_percentage);
-                const formattedPercentage = !isNaN(equalifiedPercentage) ? equalifiedPercentage.toFixed(2) : 'N/A';
-
+        function updateMessageOccurrencesContainer(occurrences) {
+            let html = occurrences.length ? '' : '<tr><td colspan="3">No pages found.</td></tr>';
+            occurrences.forEach(occurrence => {
+                let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 html += `
-            <a href="?view=page&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
-                <span class="col-7 text-truncate">${page.page_url}</span>
-                <span class="col-3 text-truncate">${formattedPercentage}%</span>
-            </a>
+                    <tr>
+                        <td><a class="text-truncate" href="index.php?view=page&id=${occurrence.page_id}">${occurrence.page_url}</td>
+                        <td><code>${codeSnippet}</code></td>
+                        <td class="text-capitalize">${occurrence.occurrence_status}</td>
+                    </tr>
+
         `;
             });
-            document.getElementById('pagesContainer').innerHTML = html;
+            document.getElementById('messageOcurrencesContainer').innerHTML = html;
         }
 
-        function updatePaginationControlsPages(currentPage, totalPages) {
-            let paginationControls = document.getElementById('paginationControlsPages');
+        function updateMessageOccurrencesPagination(currentPage, totalPages) {
+            let paginationControls = document.getElementById('messageOccurrencesPaginationControls');
 
             if (totalPages <= 1) {
                 // If only one page, clear the pagination controls
