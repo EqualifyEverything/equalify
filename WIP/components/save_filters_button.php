@@ -1,6 +1,6 @@
 <?php 
 // Adds a button to save unsaved filters.
-function the_save_filters_button($report_id){
+function the_save_filters_button($report_id, $classes){
     // Construct the cookie name
     $cookie_name = "queue_report_" . $report_id . "_filter_change";
 
@@ -10,7 +10,7 @@ function the_save_filters_button($report_id){
         // Display the button only if the cookie exists
         ?>
 
-        <a id="saveFiltersBtn" class="btn btn-primary" href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>">
+        <a id="saveFiltersBtn" class="btn btn-primary  <?php echo $classes;?>" href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>">
             Save for Everyone
         </a>
 
