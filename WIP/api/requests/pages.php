@@ -14,17 +14,17 @@ function build_where_clauses($filters = []) {
         $tagIds = implode(',', array_map('intval', $filters['tags']));
         $whereClauses[] = "tr.tag_id IN ($tagIds)";
     }
-    if (!empty($filters['messages'])) {
-        $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "m.message_id IN ($messageIds)";
-    }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
-        $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
+        $whereClauses[] = "p.page_id IN ($pageIds)";
     }
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
         $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
+    }
+    if (!empty($filters['messages'])) {
+        $messageIds = implode(',', array_map('intval', $filters['messages']));
+        $whereClauses[] = "o.occurrence_message_id IN ($messageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = $filters['statuses'];
@@ -37,48 +37,45 @@ function build_where_clauses($filters = []) {
     return $whereClauses ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 }
 
-function count_total_occurrences($filters = []) {
+function count_total_pages($filters = []) {
     global $pdo;
 
-    $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
+    $joinClauses = build_join_clauses($filters);
 
     $count_sql = "
         SELECT 
-            COUNT(DISTINCT o.occurrence_id)
-        FROM 
-            occurrences o
+            COUNT(DISTINCT p.page_id) 
+            FROM             
+            pages p
+        INNER JOIN             
+            occurrences o ON p.page_id = o.occurrence_page_id
         $joinClauses
-        LEFT JOIN 
-            messages m ON o.occurrence_message_id = m.message_id
         $whereClauses
     ";
-
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
 
-function fetch_occurrences($results_per_page, $offset, $filters = []) {
+function fetch_pages($results_per_page, $offset, $filters = []) {
     global $pdo;
 
-    $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
+    $joinClauses = build_join_clauses($filters);
 
     $sql = "
-        SELECT 
-            o.occurrence_id,
-            o.occurrence_code_snippet,
-            o.occurrence_status,
-            m.message_id,
-            m.message_title
-        FROM 
-            occurrences o
+        SELECT             
+            p.page_id, 
+            p.page_url,
+            SUM(CASE WHEN o.occurrence_status = 'active' THEN 1 ELSE 0 END) AS page_occurrences_active
+        FROM             
+            pages p
+        INNER JOIN             
+            occurrences o ON p.page_id = o.occurrence_page_id
         $joinClauses
-        LEFT JOIN 
-            messages m ON o.occurrence_message_id = m.message_id
         $whereClauses
-        ORDER BY
-            o.occurrence_status ASC
+        GROUP BY p.page_id        
+        ORDER BY page_occurrences_active DESC
         LIMIT $results_per_page OFFSET $offset
     ";
 
@@ -87,13 +84,12 @@ function fetch_occurrences($results_per_page, $offset, $filters = []) {
 }
 
 function get_results($results_per_page, $offset, $filters = []) {
-
-    $total_occurrences = count_total_occurrences($filters);
-    $occurrences = fetch_occurrences($results_per_page, $offset, $filters);
-    $total_pages = ceil($total_occurrences / $results_per_page);
+    $total_pages = count_total_pages($filters);
+    $pages = fetch_pages($results_per_page, $offset, $filters);
+    $total_pages_count = ceil($total_pages / $results_per_page);
 
     return [
-        'occurrences' => $occurrences,
-        'totalPages' => $total_pages
+        'pages' => $pages,
+        'totalPages' => $total_pages_count
     ];
 }

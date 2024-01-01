@@ -11,7 +11,7 @@ function the_save_filters_button($report_id){
         ?>
 
         <a id="saveFiltersBtn" class="btn btn-primary" href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>">
-            Save Updates
+            Save for Everyone
         </a>
 
         <?php

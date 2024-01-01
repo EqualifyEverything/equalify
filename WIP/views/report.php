@@ -13,7 +13,7 @@ require_once('components/active_filters.php');
 require_once('components/report_status_toggle.php');
 require_once('components/chart.php');
 require_once('components/message_list.php');
-require_once('components/pages_equalified_list.php');
+require_once('components/page_list.php');
 require_once('components/tag_list.php');
 require_once('components/save_filters_button.php');
 
@@ -22,7 +22,9 @@ require_once('helpers/get_report_filters.php');
 
 $report_filters = get_report_filters($pdo, $report_id);
 ?>
-
+<div>
+    Previewing Updates <a>Cancel Updates</a> <a>Save for Everyone</a>
+</div>
 <div class="d-flex flex-column flex-md-row align-items-center mt-4 mb-2">
 
     <?php

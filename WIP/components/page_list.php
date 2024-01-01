@@ -7,7 +7,7 @@ function the_page_list($filters = '')
         <h2 class="visually-hidden">Pages</h2>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">URL</strong>
-            <strong class="col-3">Equalified</strong>
+            <strong class="col-3">Active</strong>
         </div>
         <div id="pagesContainer" aria-live="polite"><!-- Pages will be loaded here --></div>
         <div class="d-flex align-items-center mt-2" id="paginationControlsPages">
@@ -18,7 +18,7 @@ function the_page_list($filters = '')
     <script>
         function fetchPages(page) {
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=pages_equalified&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api?request=pages&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {
@@ -35,14 +35,10 @@ function the_page_list($filters = '')
         function updatePagesContainer(pages) {
             let html = pages.length ? '' : '<p class="my-2">No pages found.</p>';
             pages.forEach(page => {
-                // Check if equalified_percentage is a number
-                const equalifiedPercentage = parseFloat(page.equalified_percentage);
-                const formattedPercentage = !isNaN(equalifiedPercentage) ? equalifiedPercentage.toFixed(2) : 'N/A';
-
                 html += `
             <a href="?view=page&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
                 <span class="col-7 text-truncate">${page.page_url}</span>
-                <span class="col-3 text-truncate">${formattedPercentage}%</span>
+                <span class="col-3 text-truncate">${page.page_occurrences_active}</span>
             </a>
         `;
             });

@@ -8,8 +8,8 @@ function the_message_occurrences_list($filters = '')
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">Page</th>
                 <th scope="col">Code Snippet</th>
+                <th scope="col">Page</th>
                 <th scope="col">Status</th>
             </tr>
         </thead>
@@ -23,7 +23,7 @@ function the_message_occurrences_list($filters = '')
     <script>
         function fetchPages(page) {
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=occurrences&columns[]=occurrence_code_snippet,occurrence_status&joined_columns[]=page_url,page_id&results_per_page=6&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api?request=occurrences&columns[]=occurrence_code_snippet,occurrence_status&joined_columns[]=page_url,page_id&results_per_page=10&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {
@@ -44,8 +44,8 @@ function the_message_occurrences_list($filters = '')
                 let pageUrl = occurrence.page_url.length > 35 ? occurrence.page_url.substring(0, 35) + '...' : occurrence.page_url;
                 html += `
                     <tr>
-                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${pageUrl}</td>
                         <td><code>${codeSnippet}</code></td>
+                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${pageUrl}</td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>
 

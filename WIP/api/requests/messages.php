@@ -1,4 +1,13 @@
 <?php
+function build_join_clauses($filters = []) {
+    $joinClauses = "";
+    if (!empty($filters['tags'])) {
+        // Add join with tag_relationships table only if tags filter is used
+        $joinClauses .= " LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id";
+    }
+    return $joinClauses;
+}
+
 function build_where_clauses($filters = []) {
     $whereClauses = [];
     if (!empty($filters['tags'])) {
@@ -31,13 +40,15 @@ function build_where_clauses($filters = []) {
 function count_total_messages($filters = []) {
     global $pdo;
 
+    $joinClauses = build_join_clauses($filters);
     $whereClauses = build_where_clauses($filters);
 
     $count_sql = "
         SELECT COUNT(DISTINCT m.message_id)
-        FROM messages m 
-        LEFT JOIN occurrences o ON m.message_id = o.occurrence_message_id
-        LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id
+            FROM messages m 
+        LEFT JOIN 
+            occurrences o ON m.message_id = o.occurrence_message_id
+        $joinClauses
         $whereClauses
     ";
 
@@ -49,6 +60,7 @@ function fetch_messages( $results_per_page, $offset, $filters = []) {
     global $pdo;
 
     $whereClauses = build_where_clauses($filters);
+    $joinClauses = build_join_clauses($filters);
 
     $sql = "
         SELECT 
@@ -62,8 +74,7 @@ function fetch_messages( $results_per_page, $offset, $filters = []) {
             messages m
         LEFT JOIN 
             occurrences o ON m.message_id = o.occurrence_message_id
-        LEFT JOIN 
-            tag_relationships tr ON o.occurrence_id = tr.occurrence_id
+        $joinClauses
         $whereClauses
         GROUP BY m.message_id
         ORDER BY SUM(o.occurrence_status = 'equalified') + SUM(o.occurrence_status = 'active') + SUM(o.occurrence_status = 'ignored') DESC, m.message_id

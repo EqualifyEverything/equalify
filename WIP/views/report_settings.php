@@ -10,10 +10,17 @@ if($report_id == ''){
 // Get helpers
 require_once('helpers/get_title.php');
 
+// Components
+require_once('components/save_filters_button.php');
+require_once('components/report_filter_search.php');
+require_once('components/active_filters.php');
+
+
 ?>
 
 <h1 class="my-4">Report Settings</h1>
 <div class="card my-2 p-4">
+    <h2 class="my-4">Global Settings</h2>
     <form action="actions/update_report.php">
         <div class="row my-4">
             <div class="col">
@@ -21,6 +28,22 @@ require_once('helpers/get_title.php');
                 <input type="text" class="form-control form-control-lg" id="reportName" style="max-width: 400px" value="<?php echo get_title($report_id, 'report');?>">
             </div>
         </div>
-        <button class="my-4 btn btn-primary">Save Settings</button>  <a href="actions/delete_report.php" class="btn btn-outline-danger">Delete Report</a>
+        <?php
+        // Filter search component.
+        the_report_filter_search($report_id);
+
+        // Active filters.
+        the_active_filters($report_id, $report_filters['as_array']);
+
+        // Conditional save filters button
+        the_save_filters_button($report_id);
+        ?>
+
+        <a href="?view=report" class="btn btn-outline-secondary">Cancel Updates</a> 
+
     </form>
+</div>
+<div class="card my-2 p-4">
+    <h2 class="my-4">Visibility</h2>
+    <a href="actions/delete_report.php" class="btn btn-danger">Delete Report</a>
 </div>

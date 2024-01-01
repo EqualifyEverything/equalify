@@ -30,7 +30,7 @@ function the_occurrence_list($filters = '')
 <script>
     function fetchOccurrences(page) {
         const xhr = new XMLHttpRequest();
-        const url = 'api?request=page_occurrences&current_results_page=' + page + '&results_per_page=10&<?php echo $filters; ?>';
+        const url = 'api?request=occurrences&columns[]=occurrence_id,occurrence_code_snippet,occurrence_status&joined_columns[]=message_id,message_title&current_results_page=' + page + '&results_per_page=10&<?php echo $filters; ?>';
         xhr.open('GET', url);
         xhr.onload = function() {
             if (xhr.status === 200) {
