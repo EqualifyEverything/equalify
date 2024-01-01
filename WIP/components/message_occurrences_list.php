@@ -3,18 +3,20 @@
 function the_message_occurrences_list($filters = '')
 {
 ?>
-<div class="card my-2 p-4 table-responsive">
+<div class="card my-2 p-4">
     <h2 class="visually-hidden">Occurrences</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Code Snippet</th>
-                <th scope="col">Page</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody id="messageOcurrencesContainer" aria-live="polite"><!-- Ocurrences will be loaded here --></tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Code Snippet</th>
+                    <th scope="col">Page</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody id="messageOcurrencesContainer" aria-live="polite"><!-- Ocurrences will be loaded here --></tbody>
+        </table>
+    </div>
     <div class="d-flex align-items-center mt-2" id="messageOccurrencesPaginationControls">
         <!-- Pagination for pages will be dynamically updated here -->
     </div>
@@ -44,7 +46,7 @@ function the_message_occurrences_list($filters = '')
                 let pageUrl = occurrence.page_url.length > 35 ? occurrence.page_url.substring(0, 35) + '...' : occurrence.page_url;
                 html += `
                     <tr>
-                        <td><code>${codeSnippet}</code></td>
+                        <td><pre><code>${codeSnippet}</code></pre></td>
                         <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${pageUrl}</td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>
