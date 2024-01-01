@@ -69,9 +69,9 @@ function the_report_status_toggle($report_id, $report_filters) {
             if (xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
                 const statuses = response.statuses;
-                document.getElementById('equalified_count').textContent = statuses.equalified !== undefined ? statuses.equalified : 0;
-                document.getElementById('active_count').textContent = statuses.active !== undefined ? statuses.active : 0;
-                document.getElementById('ignored_count').textContent = statuses.ignored !== undefined ? statuses.ignored : 0;
+                document.getElementById('equalified_count').textContent = statuses.equalified !== undefined ? statuses.equalified.toLocaleString('en', {useGrouping:true}) : 0;
+                document.getElementById('active_count').textContent = statuses.active !== undefined ? statuses.active.toLocaleString('en', {useGrouping:true}) : 0;
+                document.getElementById('ignored_count').textContent = statuses.ignored !== undefined ? statuses.ignored.toLocaleString('en', {useGrouping:true}) : 0;
             } else {
                 console.error('Error loading status counts.');
             }

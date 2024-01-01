@@ -35,10 +35,13 @@ function the_page_list($filters = '')
         function updatePagesContainer(pages) {
             let html = pages.length ? '' : '<p class="my-2">No pages found.</p>';
             pages.forEach(page => {
+                // Ensure counts are numbers
+                const activeCount = parseInt(page.page_occurrences_active, 10);
+
                 html += `
             <a href="?view=page&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
                 <span class="col-7 text-truncate">${page.page_url}</span>
-                <span class="col-3 text-truncate">${page.page_occurrences_active}</span>
+                <span class="col-3 text-truncate">${activeCount.toLocaleString('en', {useGrouping:true})}</span>
             </a>
         `;
             });

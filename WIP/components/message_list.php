@@ -60,20 +60,25 @@ function the_message_list($filters = '')
     function updateMessagesContainer(messages) {
         let html = messages.length ? '' : '<p>No messages found.</p>';
         messages.forEach(message => {
+            // Ensure counts are numbers
+            const equalifiedCount = parseInt(message.equalified_count, 10);
+            const activeCount = parseInt(message.active_count, 10);
+            const ignoredCount = parseInt(message.ignored_count, 10);
+            const totalCount = parseInt(message.total_count, 10);
+
             // Add HTML for each message
             html += `
-        <a class="row text-body py-2 border-bottom" href="index.php?view=message&message_id=${message.message_id}">
-            <span class="col-7">${message.message_title}</span>
-            <span class="col-1" aria-label="Equalified Occurrences Total">${message.equalified_count}</span>
-            <span class="col-1" aria-label="Active Occurrences Total">${message.active_count}</span>
-            <span class="col-1" aria-label="Ignored Occurrences Total">${message.ignored_count}</span>
-            <span class="col-1" aria-label="All Occurrences Total">${message.total_count}</span>
-        </a>
-    `;
+                <a class="row text-body py-2 border-bottom" href="index.php?view=message&message_id=${message.message_id}">
+                    <span class="col-7">${message.message_title}</span>
+                    <span class="col-1" aria-label="Equalified Occurrences Total">${equalifiedCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1" aria-label="Active Occurrences Total">${activeCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1" aria-label="Ignored Occurrences Total">${ignoredCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1" aria-label="All Occurrences Total">${totalCount.toLocaleString('en', {useGrouping:true})}</span>
+                </a>
+            `;
         });
         document.getElementById('messagesContainer').innerHTML = html;
     }
-
     function updatePaginationControls(currentPage, totalPages) {
         let paginationControls = document.getElementById('paginationControls');
 
