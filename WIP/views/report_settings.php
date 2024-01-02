@@ -16,7 +16,7 @@ require_once('components/save_filters_button.php');
 require_once('components/report_filter_search.php');
 require_once('components/active_filters.php');
 
-$report_filters = get_report_filters($pdo, $report_id);
+$report_filters = get_report_filters($report_id);
 
 
 ?>

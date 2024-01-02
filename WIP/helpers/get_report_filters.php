@@ -1,6 +1,7 @@
 <?php
 // Returns the report filters
-function get_report_filters($pdo, $report_id) {
+function get_report_filters($report_id) {
+    global $pdo;
 
     // Fetch filters from database
     $stmt = $pdo->prepare("SELECT report_filters FROM reports WHERE report_id = :report_id");

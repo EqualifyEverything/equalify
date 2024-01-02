@@ -24,7 +24,7 @@ the_report_header($report_id);
 ?>
 
 <div class="container">
-    <h2 class="mb-4">
+    <h2 class="mb-4" style="max-width:900px">
 
     <?php
     // Page Title
