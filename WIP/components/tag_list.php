@@ -4,7 +4,7 @@ function the_tag_list($filters = '')
 {
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
-        <h2 class="visually-hidden">Tags</h2>
+        <h3 class="visually-hidden">Tags</h3>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">Tag</strong>
             <strong class="col-3">Occurrences</strong>

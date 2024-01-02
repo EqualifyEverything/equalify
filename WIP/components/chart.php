@@ -5,7 +5,7 @@ function the_chart($filters = '')
 ?>
 
 <div class="card p-4 h-100">
-    <h2 class="visually-hidden">Status Occurrences Over Time</h2>
+    <h3 class="visually-hidden">Status Occurrences Over Time</h3>
     <canvas id="statusChart" width="400" height="180" style="display: none;"></canvas>
     <div id="noDataMessage"></div>
     <script>

@@ -4,7 +4,7 @@ function the_message_occurrences_list($filters = '')
 {
 ?>
 <div class="card my-2 p-4">
-    <h2 class="visually-hidden">Occurrences</h2>
+    <h3 class="visually-hidden">Occurrences</h3>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

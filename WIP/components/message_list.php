@@ -8,7 +8,7 @@ function the_message_list($filters = '')
 ?>
 
 <div class="card my-2 p-4 table-responsive">
-    <h2 class="visually-hidden">Messages</h2>
+    <h3 class="visually-hidden">Messages</h3>
     <div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">

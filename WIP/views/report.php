@@ -24,6 +24,7 @@ the_report_header($report_id);
 ?>
 
 <div class="container mt-3">
+    <h2 class="visually-hidden">Report Details</h2>
 
     <?php
 

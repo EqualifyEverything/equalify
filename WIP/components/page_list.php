@@ -5,7 +5,7 @@ function the_page_list($filters = '')
     global $report_id;
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
-        <h2 class="visually-hidden">Pages</h2>
+        <h3 class="visually-hidden">Pages</h3>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">URL</strong>
             <strong class="col-3">Active</strong>
