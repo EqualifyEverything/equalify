@@ -2,6 +2,7 @@
 // Creates a list of pages with the percent equalfied.
 function the_page_list($filters = '')
 {
+    global $report_id;
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
         <h2 class="visually-hidden">Pages</h2>
@@ -39,7 +40,7 @@ function the_page_list($filters = '')
                 const activeCount = parseInt(page.page_occurrences_active, 10);
 
                 html += `
-            <a href="?view=page&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
+            <a href="?view=page&report_id=<?php echo $report_id;?>&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
                 <span class="col-7 text-truncate">${page.page_url}</span>
                 <span class="col-3 text-truncate">${activeCount.toLocaleString('en', {useGrouping:true})}</span>
             </a>
