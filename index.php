@@ -7,7 +7,7 @@
  * many files to remind us of basic operating principles
  * that drive the Equalify project forward.
  * 
- * While Blake Bertuccelli established Equalify's
+ * While Blake Bertuccelli-Booth established Equalify's
  * copyright in 2022, this program is free software: you
  * can redistribute it and/or modify it under the terms of
  * the GNU Affero General Public License as published by
