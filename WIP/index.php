@@ -17,7 +17,7 @@ require_once('components/active_class.php');
 
 <body>
     <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
-    <header class="py-3 mb-4">
+    <header class="py-3 border-bottom  border-secondary">
         <div class="container d-flex flex-wrap justify-content-center">
             <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
@@ -30,7 +30,7 @@ require_once('components/active_class.php');
             </ul>
         </div>
     </header>
-    <main class="container">
+    <main>
         
         <?php
         // Select the view.
