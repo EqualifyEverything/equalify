@@ -5,11 +5,6 @@ if($message_id == '')
     throw new Exception(
         'message_id is missing'
     );
-$report_id = $_GET['report_id'] ;
-if($report_id == '')
-    throw new Exception(
-        'report_id is missing'
-    );
 
 // The DB can be used by required info
 require_once('db.php');
@@ -19,8 +14,13 @@ require_once('components/report_header.php');
 require_once('components/chart.php');
 require_once('components/message_occurrences_list.php');
 
-// Report Header
-the_report_header($report_id);
+// Optional Report Header
+if(!empty($_GET['report_id'])){
+    the_report_header($_GET['report_id']);
+}else{
+    // Add some space before the content
+    echo '<div class="mb-4"></div>';
+}
 ?>
 
 <div class="container">
