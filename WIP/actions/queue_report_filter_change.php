@@ -45,6 +45,6 @@ foreach ($filters_array as $filter_string) {
 setcookie($cookie_name, json_encode(array_values($latest_filters)), time() + strtotime( '+30 days' ), '/');
 
 // Redirect the user to the report page with the report ID
-header("Location: ../index.php?view=report&report_id=" . urlencode($report_id));
+header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
 exit;
 ?>

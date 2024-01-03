@@ -11,7 +11,6 @@ require_once('components/chart.php');
 require_once('components/message_list.php');
 require_once('components/page_list.php');
 require_once('components/tag_list.php');
-require_once('components/save_filters_button.php');
 
 // Lets get helpers we're using.
 require_once('helpers/get_report_filters.php');
@@ -19,7 +18,7 @@ require_once('helpers/get_report_filters.php');
 $report_filters = get_report_filters($report_id);
 
 // Report Header
-the_report_header($report_id);
+the_report_header();
 ?>
 
 <div class="container mt-3">

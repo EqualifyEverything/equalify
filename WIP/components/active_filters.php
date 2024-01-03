@@ -6,7 +6,7 @@ function the_active_filters($report_id, $report_filters) {
     if(empty($report_filters)){
 ?>
     
-<p>No active filters.</p>';
+<p>No active filters.</p>
 
 <?php
     }else{
@@ -27,7 +27,7 @@ function the_active_filters($report_id, $report_filters) {
         ?>
 
         <li class="btn-group btn-group-sm mb-2" role="group" aria-label="Report Filter">
-            <span class="btn btn-outline-secondary disabled text-primary-emphasis">
+            <span class="btn btn-outline-secondary disabled text-primary-emphasis text-truncate" style="max-width:250px">
                 <span class="fw-semibold pe-1"><?php echo $filter_type;?>:</span><?php echo htmlspecialchars($filter_value); ?>
             </span>
             <a class="btn btn-outline-secondary remove-filter-button" href="actions/queue_report_filter_change.php?<?php echo $query;?>">

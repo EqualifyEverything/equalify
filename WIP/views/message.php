@@ -19,7 +19,7 @@ require_once('components/message_occurrences_list.php');
 
 // Optional Report Header
 if(!empty($report_id)){
-    the_report_header($report_id);
+    the_report_header();
 }else{
     // Add some space before the content
     echo '<div class="mb-4"></div>';

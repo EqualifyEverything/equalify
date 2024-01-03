@@ -12,7 +12,6 @@ require_once('helpers/get_title.php');
 require_once('helpers/get_report_filters.php');
 
 // Components
-require_once('components/save_filters_button.php');
 require_once('components/report_filter_search.php');
 require_once('components/active_filters.php');
 
@@ -42,14 +41,35 @@ $report_filters = get_report_filters($report_id);
 
         </div>
         <div class="border-top py-4 my-2">
-            <a href="?view=report" class="btn btn-lg btn-outline-secondary">Cancel Updates</a> 
+            <h2 class="mb-4">Save Actions</h2>
 
             <?php
-            // Conditional save filters button
-            the_save_filters_button($report_id, 'btn-lg');
+            // Unsaved changes update the state of a button
+            $aria_disabled_state = true;
+            $disabled_class = 'disabled';
+            $cookie_name = "queue_report_" . $report_id . "_filter_change";
+            if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
+                $aria_disabled_state = false;
+                $disabled_class = '';    
+            }
             ?>
 
-            <a href="actions/delete_report.php" class="btn btn-lg btn-danger">Delete Report</a>
+            <a href="#" class="btn btn-lg btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                Cancel Updates
+            </a> 
+            <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-lg btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                Preview Updates
+            </a> 
+            <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-lg <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                Save for Everyone
+            </a>
+
+        </div>
+        <div class="border-top py-4">
+            <h2 class="mb-4">Danger Zone</h2>
+            <p>
+                <a href="actions/delete_report.php" class="btn btn-lg btn-danger">Delete Report</a>
+            </p>
         </div>
     </div>
 </div>

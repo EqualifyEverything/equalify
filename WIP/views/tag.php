@@ -24,7 +24,7 @@ require_once('helpers/get_report_filters.php');
 
 // Optional Report Header
 if(!empty($report_id)){
-    the_report_header($report_id);
+    the_report_header();
 }else{
     // Add some space before the content
     echo '<div class="mb-4"></div>';
