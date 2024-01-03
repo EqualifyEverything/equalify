@@ -22,7 +22,7 @@ $report_filters = get_report_filters($report_id);
 ?>
 
 <div class="container">
-    <h1 class="my-4">Report Settings</h1>
+    <h1 class="my-4 display-5">Report Settings</h1>
     <div class="card my-2 p-4">
         <div class="pb-4 my-2">
             <h2 class="mb-4">General Settings</h2>
