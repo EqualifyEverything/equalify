@@ -41,7 +41,7 @@ function the_report_header($report_id)
         <div class="ms-md-auto">
 
             <a class="btn btn-secondary" href="?view=report_settings&report_id=<?php echo $report_id;?>">
-                Edit Settings
+                Edit Report
             </a>
 
         </div>
