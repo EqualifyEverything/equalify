@@ -10,7 +10,7 @@ $report_id = isset($_GET['report_id']) ? $_GET['report_id'] : '';
 $last_view = isset($_GET['last_view']) ? $_GET['last_view'] : '';
 
 // Get filters
-$report_filters = get_report_filters($report_id)['as_array'];
+$report_filters = get_report_filters()['as_array'];
 
 // Update the database
 $update_stmt = $pdo->prepare("UPDATE reports SET report_filters = :report_filters WHERE report_id = :report_id");

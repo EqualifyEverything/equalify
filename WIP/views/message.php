@@ -17,6 +17,15 @@ require_once('components/report_header.php');
 require_once('components/chart.php');
 require_once('components/message_occurrences_list.php');
 
+// Helpers
+require_once('helpers/get_report_filters.php');
+
+// Ready filters for this view
+$report_filters = get_report_filters()['as_string'];
+parse_str($report_filters, $filters_array);
+$filters_array['messages'] = $message_id;
+$new_report_filters = http_build_query($filters_array);
+
 // Optional Report Header
 if(!empty($report_id)){
     the_report_header();
@@ -47,7 +56,7 @@ if(!empty($report_id)){
 
             <?php
             // Chart
-            the_chart("messages=$message_id");
+            the_chart($new_report_filters);
             ?>
 
         </div>
@@ -55,7 +64,7 @@ if(!empty($report_id)){
 
     <?php
     // Message Occurrences
-    the_message_occurrences_list("messages=$message_id");
+    the_message_occurrences_list($new_report_filters);
     ?>
 
 </div>

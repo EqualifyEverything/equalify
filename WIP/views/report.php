@@ -15,7 +15,7 @@ require_once('components/tag_list.php');
 // Lets get helpers we're using.
 require_once('helpers/get_report_filters.php');
 
-$report_filters = get_report_filters($report_id);
+$report_filters = get_report_filters()['as_string'];
 
 // Report Header
 the_report_header();
@@ -27,10 +27,10 @@ the_report_header();
     <?php
 
     // Chart component.
-    the_chart($report_filters['as_string']);
+    the_chart($report_filters);
 
     // Message List component.
-    the_message_list($report_filters['as_string']);
+    the_message_list($report_filters);
     ?>
 
     <div class="row">
@@ -38,7 +38,7 @@ the_report_header();
 
             <?php
             // Tag component.
-            the_tag_list($report_filters['as_string']);
+            the_tag_list($report_filters);
             ?>
 
         </div>
@@ -46,7 +46,7 @@ the_report_header();
 
             <?php
             // Page list component.
-            the_page_list($report_filters['as_string']);
+            the_page_list($report_filters);
             ?>
 
         </div>

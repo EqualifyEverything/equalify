@@ -19,7 +19,15 @@ require_once('components/page_occurrences_list.php');
 require_once('components/chart.php');
 require_once('components/report_header.php');
 
+// Helpers
 require_once('helpers/get_title.php');
+require_once('helpers/get_report_filters.php');
+
+// Ready filters for this view
+$report_filters = get_report_filters()['as_string'];
+parse_str($report_filters, $filters_array);
+$filters_array['pages'] = $page_id;
+$new_report_filters = http_build_query($filters_array);
 
 // Optional Report Header
 if(!empty($report_id)){
@@ -42,10 +50,10 @@ if(!empty($report_id)){
 
     <?php
     // Status toggle
-    the_chart('pages='.$page_id);
+    the_chart($new_report_filters);
 
     // Occurrence List
-    the_occurrence_list('pages='.$page_id);
+    the_occurrence_list($new_report_filters);
     ?>
 
 </div>
