@@ -21,15 +21,25 @@ $report_filters = get_report_filters($report_id);
 ?>
 
 <div class="container">
-    <h1 class="my-4 display-5">Report Settings</h1>
+    <h1 class="display-5 mt-4" style="max-width:800px">
+        <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+
+            <?php
+            // Page Title
+            echo get_title($report_id, 'report');
+            ?>
+
+        </a>
+    </h1>
+    <h2 class="mb-4">Report Settings</h2>
     <div class="card my-2 p-4">
         <div class="pb-4 my-2">
-            <h2 class="mb-4">General Settings</h2>
+            <h3 class="mb-4">General Settings</h3>
             <label for="reportName" class="form-label">Report Name</label>
             <input type="text" class="form-control form-control-lg" id="reportName" style="max-width: 400px" value="<?php echo get_title($report_id, 'report');?>">
         </div>
         <div class="border-top py-4 my-2">
-            <h2 class="mb-4">Filters</h2>
+            <h3 class="mb-4">Filters</h3>
 
             <?php
             // Active filters.
@@ -41,7 +51,7 @@ $report_filters = get_report_filters($report_id);
 
         </div>
         <div class="border-top py-4 my-2">
-            <h2 class="mb-4">Save Actions</h2>
+            <h3 class="mb-4">Save Actions</h3>
 
             <?php
             // Unsaved changes update the state of a button
@@ -66,7 +76,7 @@ $report_filters = get_report_filters($report_id);
 
         </div>
         <div class="border-top py-4">
-            <h2 class="mb-4">Danger Zone</h2>
+            <h3 class="mb-4">Danger Zone</h3>
             <p>
                 <a href="actions/delete_report.php" class="btn btn-lg btn-danger">Delete Report</a>
             </p>
