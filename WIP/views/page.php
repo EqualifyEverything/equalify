@@ -7,19 +7,23 @@ if($page_id == ''){
     );
 }
 
+// Optional report_id is used to add report data
+$report_id = isset($_GET['report_id']) ? $_GET['report_id'] : ''; 
+
 // The DB can be used by required info
 require_once('db.php');
 
 // Let's get the various components we need to create the view.
-require_once('components/title.php');
 require_once('components/chart.php');
 require_once('components/page_occurrences_list.php');
 require_once('components/chart.php');
 require_once('components/report_header.php');
 
+require_once('helpers/get_title.php');
+
 // Optional Report Header
-if(!empty($_GET['report_id'])){
-    the_report_header($_GET['report_id']);
+if(!empty($report_id)){
+    the_report_header($report_id);
 }else{
     // Add some space before the content
     echo '<div class="mb-4"></div>';
@@ -27,14 +31,14 @@ if(!empty($_GET['report_id'])){
 ?>
 
 <div class="container">
-    <div class="d-flex flex-column flex-md-row align-items-center my-4">
+    <h2 class="mb-4" style="max-width:900px">
 
-        <?php
-        // Page Title
-        the_title($page_id, 'page');
-        ?>
+    <?php
+    // Page Title
+    echo get_title($page_id, 'page');
+    ?>
 
-    </div>
+    </h2>
 
     <?php
     // Status toggle

@@ -2,6 +2,7 @@
 // Creates a list of tags with the number of occurrences per tag.
 function the_tag_list($filters = '')
 {
+    global $report_id;
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
         <h3 class="visually-hidden">Tags</h3>
@@ -48,7 +49,7 @@ function the_tag_list($filters = '')
                 const tagReferenceCount = parseInt(tag.tag_reference_count, 10);
 
                 html += `
-                    <a href="?view=tag&tag_id=${tag.tag_id}" class="row text-body py-2 border-bottom">
+                    <a href="?view=tag&report_id=<?php echo $report_id;?>&tag_id=${tag.tag_id}" class="row text-body py-2 border-bottom">
                         <span class="col-7 text-truncate">${tag.tag_name}</span>
                         <span class="col-3 text-truncate">${tagReferenceCount.toLocaleString('en', {useGrouping:true})}</span>
                     </a>

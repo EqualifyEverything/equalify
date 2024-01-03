@@ -27,13 +27,15 @@ function the_report_header($report_id)
     </div>
     <div class="d-flex flex-column flex-md-row align-items-center mt-4 container">
 
-        <h1 style="max-width:800px">
+        <h1 class="display-5" style="max-width:800px">
+            <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
 
-        <?php
-        // Page Title
-        echo get_title($report_id, 'report');
-        ?>
+                <?php
+                // Page Title
+                echo get_title($report_id, 'report');
+                ?>
 
+            </a>
         </h1>
 
         <div class="ms-md-auto">

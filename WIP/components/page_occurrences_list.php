@@ -2,6 +2,7 @@
 // Creates a list of occurrences.
 function the_occurrence_list($filters = '')
 {
+    global $report_id;
 ?>
 
 <div class="card my-2 p-4 table-responsive">
@@ -54,9 +55,9 @@ function the_occurrence_list($filters = '')
         occurrences.forEach(occurrence => {
             let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             html += `
-                <a class="row text-body py-2 border-bottom" href="index.php?view=message&message_id=${occurrence.message_id}">
+                <a class="row text-body py-2 border-bottom" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${occurrence.message_id}">
                     <span class="col-5" aria-label="Message">${occurrence.message_title}</span>
-                    <span class="col-5" aria-label="Code Snippet"><code><pre>${codeSnippet}</pre></code></span>
+                    <span class="col-5" aria-label="Code Snippet"><pre><code>${codeSnippet}</code></pre></span>
                     <span class="col-2 text-capitalize" aria-label="Status">${occurrence.occurrence_status}</span>
                 </a>
             `;

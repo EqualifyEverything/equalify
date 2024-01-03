@@ -7,7 +7,6 @@ require_once('db.php');
 
 // Let's get the various components we need to create the view.
 require_once('components/report_header.php');
-require_once('components/title.php');
 require_once('components/chart.php');
 require_once('components/message_list.php');
 require_once('components/page_list.php');

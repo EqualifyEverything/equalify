@@ -6,6 +6,9 @@ if($message_id == '')
         'message_id is missing'
     );
 
+// Optional report_id is used to add report data
+$report_id = isset($_GET['report_id']) ? $_GET['report_id'] : ''; 
+
 // The DB can be used by required info
 require_once('db.php');
 
@@ -15,8 +18,8 @@ require_once('components/chart.php');
 require_once('components/message_occurrences_list.php');
 
 // Optional Report Header
-if(!empty($_GET['report_id'])){
-    the_report_header($_GET['report_id']);
+if(!empty($report_id)){
+    the_report_header($report_id);
 }else{
     // Add some space before the content
     echo '<div class="mb-4"></div>';

@@ -2,7 +2,9 @@
 // Creates a list of pages with the percent equalfied.
 function the_message_occurrences_list($filters = '')
 {
+    global $report_id;
 ?>
+
 <div class="card my-2 p-4">
     <h3 class="visually-hidden">Occurrences</h3>
     <div class="table-responsive">
@@ -47,7 +49,7 @@ function the_message_occurrences_list($filters = '')
                 html += `
                     <tr>
                         <td><pre><code>${codeSnippet}</code></pre></td>
-                        <td><a class="text-truncate" href="index.php?view=page&page_id=${occurrence.page_id}">${pageUrl}</td>
+                        <td><a class="text-truncate" href="index.php?view=page&report_id=<?php echo $report_id;?>&page_id=${occurrence.page_id}">${pageUrl}</td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>
 

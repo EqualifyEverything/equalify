@@ -6,6 +6,8 @@ if($tag_id == ''){
         'tag_id is missing'
     );
 }
+
+// Optional report_id is used to add report data
 $report_id = isset($_GET['report_id']) ? $_GET['report_id'] : ''; 
 
 // The DB can be used by required info
@@ -26,7 +28,7 @@ if(!empty($report_id)){
 }else{
     // Add some space before the content
     echo '<div class="mb-4"></div>';
-}
+} 
 ?>
 
 <div class="container">
