@@ -64,13 +64,13 @@ $report_filters = get_report_filters();
             }
             ?>
 
-            <a href="#" class="btn btn-lg btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+            <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-lg btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
                 Cancel Updates
             </a> 
             <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-lg btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
                 Preview Updates
             </a> 
-            <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-lg <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+            <a href="actions/save_report_filter_change.php?last_view=report_settings&report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-lg <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
                 Save for Everyone
             </a>
 
