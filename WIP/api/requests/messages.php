@@ -3,7 +3,7 @@ function build_join_clauses($filters = []) {
     $joinClauses = "";
     if (!empty($filters['tags'])) {
         // Add join with tag_relationships table only if tags filter is used
-        $joinClauses .= " LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id";
+        $joinClauses .= " INNER JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id";
     }
     return $joinClauses;
 }
@@ -46,7 +46,7 @@ function count_total_messages($filters = []) {
     $count_sql = "
         SELECT COUNT(DISTINCT m.message_id)
             FROM messages m 
-        LEFT JOIN 
+        INNER JOIN 
             occurrences o ON m.message_id = o.occurrence_message_id
         $joinClauses
         $whereClauses
@@ -72,7 +72,7 @@ function fetch_messages( $results_per_page, $offset, $filters = []) {
             COUNT(o.occurrence_id) AS total_count
         FROM 
             messages m
-        LEFT JOIN 
+        INNER JOIN 
             occurrences o ON m.message_id = o.occurrence_message_id
         $joinClauses
         $whereClauses

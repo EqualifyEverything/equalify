@@ -35,8 +35,8 @@ function count_total_tags($filters = []) {
     $count_sql = "
         SELECT COUNT(DISTINCT t.tag_id)
         FROM tags t
-        LEFT JOIN tag_relationships tr ON t.tag_id = tr.tag_id
-        LEFT JOIN occurrences o ON tr.occurrence_id = o.occurrence_id
+        INNER JOIN tag_relationships tr ON t.tag_id = tr.tag_id
+        INNER JOIN occurrences o ON tr.occurrence_id = o.occurrence_id
         $whereClauses
     ";
     $stmt = $pdo->query($count_sql);
@@ -54,9 +54,9 @@ function fetch_tags($results_per_page, $offset, $filters = []) {
             COUNT(tr.occurrence_id) AS tag_reference_count
         FROM 
             tags t
-        LEFT JOIN 
+        INNER JOIN 
             tag_relationships tr ON t.tag_id = tr.tag_id
-        LEFT JOIN 
+        INNER JOIN 
             occurrences o ON tr.occurrence_id = o.occurrence_id
         $whereClauses
         GROUP BY t.tag_id
