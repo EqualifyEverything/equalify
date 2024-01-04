@@ -5,6 +5,9 @@ require_once('helpers/get_title.php');
 // Creates a list of pages with the percent equalfied.
 function the_report_header() {
     global $report_id;
+
+    // The tag_id URL parameter defines the tag.
+    $view = isset($_GET['view']) ? $_GET['view'] : ''; 
 ?>
 
 <div class="pb-2 my-0 ">
@@ -22,7 +25,7 @@ function the_report_header() {
             <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-sm btn-outline-secondary">
                 Cancel Updates
             </a> 
-            <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>&last_view=<?php $_GET['view'];?>" class="btn btn-primary btn-sm">
+            <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>&last_view=<?php echo $view;?>" class="btn btn-primary btn-sm">
                 Save for Everyone
             </a>
 

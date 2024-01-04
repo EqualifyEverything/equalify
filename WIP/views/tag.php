@@ -25,7 +25,7 @@ require_once('helpers/get_report_filters.php');
 // Ready filters for this view
 $report_filters = get_report_filters()['as_string'];
 parse_str($report_filters, $filters_array);
-$filters_array['tag_ids'] = $tag_id;
+$filters_array['tags'] = $tag_id;
 $new_report_filters = http_build_query($filters_array);
 
 // Optional Report Header
