@@ -1,7 +1,7 @@
 <?php
 // The DB can be used by required info
 function get_reports(){
-    require_once('db.php');
+    global $pdo;
 
     // Query to fetch reports
     $sql = "SELECT report_id, report_title FROM reports";

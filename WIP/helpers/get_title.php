@@ -1,6 +1,6 @@
 <?php
 function get_title($id, $view){
-    require_once('db.php');
+    global $pdo;
 
     if($view == 'report'){
 

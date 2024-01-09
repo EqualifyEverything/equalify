@@ -9,9 +9,6 @@ if($message_id == '')
 // Optional report_id is used to add report data
 $report_id = isset($_GET['report_id']) ? $_GET['report_id'] : ''; 
 
-// The DB can be used by required info
-require_once('db.php');
-
 // Let's get the various components we need to create the view.
 require_once('components/report_header.php');
 require_once('components/chart.php');

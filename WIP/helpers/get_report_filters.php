@@ -1,7 +1,7 @@
 <?php
 // Returns the report filters
 function get_report_filters() {
-    require_once('db.php');
+    global $pdo;
     global $report_id;
 
     // Fetch filters from database

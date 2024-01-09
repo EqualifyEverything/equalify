@@ -1,9 +1,11 @@
 <?php
-// Temporary testing text
-$report_id = 1;
-
-// The DB can be used by required info
-require_once('db.php');
+// The report_id URL parameter defines the page.
+$report_id = $_GET['report_id'];
+if($report_id == ''){
+    throw new Exception(
+        'report_id is missing'
+    );
+}
 
 // Let's get the various components we need to create the view.
 require_once('components/report_header.php');

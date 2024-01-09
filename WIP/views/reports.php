@@ -1,6 +1,7 @@
 <?php
 // Helpers
 require_once('helpers/get_reports.php');
+
 ?>
 
 <div class="container">
@@ -15,17 +16,17 @@ require_once('helpers/get_reports.php');
     <?php
     // Show Scan Profiles
     $reports = get_reports();
-    if( count($reports['content']) > 0 ):
-        foreach($reports['content'] as $report): 
+    if( !empty($reports) ):
+        foreach($reports as $report): 
     ?>
 
         <div class="col">
             <div class="card">
                 <div class="card-body">
                     <h2 class="h5 card-title p-2 my-2">
-                        <?php echo $report->report_title;?>
+                        <?php echo $report['report_title'];?>
                     </h2>
-                    <a href="index.php?view=report&id=<?php echo $report->report_id;?>" class="btn btn-secondary m-2">
+                    <a href="index.php?view=report&report_id=<?php echo $report['report_id'];?>" class="btn btn-secondary m-2">
                         View Report
                     </a>
                 </div>
