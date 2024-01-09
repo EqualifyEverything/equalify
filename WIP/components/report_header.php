@@ -18,7 +18,7 @@ function the_report_header() {
     if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'):
     ?>
 
-    <div class="fw-semibold text-info-emphasis bg-info-subtle border-bottom border-info">
+    <div class="fw-semibold bg-opacity-10 text-info-emphasis bg-info-subtle border-bottom border-info">
         <div class="container d-flex align-items-center justify-content-between py-4 ">
             Previewing Unsaved Report Settings
             <div>

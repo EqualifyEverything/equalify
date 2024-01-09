@@ -17,6 +17,9 @@ require_once('components/active_filters.php');
 
 $report_filters = get_report_filters();
 
+// Use Session to securely handle report ID
+session_start();
+$_SESSION['report_id'] = $report_id;
 
 ?>
 
@@ -33,13 +36,38 @@ $report_filters = get_report_filters();
     </h1>
     <h2 class="mb-4">Report Settings</h2>
     <div class="card my-2 p-4">
-        <div class="pb-4 my-2">
+        <form class="pb-4 my-2" action="actions/save_report_title.php" method="post">
             <h3 class="mb-4">General Settings</h3>
-            <label for="reportName" class="form-label">Report Name</label>
-            <input type="text" class="form-control form-control-lg" id="reportName" style="max-width: 400px" value="<?php echo get_title($report_id, 'report');?>">
-        </div>
+            <div>
+                <label for="reportTitle" class="form-label">Report Title</label>
+                <input 
+                    type="text" 
+                    class="form-control <?php if(isset($_GET['error'])) echo 'is-invalid';?>" 
+                    id="reportTitle" 
+                    name="report_title" 
+                    style="max-width: 400px" 
+                    value="<?php echo get_title($report_id, 'report');?>"
+
+                    <?php 
+                    if(isset($_GET['error']))
+                        echo 'aria-describedby="validationServer03Feedback"';
+                    ?>
+
+                    required
+                >
+                
+                <?php
+                // Error Message
+                if(isset($_GET['error']))
+                    '<div class="invalid-feedback">' . htmlspecialchars($_GET['error']) . '</div>';
+                ?>
+
+            </div>
+            <button type="submit" class="btn btn-primary visually-hidden mt-3 disabled" aria-disabled="true">Update Title</button>
+        </form>
         <div class="border-top py-4 my-2">
             <h3 class="mb-4">Filters</h3>
+            <div class="d-flex align-items-start flex-wrap">
 
             <?php
             // Active filters.
@@ -49,37 +77,54 @@ $report_filters = get_report_filters();
             the_report_filter_search($report_id);
             ?>
 
-        </div>
-        <div class="border-top py-4 my-2">
-            <h3 class="mb-4">Save Actions</h3>
-
+            </div>
+            
             <?php
-            // Unsaved changes update the state of a button
-            $aria_disabled_state = true;
-            $disabled_class = 'disabled';
-            $cookie_name = "queue_report_" . $report_id . "_filter_change";
-            if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
-                $aria_disabled_state = false;
-                $disabled_class = '';    
-            }
+                // Unsaved changes update the state of a button
+                $aria_disabled_state = true;
+                $extra_classes = 'disabled visually-hidden';
+                $hidden_class = 'visually-hidden';
+                $cookie_name = "queue_report_" . $report_id . "_filter_change";
+                if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
+                    $aria_disabled_state = false;
+                    $disabled_class = '';    
+                    $hidden_class = '';
+                }
             ?>
 
-            <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-lg btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                Cancel Updates
-            </a> 
-            <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-lg btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                Preview Updates
-            </a> 
-            <a href="actions/save_report_filter_change.php?last_view=report_settings&report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-lg <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                Save for Everyone
-            </a>
+            <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded <?php echo $hidden_class;?>" style="display:inline-block">
+                <h4 class="visually-hidden">Filter Save Actions</h3>
 
+                <a href="actions/save_report_filter_change.php?last_view=report_settings&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                    Save Filters for Everyone
+                </a>
+                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                    Preview Filter Updates
+                </a> 
+                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                    Cancel Updates
+                </a> 
+            </div>
         </div>
         <div class="border-top py-4">
             <h3 class="mb-4">Danger Zone</h3>
             <p>
-                <a href="actions/delete_report.php" class="btn btn-lg btn-danger">Delete Report</a>
+                <a href="actions/delete_report.php" class="btn btn-danger">Delete Report</a>
             </p>
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var reportTitleInput = document.getElementById('reportTitle');
+        var updateButton = document.querySelector('button[type="submit"]');
+
+        reportTitleInput.addEventListener('keyup', function() {
+            // Remove the 'disabled' and 'visually-hidden' classes from the button
+            updateButton.classList.remove('disabled', 'visually-hidden');
+
+            // Update the 'aria-disabled' attribute to 'false'
+            updateButton.setAttribute('aria-disabled', 'false');
+        });
+    });
+</script>

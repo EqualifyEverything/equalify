@@ -5,8 +5,8 @@ function the_report_filter_search($report_id) {
 
 <link rel="stylesheet" href="vendor/bbertucc/accessible-autocomplete/dist/accessible-autocomplete.min.css" />
 <script type="text/javascript" src="vendor/bbertucc/accessible-autocomplete/dist/accessible-autocomplete.min.js"></script>
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-    Add Filters
+<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+    Add Filter
 </button>
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
