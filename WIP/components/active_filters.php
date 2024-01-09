@@ -6,7 +6,7 @@ function the_active_filters($report_id, $report_filters) {
     if(empty($report_filters)){
 ?>
     
-<p>No active filters.</p>
+<div class="w-100 mb-2">No active filters.</div>
 
 <?php
     }else{
