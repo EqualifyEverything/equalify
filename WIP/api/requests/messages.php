@@ -14,10 +14,6 @@ function build_where_clauses($filters = []) {
         $tagIds = implode(',', array_map('intval', $filters['tags']));
         $whereClauses[] = "tr.tag_id IN ($tagIds)";
     }
-    if (!empty($filters['messages'])) {
-        $messageIds = implode(',', array_map('intval', $filters['messages']));
-        $whereClauses[] = "m.message_id IN ($messageIds)";
-    }
     if (!empty($filters['pages'])) {
         $pageIds = implode(',', array_map('intval', $filters['pages']));
         $whereClauses[] = "o.occurrence_page_id IN ($pageIds)";
@@ -25,6 +21,10 @@ function build_where_clauses($filters = []) {
     if (!empty($filters['properties'])) {
         $propertyIds = implode(',', array_map('intval', $filters['properties']));
         $whereClauses[] = "o.occurrence_property_id IN ($propertyIds)";
+    }
+    if (!empty($filters['messages'])) {
+        $messageIds = implode(',', array_map('intval', $filters['messages']));
+        $whereClauses[] = "m.message_id IN ($messageIds)";
     }
     if (!empty($filters['statuses'])) {
         $statuses = $filters['statuses'];

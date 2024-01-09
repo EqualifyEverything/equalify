@@ -1,5 +1,14 @@
 <?php
-function build_where_clauses_for_properties($filters = []) {
+function build_join_clauses($filters = []) {
+    $joinClauses = "";
+    if (!empty($filters['tags'])) {
+        // Add join with tag_relationships table only if tags filter is used
+        $joinClauses .= " INNER JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id";
+    }
+    return $joinClauses;
+}
+
+function build_where_clauses($filters = []) {
     $whereClauses = [];
     if (!empty($filters['tags'])) {
         $tagIds = implode(',', array_map('intval', $filters['tags']));
@@ -30,8 +39,10 @@ function build_where_clauses_for_properties($filters = []) {
 
 function count_total_properties($filters = []) {
     global $pdo;
+    
+    $joinClauses = build_join_clauses($filters);
+    $whereClauses = build_where_clauses($filters);
 
-    $whereClauses = build_where_clauses_for_properties($filters);
     $count_sql = "
         SELECT 
             COUNT(DISTINCT p.property_id) 
@@ -39,10 +50,9 @@ function count_total_properties($filters = []) {
             properties p 
         INNER JOIN 
             occurrences o ON p.property_id = o.occurrence_property_id 
-        INNER JOIN 
-        tag_relationships tr ON o.occurrence_id = tr.occurrence_id 
+        $joinClauses
         $whereClauses
-    ";
+        ";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
@@ -50,7 +60,9 @@ function count_total_properties($filters = []) {
 function fetch_properties($results_per_page, $offset, $filters = []) {
     global $pdo;
 
-    $whereClauses = build_where_clauses_for_properties($filters);
+    $joinClauses = build_join_clauses($filters);
+    $whereClauses = build_where_clauses($filters);
+
     $sql = "
         SELECT 
             p.property_id,
@@ -59,8 +71,7 @@ function fetch_properties($results_per_page, $offset, $filters = []) {
             properties p
         INNER JOIN 
             occurrences o ON p.property_id = o.occurrence_property_id
-        INNER JOIN 
-            tag_relationships tr ON o.occurrence_id = tr.occurrence_id
+        $joinClauses
         $whereClauses
         GROUP BY p.property_id
         LIMIT $results_per_page OFFSET $offset
