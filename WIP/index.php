@@ -43,7 +43,7 @@ require_once('db.php');
         }else{
 
             // This is the defaul view
-            require_once 'views/report.php';
+            require_once 'views/reports.php';
 
         }
         ?>
