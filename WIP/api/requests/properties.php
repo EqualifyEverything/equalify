@@ -32,7 +32,17 @@ function count_total_properties($filters = []) {
     global $pdo;
 
     $whereClauses = build_where_clauses_for_properties($filters);
-    $count_sql = "SELECT COUNT(DISTINCT p.property_id) FROM properties p LEFT JOIN occurrences o ON p.property_id = o.occurrence_property_id LEFT JOIN tag_relationships tr ON o.occurrence_id = tr.occurrence_id $whereClauses";
+    $count_sql = "
+        SELECT 
+            COUNT(DISTINCT p.property_id) 
+        FROM 
+            properties p 
+        INNER JOIN 
+            occurrences o ON p.property_id = o.occurrence_property_id 
+        INNER JOIN 
+        tag_relationships tr ON o.occurrence_id = tr.occurrence_id 
+        $whereClauses
+    ";
     $stmt = $pdo->query($count_sql);
     return $stmt->fetchColumn();
 }
@@ -47,9 +57,9 @@ function fetch_properties($results_per_page, $offset, $filters = []) {
             p.property_name
         FROM 
             properties p
-        LEFT JOIN 
+        INNER JOIN 
             occurrences o ON p.property_id = o.occurrence_property_id
-        LEFT JOIN 
+        INNER JOIN 
             tag_relationships tr ON o.occurrence_id = tr.occurrence_id
         $whereClauses
         GROUP BY p.property_id
