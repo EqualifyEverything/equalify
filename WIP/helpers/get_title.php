@@ -1,7 +1,4 @@
 <?php
-// The DB can be used by required info
-require_once('db.php');
-
 function get_title($id, $view){
     global $pdo;
 
