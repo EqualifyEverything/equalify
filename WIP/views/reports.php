@@ -6,9 +6,9 @@ require_once('helpers/get_reports.php');
 
 <div class="container">
     <div class="d-flex flex-column flex-md-row align-items-center my-4">
-        <h1 class="display-4">Reports</h1>
+        <h1 class="display-5">Reports</h1>
         <div class="ms-md-auto">
-            <a class="btn btn-primary" href="index.php?view=report_settings">New Report</a>
+            <a class="btn btn-primary" href="actions/create_report.php">New Report</a>
         </div>
     </div>
     <div id="reports_content" class="row row-cols-1 row-cols-md-3 g-4 justify-content-md-center">
