@@ -50,7 +50,7 @@ try {
     $stmt->execute();
 
     // Redirect on success
-    header("Location: ../index.php?view=settings&property_id=" . urlencode($property_id) . "&success=" .urlencode('"'.$_POST['property_name'].'" property updated.'));
+    header("Location: ../index.php?view=settings&property_id=" . urlencode($property_id) . "&success=" .urlencode('"'.$_POST['property_name'].'" property saved.'));
     exit;
 
 } catch (Exception $e) {
