@@ -45,7 +45,7 @@ if(!empty($report_id)){
         <div class="col-6">
             <div class="card p-4 h-100">
                 <h3>AI Analysis <span class="badge rounded-pill ounded-pill text-bg-dark">Experimental</span></h3>
-                <p>From available Equalify data on this message, lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium aspernatur sint minima non, dolores consectetur veritatis eos iusto fugit totam nobis veniam officia modi accusantium amet sequi, incidunt porro iste.</p>
+                <p>From available Equalify data related to this message, this feature was unable to load properly. Please try again.</p>
                 <p class="text-body-secondary border-top pt-2"><strong>NOTE: This feature is experimental.</strong> We're testing how large language models interpret your scan results. <a href="#" class="link-secondary">Contact us</a> to let us know what you think.</p>
             </div>
         </div>

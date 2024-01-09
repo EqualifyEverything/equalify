@@ -1,7 +1,6 @@
 <?php
 // Helpers
 require_once('helpers/get_reports.php');
-
 ?>
 
 <div class="container">
