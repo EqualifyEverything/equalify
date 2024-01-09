@@ -94,7 +94,6 @@ $_SESSION['report_id'] = $report_id;
 
             <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded <?php echo $hidden_class;?>" style="display:inline-block">
                 <h4 class="visually-hidden">Filter Save Actions</h3>
-
                 <a href="actions/save_report_filter_change.php?last_view=report_settings&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
                     Save Filters for Everyone
                 </a>
