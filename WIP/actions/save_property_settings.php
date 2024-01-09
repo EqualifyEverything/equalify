@@ -37,7 +37,7 @@ try {
     }else{
 
         // New property statement
-        $stmt = $pdo->prepare("INSERT INTO properties (property_name, property_url, property_archived, property_crawl_type) VALUES (:property_name, :property_url, :property_archived)");
+        $stmt = $pdo->prepare("INSERT INTO properties (property_name, property_url, property_archived) VALUES (:property_name, :property_url, :property_archived)");
 
         // Bind the parameters
         $stmt->bindParam(':property_name', $_POST['property_name'], PDO::PARAM_STR);
