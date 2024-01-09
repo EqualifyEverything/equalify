@@ -1,9 +1,18 @@
 <?php
 // Helpers
 require_once('helpers/get_reports.php');
+
+// Components
+require_once('components/success_or_error_message.php');
 ?>
 
 <div class="container">
+
+    <?php
+    // Success or Error message
+    the_success_or_error_message();
+    ?>
+
     <div class="d-flex flex-column flex-md-row align-items-center my-4">
         <h1 class="display-5">Reports</h1>
         <div class="ms-md-auto">

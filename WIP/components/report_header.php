@@ -1,13 +1,13 @@
 <?php
-// Get helpers
+// Components 
+require_once('components/success_or_error_message.php');
+
+// Helpers
 require_once('helpers/get_title.php');
 
 // Creates a list of pages with the percent equalfied.
 function the_report_header() {
     global $report_id;
-
-    // The tag_id URL parameter defines the tag.
-    $view = isset($_GET['view']) ? $_GET['view'] : ''; 
 ?>
 
 <div class="pb-2 my-0 ">
@@ -22,14 +22,12 @@ function the_report_header() {
         <div class="container d-flex align-items-center justify-content-between py-4 ">
             Previewing Unsaved Report Settings
             <div>
-            <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-sm btn-outline-secondary">
-                Cancel Updates
-            </a> 
-            <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>&last_view=<?php echo $view;?>" class="btn btn-primary btn-sm">
-                Save for Everyone
-            </a>
-
-                
+                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-sm btn-outline-secondary">
+                    Cancel Updates
+                </a> 
+                <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-sm">
+                    Save for Everyone
+                </a>
             </div>
         </div>
     </div>
@@ -38,24 +36,32 @@ function the_report_header() {
     // End unsaved changes notice
     endif;
     ?>
+    
+    <div class="container">
 
-    <div class="d-flex flex-column flex-md-row align-items-center mt-4 container">
-        <h1 class="display-5" style="max-width:800px">
-            <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+        <?php
+        // Success or Error message
+        the_success_or_error_message();
+        ?>
 
-                <?php
-                // Page Title
-                echo get_title($report_id, 'report');
-                ?>
+        <div class="d-flex flex-column flex-md-row align-items-center mt-4">
+            <h1 class="display-5" style="max-width:800px">
+                <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
 
-            </a>
-        </h1>
-        <div class="ms-md-auto">
+                    <?php
+                    // Page Title
+                    echo get_title($report_id, 'report');
+                    ?>
 
-            <a class="btn btn-secondary" href="?view=report_settings&report_id=<?php echo $report_id;?>">
-                Edit Report
-            </a>
+                </a>
+            </h1>
+            <div class="ms-md-auto">
 
+                <a class="btn btn-secondary" href="?view=report_settings&report_id=<?php echo $report_id;?>">
+                    Edit Report
+                </a>
+
+            </div>
         </div>
     </div>
 </div>

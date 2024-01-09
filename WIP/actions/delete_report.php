@@ -26,7 +26,7 @@ $stmt->bindParam(':report_id', $report_id, PDO::PARAM_INT);
 $stmt->execute();
 
 // Redirect after successful deletion
-header("Location: ../index.php?view=reports");
+header("Location: ../index.php?view=reports&success=".urlencode("Report deletion successful."));
 exit;
 
 ?>

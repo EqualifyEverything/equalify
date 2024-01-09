@@ -28,7 +28,7 @@ try {
     $stmt->execute();
 
     // Redirect on success
-    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
+    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id). "&success=" . urlencode("Title updated successfully."));
     exit;
 } catch (Exception $e) {
     // Handle any errors

@@ -11,6 +11,9 @@ if($report_id == ''){
 require_once('helpers/get_title.php');
 require_once('helpers/get_report_filters.php');
 
+// Components
+require_once('components/success_or_error_message.php');
+
 // Handle Wrong Report Id
 $report_title =  get_title($report_id, 'report');
 if($report_title == 'Report Not Found'){
@@ -31,6 +34,12 @@ $_SESSION['report_id'] = $report_id;
 ?>
 
 <div class="container">
+
+    <?php
+    // Success or Error message
+    the_success_or_error_message();
+    ?>
+
     <h1 class="display-5 mt-4" style="max-width:800px">
         <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
 
@@ -54,21 +63,9 @@ $_SESSION['report_id'] = $report_id;
                     name="report_title" 
                     style="max-width: 400px" 
                     value="<?php echo get_title($report_id, 'report');?>"
-
-                    <?php 
-                    if(isset($_GET['error']))
-                        echo 'aria-describedby="validationServer03Feedback"';
-                    ?>
-
                     required
                 >
                 
-                <?php
-                // Error Message
-                if(isset($_GET['error']))
-                    '<div class="invalid-feedback">' . htmlspecialchars($_GET['error']) . '</div>';
-                ?>
-
             </div>
             <button type="submit" class="btn btn-primary visually-hidden mt-3 disabled" aria-disabled="true">Update Title</button>
         </form>
@@ -101,7 +98,7 @@ $_SESSION['report_id'] = $report_id;
 
             <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded <?php echo $hidden_class;?>" style="display:inline-block">
                 <h4 class="visually-hidden">Filter Save Actions</h3>
-                <a href="actions/save_report_filter_change.php?last_view=report_settings&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                <a href="actions/save_report_filter_change.php?&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
                     Save Filters for Everyone
                 </a>
                 <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">

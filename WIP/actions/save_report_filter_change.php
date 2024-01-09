@@ -24,7 +24,7 @@ $cookie_name = 'queue_report_' . $report_id . '_filter_change';
 setcookie($cookie_name, '',  time() + strtotime( '+30 days' ), '/');
 
 // Redirect the user to the report page with the report ID
-header("Location: ../index.php?view=$last_view&report_id=$report_id");
+header("Location: ../index.php?&report_id=$report_id&success=".urlencode("Report filters saved for everyone."));
 exit;
 
 ?>

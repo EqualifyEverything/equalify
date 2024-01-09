@@ -7,14 +7,14 @@ if($report_id == ''){
     );
 }
 
-// Let's get the various components we need to create the view.
+// Components
 require_once('components/report_header.php');
 require_once('components/chart.php');
 require_once('components/message_list.php');
 require_once('components/page_list.php');
 require_once('components/tag_list.php');
 
-// Lets get helpers we're using.
+// Helpers
 require_once('helpers/get_report_filters.php');
 
 $report_filters = get_report_filters()['as_string'];
