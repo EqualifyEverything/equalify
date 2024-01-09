@@ -11,6 +11,13 @@ if($report_id == ''){
 require_once('helpers/get_title.php');
 require_once('helpers/get_report_filters.php');
 
+// Handle Wrong Report Id
+$report_title =  get_title($report_id, 'report');
+if($report_title == 'Report Not Found'){
+    echo '<p class="display-4 text-center my-4">Report not found.</p>';
+    exit;
+}
+
 // Components
 require_once('components/report_filter_search.php');
 require_once('components/active_filters.php');
@@ -29,7 +36,7 @@ $_SESSION['report_id'] = $report_id;
 
             <?php
             // Page Title
-            echo get_title($report_id, 'report');
+            echo $report_title;
             ?>
 
         </a>
