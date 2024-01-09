@@ -32,7 +32,6 @@ require_once('components/success_or_error_message.php');
                     <?php 
                     // Property Name.
                     echo $property['property_name'];
-
                     // Archived badge is helpful to show what properties
                     // aren't being scanned.
                     if($property['property_archived'] == 1)
@@ -47,6 +46,15 @@ require_once('components/success_or_error_message.php');
                         <span class="visually-hidden">Edit Property</span>
                     </a>
                 </div>
+
+                <?php
+                $property_processed = $property['property_processed'];
+                if(!empty($property_processed)){
+                    $date_object = new DateTime($property_processed);
+                    $formatted_date = $date_object->format('m/d/y');
+                    echo '<small class="text-muted">Processed on '.$formatted_date.'.</small>'; 
+                }
+                ?>
             </div>
         </div>
 
