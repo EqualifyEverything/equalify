@@ -1,3 +1,8 @@
+<?php
+// Helpers
+require_once('helpers/get_reports.php');
+?>
+
 <div class="container">
     <div class="d-flex flex-column flex-md-row align-items-center my-4">
         <h1 class="display-4">Reports</h1>
@@ -9,9 +14,7 @@
 
     <?php
     // Show Scan Profiles
-    $reports = DataAccess::get_db_rows(
-        'reports', [], get_current_page_number()
-    );
+    $reports = get_reports();
     if( count($reports['content']) > 0 ):
         foreach($reports['content'] as $report): 
     ?>
