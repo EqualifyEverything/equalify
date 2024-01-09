@@ -2,35 +2,35 @@
 // Helpers
 require_once('helpers/get_property.php');
 
-// Let's setup variables so we don't have to deal
-// with empty conditions.
-$name = '';
-$url = '';
-$status = '';
-$crawl_type = '';
-$frequency = '';
-$tests = array();
-$property_id = $_GET['property_id'];
-
-// id is used to load existing property info.
-if(!empty($_GET['property_id'])){
+// Load existing property info.
+if(isset($_GET['property_id'])){
     
-    // Let's turn the ID into a session variable so
-    // we can safely save existing content.
-    session_start();
-    $_SESSION['property_id'] = $property_id; 
-
-    // The property should only return one row.
+    // Existing property values
+    $property_id = $_GET['property_id'];
     $property = get_property($property_id);
-
-    // These values are required, so if they don't
-    // return there's a problem.
     $name = $property['property_name'];
     $url = $property['property_url'];
     $archived = $property['property_archived'];
     $processed_date = $property['property_processed'];
     $processing = $property['property_processing'];
+
+// Default data for new properties
+}else{
+    
+    // Default data for new properties
+    $property_id ='';
+    $name = '';
+    $url = '';
+    $archived = '';
+    $processed_date = '';
+    $processing = '';
+
 }
+
+// Let's turn the ID into a session variable so
+// we can safely save existing content.
+session_start();
+$_SESSION['property_id'] = $property_id; 
 
 ?>
 
