@@ -10,7 +10,7 @@ require_once('helpers/get_reports.php');
             <a class="btn btn-primary" href="actions/create_report.php">New Report</a>
         </div>
     </div>
-    <div id="reports_content" class="row row-cols-1 row-cols-md-3 g-4 justify-content-md-center">
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-md-center">
 
     <?php
     // Show Scan Profiles
@@ -39,68 +39,3 @@ require_once('helpers/get_reports.php');
 
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    createChart('chart1', 'Dataset 1', [110, 120, 130, 140, 150, 230], 'rgba(11, 101, 21, 1)');
-    createChart('chart2', 'Dataset 2', [210, 220, 230, 240, 250, 330], 'rgba(101, 11, 21, 1)');
-    createChart('chart3', 'Dataset 3', [310, 320, 330, 340, 350, 430], 'rgba(21, 11, 101, 1)');
-});
-
-function createChart(canvasId, label, data, borderColor) {
-    var ctx = document.getElementById(canvasId).getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Jul '23", "Aug '23", "Sep '23", "Oct '23", "Nov '23", "Dec '23"],
-            datasets: [
-                {
-                    label: label,
-                    fill: true,
-                    data: data,
-                    borderColor: borderColor,
-                    backgroundColor: borderColor.replace('1)', '0.6)'),
-                }
-            ]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            elements: {
-                line: {
-                    borderWidth: 2
-                }
-            },
-            scales: {
-                x: {
-                    grid:{
-                        display: false
-                    },
-                    ticks: {
-                        display: false
-                    },
-                    border: {
-                        color: borderColor,
-                        width: 2
-                    }
-                },
-                y: {
-                    grid:{
-                        display: true,
-                    },
-                    ticks: {
-                        display: false,
-                    },
-                    border: {
-                        display: false
-                    }
-                }
-
-            }
-        }
-    });
-}
-</script>
