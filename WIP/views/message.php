@@ -41,25 +41,11 @@ if(!empty($report_id)){
     ?>
 
     </h2>
-    <div class="row">
-        <div class="col-6">
-            <div class="card p-4 h-100">
-                <h3>AI Analysis <span class="badge rounded-pill ounded-pill text-bg-dark">Experimental</span></h3>
-                <p>From available Equalify data related to this message, this feature was unable to load properly. Please try again.</p>
-                <p class="text-body-secondary border-top pt-2"><strong>NOTE: This feature is experimental.</strong> We're testing how large language models interpret your scan results. <a href="#" class="link-secondary">Contact us</a> to let us know what you think.</p>
-            </div>
-        </div>
-        <div class="col-6">
-
-            <?php
-            // Chart
-            the_chart($new_report_filters);
-            ?>
-
-        </div>
-    </div>
 
     <?php
+    // Chart
+    the_chart($new_report_filters);
+
     // Message Occurrences
     the_message_occurrences_list($new_report_filters);
     ?>
