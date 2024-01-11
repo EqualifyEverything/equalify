@@ -16,14 +16,21 @@ try {
         exit;
     }
 
-    // Fetch the next scan
-    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL LIMIT 1;");
+    // Fetch a priority scan
+    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_priority = 1 LIMIT 1;");
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // If no priority scans fetch the next scan
     if (!$row) {
-        // Stop process if there is no scan.
-        echo date('Y-m-d H:i:s').": No scans to process.\n";
-        exit;
+        $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL LIMIT 1;");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            // Stop process if there is no scan.
+            echo date('Y-m-d H:i:s').": No scans to process.\n";
+            exit;
+        }
     }
 
     // Define property id and job id.
@@ -181,6 +188,11 @@ try {
     // Insert tags relationships into db
     add_tag_relationships($new_occurrence_tag_relationships);
 
+    // Count occurrences for logging
+    $count_reactivated_occurrences = count($reactivated_occurrences);
+    $count_equalified_occurrences = count($equalified_occurrences);
+    $count_new_occurrence_ids = count($new_occurrence_ids);
+
     // Update statuses in the database
     $update_stmt = $pdo->prepare("UPDATE occurrences SET occurrence_status = ? WHERE occurrence_id = ?");
     foreach ($reactivated_occurrences as $id) {
@@ -203,9 +215,8 @@ try {
 
     // On success delete scan
     delete_scan($job_id);
-    $count_reactivated_occurrences = count($reactivated_occurrences);
-    $count_equalified_occurrences = count($equalified_occurrences);
-    $count_new_occurrence_ids = count($new_occurrence_ids);
+
+    // Log output.
     echo date('Y-m-d H:i:s').": Success! Scan $job_id processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.\n";
 
 } catch (Exception $e) {
