@@ -1,4 +1,7 @@
 <?php
+// Let's get things going!
+require_once 'init.php';
+
 // Required components
 require_once('components/active_class.php');
 
