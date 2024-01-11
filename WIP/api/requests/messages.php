@@ -77,7 +77,7 @@ function fetch_messages( $results_per_page, $offset, $filters = []) {
         $joinClauses
         $whereClauses
         GROUP BY m.message_id
-        ORDER BY SUM(o.occurrence_status = 'equalified') + SUM(o.occurrence_status = 'active') + SUM(o.occurrence_status = 'ignored') DESC, m.message_id
+        ORDER BY SUM(o.occurrence_status = 'active') DESC, m.message_id
         LIMIT $results_per_page OFFSET $offset
     ";
 
