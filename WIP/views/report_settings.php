@@ -88,6 +88,7 @@ $_SESSION['report_id'] = $report_id;
                 $aria_disabled_state = true;
                 $extra_classes = 'disabled visually-hidden';
                 $hidden_class = 'visually-hidden';
+                $disabled_class = 'disabled';
                 $cookie_name = "queue_report_" . $report_id . "_filter_change";
                 if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
                     $aria_disabled_state = false;
