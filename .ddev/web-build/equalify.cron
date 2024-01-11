@@ -1,0 +1,2 @@
+*/1 * * * * php /var/www/html/WIP/engine/process_scan.php >> /var/www/html/WIP/engine/cron.log 2>&1
+*/1 * * * * php /var/www/html/WIP/engine/process_property.php >> /var/www/html/WIP/engine/cron.log 2>&1
