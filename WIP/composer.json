@@ -2,7 +2,15 @@
     "require": {
         "twbs/bootstrap": "^5.3.2",
         "alphagov/accessible-autocomplete": "2.0.4",
-        "php": "^8.1.1"
+        "php": "^8.1.1",
+        "vlucas/phpdotenv": "^5.6",
+        "auth0/auth0-php": "^8.10",
+        "nyholm/psr7": "^1.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "repositories": [
         {
