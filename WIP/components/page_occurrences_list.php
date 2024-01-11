@@ -6,7 +6,15 @@ function the_occurrence_list($filters = '')
 ?>
 
 <div class="card my-2 p-4 table-responsive">
-    <h3 class="visually-hidden">Occurrences</h3>
+    <div class="d-flex flex-column flex-md-row align-items-center">
+        <h3>Messages on Page</h3>
+        <div class="ms-md-auto">
+            <a href="actions/rescan.php?<?php echo $filters;?>" class="btn btn-sm btn-primary">
+                Rescan Page
+            </a>
+        </div>
+    </div>
+
     <div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-5">
