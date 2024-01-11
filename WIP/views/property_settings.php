@@ -74,7 +74,7 @@ $_SESSION['property_id'] = $property_id;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="actions/delete_property.php" class="btn btn-danger">Yes, Delete the Property</a>';
+        <a href="actions/delete_property.php" class="btn btn-danger">Yes, Delete the Property</a>
       </div>
     </div>
   </div>
