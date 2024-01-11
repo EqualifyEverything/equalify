@@ -51,7 +51,7 @@ function get_next_property_to_process() {
     WHERE 
         (property_archived != 1 OR property_archived IS NULL) AND
         (property_processing != 1 OR property_processing IS NULL) AND
-        (property_processed IS NULL OR property_processed <= DATE_SUB(NOW(), INTERVAL 1 DAY)) AND
+        (property_processed IS NULL OR property_processed <= DATE_SUB(NOW(), INTERVAL 7 DAY)) AND
         NOT EXISTS (
             SELECT 1 FROM properties WHERE property_processing = 1
         )
