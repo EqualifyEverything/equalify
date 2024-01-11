@@ -32,10 +32,6 @@ require_once('components/success_or_error_message.php');
                     <?php 
                     // Property Name.
                     echo $property['property_name'];
-                    // Archived badge is helpful to show what properties
-                    // aren't being scanned.
-                    if($property['property_archived'] == 1)
-                        echo ' <span class="badge text-bg-secondary" aria-label="status">Archived</span>';
                     ?>
 
                     <a class="icon-link float-end" style="--bs-link-hover-color-rgb: 25, 135, 84;" href="index.php?view=property_settings&property_id=<?php echo $property['property_id'];?>">

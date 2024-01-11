@@ -10,7 +10,6 @@ if(isset($_GET['property_id'])){
     $property = get_property($property_id);
     $name = $property['property_name'];
     $url = $property['property_url'];
-    $archived = $property['property_archived'];
     $processed_date = $property['property_processed'];
     $processing = $property['property_processing'];
 
@@ -21,7 +20,6 @@ if(isset($_GET['property_id'])){
     $property_id ='';
     $name = '';
     $url = '';
-    $archived = '';
     $processed_date = '';
     $processing = '';
 
@@ -43,15 +41,6 @@ $_SESSION['property_id'] = $property_id;
                     <label for="property_name" class="form-label h4">Property Name</label>
                     <input id="property_name"  name="property_name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
                 </div>
-                <div class="col-3">
-                    <label for="property_archived" class="form-label h4">Status</label>
-                    <select id="property_archived" name="property_archived" class="form-select form-select-lg">
-                        <option value="" <?php if($archived == 0 || $archived == false || empty($archived)) echo 'selected';?>>Active</option>
-                        <option value="1" <?php if($archived == 1 || $archived == true) echo 'selected';?>>Archived</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
                 <div class="col">
                     <label for="property_url" class="form-label h4">Sitemap URL</label>
                     <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" placeholder="https://equalify.app/sitemap.xml" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
@@ -62,7 +51,28 @@ $_SESSION['property_id'] = $property_id;
                 <button type="submit" id="submit" class="btn btn-lg btn-primary">
                     Save Property
                 </button>
+                <button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">
+                    Delete Property
+                </button>
             </div>
         </form> 
     </div>
 </div>
+<div class="modal fade" id="deletionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title fs-5" id="modalLabel">Are you sure you want to delete the property?</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Deleting a property will remove all data associated with the property. You cannot undo a deletion.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="actions/delete_property.php" class="btn btn-danger">Yes, Delete the Property</a>
+      </div>
+    </div>
+  </div>
+</div>
+
