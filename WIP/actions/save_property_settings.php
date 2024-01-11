@@ -2,8 +2,11 @@
 // Start the session
 session_start();
 
-// Include dependencies
+// Dependencies
 require_once '../db.php';
+
+// Helpers
+require_once '../helpers/get_property.php';
 
 try {
     // Check if property_name is set and not empty
@@ -25,13 +28,24 @@ try {
     if(!empty($_SESSION['property_id'])){
         $property_id = $_SESSION['property_id'];
 
+        // If URL is updated, force processing.
+        $existing_property_url = get_property($property_id)['property_url'];
+        if($existing_property_url !== $_POST['property_url']){
+            // We can force processing by removing the timestamp
+            $property_processed = NULL;
+        }else{
+            // Keep the timestamp for old properties
+            $property_processed = get_property($property_id)['property_processed'];
+        }
+
         // Existing property SQL statement
-        $stmt = $pdo->prepare("UPDATE properties SET property_name = :property_name, property_url = :property_url, property_archived = :property_archived WHERE property_id = :property_id");
+        $stmt = $pdo->prepare("UPDATE properties SET property_name = :property_name, property_url = :property_url, property_archived = :property_archived, property_processed = :property_processed WHERE property_id = :property_id");
 
         // Bind the parameters
         $stmt->bindParam(':property_name', $_POST['property_name'], PDO::PARAM_STR);
         $stmt->bindParam(':property_url', $_POST['property_url'], PDO::PARAM_STR);
         $stmt->bindParam(':property_archived', $property_archived, PDO::PARAM_INT);
+        $stmt->bindParam(':property_processed', $property_processed, PDO::PARAM_STR);
         $stmt->bindParam(':property_id', $property_id, PDO::PARAM_INT);
 
     }else{
