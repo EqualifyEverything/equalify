@@ -7,12 +7,12 @@ function the_message_occurrences_list($filters = '')
 
 <div class="card my-2 p-4">
     <div class="d-flex flex-column flex-md-row align-items-center">
-            <h3>Occurrences</h3>
-            <div class="ms-md-auto">
-                <a href="actions/rescan.php?<?php echo $filters;?>" class="btn btn-sm btn-primary">
-                    Rescan All
-                </a>
-            </div>
+        <h3>Occurrences</h3>
+        <div class="ms-md-auto">
+            <a href="actions/rescan.php?<?php echo $filters;?>" class="btn btn-sm btn-primary">
+                Rescan All
+            </a>
+        </div>
     </div>
     <div class="table-responsive">
         <table class="table table-striped">
