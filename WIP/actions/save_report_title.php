@@ -1,9 +1,9 @@
 <?php
+// Add initialization info
+require_once('../init.php');
+
 // Start the session
 session_start();
-
-// Include dependencies
-require_once '../db.php';
 
 try {
     // Check if report_title is set and not empty

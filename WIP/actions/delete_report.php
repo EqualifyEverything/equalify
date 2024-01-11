@@ -1,4 +1,7 @@
 <?php
+// Add initialization info
+require_once('../init.php');
+
 // Start the session
 session_start();
 
@@ -9,9 +12,6 @@ if (!isset($_SESSION['report_id'])) {
     );
     exit;
 }
-
-// Include dependencies
-require_once '../db.php';
 
 // Retrieve report_id from session
 $report_id = $_SESSION['report_id'];

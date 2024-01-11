@@ -1,9 +1,9 @@
 <?php
+// Add initialization info
+require_once('../init.php');
+
 // Start the session
 session_start();
-
-// Dependencies
-require_once '../db.php';
 
 // Helpers
 require_once '../helpers/get_property.php';

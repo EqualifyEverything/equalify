@@ -1,6 +1,8 @@
 <?php
+// Add initialization info
+require_once('../init.php');
+
 session_start();
-require_once '../db.php';
 
 try {
     // Assuming $property_id is obtained securely (e.g., from session or validated POST data)

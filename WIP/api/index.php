@@ -2,8 +2,8 @@
 // Set content type
 header('Content-Type: application/json');
 
-// Include the database connection
-require_once('../db.php');
+// Add initialization info
+require_once('../init.php');
 
 // Define the base path for request files
 define('REQUEST_BASE_PATH', __DIR__ . '/requests/');

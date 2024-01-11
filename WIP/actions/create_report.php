@@ -1,7 +1,6 @@
 <?php
-
-// Include dependencies
-require_once '../db.php';
+// Add initialization info
+require_once('../init.php');
 
 // Prepare the SQL statement
 $stmt = $pdo->prepare("INSERT INTO reports (report_title) VALUES (:report_title)");

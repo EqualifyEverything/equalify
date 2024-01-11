@@ -1,6 +1,8 @@
 <?php
+// Add initialization info
+require_once('../init.php');
+
 // Include dependencies
-require_once '../db.php';
 require_once '../helpers/get_report_filters.php';
 
 // Get report ID

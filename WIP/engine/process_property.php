@@ -1,10 +1,8 @@
 <?php
-// Since this file can run in cron, we must set the 
-// directory if it isn't already set.
+// Initialization Info
 if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
-    require_once(__ROOT__.'/init.php'); 
-    require_once(__ROOT__.'/db.php'); 
+require_once(__ROOT__.'/init.php'); 
 
 try {
 

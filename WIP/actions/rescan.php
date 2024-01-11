@@ -1,6 +1,6 @@
 <?php
-// Include dependencies
-require_once '../db.php';
+// Add initialization info
+require_once('../init.php');
 
 // TODO: Add meta with meta_name rescan and value with $filters 
 

@@ -5,9 +5,6 @@ require_once 'init.php';
 // Required components
 require_once('components/active_class.php');
 
-// Helpers
-require_once('db.php');
-
 ?>
 
 <!DOCTYPE html>

@@ -7,7 +7,7 @@ This is a private version of Equalify.
 We'll keep V1 code private until we're successfully sustaining our open-source development with paid users.
 
 ## Setup
-- Create `.env` with
+1. Create `.env` with
 ```
 ## DB Info
 MODE='managed'
@@ -28,7 +28,8 @@ AUTH0_COOKIE_SECRET=
 # A url your application is accessible from. Update this as appropriate.
 AUTH0_BASE_URL=
 ```
-- Make sure you have the cron running to support `process_scan.php` and `process_sitemap.php`. The cron file should include something like this:
+2. Run `php install.php` to create the tables.
+3. Make sure you have the cron running to support `process_scan.php` and `process_sitemap.php`. The cron file should include something like this:
 ```
 */1 * * * * php /var/www/html/WIP/engine/process_scan.php >> /var/www/html/WIP/engine/cron.log 2>&1
 */1 * * * * php /var/www/html/WIP/engine/process_property.php >> /var/www/html/WIP/engine/cron.log 2>&1
