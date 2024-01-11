@@ -30,7 +30,7 @@ require_once('db.php');
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="<?php the_active_class('settings');?> nav-link">Settings</a></li>
-                <li class="nav-item"><a href="#" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
+                <li class="nav-item"><a href="index.php?view=account" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
             </ul>
         </div>
     </header>
