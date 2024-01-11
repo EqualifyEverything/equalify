@@ -51,9 +51,13 @@ $_SESSION['property_id'] = $property_id;
                 <button type="submit" id="submit" class="btn btn-lg btn-primary">
                     Save Property
                 </button>
-                <button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">
-                    Delete Property
-                </button>
+
+                <?php
+                // Only show disabled link for exiting properties
+                if(isset($_GET['property_id']))
+                  echo '<button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">Delete Property</button>';
+                ?>
+                
             </div>
         </form> 
     </div>
@@ -70,7 +74,7 @@ $_SESSION['property_id'] = $property_id;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="actions/delete_property.php" class="btn btn-danger">Yes, Delete the Property</a>
+        <a href="actions/delete_property.php" class="btn btn-danger">Yes, Delete the Property</a>';
       </div>
     </div>
   </div>
