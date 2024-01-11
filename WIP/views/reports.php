@@ -43,7 +43,9 @@ require_once('components/success_or_error_message.php');
 
     <?php 
     // End Reports
-    endforeach; endif;
+    endforeach; 
+    else: echo '<p class="lead text-center">No reports.</p>';
+    endif;
     ?>
 
     </div>
