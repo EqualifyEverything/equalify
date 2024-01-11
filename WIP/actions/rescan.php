@@ -2,7 +2,7 @@
 // Include dependencies
 require_once '../db.php';
 
-// Add meta with meta_name rescan and value with $filters 
+// TODO: Add meta with meta_name rescan and value with $filters 
 
 // Parse filters
 $filters = [];
@@ -109,7 +109,7 @@ $insertQuery .= implode(', ', $insertValues);
 $insertStmt = $pdo->prepare($insertQuery);
 $insertStmt->execute($params);
 
-// Add logic to engine that removes $filters once related scans are complete
+// TODO: Add logic to engine that removes $filters once related scans are complete
 
-// Add logic to add to deactivate Rescan button if scan is queued.
+// TODO: Add logic to add to deactivate Rescan button if scan is queued.
 
