@@ -3,7 +3,8 @@
 // Assuming this script is process_scan.php
 if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__.'/db.php');
+    require_once(__ROOT__.'/init.php'); 
+    require_once(__ROOT__.'/db.php');
 
 try {
 

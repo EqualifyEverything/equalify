@@ -1,6 +1,5 @@
 <?php
 // These configs are used to setup Equalify's database and execution.
-
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
 $dotenv->load();
