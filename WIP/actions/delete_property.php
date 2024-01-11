@@ -62,7 +62,7 @@ try {
     $pdo->commit();
 
     // Success redirection or message
-    header("Location: ../index.php?view=setting&success=Property and related data deleted.");
+    header("Location: ../index.php?view=settings&success=Property and related data deleted.");
     exit;
     
 } catch (Exception $e) {
