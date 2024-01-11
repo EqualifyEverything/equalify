@@ -15,7 +15,7 @@ try {
         update_property_processing_data($next['property_id'], 1);
         
         // We'll generate the property
-        $results = get_property_results($next['property_url'], $next['property_crawl_type']);
+        $results = get_property_results($next['property_url']);
 
         if(results_are_valid_format($results) == TRUE)
             save_to_database($results, $next['property_id']);
@@ -46,7 +46,6 @@ function get_next_property_to_process() {
     $query = "
         SELECT 
         property_id, 
-        property_crawl_type, 
         property_url 
     FROM properties
     WHERE 
@@ -86,16 +85,10 @@ function update_property_processing_data($property_id, $property_processing = NU
     ]);
 }
 
-function get_property_results($property_url, $property_crawl_type) {
+function get_property_results($property_url) {
     
     // Set API endpoint
-    if($property_crawl_type == 'sitemap'){
-        $api_url = 'http://198.211.98.156/generate/sitemapurl';
-    }elseif($property_crawl_type == 'single_page'){
-        $api_url = 'http://198.211.98.156/generate/url';
-    }else{
-        throw new Exception("'$property_crawl_type' is not a valied crawl type");
-    }
+    $api_url = 'http://198.211.98.156/generate/sitemapurl';
 
     // Prepare the payload
     $data = json_encode(array("url" => $property_url));
