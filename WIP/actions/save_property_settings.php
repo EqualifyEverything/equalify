@@ -64,12 +64,12 @@ try {
     $stmt->execute();
 
     // Redirect on success
-    header("Location: ../index.php?view=settings&property_id=" . urlencode($property_id) . "&success=" .urlencode('"'.$_POST['property_name'].'" property saved.'));
+    header("Location: ../index.php?view=settings&success=" .urlencode('"'.$_POST['property_name'].'" property saved.'));
     exit;
 
 } catch (Exception $e) {
     // Handle any errors
-    header("Location: ../index.php?view=settings&property_id=" . urlencode($property_id) . "&error=" . urlencode($e->getMessage()));
+    header("Location: ../index.php?view=settings&error=" . urlencode($e->getMessage()));
 
     exit;
 }
