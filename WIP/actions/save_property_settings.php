@@ -63,6 +63,9 @@ try {
     // Execute the statement
     $stmt->execute();
 
+    // Remove session token to prevent unintended submissions.
+    $_SESSION['property_id'] = '';
+
     // Redirect on success
     header("Location: ../index.php?view=settings&success=" .urlencode('"'.$_POST['property_name'].'" property saved.'));
     exit;

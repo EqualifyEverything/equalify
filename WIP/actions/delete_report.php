@@ -25,6 +25,10 @@ $stmt->bindParam(':report_id', $report_id, PDO::PARAM_INT);
 // Execute the statement
 $stmt->execute();
 
+// Remove session token to prevent unintended submissions.
+$_SESSION['report_id'] = '';
+
+
 // Redirect after successful deletion
 header("Location: ../index.php?view=reports&success=".urlencode("Report deletion successful."));
 exit;

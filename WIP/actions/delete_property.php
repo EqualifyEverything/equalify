@@ -63,6 +63,9 @@ try {
     // Commit transaction
     $pdo->commit();
 
+    // Remove session token to prevent unintended submissions.
+    $_SESSION['property_id'] = '';
+
     // Success redirection or message
     header("Location: ../index.php?view=settings&success=Property and related data deleted.");
     exit;

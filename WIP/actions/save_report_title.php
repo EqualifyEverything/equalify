@@ -27,9 +27,13 @@ try {
     // Execute the statement
     $stmt->execute();
 
+    // Remove session token to prevent unintended submissions.
+    $_SESSION['report_id'] = '';
+
     // Redirect on success
     header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id). "&success=" . urlencode("Title updated successfully."));
     exit;
+
 } catch (Exception $e) {
     // Handle any errors
     header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id) . "&error=" . urlencode($e->getMessage()));
