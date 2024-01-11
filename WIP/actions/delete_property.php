@@ -36,25 +36,27 @@ try {
     $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($reports as $report) {
-        $filters = json_decode($report['report_filters'], true);
+        if(!empty($report['report_filters'])){
+            $filters = json_decode($report['report_filters'], true);
 
-        // Check if filters contain the property and remove it
-        $filtersModified = false;
-        foreach ($filters as $key => $filter) {
-            if ($filter['filter_type'] == 'properties' && $filter['filter_id'] == $property_id) {
-                unset($filters[$key]);
-                $filtersModified = true;
+            // Check if filters contain the property and remove it
+            $filtersModified = false;
+            foreach ($filters as $key => $filter) {
+                if ($filter['filter_type'] == 'properties' && $filter['filter_id'] == $property_id) {
+                    unset($filters[$key]);
+                    $filtersModified = true;
+                }
             }
-        }
 
-        // Update the report if filters were modified
-        if ($filtersModified) {
-            $updatedFiltersJson = json_encode(array_values($filters));
-            $updateStmt = $pdo->prepare("UPDATE reports SET report_filters = :filters WHERE report_id = :report_id");
-            $updateStmt->execute([
-                ':filters' => $updatedFiltersJson,
-                ':report_id' => $report['report_id']
-            ]);
+            // Update the report if filters were modified
+            if ($filtersModified) {
+                $updatedFiltersJson = json_encode(array_values($filters));
+                $updateStmt = $pdo->prepare("UPDATE reports SET report_filters = :filters WHERE report_id = :report_id");
+                $updateStmt->execute([
+                    ':filters' => $updatedFiltersJson,
+                    ':report_id' => $report['report_id']
+                ]);
+            }
         }
     }
 
