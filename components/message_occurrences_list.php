@@ -7,7 +7,7 @@ function the_message_occurrences_list($filters = '')
 
 <div class="card my-2 p-4">
     <div class="d-flex flex-column flex-md-row align-items-center">
-        <h3>Occurrences</h3>
+        <h3>Occurrences of Message</h3>
         <div class="ms-md-auto">
             <a href="#" class="btn btn-sm btn-outline-primary">
                 AI Analysis
