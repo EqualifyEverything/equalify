@@ -9,7 +9,10 @@ function the_message_occurrences_list($filters = '')
     <div class="d-flex flex-column flex-md-row align-items-center">
         <h3>Occurrences</h3>
         <div class="ms-md-auto">
-            <a href="actions/rescan.php?<?php echo $filters;?>" class="btn btn-sm btn-primary">
+            <a href="#" class="btn btn-sm btn-outline-primary">
+                AI Analysis
+            </a>
+            <a href="actions/rescan.php?<?php echo $filters;?>" class="btn btn-sm btn-outline-primary">
                 Rescan All
             </a>
         </div>
