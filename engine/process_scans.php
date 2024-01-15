@@ -15,8 +15,8 @@ try {
         exit;
     }
 
-    // Set maximum scans
-    $max_scans = 100;
+    // Set maximum scans (20 seems to be as much as axe can process per minute)
+    $max_scans = 20;
 
     // Setup scans array
     $scans = array();
