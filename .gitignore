@@ -25,3 +25,5 @@ package-lock.json
 .phpunit.result.cache
 .env-**
 .env
+
+cron.log
