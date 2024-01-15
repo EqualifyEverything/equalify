@@ -96,14 +96,14 @@ foreach ($results as $index => &$row) {
 }
 
 // Add results into scan queue.
-$insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id, queued_scan_priority) VALUES ";
+$insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id, queued_scan_prioritized) VALUES ";
 $insertValues = [];
 $params = [];
 foreach ($results as $index => $result) {
-    $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :queued_scan_priority{$index})";
+    $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :queued_scan_prioritized{$index})";
     $params[":jobId{$index}"] = $result['job_id']; 
     $params[":propertyId{$index}"] = $result['occurrence_property_id'];
-    $params[":queued_scan_priority{$index}"] = 1;
+    $params[":queued_scan_prioritized{$index}"] = 1;
 }
 $insertQuery .= implode(', ', $insertValues);
 $insertStmt = $pdo->prepare($insertQuery);

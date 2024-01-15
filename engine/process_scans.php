@@ -21,17 +21,17 @@ try {
     // Setup scans array
     $scans = array();
 
-    // Fetch up to five priority scan
-    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_priority = 1 LIMIT $max_scans;");
+    // Fetch up to five prioritized scan
+    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_prioritized = 1 LIMIT $max_scans;");
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if(!empty($results))
         $scans = array_merge($scans, $results);
 
-    // If no priority scans fetch the next scan
+    // If no prioritized scans fetch the next scan
     if (count($scans) < $max_scans || empty($scans)) {
         $scan_limit = $max_scans - count($scans);
-        $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL AND queued_scan_priority IS NULL LIMIT $scan_limit;");
+        $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL AND queued_scan_prioritized IS NULL LIMIT $scan_limit;");
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if(!empty($results))
