@@ -5,3 +5,4 @@ vendor/
 .env
 .github
 .vscode
+.DS_Store
