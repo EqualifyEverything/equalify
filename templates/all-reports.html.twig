@@ -1,0 +1,40 @@
+{# {% extends 'base-header.html.twig' %} #}
+
+{% block content %}
+	<h1>Reporting</h1>
+	<!-- create grid of reports-->
+	<div class="container mt-5">
+		<div class="row">
+			{% if dummyReports is not empty %}
+				{% for report in dummyReports %}
+					<div class="col-md-4 mb-4">
+						<div class="card card-report">
+            {# @TODO: Link to individual reports via id or url #}
+							<a href="" class="stretched-link" style="text-decoration:none; color:inherit;">
+								<div class="card-body">
+									<h5 class="card-title" style="font-weight:bold;">
+										{# {{ report.title }} #}
+                     {{ report.title|slice(0, 120) ~ (report.title|length > 120 ? '...' : '') }}
+									</h5>
+									<p class="card-text">
+										{# {{ report.description }} #}
+                    {{ report.description|slice(0, 120) ~ (report.description|length > 120 ? '...' : '') }}
+									</p>
+								</div>
+							</a>
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<div>
+					<p>There are currently no reports.</p>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+	<!-- create button for adding reports -->
+	<div class="d-flex justify-content-end">
+  {# @TODO: add link to add report page #}
+    <a href="add_report" class="btn btn-primary">Add Report</a>
+	</div>
+{% endblock %}

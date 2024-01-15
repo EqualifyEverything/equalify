@@ -1,36 +1,27 @@
 <?php
-// Add initialization info
-require_once('../init.php');
-
-// Start the session
-session_start();
-
-// Check if report_id is set in the session
-if (!isset($_SESSION['report_id'])) {
-    throw new Exception(
-        'No Report ID specified.'
-    );
-    exit;
-}
-
-// Retrieve report_id from session
-$report_id = $_SESSION['report_id'];
-
-// Prepare the SQL statement
-$stmt = $pdo->prepare("DELETE FROM reports WHERE report_id = :report_id");
-
-// Bind the parameters
-$stmt->bindParam(':report_id', $report_id, PDO::PARAM_INT);
-
-// Execute the statement
-$stmt->execute();
-
-// Remove session token to prevent unintended submissions.
-$_SESSION['report_id'] = '';
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document deletes reports.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
 
 
-// Redirect after successful deletion
-header("Location: ../index.php?view=reports&success=".urlencode("Report deletion successful."));
-exit;
+// Info on DB must be declared to use db.php models.
+require_once '../config.php';
+require_once '../models/db.php';
 
-?>
+// Delete DB 
+$filtered_to_report = array(
+    array(
+        'name' => 'meta_name',
+        'value' => $_GET['report'],
+    )
+);
+DataAccess::delete_db_entries(
+    'meta', $filtered_to_report
+);
+
+// Reload reports page.
+header('Location: ../index.php?view=reports');

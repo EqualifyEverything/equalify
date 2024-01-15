@@ -1,0 +1,13 @@
+services:
+  event_dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
+
+  Equalify\Event\TestEventSubscriber:
+    tags:
+      - { name: kernel.event_subscriber, event: content.before }
+
+  db_service:
+    class: Equalify\Storage\Database\Mysql\MysqlDatabase
+
+  current_user_service:
+    class: Equalify\Service\SoloCurrentUserService
