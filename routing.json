@@ -1,0 +1,24 @@
+{
+    "routes": [
+        {
+            "name": "all_reports",
+            "route": {
+                "path": "all_reports",
+                "arguments": []
+            },
+            "permissions": {
+                "names": [
+                    "access content"
+                ],
+                "method": {
+                    "class": "Equalify\\Access\\CheckAccess",
+                    "method": "checkAccess"
+                }
+            },
+			"controller": {
+				"class": "Equalify\\Controller\\AllReportsController",
+				"method": "run"
+			}
+        }
+    ]
+}

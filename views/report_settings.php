@@ -1,134 +1,303 @@
 <?php
-// The report_id URL parameter defines the page.
-$report_id = $_GET['report_id'];
-if($report_id == ''){
-    throw new Exception(
-        'report_id is missing'
+/**************!!EQUALIFY IS FOR EVERYONE!!***************
+ * This document composes the report settings view.
+ * 
+ * As always, we must remember that every function should 
+ * be designed to be as efficient as possible so that 
+ * Equalify works for everyone.
+**********************************************************/
+
+// Meta_name is used to load existing report info.
+if(empty($_GET['meta_name'])){
+    
+    // No meta_name means we can create a new report
+    // or edit the active report, which is default.
+    if(!isset($_GET['new_report'])){
+        $_GET['meta_name'] = 'report_active';
+    }
+
+}
+
+// Let's setup the variables that we're going to be using
+// in this document.
+$title = 'Untitled';
+$status = '';
+$type   = '';
+$name   = '';
+$site_id = '';
+$preset = FALSE;
+
+// We use this view to customize reports if a id is 
+// provided, otherwise we create a new report.
+if(!empty($_GET['meta_name'])){
+    
+    // Set the meta name
+    $name = $_GET['meta_name'];
+
+    // Some reports are preset. Presets have restricted fields
+    // you can edit and special naming rules.
+    $presets = array(
+        'report_equalified', 'report_ignored', 'report_all',
+        'report_active', 'report_active'
     );
+    if(in_array($name, $presets))
+        $preset = TRUE;
+
+    // Let's load in predefined variables for the report.
+    $existing_report = unserialize(
+        DataAccess::get_meta_value($name)
+    );
+
+    // Some reports, like Equalified alerts, won't
+    // have data, so we'll have to prepare variables
+    if(empty($existing_report)){
+
+        // Set the default title field.
+        if($name == 'report_equalified'){
+            $title = 'Equalified Alerts';
+        }elseif($name == 'report_ignored'){
+            $title = 'Ignored Alerts';
+        }elseif($name == 'report_all'){
+            $title = 'All Alerts';
+        }elseif($name == 'report_active'){
+            $title = 'Active Alerts';
+        }
+
+        // Set the default status field.
+        if($name == 'report_equalified'){
+            $status = 'equalified';
+        }elseif($name == 'report_ignored'){
+            $status = 'ignored';
+        }elseif($name == 'report_active'){
+            $status = 'active';
+        }
+
+    }else{
+
+        // Let's reformat the meta so we can use it in a
+        // more understandable format. The dynamically
+        // added content is added to $dynamic_meta.
+        $dynamic_meta = array();
+        foreach($existing_report as $report) {
+            if($report['name'] == 'title'){
+                $title = $report['value'];
+            }elseif($report['name'] == 'type'){
+                $type = $report['value'];
+            }elseif($report['name'] == 'status'){
+                $status = $report['value'];
+            }elseif($report['name'] == 'site_id'){
+                $site_id = $report['value'];
+            }else{
+                $dynamic_meta[] = $report['name'];
+            }
+        }
+
+    }
+    
 }
-
-// Get helpers
-require_once('helpers/get_title.php');
-require_once('helpers/get_report_filters.php');
-
-// Components
-require_once('components/success_or_error_message.php');
-
-// Handle Wrong Report Id
-$report_title =  get_title($report_id, 'report');
-if($report_title == 'Report Not Found'){
-    echo '<p class="display-4 text-center my-4">Report not found.</p>';
-    exit;
-}
-
-// Components
-require_once('components/report_filter_search.php');
-require_once('components/active_filters.php');
-
-$report_filters = get_report_filters();
-
-// Use Session to securely handle report ID
-session_start();
-$_SESSION['report_id'] = $report_id;
-
 ?>
 
-<div class="container">
-
-    <?php
-    // Success or Error message
-    the_success_or_error_message();
-    ?>
-
-    <h1 class="display-5 mt-4" style="max-width:800px">
-        <a href="?view=report&report_id=<?php echo $report_id;?>" class="link-dark link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+<section>
+    <div class="mb-3 pb-4 border-bottom">
+        <h1>
 
             <?php
-            // Page Title
-            echo $report_title;
+            // Lets add helper text, depending on if we're
+            // creating a new report or not
+            if(empty($name))
+                echo 'New';
             ?>
-
-        </a>
-    </h1>
-    <h2 class="mb-4">Report Settings</h2>
-    <div class="card my-2 p-4">
-        <form class="pb-4 my-2" action="actions/save_report_title.php" method="post">
-            <h3 class="mb-4">General Settings</h3>
-            <div>
-                <label for="reportTitle" class="form-label">Report Title</label>
-                <input 
-                    type="text" 
-                    class="form-control <?php if(isset($_GET['error'])) echo 'is-invalid';?>" 
-                    id="reportTitle" 
-                    name="report_title" 
-                    style="max-width: 400px" 
-                    value="<?php echo get_title($report_id, 'report');?>"
-                    required
-                >
-                
-            </div>
-            <button type="submit" class="btn btn-primary visually-hidden mt-3 disabled" aria-disabled="true">Update Title</button>
-        </form>
-        <div class="border-top py-4 my-2">
-            <h3 class="mb-4">Filters</h3>
-            <div class="d-flex align-items-start flex-wrap">
-
-            <?php
-            // Active filters.
-            the_active_filters($report_id, $report_filters['as_array']);
-
-            // Filter search component.
-            the_report_filter_search($report_id);
-            ?>
-
-            </div>
             
-            <?php
-                // Unsaved changes update the state of a button
-                $aria_disabled_state = true;
-                $extra_classes = 'disabled visually-hidden';
-                $hidden_class = 'visually-hidden';
-                $disabled_class = 'disabled';
-                $cookie_name = "queue_report_" . $report_id . "_filter_change";
-                if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
-                    $aria_disabled_state = false;
-                    $disabled_class = '';    
-                    $hidden_class = '';
-                }
-            ?>
+            "<span id="reportName"><?php echo $title;?></span>"
 
-            <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded <?php echo $hidden_class;?>" style="display:inline-block">
-                <h4 class="visually-hidden">Filter Save Actions</h3>
-                <a href="actions/save_report_filter_change.php?&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                    Save Filters for Everyone
-                </a>
-                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                    Preview Filter Updates
-                </a> 
-                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
-                    Cancel Updates
-                </a> 
+            <?php
+            // More helper text.
+            if(empty($name) || (!empty($name) && $preset == FALSE))
+                echo 'Report ';
+            if(!empty($name))
+                echo 'Filters & Settings';
+            ?>
+            
+        </h1>
+    </div>
+    <form action="actions/save_report.php" method="post">
+
+        <?php
+        // Certain reports don't allow editing
+        // of fields other than tag fields.
+        if($preset === FALSE):
+        ?>
+        
+        <div class="mb-3">
+            <label for="reportNameInput" class="form-label fw-semibold">Report Name</label>
+            <input type="text" id="reportNameInput" class="form-control" value="<?php echo $title;?>" name="title" required>
+        </div>
+        <hr>
+        <div class="mb-3 row">
+            <div class="col">
+                <label for="statusSelect" class="form-label fw-semibold">Site</label>
+                <select id="statusSelect" class="form-select" name="site_id">
+                    <option value="">Any</option>
+
+                    <?php 
+                    // Get the scan_profiles.
+                    $scan_profiles = DataAccess::get_db_rows( 'scan_profiles',
+                        array(), 1, 10000000
+                    )['content'];
+
+                    // Build options.
+                    if(!empty($scan_profiles)){
+                        foreach ($scan_profiles as $site_option){
+
+                            // A site may already be saved. 
+                            if($site_option->id == $site_id){
+                                $selected_attribute = 'selected';
+                            }else{
+                                $selected_attribute = '';
+                            }
+
+                            // Build option.
+                            echo '<option value="'.$site_option->id.'" '
+                            .$selected_attribute.'>'.
+                            $site_option->url.'</option>';
+
+                        }
+                    }
+                    ?>
+
+                </select>
+            </div>
+            <div class="col">
+                <label for="statusSelect" class="form-label fw-semibold">Alert Status</label>
+                <select id="statusSelect" class="form-select" name="status">
+                    <option value="">Any</option>
+
+                    <?php 
+                    // Set status as array so we can simplify
+                    // the logic to build the option html.
+                    $status_options = array(
+                        'active', 'ignored', 'equalified'
+                    );
+                    
+                    // Build options.
+                    foreach ($status_options as $option){
+
+                        // A source may already be saved. 
+                        if($option == $status){
+                            $selected_attribute = 'selected';
+                        }else{
+                            $selected_attribute = '';
+                        }
+
+                        // Build option.
+                        echo '<option value="'.$option.'" '
+                        .$selected_attribute.'>'
+                        .ucwords($option).'</option>';
+
+                    }
+                    ?>
+
+                </select>
             </div>
         </div>
-        <div class="border-top py-4">
-            <h3 class="mb-4">Danger Zone</h3>
-            <p>
-                <a href="actions/delete_report.php" class="btn btn-danger">Delete Report</a>
-            </p>
+        <hr>
+
+        <?php
+        // End hidden fields condition.
+        endif;
+
+        // Get the tags, which we use to filter.
+        $tags = DataAccess::get_db_rows( 'tags',
+            array(), 1, 10000000, 'category'
+        );
+
+        // We'll use this variable later..
+        $stored_category = '';
+
+        // Start tag markup.
+        if(!empty($tags)):
+        ?>
+
+        <div id="alert_tags" class="mb-3">
+            <h2>Show Alerts Tagged</h2>
+            <div class="d-flex flex-wrap">
+
+            <?php
+            // Start Loop
+            foreach ($tags['content'] as $tag):
+                
+                // We need to start by ending the previous category's
+                // div if it exists.
+                if(($stored_category !== '') && ($stored_category !== $tag->category))
+                    echo '</div>';
+
+                // Start a new section for every new category.
+                if($stored_category !== $tag->category)
+                    echo '<div class="pe-3 mb-3"><h3 class="fs-4 text-muted">'.$tag->category.'</h3>';
+                
+            ?>
+
+            <div class="form-check">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="<?php echo $tag->slug;?>" 
+                    name="<?php echo $tag->slug;?>"
+                    
+                    <?php
+                    // Conditionally show selected tag.
+                    if(!empty($dynamic_meta))
+                        if(in_array($tag->slug, $dynamic_meta))
+                            echo 'checked';
+                    ?>
+
+                >
+                <label class="form-check-label" for="<?php echo $tag->slug;?>">
+                    <?php echo $tag->title;?>
+                </label>
+            </div>
+
+            <?php
+            // Store the category so we can group by category.
+            $stored_category = $tag->category;
+                
+            // End loop.
+            endforeach;
+            ?>
+
+            </div>
         </div>
-    </div>
-</div>
+        <hr>
+        
+        <?php
+        // End tag markup.
+        endif;
+        ?>
+
+        <div>
+
+            <?php
+            // New reports can't be deleted.
+            if(!empty($name))
+                echo '<a href="actions/delete_report.php?report='.$name.'" class="btn btn-outline-danger">Delete Report</a>';
+            ?>
+
+            <input type="hidden" name="name" value="<?php echo $name;?>">
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Report</button>
+        </div>
+    </form>
+</section>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var reportTitleInput = document.getElementById('reportTitle');
-        var updateButton = document.querySelector('button[type="submit"]');
+document.addEventListener('DOMContentLoaded', () => {
+    // Change report title text as you type.
+    const reportName = document.getElementById('reportName');
+    const reportNameInput = document.getElementById('reportNameInput');
+    const changeReportName = function(e) {
+        reportName.innerHTML = e.target.value;
+    }
+    reportNameInput.addEventListener('input', changeReportName);
+    reportNameInput.addEventListener('propertychange', changeReportName);
+});
 
-        reportTitleInput.addEventListener('keyup', function() {
-            // Remove the 'disabled' and 'visually-hidden' classes from the button
-            updateButton.classList.remove('disabled', 'visually-hidden');
-
-            // Update the 'aria-disabled' attribute to 'false'
-            updateButton.setAttribute('aria-disabled', 'false');
-        });
-    });
 </script>
