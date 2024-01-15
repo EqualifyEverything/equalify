@@ -36,13 +36,21 @@ if(!empty($report_id)){
 ?>
 
 <div class="container">
+    
     <h2 class="mb-4" style="max-width:900px">
 
     <?php
     // Page Title
     echo get_title($page_id, 'page');
+
+    // Add session data to scan page.
+    session_start();    
+    $_SESSION['page_id'] = $page_id
     ?>
 
+        <a href="actions/rescan_page.php?report_id=<?php echo $report_id?>" class="btn btn-sm btn-primary">
+            Rescan Page
+        </a>
     </h2>
 
     <?php

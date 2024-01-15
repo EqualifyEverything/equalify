@@ -31,6 +31,7 @@ $tables = [
     "pages" => "CREATE TABLE `pages` (
             `page_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             `page_url` text NOT NULL,
+            `page_property_id` bigint(20) NOT NULL,
             PRIMARY KEY (`page_id`)
         ) ENGINE=InnoDB AUTO_INCREMENT=3998 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 

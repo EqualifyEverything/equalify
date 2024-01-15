@@ -92,7 +92,7 @@ try {
         $page_url = $data['result']['results']['url'] ?? '';
 
         // Setup page id
-        $page_id = get_page_id($page_url);
+        $page_id = get_page_id($page_url, $property_id);
 
         // Check if violations are formatted correctly and set them up
         if (isset($data['result']['results']['violations']) && !empty($data['result']['results']['violations'])) {
@@ -298,22 +298,22 @@ function get_message_id($title) {
     }
 }
 
-function get_page_id($url) {
+function get_page_id($url, $property_id) {
     global $pdo;
 
     // Check if the page exists
-    $pageQuery = "SELECT page_id FROM pages WHERE page_url = :url";
+    $pageQuery = "SELECT page_id FROM pages WHERE page_url = :url AND page_property_id = :property_id";
     $pageStmt = $pdo->prepare($pageQuery);
-    $pageStmt->execute([':url' => $url]);
+    $pageStmt->execute([':url' => $url, ':property_id' => $property_id]);
     $pageRow = $pageStmt->fetch(PDO::FETCH_ASSOC);
 
     if ($pageRow) {
         return $pageRow['page_id']; // Return existing ID
     } else {
         // Insert the new page
-        $insertPageQuery = "INSERT INTO pages (page_url) VALUES (:url)";
+        $insertPageQuery = "INSERT INTO pages (page_url, page_property_id) VALUES (:url, :property_id)";
         $insertPageStmt = $pdo->prepare($insertPageQuery);
-        $insertPageStmt->execute([':url' => $url]);
+        $insertPageStmt->execute([':url' => $url, ':property_id' => $property_id]);
         return $pdo->lastInsertId(); // Return new ID
     }
 }
