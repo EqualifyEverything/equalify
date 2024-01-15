@@ -1,7 +1,6 @@
 /.ddev
 vendor/
 *.log
-.env
 .github
 .vscode
 .DS_Store
@@ -26,4 +25,3 @@ package-lock.json
 .env
 
 cron.log
-composer.lock
