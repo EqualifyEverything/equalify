@@ -37,16 +37,6 @@ pre code{
     --bs-spinner-width: .7rem;
     --bs-spinner-height: 0.7rem;
 }
-#terminal{
-    min-height: 600px;
-}
-#scan_log{
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-}
 #archived{
     min-height: 1.5em;
     min-width: 2.5em;
@@ -87,13 +77,13 @@ pre code{
     bottom: -1.25em;
 }
 #reports_filter a#equalified:before{
-    background: rgb(11, 101, 21);
+    background: green;
 }
 #reports_filter a#active:before{
-    background: rgb(171, 39, 12);
+    background: red;
 }
 #reports_filter a#ignored:before{
-    background: rgb(52, 57, 61);
+    background: gray;
 }
 .btn-outline-secondary:hover code{
     color: white !important;

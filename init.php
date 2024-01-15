@@ -1,16 +1,8 @@
 <?php
-
-/**************!!EQUALIFY IS FOR EVERYONE!!***************
- * These configs are used to setup Equalify's database
- * and execution.
- * 
- * By default, configuration that works for ddev is added.
- * Find out more about setup up Equalify on ddev here:
- * https://github.com/bbertucc/equalify/issues/40
- **********************************************************/
+// These configs are used to setup Equalify's database and execution.
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
-$dotenv->safeLoad(); // Safeload so we don't get an error when there's no .env file on production
+$dotenv->safeLoad();
 
 $GLOBALS["managed_mode"] = false;
 if (array_key_exists('MODE', $_ENV) &&  $_ENV['MODE'] == 'managed') { 
@@ -38,6 +30,29 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
     }
     
     if ($session === null) {  // The user isn't logged in.      
+        require_once 'auth/login.php';
+    } else {
+        
+        $GLOBALS["ACTIVE_DB"] = $session->user['equalify_databases'][0]; // TODO: currently just takes first from DBs array, should be switchable
+        $user_title = $session->user['title'];
+        $user_name =  $session->user['name'];
+        $user_email =  $session->user['email'];
+        $user_nickname = $session->user['nickname'];
+        $user_picture = $session->user['picture'];
+        $user_last_updated = $session->user['updated_at'];
+        
+        echo '<!--';
+        print_r($session->user);
+        echo '-->';
+     
+        /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
+    }
+
+    if (!empty($_GET['auth'])){ // Router for auth endpoints
+        require_once 'auth/'.$_GET['auth'].'.php';
+    }
+    
+    if ($session === null) {  // The user isn't logged in.      
         //echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
         require_once 'auth/login.php';
     } else {
@@ -57,3 +72,21 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
         /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
     }
 }
+
+// Database creds
+$db_host = $_ENV['DB_HOST'];
+$db_name = $_ENV['DB_NAME'];
+$db_user = $_ENV['DB_USERNAME'];
+$db_pass = $_ENV['DB_PASSWORD']; 
+
+// Set Current DB
+if($GLOBALS["managed_mode"]){ 
+    $current_db = $GLOBALS["ACTIVE_DB"]; // if we're in managed mode, use the db name we get from auth0
+}else{
+    $current_db = $_ENV['DB_NAME'];
+}
+
+// Create DB connection
+$pdo = new PDO("mysql:host=$db_host;dbname=$db_name", "$db_user", "$db_pass");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+

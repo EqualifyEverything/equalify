@@ -1,45 +1,13 @@
 <?php
-/**************!!EQUALIFY IS FOR EVERYONE!!***************
- * Equalify is a platform developed to integrate various
- * services that manage websites.
- * 
- * You'll see comment sections like this at the top of
- * many files to remind us of basic operating principles
- * that drive the Equalify project forward.
- * 
- * While Blake Bertuccelli established Equalify's
- * copyright in 2022, this program is free software: you
- * can redistribute it and/or modify it under the terms of
- * the GNU Affero General Public License as published by
- * the Free Foundation, either version 3 of the License,
- * or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Affero General Public
- * License for more details.
- * 
- * You should have received a copy of the GNU Affero
- * General Public License along with this program. If not, 
- * see <https://www.gnu.org/licenses/>.
-**********************************************************/
-
-define('EQUALIFY_ROOT', getcwd());
-
-// Add dependencies.
+// Let's get things going!
 require_once 'init.php';
-require_once 'models/db.php';
-require_once 'models/view_components.php';
-require_once 'models/integrations.php';
-require_once 'models/contextual_data.php';
 
-// We check to make sure all the DB tables are installed.
-require_once 'install.php';
+// Install if not installed
+require_once('helpers/install.php');
 
-// We also check to see if we can run the scan on every
-// page load.
-require_once 'actions/run_scheduled_scan.php';
+// Required components
+require_once('components/active_class.php');
+
 ?>
 
 <!DOCTYPE html>
@@ -50,53 +18,54 @@ require_once 'actions/run_scheduled_scan.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta description="Equalify manages web accessibility issues with integrations with your favorite services." />
     <title>Equalify | Accessibility Issue Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="theme.css" rel="stylesheet">
 </head>
+
 <body>
-    <header class="py-3 mb-4">
+    <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
+    <header class="py-3 border-bottom  border-secondary-subtle">
         <div class="container d-flex flex-wrap justify-content-center">
             <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
                 <span class="fs-4 visually-hidden">Equalify</span>
             </a>
-            <ul class="nav navbar nav-pills">
-                <li class="nav-item"><a href="index.php?view=notice_editor" class="nav-link <?php the_active_class('notice_editor');?>">Add Notice</a></li>
+            <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
-                <li class="nav-item"><a href="index.php?view=settings" class="nav-link <?php the_active_class('settings');?>">Settings</a></li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle navbar-brand" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="padding-top:.5em">
-                        Account
-                        <img src="<?php echo $user_picture; ?>" class="nav-link-avatar align-self-center mr-3" style="max-width: 32px; border-radius: 32px" /> 
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="accountDropdown">
-                        <a class="dropdown-item" href="index.php?view=account">Account Info</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="index.php?auth=logout">Logout</a>
-                    </div>
-                </li>
+                <li class="nav-item"><a href="index.php?view=settings" class="<?php the_active_class('settings');?> nav-link">Settings</a></li>
+                
+                <?php
+                // Only show account in "managed" mode
+                if($GLOBALS["managed_mode"]){ 
+                ?>
+                
+                <li class="nav-item"><a href="index.php?view=account" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
+
+                <?php
+                }
+                ?>
+
             </ul>
         </div>
     </header>
-    <main class="container">
+    <main>
+        
+        <?php
+        // Select the view.
+        if(!empty($_GET['view'])){
+            require_once 'views/'.$_GET['view'].'.php';
+        }else{
 
-    <?php
-    // Success Message
-    the_success_message();
+            // This is the defaul view
+            require_once 'views/reports.php';
 
-    // Show View
-    if(!empty($_GET['view'])){
-        require_once 'views/'.$_GET['view'].'.php';
-    }else{
-        require_once get_default_view();
-    }
-    ?>
+        }
+        ?>
 
     </main>
     <footer class="py-4 mt-4 text-center">
         Equalify Release Candidate 2
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
 </html>
