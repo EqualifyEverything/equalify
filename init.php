@@ -30,7 +30,6 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
     }
     
     if ($session === null) {  // The user isn't logged in.      
-        //echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
         require_once 'auth/login.php';
     } else {
         
@@ -51,13 +50,20 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
 
 }
 
-// Database connection
+// Database creds
 $db_host = $_ENV['DB_HOST'];
 $db_name = $_ENV['DB_NAME'];
 $db_user = $_ENV['DB_USERNAME'];
 $db_pass = $_ENV['DB_PASSWORD']; 
 
-$pdo = new PDO("mysql:host=$db_host;dbname=$db_name", "$db_user", "$db_pass");
+// Set Current DB
+if($GLOBALS["managed_mode"]){ 
+    $current_db = $GLOBALS["ACTIVE_DB"]; // if we're in managed mode, use the db name we get from auth0
+}else{
+    $current_db = $_ENV['DB_NAME'];
+}
 
+// Create DB connection
+$pdo = new PDO("mysql:host=$db_host;dbname=$db_name", "$db_user", "$db_pass");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

@@ -1,37 +1,3 @@
-<?php
-// Helpers
-require_once('helpers/get_property.php');
-
-// Load existing property info.
-if(isset($_GET['property_id'])){
-    
-    // Existing property values
-    $property_id = $_GET['property_id'];
-    $property = get_property($property_id);
-    $name = $property['property_name'];
-    $url = $property['property_url'];
-    $processed_date = $property['property_processed'];
-    $processing = $property['property_processing'];
-
-// Default data for new properties
-}else{
-    
-    // Default data for new properties
-    $property_id ='';
-    $name = '';
-    $url = '';
-    $processed_date = '';
-    $processing = '';
-
-}
-
-// Let's turn the ID into a session variable so
-// we can safely save existing content.
-session_start();
-$_SESSION['property_id'] = $property_id; 
-
-?>
-
 <div class="container">
     <h1 class="display-5 my-4">
         Equalify Account
@@ -40,19 +6,33 @@ $_SESSION['property_id'] = $property_id;
         <form action="" method="post" id="site_form">
             <div class="row mb-4">
                 <div class="col">
-                    <label for="account_email" class="form-label h4">Email Address</label>
-                    <input id="account_email"  name="account_email" type="email" class="form-control form-control-lg" required>
+                  <label for="user_email" class="form-label h4">Email Address</label>
+                  <input id="user_email"  name="user_email" type="email" value="<?php echo $user_email;?>" class="form-control form-control-lg" disabled required>
                 </div>
                 <div class="col">
-                    <label for="account_password" class="form-label h4">Password</label>
-                    <input id="account_password"  name="account_password" type="password" class="form-control form-control-lg" required>
+                  <label for="user_account" class="form-label h4">Active Account</label>
+                  <select id="user_account" class="form-select form-select-lg mb-3" aria-label="Active Account" disabled>
+
+                    <?php 
+                    foreach ($session->user['equalify_databases'] as $key=>$item){
+                        if($key == 0){
+                            echo '<option selected>'; // highlight the active (hardcoded) database
+                        }else{
+                            echo '<option value="' . $item. '">';
+                        }
+                        echo $item;
+                        echo '</option>';
+                    }
+                    ?>
+
+                  </select>
                 </div>
             </div>
             <div class="mt-4">
                 <button type="submit" id="submit" class="btn btn-lg btn-primary">
                     Update Account
                 </button>
-                <button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">
+                <button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal" disabled>
                     Delete Account
                 </button>                
             </div>

@@ -2,6 +2,9 @@
 // Let's get things going!
 require_once 'init.php';
 
+// Install if not installed
+require_once('helpers/install.php');
+
 // Required components
 require_once('components/active_class.php');
 
@@ -30,7 +33,18 @@ require_once('components/active_class.php');
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="<?php the_active_class('settings');?> nav-link">Settings</a></li>
+                
+                <?php
+                // Only show account in "managed" mode
+                if($GLOBALS["managed_mode"]){ 
+                ?>
+                
                 <li class="nav-item"><a href="index.php?view=account" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
+
+                <?php
+                }
+                ?>
+
             </ul>
         </div>
     </header>

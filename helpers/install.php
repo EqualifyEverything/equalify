@@ -1,6 +1,4 @@
 <?php
-require_once('init.php'); 
-
 // Array of table creation queries
 $tables = [
     "messages" => "CREATE TABLE `messages` (
@@ -94,5 +92,3 @@ function checkAndCreateTable($pdo, $tableName, $createQuery) {
 foreach ($tables as $tableName => $createQuery) {
     checkAndCreateTable($pdo, $tableName, $createQuery);
 }
-
-exit;
