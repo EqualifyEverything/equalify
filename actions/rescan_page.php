@@ -30,7 +30,12 @@ if (empty($results)){
 
 // Send URL to scan
 $api_url = 'http://198.211.98.156/generate/url';
-$data = json_encode(array("url" => $results['page_url']));  
+$data = json_encode(
+    array(
+        "url" => $results['page_url'], 
+        "priortized" => true
+    )
+);  
 $ch = curl_init($api_url);  
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -61,8 +66,3 @@ $_SESSION['page_id'] = '';
 // Redirect
 header("Location: ../index.php?view=page&page_id=$page_id&report_id=$report_id&success=" .urlencode('Rescanning page.'));
 exit;
-
-// TODO: Add logic to engine that removes $filters once related scans are complete
-
-// TODO: Add logic to add to deactivate Rescan button if scan is queued.
-
