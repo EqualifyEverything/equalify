@@ -1,7 +1,4 @@
 <div class="container">
-    <h1 class="display-5 my-4">
-        Equalify Account
-    </h1>
     <div class="d-flex flex-column flex-md-row align-items-center my-4">
         <h1 class="display-5">Equalify Account</h1>
         <div class="ms-md-auto">
