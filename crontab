@@ -1,4 +1,0 @@
-*/1 * * * * php /engine/process_scans.php >> /engine/cron.log 2>&1
-*/1 * * * * php /engine/process_property.php >> /engine/cron.log 2>&1
-
-# An empty line is required at the end of this file for a valid cron file.
