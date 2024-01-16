@@ -31,11 +31,11 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
     $session = $auth0->getCredentials();
 
     if (!empty($_GET['auth'])){ // Router for auth endpoints
-        require_once 'auth/'.$_GET['auth'].'.php';
+        require_once 'actions/'.$_GET['auth'].'.php';
     }
     
     if ($session === null) {  // The user isn't logged in.      
-        require_once 'auth/login.php';
+        require_once 'actions/login.php';
     } else {
         
         $GLOBALS["ACTIVE_DB"] = $session->user['equalify_databases'][0]; // TODO: currently just takes first from DBs array, should be switchable
