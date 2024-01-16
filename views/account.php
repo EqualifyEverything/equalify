@@ -2,6 +2,12 @@
     <h1 class="display-5 my-4">
         Equalify Account
     </h1>
+    <div class="d-flex flex-column flex-md-row align-items-center my-4">
+        <h1 class="display-5">Equalify Account</h1>
+        <div class="ms-md-auto">
+            <a class="btn btn-secondary" href="index.php?auth=logout">Logout</a>
+        </div>
+    </div>
     <div class="card bg-white p-4 my-2">
         <form action="" method="post" id="site_form">
             <div class="row mb-4">
