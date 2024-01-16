@@ -57,6 +57,7 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
 
 // Database creds
 $db_host = $_ENV['DB_HOST'];
+$db_port = $_ENV['DB_PORT']; 
 $db_name = $_ENV['DB_NAME'];
 $db_user = $_ENV['DB_USERNAME'];
 $db_pass = $_ENV['DB_PASSWORD']; 
@@ -69,6 +70,6 @@ if($GLOBALS["managed_mode"]){
 }
 
 // Create DB connection
-$pdo = new PDO("mysql:host=$db_host;dbname=$current_db", "$db_user", "$db_pass");
+$pdo = new PDO("mysql:host=$db_host;port=$db_port;dbname=$current_db", "$db_user", "$db_pass");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

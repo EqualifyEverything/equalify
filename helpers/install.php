@@ -60,9 +60,10 @@ $tables = [
         ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 
     "tag_relationships" => "CREATE TABLE `tag_relationships` (
-            `occurrence_id` bigint(20) DEFAULT NULL,
-            `tag_id` bigint(20) unsigned NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+        `occurrence_id` bigint(20) NOT NULL,
+        `tag_id` bigint(20) unsigned NOT NULL,
+        PRIMARY KEY (`occurrence_id`, `tag_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 
     "tags" => "CREATE TABLE `tags` (
             `tag_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -73,7 +74,7 @@ $tables = [
 
     "updates" => "CREATE TABLE `updates` (
             `update_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            `date_created` datetime NOT NULL,
             `occurrence_id` bigint(20) NOT NULL,
             `update_message` varchar(220) NOT NULL,
             PRIMARY KEY (`update_id`)
