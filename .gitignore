@@ -4,12 +4,10 @@ vendor/
 .github
 .vscode
 .DS_Store
-.DS_Store
 .vscode
-
+/assets
 login/
 config-server.php
-vendor/
 test/
 _dev/
 _private/
@@ -23,5 +21,4 @@ package-lock.json
 .phpunit.result.cache
 .env-**
 .env
-
 cron.log

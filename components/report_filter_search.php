@@ -3,8 +3,8 @@
 function the_report_filter_search($report_id) {
 ?>
 
-<link rel="stylesheet" href="vendor/alphagov/accessible-autocomplete/dist/accessible-autocomplete.min.css" />
-<script type="text/javascript" src="vendor/alphagov/accessible-autocomplete/dist/accessible-autocomplete.min.js"></script>
+<link rel="stylesheet" href="assets/accessible-autocomplete/dist/accessible-autocomplete.min.css" />
+<script type="text/javascript" src="assets/accessible-autocomplete/dist/accessible-autocomplete.min.js"></script>
 <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#filterModal">
     Add Filter
 </button>

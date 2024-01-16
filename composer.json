@@ -14,6 +14,16 @@
             "php-http/discovery": true
         }
     },
+    "scripts": {
+        "post-install-cmd": [
+            "mkdir -p assets/bootstrap && cp -R vendor/twbs/bootstrap/dist assets/bootstrap",
+            "mkdir -p assets/accessible-autocomplete && cp -R vendor/alphagov/accessible-autocomplete/dist assets/accessible-autocomplete"
+        ],
+        "post-update-cmd": [
+            "mkdir -p assets/bootstrap && cp -R vendor/twbs/bootstrap/dist assets/bootstrap",
+            "mkdir -p assets/accessible-autocomplete && cp -R vendor/alphagov/accessible-autocomplete/dist assets/accessible-autocomplete"
+        ]
+    },
     "repositories": [
         {
             "type": "package",
