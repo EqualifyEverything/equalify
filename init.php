@@ -70,5 +70,6 @@ if($GLOBALS["managed_mode"]){
 
 // Create DB connection
 $pdo = new PDO("mysql:host=$db_host;dbname=$current_db", "$db_user", "$db_pass");
+print_r($pdo); exit;
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
