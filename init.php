@@ -48,29 +48,6 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
         /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
     }
 
-    if (!empty($_GET['auth'])){ // Router for auth endpoints
-        require_once 'auth/'.$_GET['auth'].'.php';
-    }
-    
-    if ($session === null) {  // The user isn't logged in.      
-        //echo '<p>Please <a href="/?auth=login">log in</a>.</p>';
-        require_once 'auth/login.php';
-    } else {
-        
-        $GLOBALS["ACTIVE_DB"] = $session->user['equalify_databases'][0]; // TODO: currently just takes first from DBs array, should be switchable
-        $user_title = $session->user['title'];
-        $user_name =  $session->user['name'];
-        $user_email =  $session->user['email'];
-        $user_nickname = $session->user['nickname'];
-        $user_picture = $session->user['picture'];
-        $user_last_updated = $session->user['updated_at'];
-        
-        echo '<!--';
-        print_r($session->user);
-        echo '-->';
-     
-        /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
-    }
 }
 
 // Database creds
