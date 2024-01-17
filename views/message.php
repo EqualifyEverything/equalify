@@ -16,6 +16,7 @@ require_once('components/message_occurrences_list.php');
 
 // Helpers
 require_once('helpers/get_report_filters.php');
+require_once('helpers/get_content.php');
 
 // Ready filters for this view
 $report_filters = get_report_filters()['as_string'];
@@ -30,20 +31,28 @@ if(!empty($report_id)){
     // Add some space before the content
     echo '<div class="mb-4"></div>';
 }
+
+// The content
+$the_content = get_content('messages', $message_id)
 ?>
 
 <div class="container">
-    <div class="d-flex falign-items-start mb-2">
-        <h2 class="me-2">
+    <div class="d-flex falign-items-start align-items-center mb-4">
+        <h2 class="me-2 mb-0">
 
             <?php
             // Page Title
-            echo get_title($message_id, 'message');
+            echo $the_content->message_title;
             ?>
 
         </h2>
         <div>
-            <a class="btn btn-primary" href="actions/create_report.php">
+            <?php
+            // Link
+            if(!empty($the_content->message_link)){
+            ?>
+
+            <a class="btn btn-primary btn-sm my-0" href="<?php echo $the_content->message_link;?>" target="_blank">
                 More Info 
                 <span class="visually-hidden">
                     Link opens in new tab
@@ -53,6 +62,11 @@ if(!empty($report_id)){
                     <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
                 </svg>
             </a>
+
+            <?php
+            }
+            ?>
+
         </div>
     </div>
 
