@@ -4,6 +4,7 @@ $tables = [
     "messages" => "CREATE TABLE `messages` (
         `message_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         `message_title` text NOT NULL,
+        `message_link` text DEFAULT NULL,
         PRIMARY KEY (`message_id`)
         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 

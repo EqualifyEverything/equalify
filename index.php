@@ -3,7 +3,7 @@
 require_once 'init.php';
 
 // Install if not installed
-require_once('helpers/install.php');
+require_once('actions/install.php');
 
 // Required components
 require_once('components/active_class.php');
