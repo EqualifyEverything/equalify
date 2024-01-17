@@ -73,3 +73,5 @@ if($GLOBALS["managed_mode"]){
 $pdo = new PDO("mysql:host=$db_host;port=$db_port;dbname=$current_db", "$db_user", "$db_pass");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+// Start session
+session_start();

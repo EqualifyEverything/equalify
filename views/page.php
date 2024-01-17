@@ -17,14 +17,29 @@ require_once('components/chart.php');
 require_once('components/report_header.php');
 
 // Helpers
-require_once('helpers/get_title.php');
+require_once('helpers/get_content.php');
 require_once('helpers/get_report_filters.php');
+require_once('helpers/is_page_scanning.php');
+
+// Set info if page is currently being scanned
+$is_page_scanning = is_page_scanning($page_id);
+if($is_page_scanning){
+
+    // Success message notifies that page is scanning
+    $_SESSION['success'] = 'Page is still scanning. Reload to check status.';
+
+}
 
 // Ready filters for this view
 $report_filters = get_report_filters()['as_string'];
 parse_str($report_filters, $filters_array);
 $filters_array['pages'] = $page_id;
 $new_report_filters = http_build_query($filters_array);
+
+// The content
+$the_content = get_content('pages', $page_id);
+$page_url = $the_content->page_url;
+$page_property_id = $the_content->page_property_id;
 
 // Optional Report Header
 if(!empty($report_id)){
@@ -41,21 +56,29 @@ if(!empty($report_id)){
 
         <?php
         // Page Title
-        echo get_title($page_id, 'page');
+        echo $page_url;
         ?>
 
         </h2>
         <div>
         
         <?php
-        // Add session data to scan page.
-        session_start();    
-        $_SESSION['page_id'] = $page_id
-        ?>
+        // Make button hidden if page is scanning.
+        if($is_page_scanning){
 
-            <a href="actions/rescan_page.php?report_id=<?php echo $report_id?>" class="btn btn-primary btn-sm my-0">
-                Rescan Page
-            </a>
+            // Session data is required to scan page.
+            $_SESSION['page_property_id'] = $page_property_id;
+            $_SESSION['page_id'] = $page_id;
+            $_SESSION['page_url'] = $page_url;
+            if($report_id) // Report IDs can be blank
+                $_SESSION['report_id'] = $report_id;
+
+            echo '<a href="actions/rescan_page.php" class="btn btn-primary btn-sm my-0 disabled" tabindex="-1" role="button" aria-disabled="true">Rescan Page</a>';
+ 
+        }else{
+            echo '<a href="actions/rescan_page.php" class="btn btn-primary btn-sm my-0" role="button">Rescan Page</a>';
+        }
+        ?>
 
         </div>
     </div>

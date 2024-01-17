@@ -45,8 +45,9 @@ $tables = [
         ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 
     "queued_scans" => "CREATE TABLE `queued_scans` (
-            `queued_scan_job_id` bigint(22) NOT NULL,
-            `queued_scan_property_id` bigint(22) NOT NULL,
+            `queued_scan_job_id` bigint(20) NOT NULL,
+            `queued_scan_property_id` bigint(20) NOT NULL,
+            `queued_scan_page_id` bigint(20) DEFAULT NULL,
             `queued_scan_processing` tinyint(1) DEFAULT NULL,
             `queued_scan_prioritized` tinyint(1) DEFAULT NULL,
             PRIMARY KEY (`queued_scan_job_id`)
