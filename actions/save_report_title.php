@@ -2,9 +2,6 @@
 // Add initialization info
 require_once('../init.php');
 
-// Start the session
-session_start();
-
 try {
     // Check if report_title is set and not empty
     if (!isset($_POST['report_title']) || trim($_POST['report_title']) === '') {

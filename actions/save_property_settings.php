@@ -2,9 +2,6 @@
 // Add initialization info
 require_once('../init.php');
 
-// Start the session
-session_start();
-
 // Helpers
 require_once '../helpers/get_property.php';
 

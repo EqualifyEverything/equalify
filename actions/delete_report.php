@@ -2,9 +2,6 @@
 // Add initialization info
 require_once('../init.php');
 
-// Start the session
-session_start();
-
 // Check if report_id is set in the session
 if (!isset($_SESSION['report_id'])) {
     throw new Exception(

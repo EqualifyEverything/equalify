@@ -27,7 +27,6 @@ if(isset($_GET['property_id'])){
 
 // Let's turn the ID into a session variable so
 // we can safely save existing content.
-session_start();
 $_SESSION['property_id'] = $property_id; 
 
 ?>

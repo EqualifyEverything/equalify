@@ -28,7 +28,6 @@ require_once('components/active_filters.php');
 $report_filters = get_report_filters();
 
 // Use Session to securely handle report ID
-session_start();
 $_SESSION['report_id'] = $report_id;
 
 ?>
