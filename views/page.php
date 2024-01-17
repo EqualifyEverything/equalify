@@ -36,23 +36,30 @@ if(!empty($report_id)){
 ?>
 
 <div class="container">
+<div class="d-flex falign-items-start align-items-center mb-4">
+        <h2 class="me-2 mb-0">
+
+        <?php
+        // Page Title
+        echo get_title($page_id, 'page');
+        ?>
+
+        </h2>
+        <div>
+        
+        <?php
+        // Add session data to scan page.
+        session_start();    
+        $_SESSION['page_id'] = $page_id
+        ?>
+
+            <a href="actions/rescan_page.php?report_id=<?php echo $report_id?>" class="btn btn-primary btn-sm my-0">
+                Rescan Page
+            </a>
+
+        </div>
+    </div>
     
-    <h2 class="mb-4" style="max-width:900px">
-
-    <?php
-    // Page Title
-    echo get_title($page_id, 'page');
-
-    // Add session data to scan page.
-    session_start();    
-    $_SESSION['page_id'] = $page_id
-    ?>
-
-        <a href="actions/rescan_page.php?report_id=<?php echo $report_id?>" class="btn btn-sm btn-primary">
-            Rescan Page
-        </a>
-    </h2>
-
     <?php
     // Status toggle
     the_chart($new_report_filters);
