@@ -1,0 +1,4 @@
+*/1 * * * * php /app/engine/process_scans.php
+*/1 * * * * php /app/engine/process_property.php
+
+# An empty line is required at the end of this file for a valid cron file.
