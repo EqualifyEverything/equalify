@@ -114,7 +114,7 @@ try {
                         continue;
                     }
 
-                    // Get More Info URL
+                    // Handle More Info URL
 
                     foreach (['any', 'all', 'none'] as $key) {
                         if (isset($node[$key]) && is_array($node[$key])) {
