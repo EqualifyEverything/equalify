@@ -105,6 +105,9 @@ try {
                     continue;
                 }
 
+                // Handle More Info URL
+                $message_link = $violation['helpUrl'];
+
                 foreach ($violation['nodes'] as $node) {
 
                     // Handle incorrectly formatted nodes.
@@ -113,9 +116,6 @@ try {
                         delete_scan($job_id);
                         continue;
                     }
-
-                    // Handle More Info URL
-
                     foreach (['any', 'all', 'none'] as $key) {
                         if (isset($node[$key]) && is_array($node[$key])) {
                             foreach ($node[$key] as $item) {
@@ -129,7 +129,7 @@ try {
 
                                 // Construct the occurrence data
                                 $new_occurrences[] = [
-                                    "occurrence_message_id" => get_message_id($item['message']),
+                                    "occurrence_message_id" => get_message_id($item['message'], $message_link),
                                     "occurrence_code_snippet" => $node['html'],
                                     "occurrence_page_id" => $page_id,
                                     "occurrence_source" => "scan.equalify.app",
@@ -280,7 +280,7 @@ function update_processing_value($job_id, $new_value){
     $stmt->execute([$new_value, $job_id]);
 }
 
-function get_message_id($title) {
+function get_message_id($title, $message_link) {
     global $pdo;
 
     // Check if the message exists
@@ -293,9 +293,9 @@ function get_message_id($title) {
         return $row['message_id']; // Return existing ID
     } else {
         // Insert the new message
-        $insertQuery = "INSERT INTO messages (message_title) VALUES (:title)";
+        $insertQuery = "INSERT INTO messages (message_title, message_link) VALUES (:title, :message_link)";
         $insertStmt = $pdo->prepare($insertQuery);
-        $insertStmt->execute([':title' => $title]);
+        $insertStmt->execute([':title' => $title, ':message_link' => $message_link]);
         return $pdo->lastInsertId(); // Return new ID
     }
 }
