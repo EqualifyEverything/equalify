@@ -10,6 +10,9 @@ RUN apt-get update \
     # Install Composer
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Install the Equalify app dependencies
+RUN composer install
+
 # Copy the crontab file and entrypoint script into the container
 COPY crontab /equalify-cron
 COPY entrypoint.sh /entrypoint.sh
