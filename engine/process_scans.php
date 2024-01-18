@@ -114,6 +114,8 @@ try {
                         continue;
                     }
 
+                    // Get More Info URL
+
                     foreach (['any', 'all', 'none'] as $key) {
                         if (isset($node[$key]) && is_array($node[$key])) {
                             foreach ($node[$key] as $item) {
@@ -123,7 +125,7 @@ try {
                                     update_log("Scan $job_id returns invalid '$key' format in node. Scan deleted.");
                                     delete_scan($job_id);
                                     continue;
-                                            }
+                                }
 
                                 // Construct the occurrence data
                                 $new_occurrences[] = [
