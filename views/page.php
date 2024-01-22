@@ -51,7 +51,7 @@ if(!empty($report_id)){
 ?>
 
 <div class="container">
-<div class="d-flex falign-items-start align-items-center mb-4">
+    <div class="d-flex falign-items-start align-items-center mb-4">
         <h2 class="me-2 mb-0">
 
         <?php
