@@ -1,16 +1,20 @@
 <?php
-// Add initialization info
-require_once('../init.php');
+// This file is designed to be run from command line
+// so we can do things like trigger via CRON.
+if(!defined('__ROOT__'))
+    define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/init.php'); 
 
-// Start session to securely rescan page.
-$page_property_id = $_SESSION['page_property_id'];
-$page_id = $_SESSION['page_id'];
-$page_url = $_SESSION['page_url'];
-if(isset($_SESSION['report_id'])) // Report IDs can be blank
-    $report_id = $_SESSION['report_id'];
+// Required scan info
+$page_data = $_SESSION['process_this_page'];
+$page_property_id = $page_data['property_id'];
+$page_id = $page_data['page_id'];
+$page_url = $page_data['page_url'];
+if(isset($page_data['report_id'])) // Report IDs can be blank
+    $report_id = $page_data['report_id'];
 
-// Send URL to scan
-$api_url = 'http://198.211.98.156/generate/url';
+// Send URL to scan API
+$api_url = $_ENV['SCAN_URL'].'/generate/url';
 $data = json_encode(
     array(
         "url" => $page_url, 
@@ -43,7 +47,7 @@ $stmt->bindValue(':queued_scan_prioritized', 1, PDO::PARAM_INT);
 $stmt->execute();
 
 // Remove session.
-$_SESSION['page_id'] = '';
+$_SESSION['process_this_page'] = '';
 
 // Set success messsage as session.
 $_SESSION['success'] = 'Rescanning page. Refresh for updates.';

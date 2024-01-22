@@ -1,41 +1,57 @@
 <?php
-// Initialization Info
+// This file is designed to be run from command line
+// so we can do things like trigger via CRON.
 if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/init.php'); 
 
 try {
 
-    // Check for any processing scans
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM queued_scans WHERE queued_scan_processing = 1");
-    $stmt->execute();
-    if ($stmt->fetchColumn() > 0) {
-        // Stop process if a scan is processing.
-        update_log("Killing scan. Scans are processing.");
-        exit;
+    // Set maximum concurrent scans
+    if(isset($_ENV['CONCURRENT_SCANS'])){
+        $max_scans = $_ENV['CONCURRENT_SCANS'];
+    }else{
+        // 20 seems to be as much as axe can process per minute
+        // on a xxs machine.
+        $max_scans = 20;
     }
-
-    // Set maximum scans (20 seems to be as much as axe can process per minute)
-    $max_scans = 20;
 
     // Setup scans array
     $scans = array();
 
-    // Fetch up to five prioritized scan
-    $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_prioritized = 1 LIMIT $max_scans;");
-    $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if(!empty($results))
-        $scans = array_merge($scans, $results);
+    // Scans can be manually triggered with session data.
+    if(isset($_SESSION['scan_to_process'])){
+        $scan = $_SESSION['scan_to_process'];
+        $scans = array(
+            array(
+                'queued_scan_job_id' =>  $scan->job_id,
+                'queued_scan_property_id' =>  $scan->property_id,
+            )
+         );
+        $page_property_id = $_SESSION['page_property_id'];
+        $page_id = $_SESSION['page_id'];
+        $page_url = $_SESSION['page_url'];
+        if(isset($_SESSION['report_id'])) // Report IDs can be blank
+            $report_id = $_SESSION['report_id'];
+    }else{
 
-    // If no prioritized scans fetch the next scan
-    if (count($scans) < $max_scans || empty($scans)) {
-        $scan_limit = $max_scans - count($scans);
-        $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL AND queued_scan_prioritized IS NULL LIMIT $scan_limit;");
+        // Fetch up to five prioritized scan
+        $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_prioritized = 1 LIMIT $max_scans;");
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if(!empty($results))
             $scans = array_merge($scans, $results);
+
+        // If no prioritized scans fetch the next scan
+        if (count($scans) < $max_scans || empty($scans)) {
+            $scan_limit = $max_scans - count($scans);
+            $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL AND queued_scan_prioritized IS NULL LIMIT $scan_limit;");
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if(!empty($results))
+                $scans = array_merge($scans, $results);
+        }
+
     }
 
     // Handle if no scans to process.
@@ -58,7 +74,7 @@ try {
         update_processing_value($job_id, 1);
 
         // Perform the API GET request
-        $api_url = "http://198.211.98.156/results/" . $job_id;
+        $api_url =  $_ENV['SCAN_URL']. '/results/' . $job_id;
         $json = file_get_contents($api_url);
 
         // Handle scans that don't return JSON.

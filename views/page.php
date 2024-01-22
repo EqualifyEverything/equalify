@@ -26,7 +26,7 @@ $is_page_scanning = is_page_scanning($page_id);
 if($is_page_scanning){
 
     // Success message notifies that page is scanning
-    $_SESSION['success'] = 'Page is scanning. Reload page to check status.';
+    $_SESSION['success'] = 'Page is queued for scanning. Reload page to check status.';
 
 }
 
@@ -65,17 +65,20 @@ if(!empty($report_id)){
         <?php
         // Make button hidden if page is scanning.
         if($is_page_scanning){
-            echo '<a href="actions/rescan_page.php" class="btn btn-primary btn-sm my-0 disabled" tabindex="-1" role="button" aria-disabled="true">Rescan Page</a>';
+            echo '<a href="actions/process_page.php" class="btn btn-primary btn-sm my-0 disabled" tabindex="-1" role="button" aria-disabled="true">Send to Scan</a>';
         }else{
 
             // Session data is required to scan page.
-            $_SESSION['page_property_id'] = $page_property_id;
-            $_SESSION['page_id'] = $page_id;
-            $_SESSION['page_url'] = $page_url;
+            $page_data = array(
+                'property_id' => $page_property_id,
+                'page_id' => $page_id,
+                'page_url' => $page_url
+            );
             if($report_id) // Report IDs can be blank
-                $_SESSION['report_id'] = $report_id;
+                $page_data['report_id'] = $report_id;
+            $_SESSION['process_this_page'] = $page_data;
             
-            echo '<a href="actions/rescan_page.php" class="btn btn-primary btn-sm my-0" role="button">Rescan Page</a>';
+            echo '<a href="actions/process_page.php" class="btn btn-primary btn-sm my-0" role="button">Queue for Scan</a>';
         }
         ?>
 

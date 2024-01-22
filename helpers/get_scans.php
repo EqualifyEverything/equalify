@@ -10,6 +10,7 @@ function get_scans($page = 1, $limit = 100){
     $sql = "
         SELECT 
             qs.queued_scan_job_id, 
+            qs.queued_scan_property_id, 
             qs.queued_scan_processing,
             p.page_url, 
             prop.property_name

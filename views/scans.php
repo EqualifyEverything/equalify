@@ -20,8 +20,23 @@ $scans = get_scans($page, $limit);
 
 <div class="container">
     <h1 class="display-5 my-4">Scans</h1>
-    <div class="card  bg-white p-4 my-2">
-      <h2 class="mb-2">Scan Queue</h2>
+    <div class="card bg-white p-4 my-2">
+      <div class="d-flex flex-column flex-md-row align-items-center my-4">
+          <h2 class="mb-0 me-2">Scan Queue</h2>
+          <div class="ms-md-auto">
+
+            <?php
+            if(isset($_ENV['CONCURRENT_SCANS'])){
+              $concurrent_scan_max = $_ENV['CONCURRENT_SCANS'];
+            }else{
+              // Concurrent scans default to 20 - see process_scans.php
+              $concurrent_scan_max = 20;
+            }
+            ?>
+
+            <button class="btn btn-primary" id="process_multiple_scans">Process <?php echo $concurrent_scan_max;?> Scans</button>
+          </div>
+      </div>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -45,9 +60,9 @@ $scans = get_scans($page, $limit);
           <?php foreach ($scans as $scan): ?>
 
             <tr>
-                <td><?php echo htmlspecialchars($scan['queued_scan_job_id'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($scan['queued_scan_job_id']); ?></td>
                 <td><?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($scan['property_name'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($scan['property_name']); ?></td>
                 <td>
 
                   <?php
@@ -64,7 +79,7 @@ $scans = get_scans($page, $limit);
 
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary">Run Scan</button>
+                  <button class="btn btn-sm btn-outline-primary" data-queued_scan_job_id="<?php echo $scan['queued_scan_job_id'];?>" data-property_id="<?php echo $scan['queued_scan_property_id'];?>" >Scan Page</button>
                 </td>
             </tr>
             
