@@ -1,7 +1,7 @@
 <img src="logo.svg" alt="Equalify Logo" width="300">
 
-## Equalify
-Equalify aims to be the best accessibility platform. We publish Equalify code here so that you can run the platform locally, building new features and contributing issues.
+## Better Accessibility Management
+Equalify aims to be the best accessibility platform. That means faster scanning, more acurate results, and more intuitive user interface. We publish Equalify code here so that you can run the platform locally, building new features and contributing issues.
 
 ## Managed Service
 Not technical? Want to support Equalify?
