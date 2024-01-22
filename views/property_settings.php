@@ -32,7 +32,7 @@ $_SESSION['property_id'] = $property_id;
 ?>
 
 <div class="container">
-    <h1 class="display-5 my-4">Property Settings</h1>
+    <h1 class="display-5 my-4"><?php echo $name;?> Settings</h1>
     <div class="card  bg-white p-4 my-2">
         <form action="actions/save_property_settings.php" method="post" id="site_form">
             <div class="row mb-4">
