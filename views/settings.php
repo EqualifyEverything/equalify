@@ -48,7 +48,7 @@ require_once('components/success_or_error_message.php');
                 if(!empty($property_scanned)){
                     $date_object = new DateTime($property_scanned);
                     $formatted_date = $date_object->format('m/d/y');
-                    echo '<small class="text-muted">Scanned on '.$formatted_date.'.</small>'; 
+                    echo '<small class="text-muted">Scanned '.$formatted_date.'.</small>'; 
                 }
                 ?>
             </div>
