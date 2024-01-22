@@ -1,12 +1,12 @@
 <img src="logo.svg" alt="Equalify Logo" width="300">
 
 ## Better Accessibility Management
-Equalify aims to be the most useful accessibility platform. That means faster scanning, more acurate results, and a more intuitive user interface. We publish Equalify code here so that you can run the platform locally, building new features and contributing issues.
+Equalify aims to be the most useful accessibility platform. That means faster scanning, more accurate results, and a more intuitive user interface. We publish Equalify code here so that you can run the platform locally, building new features and contributing issues.
 
 ## Managed Service
 Not technical? Want to support Equalify?
 
-Visit [https://equaliy.app](https://equaliy.app) to try our hosted service.
+Visit [https://equalify.app](https://equalify.app) to try our hosted service.
 
 The service is <strong>fully supported</strong> and <strong>super fast</strong>. Plus, you'll get these features:
 - Automatic Scans
