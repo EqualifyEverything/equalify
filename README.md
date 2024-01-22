@@ -14,9 +14,9 @@ The service is <strong>fully supported</strong> and <strong>super fast</strong>.
 - Multi-User Administration
 - Shareable Reports
 
-Please also <b>star this repo</b>.
+And please <b>star this repo</b>!
 
-Your support sustains open source work!
+Your support sustains open source work.
 
 ## Setup
 After forking the repo: 
