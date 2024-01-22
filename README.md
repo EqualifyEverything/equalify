@@ -23,7 +23,6 @@ After forking the repo:
 1. Create `.env` with the following:
     ```
     ## DB Info
-    MODE='managed'
     DB_HOST=
     DB_USERNAME=
     DB_PASSWORD=
