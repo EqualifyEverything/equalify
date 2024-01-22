@@ -25,7 +25,7 @@ try {
     if(!empty($next_property_id)){
 
         // Mark the scan as running
-        update_property_scanning_data($next_property_id, 1);
+        update_property_processing_data($next_property_id, 1);
         
         // We'll generate the property
         $results = get_property_scan_results($next_property_url);
@@ -34,13 +34,13 @@ try {
             save_to_database($results, $next_property_id);
 
         // On success
-        update_property_scanning_data($next_property_id, NULL);
-        echo "Success! $next_property_url scanned.\n";   
+        update_property_processing_data($next_property_id, NULL);
+        echo "Success! $next_property_url processed.\n";   
 
     }else{
 
         // Kill scan if no properties to scan.
-        echo "No properties to scan.\n";
+        echo "No properties to process.\n";
         
     }
 
@@ -51,7 +51,7 @@ try {
 } catch (Exception $e) {
 
     // Clear out scanning data and post error
-    update_property_scanning_data($next_property_id, NULL);
+    update_property_processing_data($next_property_id, NULL);
     echo date('Y-m-d H:i:s').': ' . $e->getMessage();
     if(isset($_SESSION['property_id']))
         unset($_SESSION['property_id']);
@@ -59,23 +59,23 @@ try {
 
 }
 
-function update_property_scanning_data($property_id, $property_scanning = NULL) {
+function update_property_processing_data($property_id, $property_processing = NULL) {
     global $pdo;
     $current_date_time = date('Y-m-d H:i:s');
 
     $update_query = "
         UPDATE properties 
         SET 
-            property_scanning = :property_scanning, 
-            property_scanned = :property_scanned
+            property_processing = :property_processing, 
+            property_processed = :property_processed
         WHERE 
             property_id = :property_id
     ";
 
     $update_stmt = $pdo->prepare($update_query);
     $update_stmt->execute([
-        ':property_scanning' => $property_scanning, 
-        ':property_scanned' => $current_date_time, // Set the current date and time
+        ':property_processing' => $property_processing, 
+        ':property_processed' => $current_date_time, // Set the current date and time
         ':property_id' => $property_id
     ]);
 }

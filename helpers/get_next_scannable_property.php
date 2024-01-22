@@ -9,12 +9,12 @@ function get_next_scannable_property() {
     FROM properties
     WHERE 
         (property_archived != 1 OR property_archived IS NULL) AND
-        (property_scanning != 1 OR property_scanning IS NULL) AND
-        (property_scanned IS NULL OR property_scanned <= DATE_SUB(NOW(), INTERVAL 7 DAY)) AND
+        (property_processing != 1 OR property_processing IS NULL) AND
+        (property_processed IS NULL OR property_processed <= DATE_SUB(NOW(), INTERVAL 7 DAY)) AND
         NOT EXISTS (
-            SELECT 1 FROM properties WHERE property_scanning = 1
+            SELECT 1 FROM properties WHERE property_processing = 1
         )
-    ORDER BY property_scanned ASC
+    ORDER BY property_processed ASC
     LIMIT 1;
     ";
 

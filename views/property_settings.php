@@ -10,10 +10,10 @@ if(isset($_GET['property_id'])){
     $property = get_property($property_id);
     $name = $property['property_name'];
     $url = $property['property_url'];
-    $property_scanned = $property['property_scanned'];
-    $date_time = new DateTime($property_scanned);
+    $property_processed = $property['property_processed'];
+    $date_time = new DateTime($property_processed);
     $scanned_date = $date_time->format('n/j/y \a\t G:i');
-    $scanning = $property['property_scanning'];
+    $scanning = $property['property_processing'];
 
 
 // Default data for new properties
@@ -98,12 +98,12 @@ document.addEventListener('DOMContentLoaded', function () {
       scanButton.disabled = true;
 
       // Update the status for screen readers
-      statusDisplay.textContent = 'Property scanning...';
+      statusDisplay.textContent = 'Property processing...';
       statusDisplay.setAttribute('aria-live', 'assertive');
 
       // Start the AJAX request
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'actions/scan_property.php', true);
+      xhr.open('POST', 'actions/process_property.php', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
       xhr.onload = function() {
