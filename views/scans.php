@@ -37,7 +37,7 @@ $scans = get_scans($page, $limit);
         <?php if (empty($scans)): ?>
 
           <tr>
-              <td colspan="4">No scans available.</td>
+              <td colspan="5">No scans queued.</td>
           </tr>
 
         <?php else: ?>

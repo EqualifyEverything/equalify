@@ -28,12 +28,26 @@ try {
 
         $results = get_api_results($next_property_url);
 
-        if(results_are_valid_format($results) == TRUE)
+        if(results_are_valid_format($results) == TRUE){
+
+            // Add existing page URLs to results where possible
+            foreach ($results as &$result) {
+                $page_id = find_page_id($result['URL'], $next_property_id);
+                if ($page_id) {
+                    $result['page_id'] = $page_id;
+                } else {
+                    $result['page_id'] = NULL;
+                }
+            }
+            unset($result);
+
             save_to_database($results, $next_property_id);
 
-        // On success
-        update_property_processing_data($next_property_id, NULL);
-        echo "Success! $next_property_url processed.\n";   
+            // On success
+            update_property_processing_data($next_property_id, NULL);
+            echo "Success! $next_property_url processed.\n";   
+
+        }
 
     }else{
 
@@ -92,6 +106,19 @@ function get_api_results($property_url) {
     $results = json_decode($response, true);
 
     return $results;
+}
+
+function find_page_id($url, $propertyId) {
+    global $pdo;
+
+    $sql = "SELECT page_id FROM pages WHERE page_url = :url AND page_property_id = :propertyId LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':url', $url, PDO::PARAM_STR);
+    $stmt->bindParam(':propertyId', $propertyId, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result ? $result['page_id'] : null;
 }
 
 
@@ -155,13 +182,14 @@ function save_to_database($results, $property_id) {
 
     // Batch insert the new results
     if (!empty($newResults)) {
-        $insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id) VALUES ";
+        $insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id, queued_scan_page_id) VALUES ";
         $insertValues = [];
         $params = [];
         foreach ($newResults as $index => $result) {
-            $insertValues[] = "(:jobId{$index}, :propertyId{$index})";
+            $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :page_id{$index})";
             $params[":jobId{$index}"] = $result['JobID'];
             $params[":propertyId{$index}"] = $property_id;
+            $params[":page_id{$index}"] = $result['page_id'];
         }
 
         $insertQuery .= implode(', ', $insertValues);

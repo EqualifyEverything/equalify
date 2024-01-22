@@ -1,7 +1,10 @@
 <?php
 function get_scans($page = 1, $limit = 100){
     global $pdo;
+
+    // Calculate offset
     $offset = ($page - 1) * $limit;
+    $offset = max($offset, 0); // Ensure offset is not negative
 
     // Query to fetch scans with joins
     $sql = "
