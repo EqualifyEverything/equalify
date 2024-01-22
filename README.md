@@ -14,6 +14,8 @@ The service is <strong>fully supported</strong> and <strong>super fast</strong>.
 - Multi-User Administration
 - Shareable Reports
 
+You can also <b>star this repo</b> to show your support.
+
 Your support sustains open source work!
 
 ## Setup
