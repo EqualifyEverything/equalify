@@ -46,8 +46,8 @@ require_once('components/success_or_error_message.php');
                 <?php
                 $property_scanned = $property['property_scanned'];
                 if(!empty($property_scanned)){
-                    $date_object = new DateTime($property_scanned);
-                    $formatted_date = $date_object->format('m/d/y');
+                    $date_object = new DateTime($property_scanned);                
+                    $formatted_date = $date_object->format('n/j/y \a\t G:i');
                     echo '<small class="text-muted">Scanned '.$formatted_date.'.</small>'; 
                 }
                 ?>
