@@ -47,15 +47,15 @@ $_SESSION['property_id'] = $property_id;
     <div class="card  bg-white p-4 my-2">
       <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="me-2 mb-0">Scan Settings</h2>
-          <div class="text-md-end">
-            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Scanned <?php echo $scanned_date; ?></small><br>
+          <div class="d-flex justify-content-end align-items-center">
+            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Scanned <?php echo $scanned_date; ?></small>
 
             <?php
             // Make button hidden if property is scanning.
             if($scanning){
-                echo '<button id="scanButton" class="btn btn-primary btn-sm my-0 disabled" tabindex="-1" aria-disabled="true" onclick="triggerPropertyScan()">Scan Property</button>';
+                echo '<button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0 disabled" tabindex="-1" aria-disabled="true" onclick="triggerPropertyScan()">Scan Property</button>';
             }else{
-                echo '<button id="scanButton" class="btn btn-primary btn-sm my-0">Start Scanning</button>';
+                echo '<button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Scan Property</button>';
             }
             ?>
 
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
       xhr.onload = function() {
-        
+
           // Update the status with the response
           statusDisplay.textContent = xhr.responseText;
 
