@@ -32,8 +32,8 @@ After forking the repo:
     ## Scan Info
     SCAN_URL=
     ```
-2. Run in your favorite local LAMP/LEMP setup. (We love ddev!)
-3. Run `php install.php` to create the tables.
+2. Run in your favorite local LAMP/LEMP setup. (We love [ddev](https://github.com/ddev/ddev)!)
+3. Run `php actions/install.php` to create the tables.
 4. Equalify everything!
 
 ## Contribute
