@@ -40,7 +40,7 @@ $_SESSION['property_id'] = $property_id;
       <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="me-2 mb-0">Scan Settings</h2>
           <div class="d-flex justify-content-end align-items-center">
-            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Processed: <?php echo $scanned_date; ?></small>
+            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Processed <?php echo $scanned_date; ?></small>
             <button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Send to Scan</button>
           </div>
       </div>
