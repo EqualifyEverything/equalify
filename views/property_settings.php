@@ -15,14 +15,6 @@ if(isset($_GET['property_id'])){
     $scanned_date = $date_time->format('n/j/y \a\t G:i');
     $scanning = $property['property_scanning'];
 
-  // Set info if page is currently being scanned
-  if($scanning){
-
-      // Success message notifies that page is scanning
-      $_SESSION['success'] = 'Property is scanning. Reload page to check status.';
-
-  }
-
 
 // Default data for new properties
 }else{
@@ -49,16 +41,7 @@ $_SESSION['property_id'] = $property_id;
           <h2 class="me-2 mb-0">Scan Settings</h2>
           <div class="d-flex justify-content-end align-items-center">
             <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Scanned <?php echo $scanned_date; ?></small>
-
-            <?php
-            // Make button hidden if property is scanning.
-            if($scanning){
-                echo '<button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0 disabled" tabindex="-1" aria-disabled="true" onclick="triggerPropertyScan()">Scan Property</button>';
-            }else{
-                echo '<button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Scan Property</button>';
-            }
-            ?>
-
+            <button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Scan Property</button>
           </div>
       </div>
         <form action="actions/save_property_settings.php" method="post" id="site_form">
