@@ -44,9 +44,9 @@ require_once('components/success_or_error_message.php');
                 </div>
 
                 <?php
-                $property_processed = $property['property_processed'];
-                if(!empty($property_processed)){
-                    $date_object = new DateTime($property_processed);
+                $property_scanned = $property['property_scanned'];
+                if(!empty($property_scanned)){
+                    $date_object = new DateTime($property_scanned);
                     $formatted_date = $date_object->format('m/d/y');
                     echo '<small class="text-muted">Processed on '.$formatted_date.'.</small>'; 
                 }

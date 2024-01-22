@@ -39,8 +39,8 @@ $tables = [
             `property_name` text NOT NULL,
             `property_archived` tinyint(1) DEFAULT NULL,
             `property_url` text NOT NULL,
-            `property_processed` datetime DEFAULT NULL,
-            `property_processing` tinyint(1) DEFAULT NULL,
+            `property_scanned` datetime DEFAULT NULL,
+            `property_scanning` tinyint(1) DEFAULT NULL,
             PRIMARY KEY (`property_id`)
         ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
 

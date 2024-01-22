@@ -29,20 +29,20 @@ try {
         $existing_property_url = get_property($property_id)['property_url'];
         if($existing_property_url !== $_POST['property_url']){
             // We can force processing by removing the timestamp
-            $property_processed = NULL;
+            $property_scanned = NULL;
         }else{
             // Keep the timestamp for old properties
-            $property_processed = get_property($property_id)['property_processed'];
+            $property_scanned = get_property($property_id)['property_scanned'];
         }
 
         // Existing property SQL statement
-        $stmt = $pdo->prepare("UPDATE properties SET property_name = :property_name, property_url = :property_url, property_archived = :property_archived, property_processed = :property_processed WHERE property_id = :property_id");
+        $stmt = $pdo->prepare("UPDATE properties SET property_name = :property_name, property_url = :property_url, property_archived = :property_archived, property_scanned = :property_scanned WHERE property_id = :property_id");
 
         // Bind the parameters
         $stmt->bindParam(':property_name', $_POST['property_name'], PDO::PARAM_STR);
         $stmt->bindParam(':property_url', $_POST['property_url'], PDO::PARAM_STR);
         $stmt->bindParam(':property_archived', $property_archived, PDO::PARAM_INT);
-        $stmt->bindParam(':property_processed', $property_processed, PDO::PARAM_STR);
+        $stmt->bindParam(':property_scanned', $property_scanned, PDO::PARAM_STR);
         $stmt->bindParam(':property_id', $property_id, PDO::PARAM_INT);
 
     }else{

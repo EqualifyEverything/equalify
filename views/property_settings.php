@@ -10,8 +10,19 @@ if(isset($_GET['property_id'])){
     $property = get_property($property_id);
     $name = $property['property_name'];
     $url = $property['property_url'];
-    $processed_date = $property['property_processed'];
-    $processing = $property['property_processing'];
+    $property_scanned = $property['property_scanned'];
+    $date_time = new DateTime($property_scanned);
+    $scanned_date = $date_time->format('n/j/y \a\t G:i');
+    $scanning = $property['property_scanning'];
+
+  // Set info if page is currently being scanned
+  if($scanning){
+
+      // Success message notifies that page is scanning
+      $_SESSION['success'] = 'Property is scanning. Reload page to check status.';
+
+  }
+
 
 // Default data for new properties
 }else{
@@ -20,13 +31,13 @@ if(isset($_GET['property_id'])){
     $property_id ='';
     $name = '';
     $url = '';
-    $processed_date = '';
-    $processing = '';
+    $scanned_date = '';
+    $scanning = '';
 
 }
 
 // Let's turn the ID into a session variable so
-// we can safely save existing content.
+// we can safely save existing content with the form.
 $_SESSION['property_id'] = $property_id; 
 
 ?>
@@ -34,6 +45,22 @@ $_SESSION['property_id'] = $property_id;
 <div class="container">
     <h1 class="display-5 my-4"><?php echo $name;?> Settings</h1>
     <div class="card  bg-white p-4 my-2">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="me-2 mb-0">Scan Settings</h2>
+          <div class="text-md-end">
+            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Scanned <?php echo $scanned_date; ?></small><br>
+
+            <?php
+            // Make button hidden if property is scanning.
+            if($scanning){
+                echo '<button id="scanButton" class="btn btn-primary btn-sm my-0 disabled" tabindex="-1" aria-disabled="true" onclick="triggerPropertyScan()">Scan Property</button>';
+            }else{
+                echo '<button id="scanButton" class="btn btn-primary btn-sm my-0">Start Scanning</button>';
+            }
+            ?>
+
+          </div>
+      </div>
         <form action="actions/save_property_settings.php" method="post" id="site_form">
             <div class="row mb-4">
                 <div class="col">
@@ -78,4 +105,40 @@ $_SESSION['property_id'] = $property_id;
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var scanButton = document.getElementById('scanButton');
+  var statusDisplay = document.getElementById('property_scan_status');
 
+  scanButton.addEventListener('click', function() {
+      // Disable the button
+      scanButton.disabled = true;
+
+      // Update the status for screen readers
+      statusDisplay.textContent = 'Property scanning...';
+      statusDisplay.setAttribute('aria-live', 'assertive');
+
+      // Start the AJAX request
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'actions/scan_property.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+      xhr.onload = function() {
+        
+          // Update the status with the response
+          statusDisplay.textContent = xhr.responseText;
+
+          // Re-enable the button
+          scanButton.disabled = false;
+      };
+
+      xhr.onerror = function() {
+          // Update the status with the error message
+          statusDisplay.textContent = 'Error: Could not connect to the server.';
+          scanButton.disabled = false;
+      };
+
+      xhr.send();
+  });
+});
+</script>
