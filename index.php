@@ -32,6 +32,7 @@ require_once('components/active_class.php');
             </a>
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
+                <li class="nav-item"><a href="index.php?view=scans" class="<?php the_active_class('scans');?> nav-link" aria-current="page">Scans</a></li>
                 <li class="nav-item"><a href="index.php?view=settings" class="<?php the_active_class('settings');?> nav-link">Settings</a></li>
                 
                 <?php
