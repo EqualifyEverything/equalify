@@ -7,7 +7,6 @@ require_once(__ROOT__.'/init.php');
 
 // Helpers
 require_once(__ROOT__.'/helpers/get_next_scannable_property.php');
-require_once(__ROOT__.'/helpers/get_property_scan_results.php');
 require_once(__ROOT__.'/helpers/get_property.php');
 
 try {
@@ -26,9 +25,8 @@ try {
 
         // Mark the scan as running
         update_property_processing_data($next_property_id, 1);
-        
-        // We'll generate the property
-        $results = get_property_scan_results($next_property_url);
+
+        $results = get_api_results($next_property_url);
 
         if(results_are_valid_format($results) == TRUE)
             save_to_database($results, $next_property_id);
@@ -59,6 +57,44 @@ try {
 
 }
 
+function get_api_results($property_url) {
+    
+    // Set API endpoint
+    $api_url = $_ENV['SCAN_URL'].'/generate/sitemapurl';
+
+    // Prepare the payload
+    $data = json_encode(array("url" => $property_url));
+
+    // Initialize cURL session
+    $ch = curl_init($api_url);
+
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($data)
+    ));
+
+    // Execute cURL session
+    $response = curl_exec($ch);
+
+    // Check for errors
+    if(curl_errno($ch)){
+        throw new Exception(curl_error($ch));
+    }
+
+    // Close cURL session
+    curl_close($ch);
+
+    // Decode JSON response
+    $results = json_decode($response, true);
+
+    return $results;
+}
+
+
 function update_property_processing_data($property_id, $property_processing = NULL) {
     global $pdo;
     $current_date_time = date('Y-m-d H:i:s');
@@ -82,7 +118,7 @@ function update_property_processing_data($property_id, $property_processing = NU
 
 function results_are_valid_format($results) {
 
-    // First heck if JSON decoding was successful and is an array
+    // First check if JSON decoding was successful and is an array
     if ($results === null || !is_array($results)) {
         throw new Exception("Property results are not formatted correctly");
     }

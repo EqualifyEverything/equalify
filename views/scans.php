@@ -21,12 +21,7 @@ $scans = get_scans($page, $limit);
 <div class="container">
     <h1 class="display-5 my-4">Scans</h1>
     <div class="card  bg-white p-4 my-2">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="me-2 mb-0">Active Scans</h2>
-          <div>
-            <button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Stop All Scans</button>
-          </div>
-      </div>
+      <h2 class="mb-2">Scan Queue</h2>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -34,6 +29,7 @@ $scans = get_scans($page, $limit);
             <th scope="col">Page URL</th>
             <th scope="col">Property</th>
             <th scope="col">Status</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -66,6 +62,9 @@ $scans = get_scans($page, $limit);
                     }
                   ?>
 
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary">Run Scan</button>
                 </td>
             </tr>
             
