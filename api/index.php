@@ -11,12 +11,12 @@ define('REQUEST_BASE_PATH', __DIR__ . '/requests/');
 // Handle various requests
 $request = $_GET['request'] ?? '';
 
-// Simplify getting query parameters
+// Optional query parameters
 $results_per_page = $_GET['results_per_page'] ?? 5;
 $page = isset($_GET['current_results_page']) ? (int)$_GET['current_results_page'] : 1;
 $offset = ($page - 1) * $results_per_page;
 
-// Filters
+// Optional Filters
 $filters = [];
 if (isset($_GET['tags'])) {
     $filters['tags'] = explode(',', $_GET['tags']);

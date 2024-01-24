@@ -1,10 +1,6 @@
 <?php
-function get_scans($page = 1, $limit = 100){
+function get_scans($results_per_page, $offset){
     global $pdo;
-
-    // Calculate offset
-    $offset = ($page - 1) * $limit;
-    $offset = max($offset, 0); // Ensure offset is not negative
 
     // Query to fetch scans with joins
     $sql = "
@@ -23,12 +19,10 @@ function get_scans($page = 1, $limit = 100){
         ORDER BY 
             (qs.queued_scan_processing = 1 OR qs.queued_scan_prioritized = 1) DESC,
             qs.queued_scan_job_id ASC
-        LIMIT :limit OFFSET :offset
+        LIMIT $results_per_page OFFSET $offset
     ";
     
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

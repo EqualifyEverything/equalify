@@ -7,40 +7,66 @@ require_once(__ROOT__.'/init.php');
 
 try {
 
-    // Set maximum concurrent scans
-    if(isset($_ENV['CONCURRENT_SCANS'])){
-        $max_scans = $_ENV['CONCURRENT_SCANS'];
-    }else{
-        // 20 seems to be as much as axe can process per minute
-        // on a xxs machine.
-        $max_scans = 20;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        
+        // Check if it's an individual scan is requested
+        if (isset($_POST['job_id']) && isset($_POST['property_id'])) {
+
+            // Validate and sanitize inputs
+            $job_id = filter_var($_POST['job_id'], FILTER_VALIDATE_INT);
+            $property_id = filter_var($_POST['property_id'], FILTER_VALIDATE_INT);
+
+            if ($job_id !== false && $property_id !== false) {
+                $scans = [
+                    [
+                        'queued_scan_job_id' => $job_id,
+                        'queued_scan_property_id' => $property_id,
+                    ]
+                ];
+                process_scans($scans);
+            } else {
+                echo 'Invalid input';
+            }
+
+        } elseif (isset($_POST['process_multiple_scans'])) {
+            process_scans();
+        }
+
+    } else {
+
+        // Not a POST request. Could be CLI or other
+        // Existing code for processing scans
+        process_scans();
+
     }
 
-    // Setup scans array
-    $scans = array();
+} catch (Exception $e) {
 
-    // Scans can be manually triggered with session data.
-    if(isset($_SESSION['scan_to_process'])){
-        $scan = $_SESSION['scan_to_process'];
-        $scans = array(
-            array(
-                'queued_scan_job_id' =>  $scan->job_id,
-                'queued_scan_property_id' =>  $scan->property_id,
-            )
-         );
-        $page_property_id = $_SESSION['page_property_id'];
-        $page_id = $_SESSION['page_id'];
-        $page_url = $_SESSION['page_url'];
-        if(isset($_SESSION['report_id'])) // Report IDs can be blank
-            $report_id = $_SESSION['report_id'];
-    }else{
+    // Handle the exception
+    echo $e->getMessage();
+    exit;
 
-        // Fetch up to five prioritized scan
+}
+
+// Helper Functions
+function process_scans($scans = null) {
+    global $pdo;
+
+    $max_scans = $_ENV['CONCURRENT_SCANS'] ?? 20; // Set maximum concurrent scans, default to 20 (what axe can do on xxs machine)
+
+    // If scans aren't declared, this will just get multiple
+    // scans automatically. 
+    if ($scans === null) {
+
+        // Fetch up prioritized scans
         $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_prioritized = 1 LIMIT $max_scans;");
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if(!empty($results))
+        if(!empty($results)){
             $scans = array_merge($scans, $results);
+        }else{
+            $scans = array();
+        }
 
         // If no prioritized scans fetch the next scan
         if (count($scans) < $max_scans || empty($scans)) {
@@ -279,16 +305,8 @@ try {
     // End scan processing
     endforeach;
 
-} catch (Exception $e) {
-
-    // Handle the exception
-    error_log($e->getMessage());
-
-    exit;
-
 }
 
-// Helper Functions
 function update_processing_value($job_id, $new_value){
     global $pdo;
 
