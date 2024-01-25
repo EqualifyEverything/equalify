@@ -12,7 +12,8 @@ require_once(__ROOT__.'/helpers/get_property.php');
 try {
 
     // support cli arguments
-    parse_str(implode('&', array_slice($argv, 1)), $_CLI);
+    if (php_sapi_name() === 'cli')
+        parse_str(implode('&', array_slice($argv, 1)), $_CLI);
 
     // Check if a property is defined via Session
     if(isset($_SESSION['property_id'])){
