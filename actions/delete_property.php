@@ -30,6 +30,7 @@ try {
     // Delete from queued_scans and properties
     $pdo->exec("DELETE FROM queued_scans WHERE queued_scan_property_id = $property_id");
     $pdo->exec("DELETE FROM properties WHERE property_id = $property_id");
+    $pdo->exec("DELETE FROM pages WHERE page_property_id = $property_id");
 
     // Process report_filters in reports table
     $reportsStmt = $pdo->query("SELECT report_id, report_filters FROM reports");
