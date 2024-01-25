@@ -10,10 +10,14 @@ if(isset($_GET['property_id'])){
     $property = get_property($property_id);
     $name = $property['property_name'];
     $url = $property['property_url'];
-    $property_processed = $property['property_processed'];
-    $date_time = new DateTime($property_processed);
-    $scanned_date = $date_time->format('n/j/y \a\t G:i');
-    $scanning = $property['property_processing'];
+    $scanning = $property['property_processing'];  
+    if(!empty($property['property_processed'])){
+      $property_processed = $property['property_processed'];
+      $date_time = new DateTime($property_processed);
+      $scanned_date = 'Processed '.$date_time->format('n/j/y \a\t G:i');
+    }else{
+      $scanned_date = 'Not processed';
+    }
 
 
 // Default data for new properties
@@ -40,7 +44,7 @@ $_SESSION['property_id'] = $property_id;
       <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="me-2 mb-0">Scan Settings</h2>
           <div class="d-flex justify-content-end align-items-center">
-            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive">Processed <?php echo $scanned_date; ?>.</small>
+            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive"><?php echo $scanned_date; ?>.</small>
             <button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Send to Scan</button>
           </div>
       </div>
