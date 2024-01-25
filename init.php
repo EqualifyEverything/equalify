@@ -37,7 +37,6 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
     if ($session === null) {  // The user isn't logged in.      
         require_once 'actions/login.php';
     } else {
-        
         $GLOBALS["ACTIVE_DB"] = $session->user['equalify_databases'][0]; // TODO: currently just takes first from DBs array, should be switchable
         $user_title = $session->user['title'];
         $user_name =  $session->user['name'];
@@ -45,12 +44,6 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
         $user_nickname = $session->user['nickname'];
         $user_picture = $session->user['picture'];
         $user_last_updated = $session->user['updated_at'];
-        
-        echo '<!--';
-        print_r($session->user);
-        echo '-->';
-     
-        /* echo '<p>You can now <a href="/?auth=logout">log out</a>.</p>';  */
     }
 
 }
