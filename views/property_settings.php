@@ -8,11 +8,11 @@ if(isset($_GET['property_id'])){
     // Existing property values
     $property_id = $_GET['property_id'];
     $property = get_property($property_id);
-    $scanning = isset($$property['property_processing']) ? $property['property_processing'] : ''; 
-    $name = isset($$property['property_name']) ? $property['property_name'] : ''; 
-    $url = isset($$property['property_url']) ? $property['property_url'] : ''; 
-    $scanning = isset($$property['property_processing']) ? $property['property_processing'] : ''; 
-    $property_processed = isset($$property['property_processed']) ? $property['property_processed'] : ''; 
+    $scanning = isset($property['property_processing']) ? $property['property_processing'] : '';
+    $name = isset($property['property_name']) ? $property['property_name'] : ''; 
+    $url = isset($property['property_url']) ? $property['property_url'] : ''; 
+    $scanning = isset($property['property_processing']) ? $property['property_processing'] : ''; 
+    $property_processed = isset($property['property_processed']) ? $property['property_processed'] : ''; 
 
     if(!empty($property_processed)){
       $date_time = new DateTime($property_processed);
