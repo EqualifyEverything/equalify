@@ -65,7 +65,7 @@ require_once('components/active_class.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Release Candidate 2
+        Equalify Version 1 - Release Candidate 2
     </footer>
     <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
