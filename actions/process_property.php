@@ -11,14 +11,29 @@ require_once(__ROOT__.'/helpers/get_property.php');
 
 try {
 
-    // Check if a property is defined
+    // support cli arguments
+    parse_str(implode('&', array_slice($argv, 1)), $_CLI);
+
+    // Check if a property is defined via Session
     if(isset($_SESSION['property_id'])){
         $next_property_id = $_SESSION['property_id']; // Define property to scan by setting session.
         $next_property_url = get_property($next_property_id)['property_url'];
+
+    // Check if a property is defined via CLI
+    }elseif(isset($_CLI['property_id'])){
+        $next_property_id = $_CLI['property_id']; // Define property to scan by setting session.
+        $next_property_url = get_property($next_property_id)['property_url'];    
+    
+    // Auto get property when no property is defined
     }else{
         $next_property = get_next_scannable_property();
-        $next_property_id = $next_property['property_id'];
-        $next_property_url = $next_property['property_url'];
+        if(!empty($next_property)){
+            $next_property_id = $next_property['property_id'];
+            $next_property_url = $next_property['property_url'];
+        }else{
+            $next_property_id = '';
+            $next_property_url = '';
+        }
     }
 
     if(!empty($next_property_id)){
@@ -53,6 +68,7 @@ try {
 
         // Kill scan if no properties to scan.
         echo "No properties to process.\n";
+        exit;
         
     }
 
