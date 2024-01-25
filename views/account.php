@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <button type="submit" id="submit" class="btn btn-lg btn-primary">
+                <button type="submit" id="submit" class="btn btn-lg btn-primary" disabled>
                     Update Account
                 </button>
                 <button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal" disabled>
