@@ -7,7 +7,35 @@ require_once(__ROOT__.'/init.php');
 
 try {
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // This script can be run via cli
+    if (php_sapi_name() === 'cli') {
+
+        // cli arguments
+        parse_str(implode('&', array_slice($argv, 1)), $_CLI);
+        $job_id = isset($_CLI['job_id']) ? $_CLI['job_id'] : '';
+        $property_id = isset($_CLI['property_id']) ? $_CLI['property_id'] : '';
+
+        // Check if it's an individual scan is requested
+        if (!empty($job_id ) && !empty($property_id)) {
+            if ($job_id !== false && $property_id !== false) {
+                $scans = [
+                    [
+                        'queued_scan_job_id' => $job_id,
+                        'queued_scan_property_id' => $property_id,
+                    ]
+                ];
+                process_scans($scans);
+            } else {
+                echo 'Invalid input';
+            }
+
+        // No arguements mean we process everything.
+        } else {
+            process_scans();
+        }
+    
+    // The script can also be run by posting to it
+    }elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Check if it's an individual scan is requested
         if (isset($_POST['job_id']) && isset($_POST['property_id'])) {
@@ -61,21 +89,19 @@ function process_scans($scans = null) {
         // Fetch up prioritized scans
         $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_prioritized = 1 LIMIT $max_scans;");
         $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if(!empty($results)){
-            $scans = array_merge($scans, $results);
-        }else{
-            $scans = array();
-        }
+        $prioritized_scans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // If no prioritized scans fetch the next scan
-        if (count($scans) < $max_scans || empty($scans)) {
-            $scan_limit = $max_scans - count($scans);
+        // Just use prioritized scans if there's enough
+        if(count($prioritized_scans) >= $max_scans)
+            $scans = $prioritized_scans;
+
+        // If not enough prioritized scans fetch the next scan
+        if (count($prioritized_scans) < $max_scans || empty($scans)) {
+            $scan_limit = $max_scans - count($prioritized_scans);
             $stmt = $pdo->prepare("SELECT queued_scan_job_id, queued_scan_property_id FROM queued_scans WHERE queued_scan_processing IS NULL AND queued_scan_prioritized IS NULL LIMIT $scan_limit;");
             $stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if(!empty($results))
-                $scans = array_merge($scans, $results);
+            $other_scans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $scans = array_merge($prioritized_scans, $other_scans);
         }
 
     }

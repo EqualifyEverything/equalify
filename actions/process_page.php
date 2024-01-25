@@ -53,5 +53,5 @@ $_SESSION['process_this_page'] = '';
 $_SESSION['success'] = 'Rescanning page. Refresh for updates.';
 
 // Redirect
-header("Location: ../index.php?view=page&page_id=$page_id&report_id=$report_id");
+header("Location: ../index.php?view=scans");
 exit;

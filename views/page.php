@@ -78,7 +78,7 @@ if(!empty($report_id)){
                 $page_data['report_id'] = $report_id;
             $_SESSION['process_this_page'] = $page_data;
             
-            echo '<a href="actions/process_page.php" class="btn btn-primary btn-sm my-0" role="button">Queue for Scan</a>';
+            echo '<a href="actions/process_page.php" class="btn btn-primary btn-sm my-0" role="button">Send to Scan</a>';
         }
         ?>
 
