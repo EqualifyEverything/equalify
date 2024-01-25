@@ -44,7 +44,7 @@ require_once('components/success_or_error_message.php');
     <?php 
     // End Reports
     endforeach; 
-    else: echo '<p class="lead text-center">No reports.</p>';
+    else: echo '<div class="text-center"><p class="lead text-center">No reports.</p><div class="mt-4 bg-secondary-subtle p-4 border border-dark-subtle rounded"><h2 class="h4">New to Equalify?</h2>Checkout <a href="https://www.youtube.com/watch?v=g3t49qSIc-0">this video</a> to get started.</div></div>';
     endif;
     ?>
 
