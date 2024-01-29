@@ -26,7 +26,10 @@ try {
                 ];
                 process_scans($scans);
             } else {
-                echo 'Invalid input';
+                $error_message = 'Invalid scan parameters';
+                $_SESSION['error'] = $error_message;
+                header("Location: ../index.php?view=scans");
+                exit;
             }
 
         // No arguements mean we process everything.
@@ -34,30 +37,36 @@ try {
             process_scans();
         }
     
-    // The script can also be run by posting to it
-    }elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // The script can also be run by posting to it or via custom URL variables
+    }elseif ( 
+        (isset($_POST['job_id']) && isset($_POST['property_id'])) || 
+        (isset($_GET['job_id']) && isset($_GET['property_id']))
+    ) {
         
-        // Check if it's an individual scan is requested
-        if (isset($_POST['job_id']) && isset($_POST['property_id'])) {
-
-            // Validate and sanitize inputs
+        // Validate and sanitize inputs
+        if(isset($_POST['job_id']))
             $job_id = filter_var($_POST['job_id'], FILTER_VALIDATE_INT);
+        if(isset($_POST['property_id']))
             $property_id = filter_var($_POST['property_id'], FILTER_VALIDATE_INT);
+        if(isset($_GET['job_id']))
+            $job_id = $_GET['job_id'];
+        if(isset($_GET['property_id']))
+            $property_id = $_GET['property_id'];
 
-            if ($job_id !== false && $property_id !== false) {
-                $scans = [
-                    [
-                        'queued_scan_job_id' => $job_id,
-                        'queued_scan_property_id' => $property_id,
-                    ]
-                ];
-                process_scans($scans);
-            } else {
-                echo 'Invalid input';
-            }
-
-        } elseif (isset($_POST['process_multiple_scans'])) {
-            process_scans();
+        if ($job_id !== false && $property_id !== false) {
+            $scans = [
+                [
+                    'queued_scan_job_id' => $job_id,
+                    'queued_scan_property_id' => $property_id,
+                ]
+            ];
+            process_scans($scans);
+        } else {
+            $error_message = 'Invalid scan parameters';
+            update_log($error_message);
+            $_SESSION['error'] = $error_message;
+            header("Location: ../index.php?view=scans");
+            exit;
         }
 
     } else {
@@ -110,12 +119,16 @@ function process_scans($scans = null) {
     if (empty($scans)) {
 
         // Stop process if there is no scan.
-        update_log("No scans to process.");
+        $error_message = 'No scans to process.';
+        update_log($error_message);
+        $_SESSION['error'] = $error_message;
+        header("Location: ../index.php?view=scans");
         exit;
-        
+
     }
 
     // Run API on each scan
+    $logged_messages = array();
     foreach ($scans as $scan):
 
         // Define property id and job id.
@@ -131,7 +144,9 @@ function process_scans($scans = null) {
 
         // Handle scans that don't return JSON.
         if ($json === false) {
-            update_log("Scan $job_id returns no JSON. Scan deleted.");
+            $message = "Scan $job_id returns no JSON. Scan deleted.";
+            $logged_messages.=$message.'<br>';
+            update_log($message);
             delete_scan($job_id);
             continue;
         }
@@ -142,7 +157,9 @@ function process_scans($scans = null) {
         // Handle incomplete scans.
         $statuses = array('delayed', 'active', 'waiting');
         if(in_array($data['status'], $statuses)){
-            update_log('Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.');
+            $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
+            $logged_messages.=$message.'<br>';
+            update_log($message);
             update_processing_value($job_id, NULL);
             continue;
         }
@@ -150,7 +167,9 @@ function process_scans($scans = null) {
         // Handle problems scans.
         $statuses = array('failed', 'unknown');
         if(in_array($data['status'], $statuses)){
-            update_log('Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan deleted.');
+            $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
+            $logged_messages.=$message.'<br>';
+            update_log($message);
             delete_scan($job_id);
             continue;
         }
@@ -168,7 +187,9 @@ function process_scans($scans = null) {
 
                 // Handle incorrectly formatted violations
                 if (!isset($violation['id'], $violation['tags'], $violation['nodes'])) {
-                    update_log("Scan $job_id returns violations in invalid format. Scan deleted.");
+                    $message = "Scan $job_id returns violations in invalid format. Scan deleted.";
+                    $logged_messages.=$message.'<br>';
+                    update_log($message);
                     delete_scan($job_id);
                     continue;
                 }
@@ -180,7 +201,10 @@ function process_scans($scans = null) {
 
                     // Handle incorrectly formatted nodes.
                     if (!isset($node['html'])) {
-                        update_log("Scan $job_id returns nodes in invalid format. Scan deleted.");
+                        $message = "Scan $job_id returns node in invalid format. Scan deleted.";
+                        $logged_messages.=$message.'<br>';
+                        update_log($message);
+    
                         delete_scan($job_id);
                         continue;
                     }
@@ -190,7 +214,10 @@ function process_scans($scans = null) {
 
                                 // Handle incorrectly formatted messages.
                                 if (!isset($item['message'])) {
-                                    update_log("Scan $job_id returns invalid '$key' format in node. Scan deleted.");
+                                    $message = "Scan $job_id returns invalid '$key' format in node. Scan deleted.";
+                                    $logged_messages.=$message.'<br>';
+                                    update_log($message);
+                
                                     delete_scan($job_id);
                                     continue;
                                 }
@@ -212,7 +239,9 @@ function process_scans($scans = null) {
         
         // Handle unformatted results.
         }else{
-            update_log("Scan $job_id returns no violations. Scan deleted.");
+            $message = "Scan $job_id returns no violations. Scan deleted.";
+            $logged_messages[] = $message;
+            update_log($message);
             delete_scan($job_id);
             continue;
         }
@@ -326,11 +355,23 @@ function process_scans($scans = null) {
         delete_scan($job_id);
 
         // Log output.
-        echo date('Y-m-d H:i:s').": Success! Scan $job_id processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.\n";
+        $message = "Scan $job_id successfully processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.";
+        $logged_messages[] = $message;
+        update_log($message);
 
     // End scan processing
     endforeach;
 
+    // Redirect with logged messages
+    if(!empty($logged_messages)){
+        $success_message = 'Returned the following results: <ul>';
+        foreach ($logged_messages as $message){
+            $success_message.= "<li>$message</li>";
+        }
+        $success_message.= "</ul>";
+        $_SESSION['success'] = $success_message;
+        header("Location: ../index.php?view=scans");    
+    }
 }
 
 function update_processing_value($job_id, $new_value){
