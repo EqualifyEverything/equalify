@@ -2,6 +2,7 @@
 // Helpers
 require_once('helpers/get_scans.php');
 require_once('helpers/get_scans_count.php');
+require_once('components/success_or_error_message.php');
 
 // Pagination Setup
 $results_per_page = 20;
@@ -21,6 +22,12 @@ $scans = get_scans($results_per_page, $offset);
 ?>
 
 <div class="container">
+  
+    <?php
+    // Success or Error message
+    the_success_or_error_message();
+    ?>
+
     <h1 class="display-5 my-4">Scans</h1>
     <div class="card bg-white p-4 my-2">
       <div class="d-flex flex-column flex-md-row align-items-center my-4">

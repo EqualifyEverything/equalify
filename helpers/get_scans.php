@@ -2,6 +2,10 @@
 function get_scans($results_per_page, $offset){
     global $pdo;
 
+    if ($offset < 0) {
+        $offset = 0;
+    }    
+
     // Query to fetch scans with joins
     $sql = "
         SELECT 
