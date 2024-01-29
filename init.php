@@ -38,12 +38,6 @@ if($GLOBALS["managed_mode"]){ // if we're in managed mode, initialize auth0
         require_once 'actions/login.php';
     } else {
         $GLOBALS["ACTIVE_DB"] = $session->user['equalify_databases'][0]; // TODO: currently just takes first from DBs array, should be switchable
-        $user_title = $session->user['title'];
-        $user_name =  $session->user['name'];
-        $user_email =  $session->user['email'];
-        $user_nickname = $session->user['nickname'];
-        $user_picture = $session->user['picture'];
-        $user_last_updated = $session->user['updated_at'];
     }
 
 }
@@ -57,7 +51,7 @@ $db_pass = $_ENV['DB_PASSWORD'];
 
 // Set Current DB
 if($GLOBALS["managed_mode"]){ 
-    $current_db = $GLOBALS["ACTIVE_DB"]; // if we're in managed mode, use the db name we get from auth0
+    $current_db = $GLOBALS["ACTIVE_DB"];
 }else{
     $current_db = $_ENV['DB_NAME'];
 }

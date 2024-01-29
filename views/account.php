@@ -10,7 +10,7 @@
             <div class="row mb-4">
                 <div class="col">
                   <label for="user_email" class="form-label h4">Email Address</label>
-                  <input id="user_email"  name="user_email" type="email" value="<?php echo $user_email;?>" class="form-control form-control-lg" disabled required>
+                  <input id="user_email"  name="user_email" type="email" value="<?php echo $session->user['email'];?>" class="form-control form-control-lg" disabled required>
                 </div>
                 <div class="col">
                   <label for="user_account" class="form-label h4">Active Account</label>
