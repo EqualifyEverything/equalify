@@ -5,7 +5,7 @@ require_once('helpers/get_scans_count.php');
 require_once('components/success_or_error_message.php');
 
 // Pagination Setup
-$results_per_page = 4;
+$results_per_page = 20;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
 $page = max(1, $page); // Ensure the current page is not less than 1
 $totalScans = get_scans_count();
