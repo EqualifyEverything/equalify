@@ -23,7 +23,7 @@ require_once('components/active_class.php');
 </head>
 
 <body>
-    <a href="#main" class="skip-main">Skip to main content</a>
+    <a href="#main" class="visually-hidden-focusable">Skip to main content</a>
     <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
     <header class="py-3 border-bottom  border-secondary-subtle">
         <div class="container d-flex flex-wrap justify-content-center">
