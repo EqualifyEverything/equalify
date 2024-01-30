@@ -1,5 +1,5 @@
 <?php
-// Creates chart.js to include status by time.
+// Creates chart.js to include status by time and a table for screen reader users.
 function the_chart($filters = '')
 {
 ?>
@@ -8,6 +8,19 @@ function the_chart($filters = '')
     <h3 class="visually-hidden">Status Occurrences Over Time</h3>
     <canvas id="statusChart" width="400" height="180" style="display: none;"></canvas>
     <div id="noDataMessage"></div>
+    <div id="statusDataTable" class="visually-hidden">
+        <table aria-describedby="statusDataTable">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <!-- Dataset headers will be added here -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be added here -->
+            </tbody>
+        </table>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -20,6 +33,8 @@ function the_chart($filters = '')
                         // Display the message and keep the canvas hidden
                         document.getElementById('noDataMessage').innerHTML = '<p>No chart data found.</p>';
                     } else {
+                        // Display the table and populate it
+                        populateDataTable(data);
                         // Load Chart.js dynamically and display the chart
                         loadChartJsAndDisplayChart(data);
                     }
@@ -29,6 +44,36 @@ function the_chart($filters = '')
                     document.getElementById('noDataMessage').innerHTML = '<p>No chart data</p>';
                 });
         });
+
+        function populateDataTable(data) {
+            var tableHead = document.querySelector('#statusDataTable thead tr');
+            var tableBody = document.querySelector('#statusDataTable tbody');
+
+            // Add dataset headers
+            data.datasets.forEach(dataset => {
+                var th = document.createElement('th');
+                th.textContent = dataset.label;
+                tableHead.appendChild(th);
+            });
+
+            // Add rows
+            data.labels.forEach((label, index) => {
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                td.textContent = label;
+                tr.appendChild(td);
+
+                data.datasets.forEach(dataset => {
+                    var td = document.createElement('td');
+                    td.textContent = dataset.data[index];
+                    tr.appendChild(td);
+                });
+
+                tableBody.appendChild(tr);
+            });
+
+            document.getElementById('statusDataTable').style.display = 'block';
+        }
 
         function loadChartJsAndDisplayChart(data) {
             var script = document.createElement('script');
