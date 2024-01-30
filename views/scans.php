@@ -5,7 +5,7 @@ require_once('helpers/get_scans_count.php');
 require_once('components/success_or_error_message.php');
 
 // Pagination Setup
-$results_per_page = 20;
+$results_per_page = 4;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
 $page = max(1, $page); // Ensure the current page is not less than 1
 $totalScans = get_scans_count();
@@ -98,21 +98,43 @@ $scans = get_scans($results_per_page, $offset);
 
         </tbody>
       </table>
-      <nav aria-label="Page navigation" class="d-flex justify-content-center">
+      <nav aria-label="Pages of Queued Scans" class="d-flex justify-content-center">
           <ul class="pagination">
-              <li class="page-item <?php if ($page <= 1) echo 'disabled'; ?>">
-                  <a class="page-link" href="?view=scans&page=<?php echo $prevPage; ?>" aria-label="Previous">
+
+              <?php 
+              // Only show link if there are multiple pages to clear up DOM for screen readers.
+              if ($totalPages > 1 && $page > 1): 
+              ?>
+
+              <li class="page-item">
+                  <a class="page-link" href="?view=scans&page=<?php echo $prevPage; ?>" aria-label="Previous Page of Scans">
                       <span aria-hidden="true">&laquo; Previous</span>
                   </a>
               </li>
+
+              <?php
+              endif;
+              ?>
+
               <li class="page-item disabled">
-                  <span class="page-link">Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
+                  <span class="page-link"><span class="visually-hidden">Currently on Scan Queue Results</span> Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
               </li>
-              <li class="page-item <?php if ($page >= $totalPages) echo 'disabled'; ?>">
-                  <a class="page-link" href="?view=scans&page=<?php echo $nextPage; ?>" aria-label="Next">
+
+              <?php 
+              // Only show link if there are multiple pages to clear up DOM for screen readers.
+              if ($page < $totalPages): 
+              ?>
+
+              <li class="page-item">
+                  <a class="page-link" href="?view=scans&page=<?php echo $nextPage; ?>" aria-label="Next Page of Scans">
                       <span aria-hidden="true">Next &raquo;</span>
                   </a>
               </li>
+
+              <?php
+              endif;
+              ?>
+
           </ul>
       </nav>
     </div>
