@@ -35,7 +35,7 @@ require_once('components/success_or_error_message.php');
                         <?php echo $report['report_title'];?>
                     </h2>
                     <a href="index.php?view=report&report_id=<?php echo $report['report_id'];?>" class="btn btn-secondary m-2">
-                        View Report
+                        View <span class="visually-hidden"><?php echo $report['report_title'];?></span> Report
                     </a>
                 </div>
             </div>
