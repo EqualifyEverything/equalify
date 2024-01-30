@@ -52,7 +52,6 @@ $scans = get_scans($results_per_page, $offset);
             <th scope="col">Job Id</th>
             <th scope="col">Page URL</th>
             <th scope="col">Property</th>
-            <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
@@ -72,21 +71,6 @@ $scans = get_scans($results_per_page, $offset);
                 <td><?php echo htmlspecialchars($scan['queued_scan_job_id']); ?></td>
                 <td><?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($scan['property_name']); ?></td>
-                <td>
-
-                  <?php
-                    // Determine the status based on 'queued_scan_processing'
-                    $status = $scan['queued_scan_processing'];
-                    if ($status === null) {
-                        echo 'Queued';
-                    } elseif ($status == 1) {
-                        echo 'Processing';
-                    } else {
-                        echo 'Idle'; // You can adjust this as per your system's status representation
-                    }
-                  ?>
-
-                </td>
                 <td>
                   <a class="btn btn-sm btn-outline-primary" href="actions/process_scans.php?<?php echo 'job_id='.$scan['queued_scan_job_id'].'&property_id='.$scan['queued_scan_property_id'];?>">Scan Page</a>
                 </td>
