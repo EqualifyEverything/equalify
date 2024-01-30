@@ -65,7 +65,17 @@ require_once('components/active_class.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Version 1 - Release Candidate 2 | <a href="https://github.com/EqualifyEverything/v1/blob/main/ACCESSIBILITY.md">Accessibility Statement</a>
+        Equalify Version 1 - Release Candidate 2
+        <nav aria-label="Footer Links">
+            <ul class="nav justify-content-center">
+                <li class="nav-item">
+                    <a href="https://github.com/equalifyEverything/v1/issues">Report an Issue</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://github.com/EqualifyEverything/v1/blob/main/ACCESSIBILITY.md">Accessibility Statement</a>
+                </li>
+            </ul>
+        </nav>
     </footer>
     <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
