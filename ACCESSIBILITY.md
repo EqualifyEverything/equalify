@@ -7,9 +7,9 @@ We welcome any comments, questions, or feedback on our site. If you notice aspec
 This project is committed to delivering an excellent user experience for everyone. Equalify's user interface is structured in a way that allows those of all abilities to easily and quickly find the information they need.
 
 ## Ongoing Efforts to Ensure Accessible Content
-Equalify uses the Web Content Accessibility Guidelines (WCAG) version 2.1 as its guiding principle. As we develop new pages and functionality, the principles of accessible design and development are an integral part of conception and realization.
+Equalify uses the Web Content Accessibility Guidelines (WCAG) version 2.2 as its guiding principle. As we develop new pages and functionality, the principles of accessible design and development are an integral part of conception and realization.
 
-We continually test content and features for WCAG 2.1 Level AA compliance and remediate any issues to ensure we meet or exceed the standards. Testing of our digital content is performed by our accessibility experts using automated testing software, screen readers, a color contrast analyzer, and keyboard-only navigation techniques.
+We continually test content and features for WCAG 2.2 Level AA compliance and remediate any issues to ensure we meet or exceed the standards. Testing of our digital content is performed by our accessibility experts using automated testing software, screen readers, a color contrast analyzer, and keyboard-only navigation techniques.
 
 ## Summary of Accessibility Features
 - All images and other non-text elements have alternative text associated with them.

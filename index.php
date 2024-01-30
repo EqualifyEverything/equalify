@@ -23,6 +23,7 @@ require_once('components/active_class.php');
 </head>
 
 <body>
+    <a href="#main" class="skip-main">Skip to main content</a>
     <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
     <header class="py-3 border-bottom  border-secondary-subtle">
         <div class="container d-flex flex-wrap justify-content-center">
@@ -49,7 +50,7 @@ require_once('components/active_class.php');
             </ul>
         </div>
     </header>
-    <main>
+    <main id="main">
         
         <?php
         // Select the view.
@@ -65,7 +66,7 @@ require_once('components/active_class.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Version 1 - Release Candidate 2
+        Equalify Version 1 - Release Candidate 2 | <a href="https://github.com/EqualifyEverything/v1/blob/main/ACCESSIBILITY.md">Accessibilility Statement</a>
     </footer>
     <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
