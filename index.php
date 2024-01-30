@@ -65,7 +65,7 @@ require_once('components/active_class.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Version 1 - Release Candidate 2
+        Equalify Version 1 - Release Candidate 3
         <nav aria-label="Footer Links">
             <ul class="nav justify-content-center">
                 <li class="nav-item">
