@@ -67,7 +67,7 @@ function the_tag_list($filters = '')
                 html += `
                     <tr>
                         <td> 
-                            <a class="link-dark link-underline-opacity-2 link-underline-opacity-75-hover" href="?view=tag&report_id=<?php echo $report_id;?>&tag_id=${tag.tag_id}" >
+                            <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="?view=tag&report_id=<?php echo $report_id;?>&tag_id=${tag.tag_id}" >
                                 <span class="visually-hidden">Message:</span> ${tag.tag_name}
                             </a>
                         </td>

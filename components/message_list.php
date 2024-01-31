@@ -65,7 +65,7 @@ function the_message_list($filters = '')
             html += `
                 <tr>
                     <td> 
-                        <a class="link-dark link-underline-opacity-2 link-underline-opacity-75-hover" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${message.message_id}">
+                        <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${message.message_id}">
                             <span class="visually-hidden">Message:</span> ${message.message_title}
                         </a>
                     </td>

@@ -60,7 +60,7 @@ function the_message_occurrences_list($filters = '')
                 html += `
                     <tr>
                         <td><pre><code>${codeSnippet}</code></pre></td>
-                        <td><a class="text-truncate" href="index.php?view=page&report_id=<?php echo $report_id;?>&page_id=${occurrence.page_id}"><span class="visually-hidden">Page:</span> ${pageUrl}</td>
+                        <td><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover text-truncate" href="index.php?view=page&report_id=<?php echo $report_id;?>&page_id=${occurrence.page_id}"><span class="visually-hidden">Page:</span> ${pageUrl}</td>
                         <td class="text-capitalize">${occurrence.occurrence_status}</td>
                     </tr>
 
