@@ -61,8 +61,8 @@ function the_page_list($filters = '')
                 html += `
                     <tr>
                         <td> 
-                            <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="?view=page&report_id=<?php echo $report_id;?>&page_id=${page.page_id}" >
-                                <span class="visually-hidden">Page:</span> ${page.page_url}
+                            <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover d-inline-block text-truncate" style="max-width: 350px;" href="?view=page&report_id=<?php echo $report_id;?>&page_id=${page.page_id}" >
+                               <span class="visually-hidden">Page:</span> ${page.page_url}
                             </a>
                         </td>
                         <td class="text-center">
