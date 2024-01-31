@@ -29,6 +29,9 @@ $scans = get_scans($results_per_page, $offset);
     ?>
 
     <h1 class="display-5 my-4">Scans</h1>
+    <div id="loadingStatus" class="visually-hidden" aria-live="polite">
+      <!-- Status messages will be updated here -->
+    </div>
     <div class="card bg-white p-4 my-2">
       <div class="d-flex flex-column flex-md-row align-items-center my-4">
           <h2 class="mb-0 me-2">Scan Queue</h2>
@@ -43,7 +46,7 @@ $scans = get_scans($results_per_page, $offset);
             }
             ?>
 
-            <a class="btn btn-primary" href="actions/process_scans.php">Process <?php echo $concurrent_scan_max;?> Scans</a>
+            <button class="btn btn-primary" onclick="startProcessing(this)">Process <?php echo $concurrent_scan_max;?> Scans</button>
           </div>
       </div>
       <table class="table table-striped">
@@ -52,7 +55,6 @@ $scans = get_scans($results_per_page, $offset);
             <th scope="col">Job Id</th>
             <th scope="col">Page URL</th>
             <th scope="col">Property</th>
-            <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
@@ -73,22 +75,9 @@ $scans = get_scans($results_per_page, $offset);
                 <td><?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($scan['property_name']); ?></td>
                 <td>
-
-                  <?php
-                    // Determine the status based on 'queued_scan_processing'
-                    $status = $scan['queued_scan_processing'];
-                    if ($status === null) {
-                        echo 'Queued';
-                    } elseif ($status == 1) {
-                        echo 'Processing';
-                    } else {
-                        echo 'Idle'; // You can adjust this as per your system's status representation
-                    }
-                  ?>
-
-                </td>
-                <td>
-                  <a class="btn btn-sm btn-outline-primary" href="actions/process_scans.php?<?php echo 'job_id='.$scan['queued_scan_job_id'].'&property_id='.$scan['queued_scan_property_id'];?>">Scan Page</a>
+                  <button class="btn btn-sm btn-outline-primary" onclick="startProcessing(this, 'actions/process_scans.php?job_id=<?php echo $scan['queued_scan_job_id']; ?>&property_id=<?php echo $scan['queued_scan_property_id']; ?>')">
+                    Scan Page <span class="visually-hidden">URL <?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></span>
+                  </button>
                 </td>
             </tr>
             
@@ -98,22 +87,56 @@ $scans = get_scans($results_per_page, $offset);
 
         </tbody>
       </table>
-      <nav aria-label="Page navigation" class="d-flex justify-content-center">
+      <nav aria-label="Pages of Queued Scans" class="d-flex justify-content-center">
           <ul class="pagination">
-              <li class="page-item <?php if ($page <= 1) echo 'disabled'; ?>">
-                  <a class="page-link" href="?view=scans&page=<?php echo $prevPage; ?>" aria-label="Previous">
+
+              <?php 
+              // Only show link if there are multiple pages to clear up DOM for screen readers.
+              if ($totalPages > 1 && $page > 1): 
+              ?>
+
+              <li class="page-item">
+                  <a class="page-link" href="?view=scans&page=<?php echo $prevPage; ?>" aria-label="Previous Page of Scans">
                       <span aria-hidden="true">&laquo; Previous</span>
                   </a>
               </li>
+
+              <?php
+              endif;
+              ?>
+
               <li class="page-item disabled">
-                  <span class="page-link">Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
+                  <span class="page-link"><span class="visually-hidden">Currently on Scan Queue Results</span> Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
               </li>
-              <li class="page-item <?php if ($page >= $totalPages) echo 'disabled'; ?>">
-                  <a class="page-link" href="?view=scans&page=<?php echo $nextPage; ?>" aria-label="Next">
+
+              <?php 
+              // Only show link if there are multiple pages to clear up DOM for screen readers.
+              if ($page < $totalPages): 
+              ?>
+
+              <li class="page-item">
+                  <a class="page-link" href="?view=scans&page=<?php echo $nextPage; ?>" aria-label="Next Page of Scans">
                       <span aria-hidden="true">Next &raquo;</span>
                   </a>
               </li>
+
+              <?php
+              endif;
+              ?>
+
           </ul>
       </nav>
     </div>
 </div>
+<script>
+function startProcessing(button, url = 'actions/process_scans.php') {
+    // Disable the button
+    button.disabled = true;
+
+    // Update the aria-live region with the loading message
+    document.getElementById('loadingStatus').textContent = 'Processing scans, please wait...';
+
+    // Redirect to the process_scans.php or appropriate URL
+    window.location.href = url;
+}
+</script>

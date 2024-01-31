@@ -23,12 +23,11 @@ require_once('components/active_class.php');
 </head>
 
 <body>
-    <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
+    <a href="#main" class="visually-hidden-focusable">Skip to main content</a>
     <header class="py-3 border-bottom  border-secondary-subtle">
         <div class="container d-flex flex-wrap justify-content-center">
-            <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo" aria-hidden="true">
-                <span class="fs-4 visually-hidden">Equalify</span>
+            <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" rel="home">
+                <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo">
             </a>
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
@@ -49,7 +48,7 @@ require_once('components/active_class.php');
             </ul>
         </div>
     </header>
-    <main>
+    <main id="main">
         
         <?php
         // Select the view.
@@ -65,7 +64,17 @@ require_once('components/active_class.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Version 1 - Release Candidate 2
+        Equalify Version 1 - Release Candidate 3
+        <nav aria-label="Footer Links">
+            <ul class="nav justify-content-center">
+                <li class="nav-item">
+                    <a href="https://github.com/equalifyEverything/v1/issues">Report an Issue</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://github.com/EqualifyEverything/v1/blob/main/ACCESSIBILITY.md">Accessibility Statement</a>
+                </li>
+            </ul>
+        </nav>
     </footer>
     <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>

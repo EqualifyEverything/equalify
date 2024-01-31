@@ -19,12 +19,23 @@ pre code{
     white-space: break-spaces;
     word-break: break-word !important;
 }
-.nav-link{
+header .nav-link{
     color: #212529;
     
 }
-.nav-item {
+header .nav-item {
     font-size: var(--bs-navbar-brand-font-size);
+}
+footer .nav-link{
+    text-decoration: underline;
+}
+footer nav li:before{
+    content: '|';
+    padding: 0 4px 0 10px;
+}
+footer nav li:first-of-type:before{
+    content: ' ';
+    padding: 0;
 }
 .fs-7{
     font-size: .9em;

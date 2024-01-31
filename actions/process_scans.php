@@ -364,7 +364,7 @@ function process_scans($scans = null) {
 
     // Redirect with logged messages
     if(!empty($logged_messages)){
-        $success_message = 'Returned the following results: <ul>';
+        $success_message = 'Success! Returned the following results: <ul>';
         foreach ($logged_messages as $message){
             $success_message.= "<li>$message</li>";
         }

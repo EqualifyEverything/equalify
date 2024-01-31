@@ -27,7 +27,8 @@ $_SESSION['report_id'] = '';
 
 
 // Redirect after successful deletion
-header("Location: ../index.php?view=reports&success=".urlencode("Report deletion successful."));
+$_SESSION['success'] = "Report deletion successful.";
+header("Location: ../index.php?view=reports");
 exit;
 
 ?>

@@ -64,12 +64,14 @@ try {
     $_SESSION['property_id'] = '';
 
     // Redirect on success
-    header("Location: ../index.php?view=settings&success=" .urlencode('"'.$_POST['property_name'].'" property saved.'));
+    $_SESSION['success'] = '"'.$_POST['property_name'].'" property saved.';
+    header("Location: ../index.php?view=settings");
     exit;
 
 } catch (Exception $e) {
     // Handle any errors
-    header("Location: ../index.php?view=settings&error=" . urlencode($e->getMessage()));
+    $_SESSION['error'] = $e->getMessage();
+    header("Location: ../index.php?view=settings");
 
     exit;
 }
