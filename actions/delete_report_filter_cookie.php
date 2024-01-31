@@ -13,6 +13,8 @@ if (isset($_COOKIE[$cookie_name])) {
 }
 
 // Redirect the user to the report page with the report ID
+session_start();
+$_SESSION['success'] = "Report filters cleared.";
 header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
 exit;
 ?>

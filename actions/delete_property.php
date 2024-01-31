@@ -68,7 +68,8 @@ try {
     $_SESSION['property_id'] = '';
 
     // Success redirection or message
-    header("Location: ../index.php?view=settings&success=Property and related data deleted.");
+    $_SESSION['success'] = "Property and related data deleted.";
+    header("Location: ../index.php?view=settings");
     exit;
     
 } catch (Exception $e) {
@@ -76,7 +77,8 @@ try {
     $pdo->rollBack();
 
     // Error redirection or message
-    header("Location: ../index.php?view=settings&error=" . urlencode($e->getMessage()));
+    $_SESSION['error'] = $e->getMessage();
+    header("Location: ../index.php?view=settings");
     exit;
 }
 ?>

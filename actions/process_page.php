@@ -34,7 +34,8 @@ $response_data = json_decode($response, true);
 
 // Check if response data contains 'jobID'
 if (!isset($response_data['jobID'])){
-    header("Location: ../index.php?view=page&page_id=$page_id&report_id=$report_id&error=" .urlencode('No response.'));
+    $_SESSION['error'] = $e->getMessage("No response.");
+    header("Location: ../index.php?view=page&page_id=$page_id&report_id=$report_id");
     exit;
 }
 

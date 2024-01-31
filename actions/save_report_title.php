@@ -28,12 +28,14 @@ try {
     $_SESSION['report_id'] = '';
 
     // Redirect on success
-    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id). "&success=" . urlencode("Title updated successfully."));
+    $_SESSION['success'] = "Title updated successfully.";
+    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
     exit;
 
 } catch (Exception $e) {
     // Handle any errors
-    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id) . "&error=" . urlencode($e->getMessage()));
+    $_SESSION['error'] = $e->getMessage();
+    header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
 
     exit;
 }
