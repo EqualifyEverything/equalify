@@ -5,24 +5,28 @@ function the_occurrence_list($filters = '')
     global $report_id;
 ?>
 
-<div class="card my-2 p-4 table-responsive">
+<div class="card my-2 p-4">
     <h3 class="visually-hidden">Messages on Page</h3>
     <div id="pageOccurrencesListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
-    <div>
-        <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-5">
-                Message
-            </strong>
-            <strong class="col-5">
-                Code Snippet
-            </strong>
-            <strong class="col-2">
-                Status
-            </strong>
-        </div>
-    </div>
-    <div id="occurrencesContainer" aria-live="polite">
-        <!-- Messages will be loaded here -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 45%">
+                        Message
+                    </th>
+                    <th scope="col">
+                        Code Snippet
+                    </th>
+                    <th scope="col">
+                        Status
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="occurrencesContainer" aria-live="polite">
+                <!-- Ocurrences will be loaded here -->
+            </tbody>
+        </table>
     </div>
     <div class="d-flex align-items-center mt-2" id="paginationControls">
         <!-- Pagination will be dynamically updated here -->
@@ -61,11 +65,19 @@ function the_occurrence_list($filters = '')
         occurrences.forEach(occurrence => {
             let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             html += `
-                <a class="row text-body py-2 border-bottom" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${occurrence.message_id}">
-                    <span class="col-5"><span class="visually-hidden">Message:</span> ${occurrence.message_title}</span>
-                    <span class="col-5"><span class="visually-hidden">Code Snippet:</span> <pre><code>${codeSnippet}</code></pre></span>
-                    <span class="col-2 text-capitalize"><span class="visually-hidden">Status:</span> ${occurrence.occurrence_status}</span>
-                </a>
+                <tr>
+                    <td> 
+                        <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${occurrence.message_id}">
+                            <span class="visually-hidden">Message:</span> ${occurrence.message_title}
+                        </a>
+                    </td>
+                    <td>
+                        Code Snippet:</span> <pre><code>${codeSnippet}</code></pre>
+                    </td>
+                    <td>
+                        <span class="visually-hidden">Status:</span> ${occurrence.occurrence_status}
+                    </td>
+                </tr>
             `;
         });
         document.getElementById('occurrencesContainer').innerHTML = html;
