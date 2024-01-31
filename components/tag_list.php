@@ -4,15 +4,23 @@ function the_tag_list($filters = '')
 {
     global $report_id;
 ?>
-    <div class="card pt-2 px-4 my-2 h-100">
+    <div class="card p-4 h-100">
         <h3 class="visually-hidden">Tags</h3>
         <div id="tagListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
-        <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-7">Tag</strong>
-            <strong class="col-3">Occurrences</strong>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Tag</th>
+                        <th scope="col" class="text-center">Occurrences <span class="visually-hidden">Count</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tagsContainer" aria-live="polite">
+                    <!-- Ocurrences will be loaded here -->
+                </tbody>
+            </table>
         </div>
-        <div id="tagsContainer" aria-live="polite"><!-- Tags will be loaded here --></div>
-        <div class="d-flex align-items-center mt-2" id="paginationControlsTags">
+        <div class="d-flex align-items-center mt-2 mb-0" id="paginationControlsTags">
             <!-- Pagination for tags will be dynamically updated here -->
         </div>
     </div>
@@ -57,15 +65,21 @@ function the_tag_list($filters = '')
                 const tagReferenceCount = parseInt(tag.tag_reference_count, 10);
 
                 html += `
-                    <a href="?view=tag&report_id=<?php echo $report_id;?>&tag_id=${tag.tag_id}" class="row text-body py-2 border-bottom">
-                        <span class="col-7 text-truncate">${tag.tag_name}</span>
-                        <span class="col-3 text-truncate">${tagReferenceCount.toLocaleString('en', {useGrouping:true})}</span>
-                    </a>
+                    <tr>
+                        <td> 
+                            <a class="link-dark link-underline-opacity-2 link-underline-opacity-75-hover" href="?view=tag&report_id=<?php echo $report_id;?>&tag_id=${tag.tag_id}" >
+                                <span class="visually-hidden">Message:</span> ${tag.tag_name}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            ${tagReferenceCount.toLocaleString('en', {useGrouping:true})} <span class="visually-hidden">Occurrences of this Tag</span>
+                        </td>
+                    </tr>
                 `;
             });
             document.getElementById('tagsContainer').innerHTML = html;
         }
-        
+
         function updatePaginationControlsTags(currentPage, totalPages) {
             let paginationControls = document.getElementById('paginationControlsTags');
 
