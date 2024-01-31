@@ -7,30 +7,23 @@ function the_message_list($filters = '')
 
 ?>
 
-<div class="card my-2 p-4 table-responsive">
+<div class="card my-2 p-4">
     <h3 class="visually-hidden">Messages</h3>
     <div id="messageListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
-    <div>
-        <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-7">
-                Messages
-            </strong>
-            <strong class="col-1">
-                Equalified
-            </strong>
-            <strong class="col-1">
-                Active
-            </strong>
-            <strong class="col-1">
-                Ignored
-            </strong>
-            <strong class="col-1">
-                Total
-            </strong>
-        </div>
-    </div>
-    <div id="messagesContainer" aria-live="polite">
-        <!-- Messages will be loaded here -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Messages</th>
+                    <th scope="col" class="text-center">Equalified <span class="visually-hidden">Count</span></th>
+                    <th scope="col" class="text-center">Active <span class="visually-hidden">Count</span></th>
+                    <th scope="col" class="text-center">Total <span class="visually-hidden">Count</span></th>
+                </tr>
+            </thead>
+            <tbody id="messagesContainer" aria-live="polite">
+                <!-- Ocurrences will be loaded here -->
+            </tbody>
+        </table>
     </div>
     <div class="d-flex align-items-center mt-2" id="paginationControls">
         <!-- Pagination will be dynamically updated here -->
@@ -66,18 +59,26 @@ function the_message_list($filters = '')
             // Ensure counts are numbers
             const equalifiedCount = parseInt(message.equalified_count, 10);
             const activeCount = parseInt(message.active_count, 10);
-            const ignoredCount = parseInt(message.ignored_count, 10);
             const totalCount = parseInt(message.total_count, 10);
 
             // Add HTML for each message
             html += `
-                <a class="row text-body py-2 border-bottom" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${message.message_id}">
-                    <span class="col-7"><span class="visually-hidden">Message:</span> ${message.message_title}</span>
-                    <span class="col-1"><span class="visually-hidden">Equalified Occurrences Total </span>${equalifiedCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1"><span class="visually-hidden">Active Occurrences Total </span>${activeCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1"><span class="visually-hidden">Ignored Occurrences Total </span>${ignoredCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1"><span class="visually-hidden">All Occurrences Total </span>${totalCount.toLocaleString('en', {useGrouping:true})}</span>
-                </a>
+                <tr>
+                    <td> 
+                        <a class="link-dark link-underline-opacity-2 link-underline-opacity-75-hover" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${message.message_id}">
+                            <span class="visually-hidden">Message:</span> ${message.message_title}
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        ${equalifiedCount.toLocaleString('en', {useGrouping:true})} <span class="visually-hidden">Equalified of this Message</span>
+                    </td>
+                    <td class="text-center">
+                        ${activeCount.toLocaleString('en', {useGrouping:true})} <span class="visually-hidden">Active of this Message</span>
+                    </td>
+                    <td class="text-center">
+                        ${totalCount.toLocaleString('en', {useGrouping:true})} <span class="visually-hidden">Total of this Message</span>
+                    </td>
+                </tr>
             `;
         });
         document.getElementById('messagesContainer').innerHTML = html;
