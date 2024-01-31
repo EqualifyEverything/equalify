@@ -83,31 +83,27 @@ $_SESSION['report_id'] = $report_id;
             </div>
             
             <?php
-                // Unsaved changes update the state of a button
-                $aria_disabled_state = true;
-                $extra_classes = 'disabled visually-hidden';
-                $hidden_class = 'visually-hidden';
-                $disabled_class = 'disabled';
-                $cookie_name = "queue_report_" . $report_id . "_filter_change";
-                if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'){
-                    $aria_disabled_state = false;
-                    $disabled_class = '';    
-                    $hidden_class = '';
-                }
+            // Unsaved changes update the state of a button
+            $cookie_name = "queue_report_" . $report_id . "_filter_change";
+            if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]) && urldecode($_COOKIE[$cookie_name]) !== '[]'):
             ?>
 
-            <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded <?php echo $hidden_class;?>" style="display:inline-block">
+            <div class="mt-2 p-3 bg-info bg-opacity-10 border border-info rounded" style="display:inline-block">
                 <h4 class="visually-hidden">Filter Save Actions</h3>
-                <a href="actions/save_report_filter_change.php?&report_id=<?php echo $report_id; ?>" class="btn btn-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                <a href="actions/save_report_filter_change.php?&report_id=<?php echo $report_id; ?>" class="btn btn-primary" >
                     Save Filters for Everyone
                 </a>
-                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary">
                     Preview Filter Updates
                 </a> 
-                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-outline-secondary <?php echo $disabled_class;?>" aria-disabled="<?php echo $aria_disabled_state;?>">
+                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-outline-secondary">
                     Cancel Updates
                 </a> 
             </div>
+            <?php
+            endif;
+            ?>
+            
         </div>
         <div class="border-top py-4">
             <h3 class="mb-4">Danger Zone</h3>
