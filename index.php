@@ -24,7 +24,6 @@ require_once('components/active_class.php');
 
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to main content</a>
-    <div id="accessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
     <header class="py-3 border-bottom  border-secondary-subtle">
         <div class="container d-flex flex-wrap justify-content-center">
             <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" rel="home">

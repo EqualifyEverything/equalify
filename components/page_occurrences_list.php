@@ -7,6 +7,7 @@ function the_occurrence_list($filters = '')
 
 <div class="card my-2 p-4 table-responsive">
     <h3 class="visually-hidden">Messages on Page</h3>
+    <div id="pageOccurrencesListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
     <div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-5">
@@ -30,6 +31,9 @@ function the_occurrence_list($filters = '')
 
 <script>
     function fetchOccurrences(page) {
+        const announcer = document.getElementById('pageOccurrencesListAccessibilityAnnouncer');
+        announcer.textContent = 'Loading occurrences, please wait.';
+
         const xhr = new XMLHttpRequest();
         const url = 'api?request=occurrences&columns[]=occurrence_id,occurrence_code_snippet,occurrence_status&joined_columns[]=message_id,message_title&current_results_page=' + page + '&results_per_page=10&<?php echo $filters; ?>';
         xhr.open('GET', url);
@@ -38,14 +42,16 @@ function the_occurrence_list($filters = '')
                 const response = JSON.parse(xhr.responseText);
                 updateOccurrencesContainer(response.occurrences);
                 updatePaginationControls(page, response.totalPages);
-                console.log(response);
+                announcer.textContent = `Page ${page} of occurrences loaded.`;
             } else {
                 document.getElementById('occurrencesContainer').innerHTML = 'Error loading occurrences.';
+                announcer.textContent = 'Error loading occurrences data.';
             }
         };
         xhr.onerror = function() {
             console.error("Error on AJAX request.");
             document.getElementById('occurrencesContainer').innerHTML = 'Error loading occurrences.';
+            announcer.textContent = 'Error loading occurrences data.';
         };
         xhr.send();
     }
@@ -56,9 +62,9 @@ function the_occurrence_list($filters = '')
             let codeSnippet = occurrence.occurrence_code_snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             html += `
                 <a class="row text-body py-2 border-bottom" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${occurrence.message_id}">
-                    <span class="col-5" aria-label="Message">${occurrence.message_title}</span>
-                    <span class="col-5" aria-label="Code Snippet"><pre><code>${codeSnippet}</code></pre></span>
-                    <span class="col-2 text-capitalize" aria-label="Status">${occurrence.occurrence_status}</span>
+                    <span class="col-5"><span class="visually-hidden">Message:</span> ${occurrence.message_title}</span>
+                    <span class="col-5"><span class="visually-hidden">Code Snippet:</span> <pre><code>${codeSnippet}</code></pre></span>
+                    <span class="col-2 text-capitalize"><span class="visually-hidden">Status:</span> ${occurrence.occurrence_status}</span>
                 </a>
             `;
         });
@@ -98,9 +104,7 @@ function the_occurrence_list($filters = '')
 
             paginationHtml += `</div>`;
             paginationControls.innerHTML = paginationHtml;
-
         }
-
     }
 
     // Initial fetch

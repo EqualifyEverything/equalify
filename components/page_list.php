@@ -6,6 +6,7 @@ function the_page_list($filters = '')
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
         <h3 class="visually-hidden">Pages</h3>
+        <div id="pageListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">URL</strong>
             <strong class="col-3">Active</strong>
@@ -18,6 +19,9 @@ function the_page_list($filters = '')
 
     <script>
         function fetchPages(page) {
+            const announcer = document.getElementById('pageListAccessibilityAnnouncer');
+            announcer.textContent = 'Loading pages, please wait.';
+
             const xhr = new XMLHttpRequest();
             const url = 'api?request=pages&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
@@ -26,9 +30,16 @@ function the_page_list($filters = '')
                     const response = JSON.parse(xhr.responseText);
                     updatePagesContainer(response.pages);
                     updatePaginationControlsPages(page, response.totalPages);
+                    announcer.textContent = `Page ${page} of pages loaded.`;
                 } else {
                     document.getElementById('pagesContainer').innerHTML = 'Error loading pages.';
+                    announcer.textContent = 'Error loading page data.';
                 }
+            };
+            xhr.onerror = function() {
+                console.error("Error on AJAX request.");
+                document.getElementById('pagesContainer').innerHTML = 'Error loading pages.';
+                announcer.textContent = 'Error loading page data.';
             };
             xhr.send();
         }

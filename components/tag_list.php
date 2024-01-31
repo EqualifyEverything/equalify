@@ -6,6 +6,7 @@ function the_tag_list($filters = '')
 ?>
     <div class="card pt-2 px-4 my-2 h-100">
         <h3 class="visually-hidden">Tags</h3>
+        <div id="tagListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">Tag</strong>
             <strong class="col-3">Occurrences</strong>
@@ -18,6 +19,9 @@ function the_tag_list($filters = '')
 
     <script>
         function fetchTags(page) {
+            const announcer = document.getElementById('tagListAccessibilityAnnouncer');
+            announcer.textContent = 'Loading tags, please wait.';
+
             const xhr = new XMLHttpRequest();
             const url = 'api?request=tags&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
@@ -27,17 +31,21 @@ function the_tag_list($filters = '')
                         const response = JSON.parse(xhr.responseText);
                         updateTagsContainer(response.tags);
                         updatePaginationControlsTags(page, response.totalPages);
+                        announcer.textContent = `Page ${page} of tags loaded.`;
                     } catch (e) {
                         console.error('Error parsing JSON:', e);
                         document.getElementById('tagsContainer').innerHTML = 'Error processing response.';
+                        announcer.textContent = 'Error processing tag data.';
                     }
                 } else {
                     document.getElementById('tagsContainer').innerHTML = 'Error loading tags.';
+                    announcer.textContent = 'Error loading tag data.';
                 }
             };
             xhr.onerror = function() {
                 console.error("Error on AJAX request.");
                 document.getElementById('tagsContainer').innerHTML = 'Error loading tags.';
+                announcer.textContent = 'Error loading tag data.';
             };
             xhr.send();
         }
@@ -57,7 +65,7 @@ function the_tag_list($filters = '')
             });
             document.getElementById('tagsContainer').innerHTML = html;
         }
-
+        
         function updatePaginationControlsTags(currentPage, totalPages) {
             let paginationControls = document.getElementById('paginationControlsTags');
 

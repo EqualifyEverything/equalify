@@ -9,6 +9,7 @@ function the_message_list($filters = '')
 
 <div class="card my-2 p-4 table-responsive">
     <h3 class="visually-hidden">Messages</h3>
+    <div id="messageListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
     <div>
         <div class="row border-bottom py-2" aria-hidden="true">
             <strong class="col-7">
@@ -71,11 +72,11 @@ function the_message_list($filters = '')
             // Add HTML for each message
             html += `
                 <a class="row text-body py-2 border-bottom" href="index.php?view=message&report_id=<?php echo $report_id;?>&message_id=${message.message_id}">
-                    <span class="col-7">${message.message_title}</span>
-                    <span class="col-1" aria-label="Equalified Occurrences Total">${equalifiedCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1" aria-label="Active Occurrences Total">${activeCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1" aria-label="Ignored Occurrences Total">${ignoredCount.toLocaleString('en', {useGrouping:true})}</span>
-                    <span class="col-1" aria-label="All Occurrences Total">${totalCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-7"><span class="visually-hidden">Message:</span> ${message.message_title}</span>
+                    <span class="col-1"><span class="visually-hidden">Equalified Occurrences Total </span>${equalifiedCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1"><span class="visually-hidden">Active Occurrences Total </span>${activeCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1"><span class="visually-hidden">Ignored Occurrences Total </span>${ignoredCount.toLocaleString('en', {useGrouping:true})}</span>
+                    <span class="col-1"><span class="visually-hidden">All Occurrences Total </span>${totalCount.toLocaleString('en', {useGrouping:true})}</span>
                 </a>
             `;
         });
@@ -119,7 +120,7 @@ function the_message_list($filters = '')
     }
 
     function updateAccessibilityAnnouncer(message) {
-        document.getElementById('accessibilityAnnouncer').textContent = message;
+        document.getElementById('messageListAccessibilityAnnouncer').textContent = message;
     }
 
     // Initial fetch
