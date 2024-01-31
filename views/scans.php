@@ -29,6 +29,9 @@ $scans = get_scans($results_per_page, $offset);
     ?>
 
     <h1 class="display-5 my-4">Scans</h1>
+    <div id="loadingStatus" class="visually-hidden" aria-live="polite">
+      <!-- Status messages will be updated here -->
+    </div>
     <div class="card bg-white p-4 my-2">
       <div class="d-flex flex-column flex-md-row align-items-center my-4">
           <h2 class="mb-0 me-2">Scan Queue</h2>
@@ -43,7 +46,7 @@ $scans = get_scans($results_per_page, $offset);
             }
             ?>
 
-            <a class="btn btn-primary" href="actions/process_scans.php">Process <?php echo $concurrent_scan_max;?> Scans</a>
+            <button class="btn btn-primary" onclick="startProcessing(this)">Process <?php echo $concurrent_scan_max;?> Scans</button>
           </div>
       </div>
       <table class="table table-striped">
@@ -72,7 +75,9 @@ $scans = get_scans($results_per_page, $offset);
                 <td><?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($scan['property_name']); ?></td>
                 <td>
-                  <a class="btn btn-sm btn-outline-primary" href="actions/process_scans.php?<?php echo 'job_id='.$scan['queued_scan_job_id'].'&property_id='.$scan['queued_scan_property_id'];?>">Scan Page</a>
+                  <button class="btn btn-sm btn-outline-primary" onclick="startProcessing(this, 'actions/process_scans.php?job_id=<?php echo $scan['queued_scan_job_id']; ?>&property_id=<?php echo $scan['queued_scan_property_id']; ?>')">
+                    Scan Page <span class="visually-hidden">URL <?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></span>
+                  </button>
                 </td>
             </tr>
             
@@ -123,3 +128,15 @@ $scans = get_scans($results_per_page, $offset);
       </nav>
     </div>
 </div>
+<script>
+function startProcessing(button, url = 'actions/process_scans.php') {
+    // Disable the button
+    button.disabled = true;
+
+    // Update the aria-live region with the loading message
+    document.getElementById('loadingStatus').textContent = 'Processing scans, please wait...';
+
+    // Redirect to the process_scans.php or appropriate URL
+    window.location.href = url;
+}
+</script>
