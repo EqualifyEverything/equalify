@@ -4,14 +4,22 @@ function the_page_list($filters = '')
 {
     global $report_id;
 ?>
-    <div class="card pt-2 px-4 my-2 h-100">
+    <div class="card p-4 h-100">
         <h3 class="visually-hidden">Pages</h3>
         <div id="pageListAccessibilityAnnouncer" class="visually-hidden" aria-live="assertive"></div>
-        <div class="row border-bottom py-2" aria-hidden="true">
-            <strong class="col-7">URL</strong>
-            <strong class="col-3">Active</strong>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">URL</th>
+                        <th scope="col" class="text-center">Active <span class="visually-hidden">Occurrences Count</span></th>
+                    </tr>
+                </thead>
+                <tbody id="pagesContainer" aria-live="polite">
+                    <!-- Pages will be loaded here -->
+                </tbody>
+            </table>
         </div>
-        <div id="pagesContainer" aria-live="polite"><!-- Pages will be loaded here --></div>
         <div class="d-flex align-items-center mt-2" id="paginationControlsPages">
             <!-- Pagination for pages will be dynamically updated here -->
         </div>
@@ -51,11 +59,17 @@ function the_page_list($filters = '')
                 const activeCount = parseInt(page.page_occurrences_active, 10);
 
                 html += `
-            <a href="?view=page&report_id=<?php echo $report_id;?>&page_id=${page.page_id}" class="row text-body py-2 border-bottom">
-                <span class="col-7 text-truncate">${page.page_url}</span>
-                <span class="col-3 text-truncate">${activeCount.toLocaleString('en', {useGrouping:true})}</span>
-            </a>
-        `;
+                    <tr>
+                        <td> 
+                            <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="?view=page&report_id=<?php echo $report_id;?>&page_id=${page.page_id}" >
+                                <span class="visually-hidden">Page:</span> ${page.page_url}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            ${activeCount.toLocaleString('en', {useGrouping:true})} <span class="visually-hidden">Active Occurrences on this Page</span>
+                        </td>
+                    </tr>
+                `;
             });
             document.getElementById('pagesContainer').innerHTML = html;
         }
