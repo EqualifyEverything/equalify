@@ -45,6 +45,9 @@ try {
         $stmt->bindParam(':property_processed', $property_processed, PDO::PARAM_STR);
         $stmt->bindParam(':property_id', $property_id, PDO::PARAM_INT);
 
+        // Execute the statement
+        $stmt->execute();
+
     }else{
 
         // New property statement
@@ -55,23 +58,30 @@ try {
         $stmt->bindParam(':property_url', $_POST['property_url'], PDO::PARAM_STR);
         $stmt->bindParam(':property_archived', $property_archived, PDO::PARAM_INT);
 
-    }
+        // Execute the insert statement
+        $stmt->execute();
 
-    // Execute the statement
-    $stmt->execute();
+        // Get the ID of the last inserted record
+        $property_id = $pdo->lastInsertId();
+
+    }
 
     // Remove session token to prevent unintended submissions.
     $_SESSION['property_id'] = '';
 
     // Redirect on success
     $_SESSION['success'] = '"'.$_POST['property_name'].'" property saved.';
-    header("Location: ../index.php?view=settings");
+    header("Location: ../index.php?view=property_settings&property_id=$property_id");
     exit;
 
 } catch (Exception $e) {
+
+    // Remove session token to prevent unintended submissions.
+    $_SESSION['property_id'] = '';
+
     // Handle any errors
     $_SESSION['error'] = $e->getMessage();
-    header("Location: ../index.php?view=settings");
+    header("Location: ../index.php?view=property_settings&property_id=$property_id");
 
     exit;
 }
