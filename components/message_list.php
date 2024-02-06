@@ -33,7 +33,7 @@ function the_message_list($filters = '')
 <script>
     function fetchMessages(page) {
         const xhr = new XMLHttpRequest();
-        const url = 'api?request=messages&results_per_page=10&current_results_page=' + page + '&<?php echo $filters; ?>';
+        const url = 'api/index.php?request=messages&results_per_page=10&current_results_page=' + page + '&<?php echo $filters; ?>';
         xhr.open('GET', url);
         xhr.onload = function() {
             if (xhr.status === 200) {

@@ -31,7 +31,7 @@ function the_page_list($filters = '')
             announcer.textContent = 'Loading pages, please wait.';
 
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=pages&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api/index.php?request=pages&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {
