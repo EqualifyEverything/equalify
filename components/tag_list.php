@@ -31,7 +31,7 @@ function the_tag_list($filters = '')
             announcer.textContent = 'Loading tags, please wait.';
 
             const xhr = new XMLHttpRequest();
-            const url = 'api?request=tags&current_results_page=' + page + '&<?php echo $filters; ?>';
+            const url = 'api/index.php?request=tags&current_results_page=' + page + '&<?php echo $filters; ?>';
             xhr.open('GET', url);
             xhr.onload = function() {
                 if (xhr.status === 200) {

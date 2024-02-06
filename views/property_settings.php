@@ -1,6 +1,7 @@
 <?php
 // Helpers
 require_once('helpers/get_property.php');
+require_once('components/success_or_error_message.php');
 
 // Load existing property info.
 if(isset($_GET['property_id'])){
@@ -41,41 +42,47 @@ $_SESSION['property_id'] = $property_id;
 ?>
 
 <div class="container">
-    <h1 class="display-5 my-4"><?php echo $name;?> Settings</h1>
-    <div class="card  bg-white p-4 my-2">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="me-2 mb-0">Scan Settings</h2>
-          <div class="d-flex justify-content-end align-items-center">
-            <small id="property_scan_status" class="text-body-secondary" aria-live="assertive"><?php echo $scanned_date; ?>.</small>
-            <button id="scanButton" class="ms-1 btn btn-primary btn-sm my-0">Send to Scan</button>
-          </div>
-      </div>
-        <form action="actions/save_property_settings.php" method="post" id="site_form">
-            <div class="row mb-4">
-                <div class="col">
-                    <label for="property_name" class="form-label h4">Property Name</label>
-                    <input id="property_name"  name="property_name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
-                </div>
-                <div class="col">
-                    <label for="property_url" class="form-label h4">Sitemap URL</label>
-                    <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" placeholder="https://equalify.app/sitemap.xml" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
-                    <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.</div>
-                </div>
-            </div>
-            <div class="mt-4">
-                <button type="submit" id="submit" class="btn btn-lg btn-primary">
-                    Save Property
-                </button>
 
-                <?php
-                // Only show disabled link for exiting properties
-                if(isset($_GET['property_id']))
-                  echo '<button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">Delete Property</button>';
-                ?>
-                
-            </div>
-        </form> 
+  <?php
+  // Error message
+  the_success_or_error_message();
+  ?>
+
+  <h1 class="display-5 my-4"><?php echo $name;?> Settings</h1>
+  <div class="card  bg-white p-4 my-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="me-2 mb-0">Scan Settings</h2>
+        <div class="d-flex justify-content-end align-items-center">
+          <small id="property_scan_status" class="text-body-secondary" aria-live="assertive"><?php echo $scanned_date; ?>.</small>
+          <button id="scanButton" class="ms-1 btn btn-primary my-0">Send to Scan</button>
+        </div>
     </div>
+      <form action="actions/save_property_settings.php" method="post" id="site_form">
+          <div class="row mb-4">
+              <div class="col">
+                  <label for="property_name" class="form-label h4">Property Name</label>
+                  <input id="property_name"  name="property_name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
+              </div>
+              <div class="col">
+                  <label for="property_url" class="form-label h4">Sitemap URL</label>
+                  <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" placeholder="https://equalify.app/sitemap.xml" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
+                  <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.</div>
+              </div>
+          </div>
+          <div class="mt-4">
+              <button type="submit" id="submit" class="btn btn-lg btn-primary">
+                  Save Property
+              </button>
+
+              <?php
+              // Only show disabled link for exiting properties
+              if(isset($_GET['property_id']))
+                echo '<button type="button" id="delete_property" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#deletionModal">Delete Property</button>';
+              ?>
+              
+          </div>
+      </form> 
+  </div>
 </div>
 <div class="modal fade" id="deletionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
   <div class="modal-dialog">

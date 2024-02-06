@@ -27,7 +27,7 @@ function the_chart($filters = '')
             const announcer = document.getElementById('chartAccessibilityAnnouncer');
             announcer.textContent = 'Loading chart data, please wait.';
 
-            const url = 'api?request=chart&<?php echo $filters; ?>';
+            const url = 'api/index.php?request=chart&<?php echo $filters; ?>';
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
