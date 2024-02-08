@@ -1,6 +1,7 @@
 <?php
 // Retrieve values from the URL query parameter
 $report_id = $_GET['report_id'] ?? '';
+$redirect = $_GET['redirect'] ?? 'report_settings'; // Return to report_settings by default
 $filters_array = isset($_GET['filters']) ? $_GET['filters'] : null;
 
 // Cookie name
@@ -14,7 +15,7 @@ if (isset($_COOKIE[$cookie_name])) {
 
 // Redirect the user to the report page with the report ID
 session_start();
-$_SESSION['success'] = "Report filters cleared.";
-header("Location: ../index.php?view=report_settings&report_id=" . urlencode($report_id));
+$_SESSION['success'] = "Report filter changes are cancelled.";
+header("Location: ../index.php?view=$redirect&report_id=" . urlencode($report_id));
 exit;
 ?>
