@@ -96,7 +96,7 @@ $_SESSION['report_id'] = $report_id;
                 <a href="?view=report&report_id=<?php echo $report_id?>" class="btn  btn-outline-primary">
                     Preview Filter Updates
                 </a> 
-                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-outline-secondary">
+                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>&redirect=report_settings" class="btn btn-outline-secondary">
                     Cancel Updates
                 </a> 
             </div>
