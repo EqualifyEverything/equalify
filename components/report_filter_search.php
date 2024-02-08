@@ -21,6 +21,7 @@ function the_report_filter_search($report_id) {
                         <option value="messages">Messages</option>
                         <option value="tags">Tags</option>
                         <option value="properties">Properties</option>
+                        <option value="statuses">Statuses</option>
                         <option value="pages">Related URL</option>
                     </select>
                     <label for="filterType">Select Filter Type</label>
@@ -40,28 +41,41 @@ document.addEventListener('DOMContentLoaded', function() {
     var currentAutocomplete;
 
     function fetchAndPopulateAutocomplete(filterType) {
-        var apiUrl = "api/?request=" + filterType + "&results_per_page=99999";
+        var apiUrl = "api/index.php?request=" + filterType + "&results_per_page=99999";
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
+                var items;
                 if (filterType === 'properties') {
                     objectKey = 'property';
+                    items = data[filterType].map(item => ({
+                        label: item[objectKey + '_name'],
+                        value: item[objectKey + '_id']
+                    }));
+                } else if (filterType === 'statuses') {
+                    items = Object.entries(data.statuses).map(([statusName, count]) => ({
+                        label: `${statusName.charAt(0).toUpperCase() + statusName.slice(1)}`, // Capitalize first letter
+                        value: statusName
+                    }));
                 } else if (filterType.endsWith('s')) {
                     objectKey = filterType.slice(0, -1);
-                } else {
-                    objectKey = filterType;
-                }
-                var items = data[filterType].map(item => {
-                    return {
+                    items = data[filterType].map(item => ({
                         label: item[objectKey + '_name'] || item[objectKey + '_title'] || item[objectKey + '_url'],
                         value: item[objectKey + '_id']
-                    };
-                });
+                    }));
+                } else {
+                    objectKey = filterType;
+                    items = data[filterType].map(item => ({
+                        label: item[objectKey + '_name'] || item[objectKey + '_title'] || item[objectKey + '_url'],
+                        value: item[objectKey + '_id']
+                    }));
+                }
                 setupAutocomplete(items);
             }).catch(error => {
                 console.error('Error fetching data: ', error);
             });
     }
+
 
     function setupAutocomplete(items) {
         // Clear the existing autocomplete if it exists
