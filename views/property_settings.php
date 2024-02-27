@@ -65,8 +65,8 @@ $_SESSION['property_id'] = $property_id;
               </div>
               <div class="col">
                   <label for="property_url" class="form-label h4">Sitemap URL</label>
-                  <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" placeholder="https://equalify.app/sitemap.xml" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
-                  <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.</div>
+                  <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
+                  <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.<br> Example:"https://equalify.app/sitemap.xml"</div>
               </div>
           </div>
           <div class="mt-4">
