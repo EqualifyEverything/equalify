@@ -8,6 +8,9 @@ require_once('actions/install.php');
 // Required components
 require_once('components/active_class.php');
 
+// Get current title and active page for screenreader
+require_once('helpers/get_page_title.php');
+
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +20,7 @@ require_once('components/active_class.php');
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta description="Equalify manages web accessibility issues with integrations with your favorite services." />
-    <title>Equalify | Accessibility Issue Management</title>
+    <title><?php echo get_page_title(); ?></title>
     <link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="theme.css" rel="stylesheet">
 </head>
@@ -30,16 +33,20 @@ require_once('components/active_class.php');
                 <img src="logo.svg" height="40" class="me-2" alt="Equalify Logo">
             </a>
             <ul class="nav nav-pills">
-                <li class="nav-item"><a href="index.php?view=reports" class="<?php the_active_class('reports');?> nav-link" aria-current="page">Reports</a></li>
-                <li class="nav-item"><a href="index.php?view=scans" class="<?php the_active_class('scans');?> nav-link" aria-current="page">Scans</a></li>
-                <li class="nav-item"><a href="index.php?view=settings" class="<?php the_active_class('settings');?> nav-link">Settings</a></li>
-                
+                <li class="nav-item">
+                    <a href="index.php?view=reports" class="<?php echo the_active_class('reports'); ?> nav-link" <?php echo (the_active_page() == 'reports' || the_active_page() == 'report') ? 'aria-current="page"' : ''; ?>>Reports</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.php?view=scans" class="<?php echo the_active_class('scans'); ?> nav-link" <?php echo the_active_page() == 'scans' ? 'aria-current="page"' : ''; ?>>Scans</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.php?view=settings" class="<?php echo the_active_class('settings'); ?> nav-link" <?php echo the_active_page() == 'settings' ? 'aria-current="page"' : ''; ?>>Settings</a>
+                </li>
                 <?php
                 // Only show account in "managed" mode
-                if($GLOBALS["managed_mode"]){ 
+                if ($GLOBALS["managed_mode"]) {
                 ?>
-                
-                <li class="nav-item"><a href="index.php?view=account" class="<?php the_active_class('account');?> nav-link">My Account</a></li>
+                    <li class="nav-item"><a href="index.php?view=account" class="<?php the_active_class('account'); ?> nav-link"<?php echo the_active_page() == 'account' ? 'aria-current="page"' : ''; ?>>My Account</a></li>
 
                 <?php
                 }
@@ -49,16 +56,15 @@ require_once('components/active_class.php');
         </div>
     </header>
     <main id="main">
-        
+
         <?php
         // Select the view.
-        if(!empty($_GET['view'])){
-            require_once 'views/'.$_GET['view'].'.php';
-        }else{
+        if (!empty($_GET['view'])) {
+            require_once 'views/' . $_GET['view'] . '.php';
+        } else {
 
             // This is the defaul view
             require_once 'views/reports.php';
-
         }
         ?>
 
@@ -78,4 +84,5 @@ require_once('components/active_class.php');
     </footer>
     <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
+
 </html>
