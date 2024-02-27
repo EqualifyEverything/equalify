@@ -32,9 +32,10 @@ After forking the repo:
     ## Scan Info
     SCAN_URL=
     ```
-2. Run in your favorite local LAMP/LEMP setup. (We love [ddev](https://github.com/ddev/ddev)!)
-3. Run `php actions/install.php` to create the tables.
-4. Equalify everything!
+2. Run `composer install` to integrate upload script(you may need to install composer first)
+3.  Run in your favorite local LAMP/LEMP setup. (We love [ddev](https://github.com/ddev/ddev)!)
+4. Run `php actions/install.php` to create the tables.
+5. Equalify everything!
 
 ## Contribute
 Submit bug reports, questions, and patches to the repo's [issues](https://github.com/EqualifyEverything/equalify/issues) tab.
