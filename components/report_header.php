@@ -22,7 +22,7 @@ function the_report_header() {
         <div class="container d-flex align-items-center justify-content-between py-4 ">
             Previewing Unsaved Report Settings
             <div>
-                <a href="?view=report&report_id=<?php echo $report_id?>" class="btn btn-sm btn-outline-secondary">
+                <a href="actions/delete_report_filter_cookie.php?report_id=<?php echo $report_id; ?>" class="btn btn-sm btn-outline-secondary">
                     Cancel Updates
                 </a> 
                 <a href="actions/save_report_filter_change.php?report_id=<?php echo $report_id; ?>" class="btn btn-primary btn-sm">
