@@ -22,3 +22,4 @@ package-lock.json
 .env-**
 .env
 cron.log
+composer.lock
