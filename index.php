@@ -70,7 +70,7 @@ require_once('helpers/get_page_title.php');
 
     </main>
     <footer class="py-4 mt-4 text-center">
-        Equalify Version 1 - Release Candidate 3
+        Equalify Version 1 - Release Candidate 4
         <nav aria-label="Footer Links">
             <ul class="nav justify-content-center">
                 <li class="nav-item">
