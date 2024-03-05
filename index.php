@@ -21,7 +21,7 @@ require_once('helpers/get_page_title.php');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta description="Equalify manages web accessibility issues with integrations with your favorite services." />
     <title><?php echo get_page_title(); ?></title>
-    <link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" >
     <link href="theme.css" rel="stylesheet">
 </head>
 
@@ -82,7 +82,7 @@ require_once('helpers/get_page_title.php');
             </ul>
         </nav>
     </footer>
-    <script src="assets/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="assets/bootstrap/dist/js/bootstrap.min.js"dde></script>
 </body>
 
 </html>
