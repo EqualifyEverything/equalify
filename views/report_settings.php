@@ -66,7 +66,7 @@ $_SESSION['report_id'] = $report_id;
                 >
                 
             </div>
-            <button type="submit" class="btn btn-primary visually-hidden mt-3 disabled" aria-disabled="true">Update Title</button>
+            <div id="update-button-container"></div>
         </form>
         <div class="border-top py-4 my-2">
             <h3 class="mb-4">Filters</h3>
@@ -114,16 +114,30 @@ $_SESSION['report_id'] = $report_id;
     </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var reportTitleInput = document.getElementById('reportTitle');
-        var updateButton = document.querySelector('button[type="submit"]');
+        document.addEventListener('DOMContentLoaded', function() {
+        let reportTitleInput = document.getElementById('reportTitle');
+        let buttonContainer = document.getElementById('update-button-container');
+        // Store the original report title
+        let originalTitle = reportTitleInput.value;
 
-        reportTitleInput.addEventListener('keyup', function() {
-            // Remove the 'disabled' and 'visually-hidden' classes from the button
-            updateButton.classList.remove('disabled', 'visually-hidden');
-
-            // Update the 'aria-disabled' attribute to 'false'
-            updateButton.setAttribute('aria-disabled', 'false');
-        });
+        function updateButtonVisibility() {
+            let isTitleChanged = reportTitleInput.value !== originalTitle;
+            let updateButtonExists = !!document.querySelector('button[type="submit"]');
+            if (isTitleChanged && !updateButtonExists) {
+                // If the title is changed and the button doesn't exist, create and append it
+                let updateButton = document.createElement('button');
+                updateButton.setAttribute('type', 'submit');
+                updateButton.classList.add('btn', 'btn-primary', 'mt-3');
+                updateButton.textContent = 'Update Title';
+                buttonContainer.appendChild(updateButton);
+            } else if (!isTitleChanged && updateButtonExists) {
+                // If the title is not changed and the button exists, remove it
+                let updateButton = document.querySelector('button[type="submit"]');
+                buttonContainer.removeChild(updateButton);
+            }
+        }
+        // Monitor for changes in the input field
+        reportTitleInput.addEventListener('input', updateButtonVisibility);
     });
+
 </script>
