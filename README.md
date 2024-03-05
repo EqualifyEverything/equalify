@@ -37,6 +37,8 @@ After forking the repo:
 4. Run `php actions/install.php` to create the tables.
 5. Equalify everything!
 
+PHP 8.1+ is required with MySQL 8.0+.
+
 ## Contribute
 Submit bug reports, questions, and patches to the repo's [issues](https://github.com/EqualifyEverything/equalify/issues) tab.
 

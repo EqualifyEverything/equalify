@@ -45,32 +45,38 @@ function get_results($results_per_page = '', $offset = '', $filters = []) {
     // Construct the SQL query with filters
     if(!empty($occurrence_id_list)){
         $updates_sql = "
+        SELECT 
+            month_year,
+            update_message,
+            occurrence_id
+        FROM (
             SELECT 
                 DATE_FORMAT(u.date_created, '%Y-%m') AS month_year,
                 u.update_message,
-                o.occurrence_id
+                o.occurrence_id,
+                ROW_NUMBER() OVER(PARTITION BY o.occurrence_id, DATE_FORMAT(u.date_created, '%Y-%m') ORDER BY u.date_created DESC) as rn
             FROM 
                 updates u
             JOIN occurrences o ON u.occurrence_id = o.occurrence_id
             WHERE
                 o.occurrence_id IN ($occurrence_id_list)
         ";
+        
         if (!empty($filters['statuses'])) {
             $statuses = is_array($filters['statuses']) ? $filters['statuses'] : explode(',', $filters['statuses']);
             $statuses = array_map(function($status) {
-                // Correcting 'active' to 'activated'
                 return $status === 'active' ? 'activated' : preg_replace("/[^a-zA-Z0-9_\-]+/", "", $status);
             }, $statuses);
             $statusList = "'" . implode("', '", $statuses) . "'";
-            $updates_sql.= "
-                AND u.update_message IN ($statusList)
-            ";
+            $updates_sql .= " AND u.update_message IN ($statusList)";
         }
-        $updates_sql.= "
-            GROUP BY month_year, u.update_message, o.occurrence_id
+        
+        $updates_sql .= "
+            ) as sub
+            WHERE rn = 1
+            GROUP BY month_year, update_message, occurrence_id
             ORDER BY month_year ASC
         ";
-
 
         // Updates query
         $stmt = $pdo->prepare($updates_sql);
