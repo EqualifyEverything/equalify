@@ -1,17 +1,8 @@
 body{
-    min-height: 100vh;
+    background-color: var(--bs-secondary-bg);
 }
-.container{
-    max-width: 960px;
-}
-main{
-    display: flex;
-    flex-wrap: nowrap;
-    height: 100vh;
-    height: -webkit-fill-available;
-    min-height: 100vh;
-    overflow-x: auto;
-    overflow-y: scroll;
+#reports_content{
+    min-height: 60vh;
 }
 .bi{
     vertical-align: -.125em;
@@ -21,30 +12,30 @@ main{
 .me-2{
     margin-right: .5rem !important;
 }
-.sites tbody tr, .sites tbody td{
-    border: 0;
-    padding-top: 0;
-}
-.sites tbody tr{
-    opacity: .5;
-    font-size: .8em;
-}
-.sites tbody tr.parent{
-    font-weight: bold;
-    border-top: 1px solid;
-    opacity: 1;
-    font-size: 1em;
-}
-.sites tbody tr.parent td{
-    padding-top: .5rem;
-
+a.active{
+    background-color: var(--bs-secondary-color) !important;
 }
 pre code{
     white-space: break-spaces;
     word-break: break-word !important;
 }
-.nav-link{
+header .nav-link{
     color: #212529;
+    
+}
+header .nav-item {
+    font-size: var(--bs-navbar-brand-font-size);
+}
+footer .nav-link{
+    text-decoration: underline;
+}
+footer nav li:before{
+    content: '|';
+    padding: 0 4px 0 10px;
+}
+footer nav li:first-of-type:before{
+    content: ' ';
+    padding: 0;
 }
 .fs-7{
     font-size: .9em;
@@ -57,20 +48,60 @@ pre code{
     --bs-spinner-width: .7rem;
     --bs-spinner-height: 0.7rem;
 }
-#terminal{
-    min-height: 600px;
+#archived{
+    min-height: 1.5em;
+    min-width: 2.5em;
 }
-#scan_log{
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+.snippet-input{
+    width:100%;
 }
-.screen-reader-only {
-    position: absolute;
-    width: 1px;
-    clip: rect(0 0 0 0);
+.snippet-delete{
+    margin-right: 1em;
+}
+#reports_filter {
     overflow: hidden;
-    white-space: nowrap;
-  }
+}
+#reports_filter a{
+    width: 200px;
+    position: relative;
+    background: transparent !important;
+}
+@media (max-width: 768px) {
+    #reports_filter a{
+        width: auto;
+    }
+}
+#reports_filter a:before{
+    position: absolute;
+    content: '';
+    bottom: -2em;
+    left: 0;
+    width: 100%;
+    height: 1em;
+    border-radius: 6px;
+    transition: bottom .4s;
+}
+#reports_filter a.active:before{
+    bottom: -1em;
+}
+#reports_filter a:hover:before{
+    bottom: -1.25em;
+}
+#reports_filter a#equalified:before{
+    background: green;
+}
+#reports_filter a#active:before{
+    background: red;
+}
+#reports_filter a#ignored:before{
+    background: gray;
+}
+.btn-outline-secondary:hover code{
+    color: white !important;
+}
+a.row{
+    text-decoration: none;
+}
+a.row:hover{
+    background-color: var(--bs-secondary-bg)
+}
