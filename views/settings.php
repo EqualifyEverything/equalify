@@ -4,6 +4,8 @@ require_once('helpers/get_properties.php');
 
 // Components
 require_once('components/success_or_error_message.php');
+require_once('components/add_properties_button_and_modal.php');
+
 
 ?>
 
@@ -16,7 +18,17 @@ require_once('components/success_or_error_message.php');
 
     <h1 class="display-5 my-4">Equalify Settings</h1>
     <section class="my-2">
-        <h2 class="my-4">Properties</h2>
+        <div class="d-flex flex-column flex-md-row align-items-center my-4">
+            <h2 class="mb-0 me-2">Properties</h2>
+            <div class="ms-md-auto">
+                
+                <?php
+                // Add Properties Button and Modal
+                the_add_properties_button_and_modal();
+                ?>
+                
+            </div>
+        </div>
         <div class="row row-cols-3 g-4 gx-4">
 
         <?php
@@ -62,8 +74,5 @@ require_once('components/success_or_error_message.php');
         ?>
 
         </div>
-        <p>
-            <a class="btn btn-primary mt-3" href="index.php?view=property_settings">Add Property</a>
-        </p>
     </section>
 </div>
