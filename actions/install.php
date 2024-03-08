@@ -38,6 +38,7 @@ $tables = [
             `property_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             `property_name` text NOT NULL,
             `property_archived` tinyint(1) DEFAULT NULL,
+            `property_discovery` varchar(220) DEFAULT NULL,
             `property_url` text NOT NULL,
             `property_processed` datetime DEFAULT NULL,
             `property_processing` tinyint(1) DEFAULT NULL,
