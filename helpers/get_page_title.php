@@ -48,7 +48,7 @@ function get_page_title()
                 $title = " All Reports | Equalify";
                 break;
             case 'scans':
-                $title = "Scans | Equalify";
+                $title = "Discovery | Equalify";
                 break;
             case 'settings':
                 $title = "Settings | Equalify";
