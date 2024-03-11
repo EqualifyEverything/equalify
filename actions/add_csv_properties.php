@@ -7,27 +7,39 @@ require_once '../helpers/validate_url.php';
 $properties = [];
 $validationResults = [];
 
-// Return content as JSON
-header('Content-Type: application/json');
+// Define the valid discovery options
+$validDiscoveryOptions = ['single page import', 'sitemap import', 'crawl'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['csvFile']) && $_FILES['csvFile']['error'] == 0) {
         // Handle CSV file upload
         $file = $_FILES['csvFile']['tmp_name'];
         $handle = fopen($file, "r");
-        $header = fgetcsv($handle); // Assuming the first row contains column headers
+        $header = fgetcsv($handle); // Read the first row as headers
 
-        // Validate column names
-        if ($header !== ['Name', 'URL', 'Discovery']) {
-            echo json_encode(["error" => "Invalid CSV format"]);
+        // Map column headers to their indices
+        $columnIndices = array_flip($header); // Flip keys with values
+        
+        // Validate existence of required columns
+        if (!isset($columnIndices['Name'], $columnIndices['URL'], $columnIndices['Discovery'])) {
+            echo json_encode(["error" => "Invalid CSV format. Columns 'Name', 'URL', and 'Discovery' are required."]);
             exit;
         }
 
+        $properties = [];
         while ($row = fgetcsv($handle)) {
+            $discoveryType = strtolower(trim($row[$columnIndices['Discovery']]));
+            // Check if the discovery type is valid
+            if (!in_array($discoveryType, $validDiscoveryOptions)) {
+                echo json_encode(["error" => "Invalid discovery type '$discoveryType'. Valid options are 'Single Page Import', 'Sitemap Import', or 'Crawl'."]);
+                fclose($handle);
+                exit;
+            }
+
             $properties[] = [
-                "property_name" => $row[0],
-                "property_url" => $row[1],
-                "property_discovery" => strtolower($row[2]),
+                "property_name" => $row[$columnIndices['Name']],
+                "property_url" => $row[$columnIndices['URL']],
+                "property_discovery" => $discoveryType,
             ];
         }
         fclose($handle);
