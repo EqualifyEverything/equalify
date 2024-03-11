@@ -44,8 +44,8 @@ function the_add_properties_button_and_modal() {
                         <div class="form-floating mb-2">
                             <select id="discoveryProcess" class="form-select" required>
                                 <option value="" selected disabled>Choose...</option>
-                                <option value="single">Single Page</option>
-                                <option value="sitemap">Sitemap Scan</option>
+                                <option value="single_page_import">Single Page Import</option>
+                                <option value="sitemap_import">Sitemap Import</option>
                                 <option value="crawl">Crawl</option>
                             </select>
                             <label for="discoveryProcess">Discovery Process</label>

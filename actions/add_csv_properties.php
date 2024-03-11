@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $properties = [];
         while ($row = fgetcsv($handle)) {
             $discoveryType = strtolower(trim($row[$columnIndices['Discovery']]));
+
             // Check if the discovery type is valid
             if (!in_array($discoveryType, $validDiscoveryOptions)) {
                 echo json_encode(["error" => "Invalid discovery type '$discoveryType'. Valid options are 'Single Page Import', 'Sitemap Import', or 'Crawl'."]);
@@ -60,12 +61,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response = ['success' => [], 'failed' => []];
         if ($allValid) {
             foreach ($properties as $property) {
+
+                // Reformat Discovery for table
+                // Replace spaces with underscores for the discovery type
+                $discoveryTypeFormatted = str_replace(' ', '_', $property['property_discovery']);
+
                 // All properties are previously validated, so we can directly insert them into the database
                 $query = $pdo->prepare("INSERT INTO properties (property_name, property_url, property_discovery) VALUES (:name, :url, :discovery)");
                 $query->execute([
                     ':name' => $property['property_name'],
                     ':url' => $property['property_url'],
-                    ':discovery' => $property['property_discovery'],
+                    ':discovery' => $discoveryTypeFormatted,
                 ]);
                 $response['success'][] = $property['property_name'];
             }
