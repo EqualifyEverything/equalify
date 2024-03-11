@@ -66,7 +66,7 @@ function the_add_properties_button_and_modal() {
             </div>
             <div class="modal-footer"> 
                 <button type="button" class="btn btn-primary" id="submitProperties">Submit</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="?view=settings" class="btn btn-secondary">Close</a>
             </div>
         </div>
     </div>
