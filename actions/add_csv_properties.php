@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $header = fgetcsv($handle); // Assuming the first row contains column headers
 
         // Validate column names
-        if ($header !== ['Property Name', 'Property URL', 'Discovery Type']) {
+        if ($header !== ['Name', 'URL', 'Discovery']) {
             echo json_encode(["error" => "Invalid CSV format"]);
             exit;
         }
@@ -27,14 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $properties[] = [
                 "property_name" => $row[0],
                 "property_url" => $row[1],
-                "discovery_type" => strtolower($row[2]),
+                "property_discovery" => strtolower($row[2]),
             ];
         }
         fclose($handle);
 
         // First, validate all properties without saving to the database
         foreach ($properties as $property) {
-            $validationResult = validateUrl($property['property_url'], $property['discovery_type'], $pdo);
+            $validationResult = validateUrl($property['property_url'], $property['property_discovery'], $pdo);
             $validationResult['property_name'] = $property['property_name']; // Include property name in validation result for reference
             $validationResults[] = $validationResult;
         }
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $query->execute([
                     ':name' => $property['property_name'],
                     ':url' => $property['property_url'],
-                    ':discovery' => $property['discovery_type'],
+                    ':discovery' => $property['property_discovery'],
                 ]);
                 $response['success'][] = $property['property_name'];
             }

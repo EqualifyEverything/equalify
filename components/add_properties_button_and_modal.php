@@ -57,7 +57,7 @@ function the_add_properties_button_and_modal() {
                     <div id="csvUploadForm" style="display: none;"> 
                         <label for="csvFile" class="form-label">Upload CSV</label>
                         <input type="file" id="csvFile" class="form-control mb-2" accept=".csv" required>
-                        <div class="form-text">Your file must be a CSV with two columns: "Website," with valid URLs, and "Discovery Process," including either "Single Page", "Sitemap", or "Crawl".</div>
+                        <div class="form-text">Valid CSVs must include three cololumns "Name", "URL" and "Discovery" in that order. Valid Discovery options including either "Single Page", "Sitemap", or "Crawl."</div>
                         <div class="invalid-feedback">
                             Please upload a CSV file.
                         </div>
