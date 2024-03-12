@@ -11,7 +11,8 @@ if(isset($_GET['property_id'])){
     $property = get_property($property_id);
     $scanning = isset($property['property_processing']) ? $property['property_processing'] : '';
     $name = isset($property['property_name']) ? $property['property_name'] : ''; 
-    $url = isset($property['property_url']) ? $property['property_url'] : ''; 
+    $url = isset($property['property_url']) ? $property['property_url'] : '';
+    $discovery = isset($property['property_discovery']) ? $property['property_discovery'] : ''; 
     $scanning = isset($property['property_processing']) ? $property['property_processing'] : ''; 
     $property_processed = isset($property['property_processed']) ? $property['property_processed'] : ''; 
 
@@ -22,16 +23,6 @@ if(isset($_GET['property_id'])){
       $scanned_date = 'Not processed';
     }
 
-
-// Default data for new properties
-}else{
-    
-    // Default data for new properties
-    $property_id ='';
-    $name = '';
-    $url = '';
-    $scanned_date = '';
-    $scanning = '';
 
 }
 
@@ -68,6 +59,15 @@ $_SESSION['property_id'] = $property_id;
                   <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
                   <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.<br> Example:"https://equalify.app/sitemap.xml"</div>
               </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-6">
+              <label for="property_discovery" class="form-label h4">Discovery Process</label>
+              <select id="property_discovery" name="property_discovery" class="form-select form-select-lg" aria-label="Discovery Process" required>
+                <option value="single_page_import" <?php if($discovery == 'single_page_import') echo 'selected';?>>Single Page Import</option>
+                <option value="sitemap_import" <?php if($discovery == 'sitemap_import') echo 'selected';?>>Sitemap Import</option>
+              </select>
+            </div>
           </div>
           <div class="mt-4">
               <button type="submit" id="submit" class="btn btn-lg btn-primary">
