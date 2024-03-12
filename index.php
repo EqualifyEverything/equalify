@@ -34,13 +34,13 @@ require_once('helpers/get_page_title.php');
             </a>
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a href="index.php?view=reports" class="<?php echo the_active_class('reports'); ?> nav-link" <?php echo (the_active_page() == 'reports' || the_active_page() == 'report') ? 'aria-current="page"' : ''; ?>>Reports</a>
+                    <a href="index.php?view=reports" class="<?php echo the_active_class('reports'); ?> nav-link" <?php echo (the_active_page() == 'reports' || the_active_page() == 'report') ? 'aria-current="page"' : ''; ?>>Reporting</a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=scans" class="<?php echo the_active_class('scans'); ?> nav-link" <?php echo the_active_page() == 'scans' ? 'aria-current="page"' : ''; ?>>Scans</a>
+                    <a href="index.php?view=scans" class="<?php echo the_active_class('scans'); ?> nav-link" <?php echo the_active_page() == 'scans' ? 'aria-current="page"' : ''; ?>>Scanning</a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.php?view=settings" class="<?php echo the_active_class('settings'); ?> nav-link" <?php echo the_active_page() == 'settings' ? 'aria-current="page"' : ''; ?>>Settings</a>
+                    <a href="index.php?view=discovery" class="<?php echo the_active_class('discovery'); ?> nav-link" <?php echo the_active_page() == 'discovery' ? 'aria-current="page"' : ''; ?>>Discovery</a>
                 </li>
                 <?php
                 // Only show account in "managed" mode

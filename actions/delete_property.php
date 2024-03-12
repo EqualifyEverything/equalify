@@ -69,7 +69,7 @@ try {
 
     // Success redirection or message
     $_SESSION['success'] = "Property and related data deleted.";
-    header("Location: ../index.php?view=settings");
+    header("Location: ../index.php?view=discovery");
     exit;
     
 } catch (Exception $e) {
@@ -78,7 +78,7 @@ try {
 
     // Error redirection or message
     $_SESSION['error'] = $e->getMessage();
-    header("Location: ../index.php?view=settings");
+    header("Location: ../index.php?view=discovery");
     exit;
 }
 ?>
