@@ -31,7 +31,8 @@ try {
         $next_property_discovery = $the_property['property_discovery']; 
         $next_property_name = $the_property['property_name'];
     
-    // Auto get property when no property is defined
+    // Auto get property when no property is defined, so we can
+    // ping this URL on a cron to automatically process properties.
     }else{
         $next_property = get_next_scannable_property();
         if(!empty($next_property)){
@@ -47,6 +48,8 @@ try {
         }
     }
 
+    // When $next_property_id is declared, we assume there 
+    // is a property to process.
     if(!empty($next_property_id)){
 
         // Mark the scan as running
@@ -54,39 +57,29 @@ try {
 
         $results = get_api_results($next_property_url, $next_property_discovery);
 
-        if(results_are_valid_format($results) == TRUE){
-
-            // Make sure single page results are formatted
-            // correctly.
-            if($next_property_discovery === 'single_page_import'){
-                $formatted_results = array(
-                    array(
-                        'URL' => $next_property_url,
-                        'JobID' => $results['jobID']
-                    )
-                );
-            }else{
-                $formatted_results = $results;
-            }
-
+        // Process scan jobs
+        $scan_jobs = $results['jobs'];
+        if(count($scan_jobs) > 0){
 
             // Add existing page URLs to results where possible
-            foreach ($formatted_results as &$result) {
-                $page_id = find_page_id($result['URL'], $next_property_id);
+            foreach ($scan_jobs as &$job) {
+                $page_id = find_page_id($job['URL'], $next_property_id);
                 if ($page_id) {
-                    $result['page_id'] = $page_id;
+                    $job['page_id'] = $page_id;
                 } else {
-                    $result['page_id'] = NULL;
+                    $job['page_id'] = NULL;
                 }
             }
-            unset($result);
+            unset($job);
 
-            save_to_database($formatted_results, $next_property_id);
+            save_to_database($scan_jobs, $next_property_id);
 
             // On success
             update_property_processing_data($next_property_id, NULL);
             echo "Success! $next_property_name processed.\n";   
 
+        }else{
+            throw new Exception("No scan jobs found!");
         }
 
     }else{
@@ -187,31 +180,6 @@ function update_property_processing_data($property_id, $property_processing = NU
         ':property_processed' => $current_date_time, // Set the current date and time
         ':property_id' => $property_id
     ]);
-}
-
-function results_are_valid_format($results) {
-
-    // First check if JSON decoding was successful and is an array
-    if ($results === null || !is_array($results)) {
-        throw new Exception("Property results are not formatted correctly");
-    }
-
-    // Results from a single page scan are an object and need to 
-    // be treated differently.
-    if(!empty($results['JobID'])){
-
-        // Validate each element in the array
-        foreach ($results as $item) {
-            if (!isset($item['JobID']) || !isset($item['URL'])) {
-                throw new Exception("$item");
-            }
-        }
-    
-    }
-
-    // On sucesss
-    return true;
-
 }
 
 function save_to_database($results, $property_id) {
