@@ -1,7 +1,7 @@
 <?php
 // Array of table creation queries
 $tables = [
-    "status" => "CREATE TABLE statuses (
+    "status" => "CREATE TABLE status (
         status_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         status VARCHAR(220) NOT NULL
     );",
@@ -30,7 +30,7 @@ $tables = [
         message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         message TEXT NOT NULL,
         message_status_id BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY (message_status_id) REFERENCES statuses(status_id)
+        FOREIGN KEY (message_status_id) REFERENCES status(status_id)
     );",
     
     "message_pages" => "CREATE TABLE message_pages (
@@ -90,14 +90,15 @@ $tables = [
 ];
 
 // Function to check and create table if it doesn't exist
-function checkAndCreateTable($pdo, $tableName, $createQuery) {
-    $stmt = $pdo->query("SHOW TABLES LIKE '$tableName'");
-    if ($stmt->rowCount() == 0) {
-        $pdo->exec($createQuery);
-    }
+function tableExists($pdo, $tableName) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schemaName AND TABLE_NAME = :tableName");
+    $stmt->execute(['schemaName' => 'test', 'tableName' => $tableName]); // Replace 'test' with your actual database name
+    return $stmt->fetchColumn() > 0;
 }
 
-// Loop through tables and check/create each
+// Then use this function in your loop
 foreach ($tables as $tableName => $createQuery) {
-    checkAndCreateTable($pdo, $tableName, $createQuery);
+    if (!tableExists($pdo, $tableName)) {
+        $pdo->exec($createQuery);
+    }
 }
