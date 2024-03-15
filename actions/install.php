@@ -23,7 +23,7 @@ $tables = [
 
     "properties" => "CREATE TABLE properties (
         property_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        property_name BIGINT NOT NULL,
+        property_name TEXT NULL,
         property_archived TINYINT(1),
         property_processed DATETIME,
         property_processing TINYINT(1),
