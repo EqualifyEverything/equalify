@@ -7,13 +7,6 @@ $tables = [
         `message_link` text DEFAULT NULL,
         PRIMARY KEY (`message_id`)
         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
-
-    "meta" => "CREATE TABLE `meta` (
-        `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        `meta_name` varchar(220) DEFAULT NULL,
-        `meta_value` longtext DEFAULT NULL,
-        PRIMARY KEY (`meta_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
     
     "occurrences" => "CREATE TABLE `occurrences` (
             `occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
