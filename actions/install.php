@@ -9,6 +9,7 @@ $tables = [
 
     "code" => "CREATE TABLE code (
         code_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        code_equalified TINYINT(1),
         code TEXT NOT NULL
     );",
 
@@ -30,7 +31,7 @@ $tables = [
     "messages" => "CREATE TABLE messages (
         message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         message TEXT NOT NULL,
-        message_status VARCHAR(220) NOT NULL
+        message_type VARCHAR(220) NOT NULL
     );",
     
     "message_pages" => "CREATE TABLE message_pages (
@@ -65,11 +66,11 @@ $tables = [
         FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
     );",
 
-    "message_updates" => "CREATE TABLE message_updates (
+    "code_updates" => "CREATE TABLE code_updates (
         update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        date_created datetime NOT NULL,
-        message_id BIGINT NOT NULL,
-        message_update VARCHAR(220) NOT NULL
+        update_date datetime NOT NULL,
+        code_id BIGINT NOT NULL,
+        code_equalified TINYINT(1) NOT NULL
     );",
 
     "reports" => "CREATE TABLE reports (
