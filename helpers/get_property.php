@@ -3,7 +3,7 @@ function get_property($property_id){
     global $pdo;
 
     // Prepare the SQL statement to fetch a specific property
-    $sql = "SELECT property_id, property_name, property_archived, property_url, property_processed, property_processing FROM properties WHERE property_id = :property_id";
+    $sql = "SELECT * FROM properties WHERE property_id = :property_id";
 
     // Prepare the statement
     $stmt = $pdo->prepare($sql);

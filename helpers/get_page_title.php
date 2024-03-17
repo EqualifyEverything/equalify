@@ -4,10 +4,17 @@ require_once('helpers/get_title.php');
 function get_page_title()
 {
     global $pdo;
+    
     // Default title
     $title = "Equalify | Accessibility Issue Management";
-    $report_id = isset($_GET['report_id']) ? $_GET['report_id'] : '';
 
+    // Initialize variables
+    $report_id = isset($_GET['report_id']) ? $_GET['report_id'] : '';
+    $property_name = ''; // Initialized to prevent undefined variable warning
+    $report_title = '';
+    $message_title = '';
+    $tag_name = '';
+    $page_url = '';
 
     // Check if 'view' URL parameter is set
     if (isset($_GET['view'])) {
