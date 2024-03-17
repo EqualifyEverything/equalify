@@ -1,11 +1,6 @@
 <?php
 // Array of table creation queries
 $tables = [
-    "status" => "CREATE TABLE status (
-        status_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        status VARCHAR(220) NOT NULL
-    );",
-
     "pages" => "CREATE TABLE pages (
         page_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         page_url TEXT NOT NULL,
@@ -35,8 +30,7 @@ $tables = [
     "messages" => "CREATE TABLE messages (
         message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         message TEXT NOT NULL,
-        message_status_id BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY (message_status_id) REFERENCES status(status_id)
+        message_status VARCHAR(220) NOT NULL
     );",
     
     "message_pages" => "CREATE TABLE message_pages (
