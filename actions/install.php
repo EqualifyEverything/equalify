@@ -8,7 +8,8 @@ $tables = [
 
     "pages" => "CREATE TABLE pages (
         page_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        page_url TEXT NOT NULL
+        page_url TEXT NOT NULL,
+        page_property_id BIGINT NOT NULL
     );",
 
     "code" => "CREATE TABLE code (
