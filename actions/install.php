@@ -1,98 +1,109 @@
 <?php
 // Array of table creation queries
 $tables = [
-    "messages" => "CREATE TABLE `messages` (
-        `message_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        `message_title` text NOT NULL,
-        `message_link` text DEFAULT NULL,
-        PRIMARY KEY (`message_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "status" => "CREATE TABLE status (
+        status_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        status VARCHAR(220) NOT NULL
+    );",
 
-    "meta" => "CREATE TABLE `meta` (
-        `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        `meta_name` varchar(220) DEFAULT NULL,
-        `meta_value` longtext DEFAULT NULL,
-        PRIMARY KEY (`meta_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "pages" => "CREATE TABLE pages (
+        page_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        page_url TEXT NOT NULL
+    );",
+
+    "code" => "CREATE TABLE code (
+        code_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        code TEXT NOT NULL
+    );",
+
+    "tags" => "CREATE TABLE tags (
+        tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        tag VARCHAR(220) NOT NULL
+    );",
+
+    "properties" => "CREATE TABLE properties (
+        property_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        property_name TEXT NULL,
+        property_archived TINYINT(1),
+        property_processed DATETIME,
+        property_processing TINYINT(1),
+        property_url TEXT,
+        property_discovery VARCHAR(220)
+    );",
+
+    "messages" => "CREATE TABLE messages (
+        message_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        message TEXT NOT NULL,
+        message_status_id BIGINT UNSIGNED NOT NULL,
+        FOREIGN KEY (message_status_id) REFERENCES status(status_id)
+    );",
     
-    "occurrences" => "CREATE TABLE `occurrences` (
-            `occurrence_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `occurrence_message_id` bigint(20) NOT NULL,
-            `occurrence_property_id` bigint(20) NOT NULL,
-            `occurrence_status` varchar(220) NOT NULL,
-            `occurrence_page_id` bigint(20) NOT NULL,
-            `occurrence_source` varchar(220) NOT NULL,
-            `occurrence_code_snippet` longtext DEFAULT NULL,
-            `occurrence_archived` tinyint(1) DEFAULT NULL,
-            PRIMARY KEY (`occurrence_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=67320 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "message_pages" => "CREATE TABLE message_pages (
+        message_id BIGINT UNSIGNED NOT NULL,
+        page_id BIGINT UNSIGNED NOT NULL, 
+        PRIMARY KEY (message_id, page_id),
+        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
+        FOREIGN KEY (page_id) REFERENCES pages(page_id) ON DELETE CASCADE
+    );",    
 
-    "pages" => "CREATE TABLE `pages` (
-            `page_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `page_url` text NOT NULL,
-            `page_property_id` bigint(20) NOT NULL,
-            PRIMARY KEY (`page_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=3998 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "message_code" => "CREATE TABLE message_code (
+        message_id BIGINT UNSIGNED NOT NULL,
+        code_id BIGINT UNSIGNED NOT NULL,
+        PRIMARY KEY (message_id, code_id),
+        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
+        FOREIGN KEY (code_id) REFERENCES code(code_id) ON DELETE CASCADE
+    );",
 
-    "properties" => "CREATE TABLE `properties` (
-            `property_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `property_name` text NOT NULL,
-            `property_archived` tinyint(1) DEFAULT NULL,
-            `property_discovery` varchar(220) DEFAULT NULL,
-            `property_url` text NOT NULL,
-            `property_processed` datetime DEFAULT NULL,
-            `property_processing` tinyint(1) DEFAULT NULL,
-            PRIMARY KEY (`property_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "message_tags" => "CREATE TABLE message_tags (
+        message_id BIGINT UNSIGNED NOT NULL,
+        tag_id BIGINT UNSIGNED NOT NULL,
+        PRIMARY KEY (message_id, tag_id),
+        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
+        FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
+    );",
 
-    "queued_scans" => "CREATE TABLE `queued_scans` (
-            `queued_scan_job_id` bigint(20) NOT NULL,
-            `queued_scan_property_id` bigint(20) NOT NULL,
-            `queued_scan_page_id` bigint(20) DEFAULT NULL,
-            `queued_scan_processing` tinyint(1) DEFAULT NULL,
-            `queued_scan_prioritized` tinyint(1) DEFAULT NULL,
-            PRIMARY KEY (`queued_scan_job_id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "message_properties" => "CREATE TABLE message_properties (
+        message_id BIGINT UNSIGNED NOT NULL,
+        property_id BIGINT UNSIGNED NOT NULL,
+        PRIMARY KEY (message_id, property_id),
+        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
+        FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
+    );",
 
-    "reports" => "CREATE TABLE `reports` (
-            `report_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `report_title` text NOT NULL,
-            `report_visibility` varchar(220) DEFAULT NULL,
-            `report_filters` text DEFAULT NULL,
-            PRIMARY KEY (`report_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "message_updates" => "CREATE TABLE message_updates (
+        update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        date_created datetime NOT NULL,
+        message_id BIGINT NOT NULL,
+        message_update VARCHAR(220) NOT NULL
+    );",
 
-    "tag_relationships" => "CREATE TABLE `tag_relationships` (
-        `occurrence_id` bigint(20) NOT NULL,
-        `tag_id` bigint(20) unsigned NOT NULL,
-        PRIMARY KEY (`occurrence_id`, `tag_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "reports" => "CREATE TABLE reports (
+        report_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        report_title TEXT NOT NULL,
+        report_visibility VARCHAR(220),
+        report_filters TEXT
+    );",
 
-    "tags" => "CREATE TABLE `tags` (
-            `tag_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-            `tag_name` varchar(220) NOT NULL,
-            `tag_slug` varchar(220) NOT NULL,
-            PRIMARY KEY (`tag_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+    "queued_scans" => "CREATE TABLE queued_scans (
+        queued_scan_job_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        queued_scan_property_id BIGINT,
+        queued_scan_page_id BIGINT,
+        queued_scan_processing TINYINT(1),
+        queued_scan_prioritized TINYINT(1)
+    );"
 
-    "updates" => "CREATE TABLE `updates` (
-            `update_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            `date_created` datetime NOT NULL,
-            `occurrence_id` bigint(20) NOT NULL,
-            `update_message` varchar(220) NOT NULL,
-            PRIMARY KEY (`update_id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;"
 ];
 
 // Function to check and create table if it doesn't exist
-function checkAndCreateTable($pdo, $tableName, $createQuery) {
-    $stmt = $pdo->query("SHOW TABLES LIKE '$tableName'");
-    if ($stmt->rowCount() == 0) {
-        $pdo->exec($createQuery);
-    }
+function tableExists($pdo, $tableName) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schemaName AND TABLE_NAME = :tableName");
+    $stmt->execute(['schemaName' => 'test', 'tableName' => $tableName]); // Replace 'test' with your actual database name
+    return $stmt->fetchColumn() > 0;
 }
 
-// Loop through tables and check/create each
+// Then use this function in your loop
 foreach ($tables as $tableName => $createQuery) {
-    checkAndCreateTable($pdo, $tableName, $createQuery);
+    if (!tableExists($pdo, $tableName)) {
+        $pdo->exec($createQuery);
+    }
 }
