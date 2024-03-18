@@ -22,6 +22,13 @@ $tables = [
         FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
     );",
 
+    "node_updates" => "CREATE TABLE code_updates (
+        update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        update_date datetime NOT NULL,
+        node_id BIGINT NOT NULL,
+        node_equalified TINYINT(1) NOT NULL
+    );",
+
     "tags" => "CREATE TABLE tags (
         tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         tag VARCHAR(220) NOT NULL
@@ -73,13 +80,6 @@ $tables = [
         PRIMARY KEY (message_id, property_id),
         FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
         FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
-    );",
-
-    "node_updates" => "CREATE TABLE code_updates (
-        update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        update_date datetime NOT NULL,
-        node_id BIGINT NOT NULL,
-        node_equalified TINYINT(1) NOT NULL
     );",
 
     "reports" => "CREATE TABLE reports (
