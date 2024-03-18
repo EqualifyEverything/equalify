@@ -18,7 +18,7 @@ $tables = [
         node_id BIGINT UNSIGNED NOT NULL,
         url_id BIGINT UNSIGNED NOT NULL, 
         PRIMARY KEY (node_id, url_id),
-        FOREIGN KEY (node_id) REFERENCES messages(node_id) ON DELETE CASCADE,
+        FOREIGN KEY (node_id) REFERENCES nodes(node_id) ON DELETE CASCADE,
         FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
     );",
 
@@ -58,12 +58,12 @@ $tables = [
         FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
     );",
 
-    "message_code" => "CREATE TABLE message_code (
+    "message_nodes" => "CREATE TABLE message_nodes (
         message_id BIGINT UNSIGNED NOT NULL,
-        code_id BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (message_id, code_id),
+        node_id BIGINT UNSIGNED NOT NULL,
+        PRIMARY KEY (message_id, node_id),
         FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
-        FOREIGN KEY (code_id) REFERENCES code(code_id) ON DELETE CASCADE
+        FOREIGN KEY (node_id) REFERENCES nodes(node_id) ON DELETE CASCADE
     );",
 
     "message_tags" => "CREATE TABLE message_tags (
@@ -102,13 +102,12 @@ $tables = [
 // Function to check and create table if it doesn't exist
 function tableExists($pdo, $tableName) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schemaName AND TABLE_NAME = :tableName");
-    $stmt->execute(['schemaName' => 'test', 'tableName' => $tableName]); // Replace 'test' with your actual database name
+    $stmt->execute(['schemaName' => $_ENV['DB_NAME'], 'tableName' => $tableName]);
     return $stmt->fetchColumn() > 0;
 }
 
 // Then use this function in your loop
 foreach ($tables as $tableName => $createQuery) {
-    if (!tableExists($pdo, $tableName)) {
-        $pdo->exec($createQuery);
+    if (!tableExists($pdo, $tableName)) {        $pdo->exec($createQuery);
     }
 }
