@@ -7,10 +7,11 @@ $tables = [
         url_property_id BIGINT NOT NULL
     );",
 
-    "code" => "CREATE TABLE code (
-        code_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        code_equalified TINYINT(1),
-        code TEXT NOT NULL
+    "nodes" => "CREATE TABLE nodes (
+        node_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        node_equalified TINYINT(1),
+        node_html TEXT NOT NULL,
+        node_targets JSON
     );",
 
     "tags" => "CREATE TABLE tags (
@@ -66,11 +67,11 @@ $tables = [
         FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
     );",
 
-    "code_updates" => "CREATE TABLE code_updates (
+    "node_updates" => "CREATE TABLE code_updates (
         update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         update_date datetime NOT NULL,
-        code_id BIGINT NOT NULL,
-        code_equalified TINYINT(1) NOT NULL
+        node_id BIGINT NOT NULL,
+        node_equalified TINYINT(1) NOT NULL
     );",
 
     "reports" => "CREATE TABLE reports (
