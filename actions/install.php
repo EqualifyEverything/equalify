@@ -14,6 +14,14 @@ $tables = [
         node_targets JSON
     );",
 
+    "node_urls" => "CREATE TABLE node_urls (
+        node_id BIGINT UNSIGNED NOT NULL,
+        url_id BIGINT UNSIGNED NOT NULL, 
+        PRIMARY KEY (node_id, url_id),
+        FOREIGN KEY (node_id) REFERENCES messages(node_id) ON DELETE CASCADE,
+        FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
+    );",
+
     "tags" => "CREATE TABLE tags (
         tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         tag VARCHAR(220) NOT NULL
@@ -35,13 +43,13 @@ $tables = [
         message_type VARCHAR(220) NOT NULL
     );",
     
-    "message_urls" => "CREATE TABLE message_pages (
+    "message_urls" => "CREATE TABLE message_urls (
         message_id BIGINT UNSIGNED NOT NULL,
         url_id BIGINT UNSIGNED NOT NULL, 
         PRIMARY KEY (message_id, url_id),
         FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
         FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
-    );",    
+    );",
 
     "message_code" => "CREATE TABLE message_code (
         message_id BIGINT UNSIGNED NOT NULL,
