@@ -1,10 +1,10 @@
 <?php
 // Array of table creation queries
 $tables = [
-    "pages" => "CREATE TABLE pages (
-        page_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        page_url TEXT NOT NULL,
-        page_property_id BIGINT NOT NULL
+    "urls" => "CREATE TABLE urls (
+        url_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        url TEXT NOT NULL,
+        url_property_id BIGINT NOT NULL
     );",
 
     "code" => "CREATE TABLE code (
@@ -34,12 +34,12 @@ $tables = [
         message_type VARCHAR(220) NOT NULL
     );",
     
-    "message_pages" => "CREATE TABLE message_pages (
+    "message_urls" => "CREATE TABLE message_pages (
         message_id BIGINT UNSIGNED NOT NULL,
-        page_id BIGINT UNSIGNED NOT NULL, 
-        PRIMARY KEY (message_id, page_id),
+        url_id BIGINT UNSIGNED NOT NULL, 
+        PRIMARY KEY (message_id, url_id),
         FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
-        FOREIGN KEY (page_id) REFERENCES pages(page_id) ON DELETE CASCADE
+        FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
     );",    
 
     "message_code" => "CREATE TABLE message_code (
@@ -83,7 +83,7 @@ $tables = [
     "queued_scans" => "CREATE TABLE queued_scans (
         queued_scan_job_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         queued_scan_property_id BIGINT,
-        queued_scan_page_id BIGINT,
+        queued_scan_url_id BIGINT,
         queued_scan_processing TINYINT(1),
         queued_scan_prioritized TINYINT(1)
     );"
