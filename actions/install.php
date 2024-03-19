@@ -74,14 +74,6 @@ $tables = [
         FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
 
-    "message_properties" => "CREATE TABLE message_properties (
-        message_id BIGINT UNSIGNED NOT NULL,
-        property_id BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (message_id, property_id),
-        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
-        FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
-    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-
     "reports" => "CREATE TABLE reports (
         report_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         report_title TEXT NOT NULL,
