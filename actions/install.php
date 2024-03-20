@@ -11,15 +11,8 @@ $tables = [
         node_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         node_equalified TINYINT(1),
         node_html TEXT NOT NULL,
+        node_url_id BIGINT UNSIGNED NOT NULL, 
         node_targets JSON
-    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-
-    "node_urls" => "CREATE TABLE node_urls (
-        node_id BIGINT UNSIGNED NOT NULL,
-        url_id BIGINT UNSIGNED NOT NULL, 
-        PRIMARY KEY (node_id, url_id),
-        FOREIGN KEY (node_id) REFERENCES nodes(node_id) ON DELETE CASCADE,
-        FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
 
     "node_updates" => "CREATE TABLE node_updates (
