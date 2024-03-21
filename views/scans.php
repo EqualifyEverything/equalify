@@ -72,11 +72,11 @@ $scans = get_scans($results_per_page, $offset);
 
             <tr>
                 <td><?php echo htmlspecialchars($scan['queued_scan_job_id']); ?></td>
-                <td><?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($scan['url'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($scan['property_name']); ?></td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary" onclick="startProcessing(this, 'actions/process_scans.php?job_id=<?php echo $scan['queued_scan_job_id']; ?>&property_id=<?php echo $scan['queued_scan_property_id']; ?>')">
-                    Scan Page <span class="visually-hidden">URL <?php echo htmlspecialchars($scan['page_url'] ?? ''); ?></span>
+                    Scan Page <span class="visually-hidden">URL <?php echo htmlspecialchars($scan['url'] ?? ''); ?></span>
                   </button>
                 </td>
             </tr>

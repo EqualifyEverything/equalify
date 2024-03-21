@@ -1,13 +1,24 @@
 <?php
-// This file is designed to be run from command line
-// so we can do things like trigger via CRON.
+/* Process Scans - actions/process_scans
+ *
+ * This file will process any queued or explicitly defined scan jobs.
+ * 
+ */
+
+//======================================================================
+// Initialization
+//======================================================================
+
+// Absolute file locations help us run this file
+// via CLI.
 if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/init.php'); 
+require_once(__ROOT__.'/helpers/scan_processor.php'); 
 
 try {
 
-    // This script can be run via cli
+    // If run via CLI...
     if (php_sapi_name() === 'cli') {
 
         // cli arguments
@@ -15,7 +26,7 @@ try {
         $job_id = isset($_CLI['job_id']) ? $_CLI['job_id'] : '';
         $property_id = isset($_CLI['property_id']) ? $_CLI['property_id'] : '';
 
-        // Check if it's an individual scan is requested
+        // Check if an individual scan is requested
         if (!empty($job_id ) && !empty($property_id)) {
             if ($job_id !== false && $property_id !== false) {
                 $scans = [
@@ -27,8 +38,11 @@ try {
                 process_scans($scans);
             } else {
                 $error_message = 'Invalid scan parameters';
-                $_SESSION['error'] = $error_message;
-                header("Location: ../index.php?view=scans");
+                update_log($error_message);
+                if (php_sapi_name() !== 'cli'){
+                    $_SESSION['error'] = $error_message;
+                    header("Location: ../index.php?view=scans");    
+                }
                 exit;
             }
 
@@ -37,7 +51,7 @@ try {
             process_scans();
         }
     
-    // The script can also be run by posting to it or via custom URL variables
+    // If run via custom URL variables
     }elseif ( 
         (isset($_POST['job_id']) && isset($_POST['property_id'])) || 
         (isset($_GET['job_id']) && isset($_GET['property_id']))
@@ -64,8 +78,12 @@ try {
         } else {
             $error_message = 'Invalid scan parameters';
             update_log($error_message);
-            $_SESSION['error'] = $error_message;
-            header("Location: ../index.php?view=scans");
+
+            if (php_sapi_name() !== 'cli'){
+                $_SESSION['error'] = $error_message;
+                header("Location: ../index.php?view=scans");
+            }
+
             exit;
         }
 
@@ -85,7 +103,11 @@ try {
 
 }
 
+//======================================================================
 // Helper Functions
+//======================================================================
+
+// This is how we initiate the scan processor.
 function process_scans($scans = null) {
     global $pdo;
 
@@ -121,9 +143,11 @@ function process_scans($scans = null) {
         // Stop process if there is no scan.
         $error_message = 'No scans to process.';
         update_log($error_message);
-        $_SESSION['error'] = $error_message;
-        header("Location: ../index.php?view=scans");
-        exit;
+        if (php_sapi_name() !== 'cli'){
+            $_SESSION['error'] = $error_message;
+            header("Location: ../index.php?view=scans");
+        }
+
 
     }
 
@@ -164,7 +188,7 @@ function process_scans($scans = null) {
             continue;
         }
 
-        // Handle problems scans.
+        // Handle problem scans.
         $statuses = array('failed', 'unknown');
         if(in_array($data['status'], $statuses)){
             $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
@@ -174,188 +198,15 @@ function process_scans($scans = null) {
             continue;
         }
 
-        // Setup variables from decoded json
-        $new_occurrences = [];
-        $page_url = $data['result']['results']['url'] ?? '';
-
-        // Setup page id
-        $page_id = get_page_id($page_url, $property_id);
-
-        // Check if violations are formatted correctly and set them up
-        if (isset($data['result']['results']['violations']) && !empty($data['result']['results']['violations'])) {
-            foreach ($data['result']['results']['violations'] as $violation) {
-
-                // Handle incorrectly formatted violations
-                if (!isset($violation['id'], $violation['tags'], $violation['nodes'])) {
-                    $message = "Scan $job_id returns violations in invalid format. Scan deleted.";
-                    $logged_messages.=$message.'<br>';
-                    update_log($message);
-                    delete_scan($job_id);
-                    continue;
-                }
-
-                // Handle More Info URL
-                $message_link = $violation['helpUrl'];
-
-                foreach ($violation['nodes'] as $node) {
-
-                    // Handle incorrectly formatted nodes.
-                    if (!isset($node['html'])) {
-                        $message = "Scan $job_id returns node in invalid format. Scan deleted.";
-                        $logged_messages.=$message.'<br>';
-                        update_log($message);
-    
-                        delete_scan($job_id);
-                        continue;
-                    }
-                    foreach (['any', 'all', 'none'] as $key) {
-                        if (isset($node[$key]) && is_array($node[$key])) {
-                            foreach ($node[$key] as $item) {
-
-                                // Handle incorrectly formatted messages.
-                                if (!isset($item['message'])) {
-                                    $message = "Scan $job_id returns invalid '$key' format in node. Scan deleted.";
-                                    $logged_messages.=$message.'<br>';
-                                    update_log($message);
-                
-                                    delete_scan($job_id);
-                                    continue;
-                                }
-
-                                // Construct the occurrence data
-                                $new_occurrences[] = [
-                                    "occurrence_message_id" => get_message_id($item['message'], $message_link),
-                                    "occurrence_code_snippet" => $node['html'],
-                                    "occurrence_page_id" => $page_id,
-                                    "occurrence_source" => "scan.equalify.app",
-                                    "occurrence_property_id" => $property_id,
-                                    "tag_ids" => get_tag_ids($violation['tags'])
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        
-        // Handle unformatted results.
-        }else{
-            $message = "Scan $job_id returns no violations. Scan deleted.";
-            $logged_messages[] = $message;
-            update_log($message);
-            delete_scan($job_id);
-            continue;
-        }
-
-        // Group occurrences by page_id and source
-        $grouped_occurrences = [];
-        foreach ($new_occurrences as $occurrence) {
-            $key = $occurrence['occurrence_page_id'] . '_' . $occurrence['occurrence_source'];
-            $grouped_occurrences[$key][] = $occurrence;
-        }
-
-        // If no new occurrences are found, add a dummy group to trigger the database check
-        if (empty($new_occurrences)) {
-            $grouped_occurrences[$page_id . '_scan.equalify.app'] = [];
-        }
-
-        $reactivated_occurrences = [];
-        $equalified_occurrences = [];
-        $to_save_occurrences = [];
-
-        foreach ($grouped_occurrences as $key => $group) {
-            list($page_id, $source) = explode('_', $key);
-
-            // Fetch existing occurrences from database
-            $existing_occurrences_stmt = $pdo->prepare("SELECT * FROM occurrences WHERE occurrence_page_id = ? AND occurrence_source = ?");
-            $existing_occurrences_stmt->execute([$page_id, $source]);
-            $existing_occurrences = $existing_occurrences_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $existing_ids_in_group = [];
-
-            // Check if each new occurrence exists in the database
-            foreach ($group as $occurrence) {
-                $found = false;
-                foreach ($existing_occurrences as $existing_occurrence) {
-                    if ($existing_occurrence['occurrence_code_snippet'] == $occurrence['occurrence_code_snippet'] &&
-                        $existing_occurrence['occurrence_message_id'] == $occurrence['occurrence_message_id']) {
-                        $found = true;
-                        $existing_ids_in_group[] = $existing_occurrence['occurrence_id'];
-                        if ($existing_occurrence['occurrence_status'] == 'equalified') {
-                            $reactivated_occurrences[] = $existing_occurrence['occurrence_id'];
-                        }
-                        break;
-                    }
-                }
-
-                if (!$found) {
-                    $to_save_occurrences[] = $occurrence;
-                }
-            }
-
-            // Mark as 'equalified' occurrences that are in the database without the status "equalfied" but not in new occurrences
-            foreach ($existing_occurrences as $existing_occurrence) {
-                if (!in_array($existing_occurrence['occurrence_id'], $existing_ids_in_group) && $existing_occurrence['occurrence_status'] !== 'equalified') {
-                    $equalified_occurrences[] = $existing_occurrence['occurrence_id'];
-                }
-            }
-
-        }
-
-        // Save new occurrences as 'activated'
-        $new_occurrence_ids = [];
-        $new_occurrence_tag_relationships = [];
-        foreach ($to_save_occurrences as $occurrence) {
-
-            // Insert occurrences into db.
-            $insert_stmt = $pdo->prepare("INSERT INTO occurrences (occurrence_message_id, occurrence_code_snippet, occurrence_page_id, occurrence_source, occurrence_property_id, occurrence_status) VALUES (?, ?, ?, ?, ?, 'active')");
-            $insert_stmt->execute([
-                $occurrence['occurrence_message_id'],
-                $occurrence['occurrence_code_snippet'],
-                $occurrence['occurrence_page_id'],
-                $occurrence['occurrence_source'],
-                $occurrence['occurrence_property_id']
-            ]);
-            $new_occurrence_ids[] = $pdo->lastInsertId();
-            $new_occurrence_tag_relationships[] = array(
-                'occurrence_id' => $pdo->lastInsertId(),
-                'occurrence_tag_ids' => $occurrence['tag_ids']
-            );
-
-        }
-
-        // Insert tags relationships into db
-        add_tag_relationships($new_occurrence_tag_relationships);
-
-        // Count occurrences for logging
-        $count_reactivated_occurrences = count($reactivated_occurrences);
-        $count_equalified_occurrences = count($equalified_occurrences);
-        $count_new_occurrence_ids = count($new_occurrence_ids);
-
-        // Update statuses in the database
-        $update_stmt = $pdo->prepare("UPDATE occurrences SET occurrence_status = ? WHERE occurrence_id = ?");
-        foreach ($reactivated_occurrences as $id) {
-            $update_stmt->execute(['active', $id]);
-        }
-        foreach ($equalified_occurrences as $id) {
-            $update_stmt->execute(['equalified', $id]);
-        }
-
-        // Insert updates for new and reactivated occurrences
-        $insert_update_stmt = $pdo->prepare("INSERT INTO updates (date_created, occurrence_id, update_message) VALUES (NOW(), ?, ?)");
-        foreach (array_merge($new_occurrence_ids, $reactivated_occurrences) as $id) {
-            $insert_update_stmt->execute([$id, 'activated']);
-        }
-
-        // Insert updates for equalified occurrences
-        foreach ($equalified_occurrences as $id) {
-            $insert_update_stmt->execute([$id, 'equalified']);
-        }
+        // Run scan processor.
+        $jsonResult = $data['result'];
+        scan_processor($jsonResult, $property_id);
 
         // On success delete scan
         delete_scan($job_id);
 
         // Log output.
-        $message = "Scan $job_id successfully processed. $count_new_occurrence_ids new. $count_equalified_occurrences equalified. $count_reactivated_occurrences reactivated.";
+        $message = "Scan $job_id successfully processed.";
         $logged_messages[] = $message;
         update_log($message);
 
@@ -369,8 +220,12 @@ function process_scans($scans = null) {
             $success_message.= "<li>$message</li>";
         }
         $success_message.= "</ul>";
-        $_SESSION['success'] = $success_message;
-        header("Location: ../index.php?view=scans");    
+        update_log($success_message);
+        if (php_sapi_name() !== 'cli'){
+            $_SESSION['success'] = $success_message;
+            header("Location: ../index.php?view=scans");
+        }
+
     }
 }
 

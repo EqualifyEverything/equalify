@@ -1,7 +1,7 @@
 <?php
-/* Equalify Scan Processor 
+/* Scan Processor - helpers/scan_processor.php
  *
- * Processed STREAM results. This processor will:
+ * Processes STREAM results. This processor will:
  * 1. Add new urls
  * 2. Add new messages
  * 3. Add new tags and relate tags to messages.
@@ -23,20 +23,72 @@
  *   it could also be an issue if message text just changes in a 
  *   scan.
  * 
+ * For more info on STREAM, visit:
+ * https://github.com/equalifyEverything/stream
+ * 
  */
 
-// This file is designed to be run from command line
-// so we can do things like trigger via CRON.
+//======================================================================
+// Testing Data
+//======================================================================
 if(!defined('__ROOT__'))
     define('__ROOT__', dirname(dirname(__FILE__)));
-
-// Get DB and global info.
 require_once(__ROOT__.'/init.php'); 
-
-// Testing data
+require_once(__ROOT__.'/helpers/scan_processor.php'); 
 $property_id = 1; 
-$jsonFilePath = __ROOT__.'/_dev/samples/stream-sample-11.json';
+$jsonFilePath = __ROOT__.'/_dev/samples/stream-sample-1.json';
 $jsonData = json_decode(file_get_contents($jsonFilePath), true);
+scan_processor($jsonData, $property_id);
+
+//======================================================================
+// The Processsor
+//======================================================================
+function scan_processor($jsonData, $property_id){
+
+    global $pdo;
+
+    try {
+        $pdo->beginTransaction();
+
+        // Log start
+        echo "Starting process_scans.php\n";
+
+        // We aren't interested in pass data, since we'll 
+        // get it when violations or errors are equalified.
+        // We also want to get rid of any ophans because
+        // we know a node is equalified when it isn't in
+        // the JSON. We also remove tags so we don't fill
+        // the DB with unnessary tags.
+        trimPassDataAndOrphans($jsonData);
+
+        // Count unique items in JSON for debugging - all
+        // JSON counts should add up to added counts.
+        countUniqueItemsInJson($jsonData);
+
+        // Process content
+        processUrl($pdo, $jsonData, $property_id);
+        processMessages($pdo, $jsonData);
+        processTags($pdo, $jsonData);
+        processNodes($pdo, $jsonData);
+        
+        // After all processing is done, compare and update nodes
+        compareAndUpdateNodes($pdo, $jsonData, $property_id);
+
+        $pdo->commit();
+
+        // Log end
+        echo "Ending process_scans.php\n";
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo "Error: " . $e->getMessage();
+    }
+
+}
+
+//======================================================================
+// Helper Functions
+//======================================================================
 
 // Remove pass data and ophans
 function trimPassDataAndOrphans(&$jsonData) {
@@ -401,42 +453,5 @@ function compareAndUpdateNodes(PDO $pdo, array $jsonData, $property_id) {
     // Echo out the totals
     echo "- Nodes Equalified: $equalifiedNodesCount\n";
     echo "- Nodes Un-equalified: $unequalifiedNodesCount\n";
-}
-
-try {
-    $pdo->beginTransaction();
-
-    // Log start
-    echo "Starting process_scans.php\n";
-
-    // We aren't interested in pass data, since we'll 
-    // get it when violations or errors are equalified.
-    // We also want to get rid of any ophans because
-    // we know a node is equalified when it isn't in
-    // the JSON. We also remove tags so we don't fill
-    // the DB with unnessary tags.
-    trimPassDataAndOrphans($jsonData);
-
-    // Count unique items in JSON for debugging - all
-    // JSON counts should add up to added counts.
-    countUniqueItemsInJson($jsonData);
-
-    // Process content
-    processUrl($pdo, $jsonData, $property_id);
-    processMessages($pdo, $jsonData);
-    processTags($pdo, $jsonData);
-    processNodes($pdo, $jsonData);
-    
-    // After all processing is done, compare and update nodes
-    compareAndUpdateNodes($pdo, $jsonData, $property_id);
-
-    $pdo->commit();
-
-    // Log end
-    echo "Ending process_scans.php\n";
-
-} catch (Exception $e) {
-    $pdo->rollBack();
-    echo "Error: " . $e->getMessage();
 }
 ?>
