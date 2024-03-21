@@ -31,14 +31,14 @@
 //======================================================================
 // Testing Data
 //======================================================================
-if(!defined('__ROOT__'))
-    define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__.'/init.php'); 
-require_once(__ROOT__.'/helpers/scan_processor.php'); 
-$property_id = 1; 
-$jsonFilePath = __ROOT__.'/_dev/samples/stream-sample-1.json';
-$jsonData = json_decode(file_get_contents($jsonFilePath), true);
-scan_processor($jsonData, $property_id);
+// if(!defined('__ROOT__'))
+//     define('__ROOT__', dirname(dirname(__FILE__)));
+// require_once(__ROOT__.'/init.php'); 
+// require_once(__ROOT__.'/helpers/scan_processor.php'); 
+// $property_id = 1; 
+// $jsonFilePath = __ROOT__.'/_dev/samples/stream-sample-1.json';
+// $jsonData = json_decode(file_get_contents($jsonFilePath), true);
+// scan_processor($jsonData, $property_id);
 
 //======================================================================
 // The Processsor
