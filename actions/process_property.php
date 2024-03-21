@@ -63,11 +63,11 @@ try {
 
             // Add existing page URLs to results where possible
             foreach ($scan_jobs as &$job) {
-                $page_id = find_page_id($job['URL'], $next_property_id);
-                if ($page_id) {
-                    $job['page_id'] = $page_id;
+                $url_id = find_url_id($job['URL'], $next_property_id);
+                if ($url_id) {
+                    $job['url_id'] = $url_id;
                 } else {
-                    $job['page_id'] = NULL;
+                    $job['url_id'] = NULL;
                 }
             }
             unset($job);
@@ -147,17 +147,17 @@ function get_api_results($property_url, $property_discovery) {
     return $results;
 }
 
-function find_page_id($url, $propertyId) {
+function find_url_id($url, $propertyId) {
     global $pdo;
 
-    $sql = "SELECT page_id FROM pages WHERE page_url = :url AND page_property_id = :propertyId LIMIT 1";
+    $sql = "SELECT url_id FROM urls WHERE url = :url AND url_property_id = :propertyId LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':url', $url, PDO::PARAM_STR);
     $stmt->bindParam(':propertyId', $propertyId, PDO::PARAM_INT);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $result ? $result['page_id'] : null;
+    return $result ? $result['url_id'] : null;
 }
 
 
@@ -202,14 +202,14 @@ function save_to_database($results, $property_id) {
 
     // Batch insert the new results
     if (!empty($newResults)) {
-        $insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id, queued_scan_page_id) VALUES ";
+        $insertQuery = "INSERT INTO queued_scans (queued_scan_job_id, queued_scan_property_id, queued_scan_url_id) VALUES ";
         $insertValues = [];
         $params = [];
         foreach ($newResults as $index => $result) {
-            $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :page_id{$index})";
+            $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :url_id{$index})";
             $params[":jobId{$index}"] = $result['JobID'];
             $params[":propertyId{$index}"] = $property_id;
-            $params[":page_id{$index}"] = $result['page_id'];
+            $params[":url_id{$index}"] = $result['url_id'];
         }
 
         $insertQuery .= implode(', ', $insertValues);
