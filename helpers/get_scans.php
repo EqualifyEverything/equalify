@@ -12,12 +12,12 @@ function get_scans($results_per_page, $offset){
             qs.queued_scan_job_id, 
             qs.queued_scan_property_id, 
             qs.queued_scan_processing,
-            p.page_url, 
+            u.url, 
             prop.property_name
         FROM 
             queued_scans qs
         LEFT JOIN 
-            pages p ON qs.queued_scan_page_id = p.page_id
+            urls u ON qs.queued_scan_url_id = u.url_id
         LEFT JOIN 
             properties prop ON qs.queued_scan_property_id = prop.property_id
         ORDER BY 
