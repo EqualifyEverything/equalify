@@ -43,14 +43,6 @@ $tables = [
         message_type VARCHAR(220) NOT NULL
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
     
-    "message_urls" => "CREATE TABLE message_urls (
-        message_id BIGINT UNSIGNED NOT NULL,
-        url_id BIGINT UNSIGNED NOT NULL, 
-        PRIMARY KEY (message_id, url_id),
-        FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
-        FOREIGN KEY (url_id) REFERENCES urls(url_id) ON DELETE CASCADE
-    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-
     "message_nodes" => "CREATE TABLE message_nodes (
         message_id BIGINT UNSIGNED NOT NULL,
         node_id BIGINT UNSIGNED NOT NULL,
