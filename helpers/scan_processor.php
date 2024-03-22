@@ -43,15 +43,16 @@
 //======================================================================
 // The Processsor
 //======================================================================
-function scan_processor($jsonData, $property_id){
+function scan_processor($jsonData, $property_id, $debug = false){
 
     global $pdo;
+    $logMessages = [];
 
     try {
         $pdo->beginTransaction();
 
         // Log start
-        echo "Starting process_scans.php\n";
+        $logMessages[] = "Starting process_scans.php";
 
         // We aren't interested in pass data, since we'll 
         // get it when violations or errors are equalified.
@@ -77,12 +78,15 @@ function scan_processor($jsonData, $property_id){
         $pdo->commit();
 
         // Log end
-        echo "Ending process_scans.php\n";
+        $logMessages[] = "Ending process_scans.php";
 
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo "Error: " . $e->getMessage();
+        $logMessages[] = "Error: " . $e->getMessage();
     }
+
+    // Return log messages if debug is true, otherwise return true to indicate success
+    return $debug ? $logMessages : true;
 
 }
 
@@ -181,15 +185,15 @@ function countUniqueItemsInJson(array $jsonData) {
         $uniqueNodes[$uniqueKey] = true; // Use md5 hash of html and targets to identify uniqueness
     }
 
-    // Echo counts
-    echo "- JSON has \"$url\" URL\n";
-    echo "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'error')) . " Unique Error Messages\n";
-    echo "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'pass')) . " Unique Pass Messages\n";
-    echo "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'violation')) . " Unique Violation Messages\n";
-    echo "- JSON has " . count($uniqueTags) . " Unique Tags\n";
-    echo "- JSON has " . count($uniqueNodes) . " Unique Nodes\n";
-    echo "- JSON has " . $totalRelatedTags . " Total Related Tags in All Messages\n";
-    echo "- JSON has " . $totalRelatedNodes . " Total Related Nodes in All Messages\n";
+    // $logMessages[] = counts
+    $logMessages[] = "- JSON has \"$url\" URL";
+    $logMessages[] = "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'error')) . " Unique Error Messages";
+    $logMessages[] = "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'pass')) . " Unique Pass Messages";
+    $logMessages[] = "- JSON has " . count(array_filter($jsonData['messages'], fn($msg) => $msg['type'] === 'violation')) . " Unique Violation Messages";
+    $logMessages[] = "- JSON has " . count($uniqueTags) . " Unique Tags";
+    $logMessages[] = "- JSON has " . count($uniqueNodes) . " Unique Nodes";
+    $logMessages[] = "- JSON has " . $totalRelatedTags . " Total Related Tags in All Messages";
+    $logMessages[] = "- JSON has " . $totalRelatedNodes . " Total Related Nodes in All Messages";
 }
 
 // Process url.
@@ -228,7 +232,7 @@ function processUrl(PDO $pdo, array &$jsonData, $property_id) {
     $jsonData['urlId'] = $urlId;
 
     // Log count.
-    echo "- Processed URL \"$url\" ($logging_message)\n";
+    $logMessages[] = "- Processed URL \"$url\" ($logging_message)";
 
 }
 
@@ -274,12 +278,12 @@ function processMessages(PDO $pdo, array &$jsonData) {
 
         // Log counts for each type.
         foreach ($typeCounts as $type => $counts) {
-            echo "- Processed {$counts['all']} $type Messages ({$counts['new']} New)\n";
+            $logMessages[] = "- Processed {$counts['all']} $type Messages ({$counts['new']} New)";
         }
 
     // Log if no messages.
     }else{
-        echo "- No messages to process.\n";
+        $logMessages[] = "- No messages to process.";
     }
 
 }
@@ -327,11 +331,11 @@ function processTags(PDO $pdo, array &$jsonData) {
             }
         }
 
-        echo "- Processed $allTagsCounter Tags ($newTagsCounter New)\n";
-        echo "- Processed $processedRelationshipsCounter New Message+Tag Relationships\n";
+        $logMessages[] = "- Processed $allTagsCounter Tags ($newTagsCounter New)";
+        $logMessages[] = "- Processed $processedRelationshipsCounter New Message+Tag Relationships";
 
     }else{
-        echo "- No tags to process.\n";
+        $logMessages[] = "- No tags to process.";
     }
 }
 
@@ -394,11 +398,11 @@ function processNodes(PDO $pdo, array &$jsonData) {
             }
         }
 
-        echo "- Processed $allNodesCounter Nodes ($newNodesCounter New)\n";
-        echo "- Processed $newNodeMessageRelationsCounter Message+Node Relationships\n";
+        $logMessages[] = "- Processed $allNodesCounter Nodes ($newNodesCounter New)";
+        $logMessages[] = "- Processed $newNodeMessageRelationsCounter Message+Node Relationships";
 
     }else{
-        echo "- No nodes to process.\n";
+        $logMessages[] = "- No nodes to process.";
     }
 
 }
@@ -450,8 +454,8 @@ function compareAndUpdateNodes(PDO $pdo, array $jsonData, $property_id) {
         }
     }
 
-    // Echo out the totals
-    echo "- Nodes Equalified: $equalifiedNodesCount\n";
-    echo "- Nodes Un-equalified: $unequalifiedNodesCount\n";
+    // $logMessages[] = out the totals
+    $logMessages[] = "- Nodes Equalified: $equalifiedNodesCount";
+    $logMessages[] = "- Nodes Un-equalified: $unequalifiedNodesCount";
 }
 ?>

@@ -147,7 +147,7 @@ function process_scans($scans = null) {
             $_SESSION['error'] = $error_message;
             header("Location: ../index.php?view=scans");
         }
-
+        exit;
 
     }
 
@@ -225,6 +225,7 @@ function process_scans($scans = null) {
             $_SESSION['success'] = $success_message;
             header("Location: ../index.php?view=scans");
         }
+        exit;
 
     }
 }
