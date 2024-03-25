@@ -10,7 +10,7 @@ if( isset($_GET['urlIds']) && !empty($_GET['urlIds'])){
     $urlIds = explode(',', $_GET['urlIds']);
 }else{
     http_response_code(400);
-    echo json_encode(['error' => 'url_ids required']);
+    echo json_encode(['error' => 'urlIds required']);
     exit;
 }
 
