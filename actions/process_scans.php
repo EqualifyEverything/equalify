@@ -169,7 +169,7 @@ function process_scans($scans = null) {
         // Handle scans that don't return JSON.
         if ($json === false) {
             $message = "Scan $job_id returns no JSON. Scan deleted.";
-            $logged_messages.=$message.'<br>';
+            $logged_messages[] = $message.'<br>';
             update_log($message);
             delete_scan($job_id);
             continue;
@@ -182,7 +182,7 @@ function process_scans($scans = null) {
         $statuses = array('delayed', 'active', 'waiting');
         if(in_array($data['status'], $statuses)){
             $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
-            $logged_messages.=$message.'<br>';
+            $logged_messages[] = $message;
             update_log($message);
             update_processing_value($job_id, NULL);
             continue;
@@ -192,7 +192,7 @@ function process_scans($scans = null) {
         $statuses = array('failed', 'unknown');
         if(in_array($data['status'], $statuses)){
             $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
-            $logged_messages.=$message.'<br>';
+            $logged_messages[] = $message;
             update_log($message);
             delete_scan($job_id);
             continue;
