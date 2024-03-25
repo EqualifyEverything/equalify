@@ -24,3 +24,13 @@ Here are some steps to start contributing:
 
 ## Questions?
 Open up a new issue with any question. Maintainers or the community will answer.
+
+## Equalify API
+
+The API can be accessed at accessible at `api.php`. All output is in [STREAM](https://github.com/EqualifyEverything/STREAM).
+
+### Requests
+You can request data by passing URL IDs to the API like this:
+```
+api.php?url_ids=2,3
+```
