@@ -55,10 +55,9 @@ try {
         // Mark the scan as running
         update_property_processing_data($next_property_id, 1);
 
-        $results = get_api_results($next_property_url, $next_property_discovery);
+        $scan_jobs = get_api_results($next_property_url, $next_property_discovery)['jobs'];
 
         // Process scan jobs
-        $scan_jobs = $results['jobs'];
         if(count($scan_jobs) > 0){
 
             // Add existing page URLs to results where possible

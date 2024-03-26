@@ -162,7 +162,7 @@ function countUniqueItemsInJson(array $jsonData) {
     $totalRelatedNodes = 0;
 
     // Count the URL (assuming there's only one URL in the structure)
-    $url = $jsonData['url'];
+    $url = $jsonData['urls'][0]['url'];
 
     // Count Unique Messages
     foreach ($jsonData['messages'] as $message) {
@@ -200,12 +200,12 @@ function countUniqueItemsInJson(array $jsonData) {
 function processUrl(PDO $pdo, array &$jsonData, $property_id) {
 
     // URL Is required, so if it isn't present we'll stop the script
-    if(empty($jsonData['url'])){
+    if(empty($jsonData['urls'][0]['url'])){
         throw new Exception("No URL found!");
         exit;
     }
 
-    $url = $jsonData['url'];
+    $url = $jsonData['urls'][0]['url'];
     $stmt = $pdo->prepare("SELECT url_id FROM urls WHERE url = :url AND url_property_id = :property_id");
     $stmt->execute(['url' => $url, 'property_id' => $property_id]);
 
@@ -245,7 +245,6 @@ function processMessages(PDO $pdo, array &$jsonData) {
         'pass' => ['all' => 0, 'new' => 0],
         'violation' => ['all' => 0, 'new' => 0],
     ];
-    $urlId = $jsonData['urlId']; // Assuming this has been set earlier in your script
 
     // Check to see if there are messages.
     if(!empty($jsonData['messages'])){
