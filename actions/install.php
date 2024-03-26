@@ -9,7 +9,7 @@ $tables = [
 
     "nodes" => "CREATE TABLE nodes (
         node_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        node_equalified TINYINT(1),
+        node_equalified TINYINT(1) DEFAULT 0,
         node_html TEXT NOT NULL,
         node_url_id BIGINT UNSIGNED NOT NULL, 
         node_targets JSON
