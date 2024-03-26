@@ -23,12 +23,32 @@ $stmtUrls = $pdo->prepare($sqlUrls);
 $stmtUrls->execute($urlIds);
 $urls = $stmtUrls->fetchAll(PDO::FETCH_ASSOC);
 
+// Require at least one URL to be found
+if( empty($urls)){
+    http_response_code(400);
+    echo json_encode(['error' => 'No URLs found with that ID.']);
+    exit;
+}
+
 // Fetch Nodes related to URLs
 $sqlNodes = "SELECT node_id AS nodeId, node_html AS html, node_targets AS targets, node_url_id AS relatedUrlId, node_equalified AS equalified FROM nodes WHERE node_url_id IN ($urlsIn)";
 $stmtNodes = $pdo->prepare($sqlNodes);
 $stmtNodes->execute($urlIds);
 $nodes = $stmtNodes->fetchAll(PDO::FETCH_ASSOC);
-
+if(!empty($nodes)){
+    foreach ($nodes as &$node) {
+        // Escape HTML and tagets
+        $node['html'] = addslashes($node['html']);
+        $node['targets'] = json_decode($node['targets']);
+        if(!empty($node['targets'])){
+            foreach ($node['targets'] as &$target) {
+                $target = addslashes($target);
+            }
+            unset($target);
+        }
+    }
+    unset($node);
+}
 $nodeIds = array_column($nodes, 'nodeId');
 
 // Fetch Messages related to Nodes
@@ -79,14 +99,6 @@ foreach ($tagsRaw as $tag) {
 
 // Finalize messages array
 $messages = array_values($messages); // Reset keys
-
-// Finalize nodes array
-foreach ($nodes as &$node) {
-    $node['relatedUrlIds'] = [$node['relatedUrlId']];
-    unset($node['relatedUrlId']); // Clean up
-    $node['equalified'] = $node['equalified'] == 1; // Convert to boolean
-}
-unset($node); // Break the reference with the last element
 
 // Prepare the final structure
 $output = [
