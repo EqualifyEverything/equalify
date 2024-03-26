@@ -1,5 +1,4 @@
 <?php
-// The DB can be used by required info
 function get_reports(){
     global $pdo;
 

@@ -13,24 +13,44 @@ try {
     // Begin transaction
     $pdo->beginTransaction();
 
-    // Delete related data from occurrences and its dependent tables
-    $occurrencesStmt = $pdo->prepare("SELECT occurrence_id FROM occurrences WHERE occurrence_property_id = :property_id");
-    $occurrencesStmt->execute([':property_id' => $property_id]);
-    $occurrence_ids = $occurrencesStmt->fetchAll(PDO::FETCH_COLUMN);
+    // Delete from urls and save url_id values
+    $sqlSelectUrls = "SELECT url_id FROM urls WHERE url_property_id = ?";
+    $stmtSelectUrls = $pdo->prepare($sqlSelectUrls);
+    $stmtSelectUrls->execute([$property_id]);
+    $urlIds = $stmtSelectUrls->fetchAll(PDO::FETCH_COLUMN);
 
-    if ($occurrence_ids) {
-        // Delete from tag_relationships and updates table
-        $pdo->exec("DELETE FROM tag_relationships WHERE occurrence_id IN (" . implode(',', $occurrence_ids) . ")");
-        $pdo->exec("DELETE FROM updates WHERE occurrence_id IN (" . implode(',', $occurrence_ids) . ")");
-        
-        // Delete occurrences
-        $pdo->exec("DELETE FROM occurrences WHERE occurrence_property_id = $property_id");
+    if (!empty($urlIds)) {
+        $inQuery = implode(',', array_fill(0, count($urlIds), '?')); // Placeholder for IN clause
+
+        // Actual deletion of urls
+        $sqlDeleteUrls = "DELETE FROM urls WHERE url_id IN ($inQuery)";
+        $stmtDeleteUrls = $pdo->prepare($sqlDeleteUrls);
+        $stmtDeleteUrls->execute($urlIds);
+
+        // Delete from nodes using saved url_id values and save node_id values
+        $sqlSelectNodes = "SELECT node_id FROM nodes WHERE node_url_id IN ($inQuery)";
+        $stmtSelectNodes = $pdo->prepare($sqlSelectNodes);
+        $stmtSelectNodes->execute($urlIds);
+        $nodeIds = $stmtSelectNodes->fetchAll(PDO::FETCH_COLUMN);
+
+        if (!empty($nodeIds)) {
+            $inQueryNodes = implode(',', array_fill(0, count($nodeIds), '?')); // Placeholder for IN clause
+
+            // Actual deletion of nodes
+            $sqlDeleteNodes = "DELETE FROM nodes WHERE node_id IN ($inQueryNodes)";
+            $stmtDeleteNodes = $pdo->prepare($sqlDeleteNodes);
+            $stmtDeleteNodes->execute($nodeIds);
+
+            // Delete from node_updates using saved node_id values
+            $sqlDeleteNodeUpdates = "DELETE FROM node_updates WHERE node_id IN ($inQueryNodes)";
+            $stmtDeleteNodeUpdates = $pdo->prepare($sqlDeleteNodeUpdates);
+            $stmtDeleteNodeUpdates->execute($nodeIds);
+        }
     }
 
     // Delete from queued_scans and properties
     $pdo->exec("DELETE FROM queued_scans WHERE queued_scan_property_id = $property_id");
     $pdo->exec("DELETE FROM properties WHERE property_id = $property_id");
-    $pdo->exec("DELETE FROM pages WHERE page_property_id = $property_id");
 
     // Process report_filters in reports table
     $reportsStmt = $pdo->query("SELECT report_id, report_filters FROM reports");

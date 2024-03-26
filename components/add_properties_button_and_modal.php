@@ -46,7 +46,7 @@ function the_add_properties_button_and_modal() {
                                 <option value="" selected disabled>Choose...</option>
                                 <option value="single_page_import">Single Page Import</option>
                                 <option value="sitemap_import">Sitemap Import</option>
-                                <option value="crawl">Crawl</option>
+                                <option value="crawl" disabled>Crawl - Coming Soon</option>
                             </select>
                             <label for="discoveryProcess">Discovery Process</label>
                             <div class="invalid-feedback">

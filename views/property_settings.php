@@ -55,9 +55,8 @@ $_SESSION['property_id'] = $property_id;
                   <input id="property_name"  name="property_name" type="text" class="form-control form-control-lg" value="<?php echo $name;?>" required>
               </div>
               <div class="col">
-                  <label for="property_url" class="form-label h4">Sitemap URL</label>
+                  <label for="property_url" class="form-label h4">URL</label>
                   <input id="property_url"  name="property_url" type="url" class="form-control form-control-lg" aria-describedby="url_helper" value="<?php echo $url;?>" style="max-width:480px;" required>
-                  <div id="url_helper" class="form-text">Sitemaps must follow valid <a href="https://www.sitemaps.org/protocol.html" target="_blank">XML Sitemap schema</a>.<br> Example:"https://equalify.app/sitemap.xml"</div>
               </div>
           </div>
           <div class="row mb-4">
@@ -66,6 +65,7 @@ $_SESSION['property_id'] = $property_id;
               <select id="property_discovery" name="property_discovery" class="form-select form-select-lg" aria-label="Discovery Process" required>
                 <option value="single_page_import" <?php if($discovery == 'single_page_import') echo 'selected';?>>Single Page Import</option>
                 <option value="sitemap_import" <?php if($discovery == 'sitemap_import') echo 'selected';?>>Sitemap Import</option>
+                <option value="crawl" disabled>Crawl - Coming Soon</option>
               </select>
             </div>
           </div>
