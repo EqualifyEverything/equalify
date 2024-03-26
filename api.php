@@ -18,18 +18,18 @@ if( isset($_GET['urlIds']) && !empty($_GET['urlIds'])){
 $urlsIn = str_repeat('?,', count($urlIds) - 1) . '?';
 
 // Fetch URLs
-$sqlUrls = "SELECT url_id, url FROM urls WHERE url_id IN ($urlsIn)";
+$sqlUrls = "SELECT url_id AS urlId, url FROM urls WHERE url_id IN ($urlsIn)";
 $stmtUrls = $pdo->prepare($sqlUrls);
 $stmtUrls->execute($urlIds);
 $urls = $stmtUrls->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch Nodes related to URLs
-$sqlNodes = "SELECT node_id, node_html AS html, node_targets AS targets, node_url_id, node_equalified AS equalified FROM nodes WHERE node_url_id IN ($urlsIn)";
+$sqlNodes = "SELECT node_id AS nodeId, node_html AS html, node_targets AS targets, node_url_id AS relatedUrlId, node_equalified AS equalified FROM nodes WHERE node_url_id IN ($urlsIn)";
 $stmtNodes = $pdo->prepare($sqlNodes);
 $stmtNodes->execute($urlIds);
 $nodes = $stmtNodes->fetchAll(PDO::FETCH_ASSOC);
 
-$nodeIds = array_column($nodes, 'node_id');
+$nodeIds = array_column($nodes, 'nodeId');
 
 // Fetch Messages related to Nodes
 $nodeIdsIn = str_repeat('?,', count($nodeIds) - 1) . '?';
@@ -39,33 +39,51 @@ $sqlMessages = "SELECT m.message_id, m.message, m.message_type AS type, mn.node_
                 WHERE mn.node_id IN ($nodeIdsIn)";
 $stmtMessages = $pdo->prepare($sqlMessages);
 $stmtMessages->execute($nodeIds);
-$messages = $stmtMessages->fetchAll(PDO::FETCH_ASSOC);
+$messagesRaw = $stmtMessages->fetchAll(PDO::FETCH_ASSOC);
+$messages = [];
+
+// Re-organize messages to include necessary data
+foreach ($messagesRaw as $message) {
+    if (!isset($messages[$message['message_id']])) {
+        $messages[$message['message_id']] = [
+            'message' => $message['message'],
+            'type' => $message['type'],
+            'relatedTagIds' => [],
+            'relatedNodeIds' => [],
+        ];
+    }
+    $messages[$message['message_id']]['relatedNodeIds'][] = $message['node_id'];
+}
 
 // Fetch Tags related to Messages
-$messageIds = array_column($messages, 'message_id');
+$messageIds = array_keys($messages);
 $messageIdsIn = str_repeat('?,', count($messageIds) - 1) . '?';
-$sqlTags = "SELECT t.tag_id, t.tag, mt.message_id 
+$sqlTags = "SELECT t.tag_id AS tagId, t.tag, mt.message_id 
             FROM tags t 
             INNER JOIN message_tags mt ON t.tag_id = mt.tag_id 
             WHERE mt.message_id IN ($messageIdsIn)";
 $stmtTags = $pdo->prepare($sqlTags);
 $stmtTags->execute($messageIds);
-$tags = $stmtTags->fetchAll(PDO::FETCH_ASSOC);
+$tagsRaw = $stmtTags->fetchAll(PDO::FETCH_ASSOC);
+$tags = [];
 
-// Organize Messages with related Tag IDs
-foreach ($messages as &$message) {
-    $message['relatedTagIds'] = array_column(array_filter($tags, function ($tag) use ($message) {
-        return $tag['message_id'] == $message['message_id'];
-    }), 'tag_id');
-    $message['relatedNodeIds'] = array($message['node_id']);
-    unset($message['node_id'], $message['message_id']); // Clean up
+foreach ($tagsRaw as $tag) {
+    if (!isset($tags[$tag['tagId']])) {
+        $tags[$tag['tagId']] = [
+            'tagId' => $tag['tagId'],
+            'tag' => $tag['tag'],
+        ];
+    }
+    $messages[$tag['message_id']]['relatedTagIds'][] = $tag['tagId'];
 }
-unset($message); // Break the reference with the last element
 
-// Organize Nodes with related URL IDs
+// Finalize messages array
+$messages = array_values($messages); // Reset keys
+
+// Finalize nodes array
 foreach ($nodes as &$node) {
-    $node['relatedUrlIds'] = array($node['node_url_id']);
-    unset($node['node_url_id']); // Clean up
+    $node['relatedUrlIds'] = [$node['relatedUrlId']];
+    unset($node['relatedUrlId']); // Clean up
     $node['equalified'] = $node['equalified'] == 1; // Convert to boolean
 }
 unset($node); // Break the reference with the last element
@@ -75,10 +93,7 @@ $output = [
     "urls" => $urls,
     "nodes" => $nodes,
     "messages" => $messages,
-    "tags" => array_map(function ($tag) {
-        unset($tag['message_id']); // Clean up
-        return $tag;
-    }, $tags),
+    "tags" => array_values($tags), // Ensure tags are properly formatted
 ];
 
 // Return as JSON
