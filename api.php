@@ -37,6 +37,10 @@ $stmtNodes->execute($urlIds);
 $nodes = $stmtNodes->fetchAll(PDO::FETCH_ASSOC);
 if(!empty($nodes)){
     foreach ($nodes as &$node) {
+
+        // Convert numeric equalified to boolean
+        $node['equalified'] = $node['equalified'] ? true : false;
+
         // Escape HTML and tagets
         $node['html'] = addslashes($node['html']);
         $node['targets'] = json_decode($node['targets']);
@@ -46,6 +50,7 @@ if(!empty($nodes)){
             }
             unset($target);
         }
+        
     }
     unset($node);
 }
