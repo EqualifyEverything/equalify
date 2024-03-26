@@ -63,7 +63,7 @@ try {
 
             // Add existing page URLs to results where possible
             foreach ($scan_jobs as &$job) {
-                $url_id = find_url_id($job['URL'], $next_property_id);
+                $url_id = find_url_id($job['url'], $next_property_id);
                 if ($url_id) {
                     $job['url_id'] = $url_id;
                 } else {
@@ -186,7 +186,7 @@ function save_to_database($results, $property_id) {
     global $pdo;
 
     // Extract all job IDs from the results
-    $jobIds = array_column($results, 'JobID');
+    $jobIds = array_column($results, 'jobId');
 
     // Check which job IDs already exist in the database
     $placeholders = implode(',', array_fill(0, count($jobIds), '?'));
@@ -197,7 +197,7 @@ function save_to_database($results, $property_id) {
 
     // Filter out existing job IDs from results
     $newResults = array_filter($results, function($result) use ($existingJobIds) {
-        return !in_array($result['JobID'], $existingJobIds);
+        return !in_array($result['jobId'], $existingJobIds);
     });
 
     // Batch insert the new results
@@ -207,7 +207,7 @@ function save_to_database($results, $property_id) {
         $params = [];
         foreach ($newResults as $index => $result) {
             $insertValues[] = "(:jobId{$index}, :propertyId{$index}, :url_id{$index})";
-            $params[":jobId{$index}"] = $result['JobID'];
+            $params[":jobId{$index}"] = $result['jobId'];
             $params[":propertyId{$index}"] = $property_id;
             $params[":url_id{$index}"] = $result['url_id'];
         }
