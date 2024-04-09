@@ -39,7 +39,7 @@ try {
             $next_property_id = $next_property['property_id'];
             $next_property_url = $next_property['property_url'];
             $next_property_discovery = $next_property['property_discovery'];
-            $next_property_name = $the_property['property_name'];
+            $next_property_name = $next_property['property_name'];
         }else{
             $next_property_id = '';
             $next_property_url = '';

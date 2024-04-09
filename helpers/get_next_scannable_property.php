@@ -3,9 +3,8 @@
 function get_next_scannable_property() {
     global $pdo;
     $query = "
-        SELECT 
-        property_id, 
-        property_url 
+    SELECT 
+        *
     FROM properties
     WHERE 
         (property_archived != 1 OR property_archived IS NULL) AND

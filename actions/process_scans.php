@@ -191,7 +191,17 @@ function process_scans($scans = null) {
         // Handle problem scans.
         $statuses = array('failed', 'unknown');
         if(in_array($data['status'], $statuses)){
-            $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan skipped.';
+            $message = 'Scan ' . $job_id . ' has "' . $data['status'] .'" status. Scan deleted.';
+            $logged_messages[] = $message;
+            update_log($message);
+            delete_scan($job_id);
+            continue;
+        }
+
+        // Handle deleted scans.
+        $messages = array('Record not found. Records are deleted after 7 days!');
+        if(in_array($data['result'], $messages)){
+            $message = 'Scan ' . $job_id . ' records were deleted from scan. Scan deleted.';
             $logged_messages[] = $message;
             update_log($message);
             delete_scan($job_id);
@@ -214,7 +224,7 @@ function process_scans($scans = null) {
     endforeach;
 
     // Redirect with logged messages
-    if(!empty($logged_messages)){
+    if(!empty($logged_messages) && (php_sapi_name() !== 'cli')){
         $success_message = 'Success! Returned the following results: <ul>';
         foreach ($logged_messages as $message){
             $success_message.= "<li>$message</li>";
