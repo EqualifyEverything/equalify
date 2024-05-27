@@ -139,7 +139,7 @@ function process_scans($scans = null) {
         update_processing_value($job_id, 1);
 
         // Perform the API GET request
-        $api_url =  $_ENV['SCAN_URL']. '/results/' . $job_id;
+        $api_url =  $_ENV['SCAN_URL']. '/results/axe/' . $job_id;
         $json = file_get_contents($api_url);
 
         // Handle scans that don't return JSON.
