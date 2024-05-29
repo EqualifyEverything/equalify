@@ -106,21 +106,23 @@ try {
 
 function get_api_results($property_url, $property_discovery) {
     
-    // Setup sitemap processing
-    if($property_discovery == 'sitemap_import')
-        $api_url = $_ENV['SCAN_URL'].'/generate/sitemapurl';
+ 
+    // Determine the API endpoint based on the type of import
+    if ($property_discovery == 'sitemap_import') {
+        $api_url = $_ENV['SCAN_URL'] . '/generate/sitemapurl';
+    } elseif ($property_discovery == 'single_page_import') {
+        $api_url = $_ENV['SCAN_URL'] . '/generate/url';
+    } else {
+        throw new Exception("Invalid property discovery method");
+    }
 
-    // Single page processing
-    if($property_discovery == 'single_page_import')
-        $api_url = $_ENV['SCAN_URL'].'/generate/url';
-
-    // Setup payload
-    $data = json_encode(array("url" => $property_url));
+    // Prepare the payload
+    $data = json_encode(array('url' => $property_url), JSON_UNESCAPED_SLASHES);
 
     // Initialize cURL session
     $ch = curl_init($api_url);
 
-    // Set cURL options
+    // Set cURL options for posting JSON
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
@@ -129,21 +131,22 @@ function get_api_results($property_url, $property_discovery) {
         'Content-Length: ' . strlen($data)
     ));
 
-    // Execute cURL session
+    // Execute the cURL session
     $response = curl_exec($ch);
 
-    // Check for errors
-    if(curl_errno($ch)){
-        throw new Exception(curl_error($ch));
+    // Check for any cURL errors
+    if (curl_errno($ch)) {
+        throw new Exception('cURL error: ' . curl_error($ch));
     }
 
-    // Close cURL session
+    // Close the cURL session
     curl_close($ch);
 
-    // Decode JSON response
+    // Decode the JSON response
     $results = json_decode($response, true);
 
     return $results;
+
 }
 
 function find_url_id($url, $propertyId) {
