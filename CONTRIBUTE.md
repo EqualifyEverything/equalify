@@ -17,7 +17,7 @@ These guidelines are used to assess new code:
 Here are some steps to start contributing:
 
 1. Add a new ticket to [issues](https://github.com/EqualifyEverything/equalify/issues) or create a pull request for changes.
-2. @bbertucc is the principal maintainer, and he'll chime in on any new issues or PR with next steps.
+2. @bbertucc is the principal maintainer, and he'll chime in on any new issues or PR with the next steps.
 3. Followup! Feel free to follow up on any issue or PR. Some things slip through the cracks.
 4. Usually a discussion ensues before some clear tasks are assigned or a PR is approved.
 5. Approved PRs and work will be tested before entering the `main` branch and turned into a release.
