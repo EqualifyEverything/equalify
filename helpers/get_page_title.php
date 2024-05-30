@@ -13,6 +13,9 @@ function get_page_title()
     if (isset($_GET['view'])) {
         $view = $_GET['view'];
 
+        // Initialize variables
+        $property_name = $report_title = $message_title = $tag_name = $page_url = null;
+
         // Optionally, retrieve 'id' parameter
         if (isset($_GET['report_id'])) {
             $stmt = $pdo->prepare("SELECT report_title FROM reports WHERE report_id = :report_id");
@@ -42,7 +45,7 @@ function get_page_title()
         
         switch ($view) {
             case 'property_settings':
-                $title = ($property_name ? " ID- $property_name" : "") . " Property Settings | Equalify";
+                $title = ($property_name ? "$property_name" : "Untitled Property") . " Settings | Equalify";
                 break;
             case 'reports':
                 $title = " All Reports | Equalify";

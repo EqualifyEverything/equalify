@@ -15,7 +15,7 @@ require_once('helpers/get_report_filters.php');
 require_once('components/success_or_error_message.php');
 
 // Handle Wrong Report Id
-$report_title =  get_title($report_id, 'report');
+$report_title = get_title($report_id, 'report');
 if($report_title == 'Report Not Found'){
     echo '<p class="display-4 text-center my-4">Report not found.</p>';
     exit;
