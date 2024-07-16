@@ -1,6 +1,8 @@
 <?php
 // Built with ❤️ from ChatGPT here: https://chatgpt.com/share/e1d01a41-f014-44b0-bcfe-324679c7116b
+?>
 
+<?php
 // Display all errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,16 +11,10 @@ error_reporting(E_ALL);
 // Import init.php file
 require 'init.php';
 
-// PostgreSQL connection settings
-$pg_host = 'your_postgresql_host';
-$pg_port = 'your_postgresql_port';
-$pg_dbname = 'your_postgresql_dbname';
-$pg_user = 'your_postgresql_user';
-$pg_pass = 'your_postgresql_password';
-
-// Create PostgreSQL connection
-$pg_pdo = new PDO("pgsql:host=$pg_host;port=$pg_port;dbname=$pg_dbname", $pg_user, $pg_pass);
-$pg_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Create exports directory if it doesn't exist
+if (!file_exists('exports')) {
+    mkdir('exports', 0777, true);
+}
 
 // Define user details for the conversion
 $user_id = '31bb8500-f091-70b1-9009-85d53a967818';
@@ -28,20 +24,16 @@ $last_name = 'Bertuccelli-Booth';
 
 // Function to convert MySQL datetime to PostgreSQL timestamptz
 function convertDatetime($datetime) {
-    return (new DateTime($datetime))->format(DateTime::ATOM);
+    return is_null($datetime) ? null : (new DateTime($datetime))->format(DateTime::ATOM);
 }
 
-// Insert user into PostgreSQL
-$pg_pdo->exec("
-    INSERT INTO users (id, email, first_name, last_name) VALUES 
-    ('$user_id', '$email', '$first_name', '$last_name')
-    ON CONFLICT (id) DO NOTHING;
-");
-
-// Function to export and insert data from MySQL to PostgreSQL
+// Function to export data from MySQL to a SQL file for PostgreSQL
 function exportTable($mysql_table, $pg_table, $columns_map) {
-    global $pdo, $pg_pdo, $user_id;
-    
+    global $pdo, $user_id;
+
+    $filePath = "exports/{$pg_table}.sql";
+    $file = fopen($filePath, 'w');
+
     $stmt = $pdo->query("SELECT * FROM $mysql_table");
     
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -57,20 +49,22 @@ function exportTable($mysql_table, $pg_table, $columns_map) {
             }
             
             $columns[] = $pg_col;
-            $values[] = $pg_pdo->quote($value);
+            $values[] = is_null($value) ? 'NULL' : "'" . addslashes($value) . "'";
         }
         
         $columns[] = 'user_id';
-        $values[] = $pg_pdo->quote($user_id);
+        $values[] = "'" . addslashes($user_id) . "'";
         
         $columns_str = implode(',', $columns);
         $values_str = implode(',', $values);
         
-        $pg_pdo->exec("INSERT INTO $pg_table ($columns_str) VALUES ($values_str)");
+        fwrite($file, "INSERT INTO $pg_table ($columns_str) VALUES ($values_str);\n");
     }
+
+    fclose($file);
 }
 
-// Export and convert each table
+// Export each table to a separate file
 exportTable('message_nodes', 'message_nodes', [
     'message_id' => 'message_id',
     'node_id' => 'enode_id'
@@ -141,5 +135,5 @@ exportTable('urls', 'urls', [
     'url_property_id' => 'property_id'
 ]);
 
-echo "Data export and conversion completed successfully.";
+echo "Data export completed successfully. Check the /exports directory for the SQL files.";
 ?>
