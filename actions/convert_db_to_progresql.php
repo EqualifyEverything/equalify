@@ -78,7 +78,7 @@ exportTable('message_tags', 'message_tags', [
 exportTable('messages', 'messages', [
     'message_id' => 'id',
     'message' => 'message',
-    'message_type' => 'messageType'
+    'message_type' => 'type'
 ]);
 
 exportTable('node_updates', 'enode_updates', [

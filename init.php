@@ -61,4 +61,4 @@ $pdo = new PDO("mysql:host=$db_host;port=$db_port;dbname=$current_db", "$db_user
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Start session
-session_start();
+//session_start();
