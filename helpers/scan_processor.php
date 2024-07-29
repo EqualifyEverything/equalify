@@ -241,8 +241,9 @@ function processMessages(PDO $pdo, array &$jsonData) {
         
     $uniqueMessages = [];
     $typeCounts = [
-        'error' => ['all' => 0, 'new' => 0],
+        'incomplete' => ['all' => 0, 'new' => 0],
         'pass' => ['all' => 0, 'new' => 0],
+        'warning' => ['all' => 0, 'new' => 0],
         'violation' => ['all' => 0, 'new' => 0],
     ];
 
