@@ -7,4 +7,4 @@ assignees: wilsuriel03
 
 ---
 
-
+Before posting an issue, read about our development and deployment process here: https://github.com/EqualifyEverything/handbook
