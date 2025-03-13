@@ -11,8 +11,8 @@ assignees: azdak
 Describe the problem being addressed by the issue.
 
 ## Steps to Close This Issue
-- [ ] @bbertucc review issue with the assignee to make sure it can be accomplished within two weeks, or links to additional issues.
+- [ ] @bbertucc reviews issue with the assignee.
 - [ ] Assinee budgets issues.
 - [ ] Budget is approved/disapproved with comment.
-- [ ] ..
-- [ ] @bbertucc closes this issue after logging budget.
+- [ ] Work commences
+- [ ] @bbertucc closes this issue after validating fix logging payment.
