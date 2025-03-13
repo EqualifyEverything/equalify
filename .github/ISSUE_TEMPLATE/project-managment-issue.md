@@ -11,6 +11,8 @@ assignees: bbertucc
 Describe the problem being addressed by the issue.
 
 ## Steps to Close This Issue
-- [ ] @bbertucc review issue to ensure it can be accomplished within two weeks or links to additional issues.
-- [ ] ..
-- [ ] @bbertucc closes this issue.
+- [ ] @bbertucc reviews issue with the assignee.
+- [ ] Assinee budgets issues.
+- [ ] Budget is approved/disapproved with comment.
+- [ ] Work commences
+- [ ] @bbertucc closes this issue after validating fix logging payment.
