@@ -1,52 +1,39 @@
 <img src="logo.svg" alt="Equalify Logo" width="300">
 
-## Better Accessibility Management
-Equalify aims to be the most useful accessibility platform. That means faster scanning, more accurate results, and a more intuitive user interface. We publish Equalify code here so that you can run the platform locally, building new features and fixing issues.
+## Big Changes are Coming!
+Equalify has officially transitioned to a project of the [University of Illinois Chicago (UIC) Technology Solutions](https://it.uic.edu/about/technology-solutions/ "University of Illinois Chicago (UIC) Technology Solutions") department! This marks a new chapter for Equalify, but we remain focused on our goal: bringing top-in-class acessibility scanning and reporting tools to the widest possible audience. 
 
-## Managed Service
-Not technical? Want to support Equalify?
+We built Equalify as a multi-tenant, SaaS platform, but after 3 years and tens of thousands of scans, we believe users want something different - something simple, robust, and easy-to-use, and that can be deployed by users themselves, *without* a dedicated DevOps team. That means we'll be moving in a new direction for Equalify, with the goal of a streamlined application, with straightforward deployment. We aim to make Equalify as easy to install as any popular open source project. Here's what this means:
 
-Visit [https://equalify.app](https://equalify.app) to try our hosted service.
+### What to Expect:
 
-The service is <strong>fully supported</strong> and <strong>super fast</strong>. Plus, you'll get these features:
-- Automatic Scans
-- Scheduled Scans
-- Multi-User Administration
-- Shareable Reports
+- **Ease of Deployment** 
+Our priority will be to make it as simple and painless as possible for users to spin up their own instances of Equalify
+- **Unified Codebase**
+A consolidated codebase, to make it simpler for developers to contribute and act as a single entry point for end users and developers
+- **Customization**
+Prioritize extensibility, and make it as straightforward as possible for users to add their own scans, modify the user interface, etc
+- **Better Documentation**
+Simplify adoption by unifying and expanding existing documentation
+- **Always Open Source**
+Continued Open Source development under the AGPL
 
-And please <b>star this repo</b>!
+### Roadmap
+- **Beta (Q1 2026)**
+  - Deployment in 30 minutes or less
+  - Handles 100 pages/minute without breaking a sweat
+  - Costs less than $1000/month for typical usage
+  - No critical bugs
+  - Documentation that doesn't suck
 
-Your support sustains open source work.
+### Stay in Touch! 
+Subscribe to our newsletter: [it.uic.edu/accessibility/engineering](http://it.uic.edu/accessibility/engineering "it.uic.edu/accessibility/engineering")
+Star or contribute on GitHub: [github.com/equalifyEverything/equalify](http://github.com/equalifyEverything/equalify "github.com/equalifyEverything/equalify")
 
-## Setup
-After forking the repo: 
-1. Create `.env` with the following:
-    ```
-    ## DB Info
-    DB_HOST=
-    DB_USERNAME=
-    DB_PASSWORD=
-    DB_NAME=
-    DB_PORT=
-
-    ## Scan Info
-    SCAN_URL=
-    ```
-2. Run `composer install` to integrate upload script(you may need to install composer first)
-3.  Run in your favorite local LAMP/LEMP setup. (We love [ddev](https://github.com/ddev/ddev)!)
-4. Run `php actions/install.php` to create the tables.
-5. Equalify everything!
-
-PHP 8.1+ is required with MySQL 8.0+.
-
-## Contribute
-Submit bug reports, questions, and patches to the repo's [issues](https://github.com/EqualifyEverything/equalify/issues) tab.
-
-If you would like to submit a pull request, please read [CONTRIBUTE.md](/CONTRIBUTE.md) and [ACCESSIBILITY.md](/ACCESSIBILITY.md) before you do.
-
-## Special Thanks
-A chaos wizard 🧙, [Bruno Lowagie](https://lowagie.com), and many others help Equalify. The project is run by [@bbertucc](https://github.com/bbertucc). Special shout out to [Pantheon](https://pantheon.io/) and [Little Forest](https://littleforest.co.uk/feature/web-accessibility/) for providing funding for [bounties](https://github.com/bbertucc/equalify/issues?q=is%3Aopen+is%3Aissue+label%3Abountied). Yi, Kate, Bill, Dash, Sylvia, Anne, Doug, Matt, Nathan, and John- You are the brains that helped launch this idea. [@ebertucc](https://github.com/ebertucc) and [@jrchamp](https://github.com/jrchamp) are the project's first contributors - woot woot! Much help also came from [mgifford](https://github.com/mgifford), [kreynen](https://github.com/kreynen), and [j-mendez](https://github.com/j-mendez) - you all rock! [Guzzle](https://github.com/guzzle/guzzle) makes multiple concurrent scans possible. [Composer](https://getcomposer.org/) makes Guzzle possible. [TolstoyDotCom](https://github.com/TolstoyDotCom) and [zersiax](https://github.com/zersiax) were our first hired contributors. [azsak](https://github.com/azdak) currently keeps the scan chugging. And of course shoutout to [Decubing](https://github.com/decubing) - they built our MVP!
-
-This project's code is published under the [GNU Affero General Public License v3.0](https://github.com/bbertucc/equalify/blob/main/LICENSE) to inspire new collaborations.
+We welcome your questions, feedback, and continued participation.
 
 **Together, we can equalify the internet.**
+
+All the best, 
+**Digital Accessibility Engineering 
+UIC Technology Solutions**
