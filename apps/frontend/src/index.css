@@ -1,0 +1,55 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+:root {
+  --background: #ffffff;
+  --text: #000000;
+  --link: #2f00ff;
+  --border: #aaaaaa;
+  --image: url(/bg.jpg);
+}
+
+.dark {
+  --background: #000000;
+  --text: #ffffff;
+  --link: #00a2ff;
+  --border: #444444;
+  --image: url(/bg-dark.jpg);
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-text: var(--text);
+  --color-border: var(--border);
+}
+
+body {
+  margin: 0;
+  background-color: var(--border);
+  background: var(--image);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: "Poppins", Arial, sans-serif;
+}
+
+a {
+  color: var(--link)
+}
+
+input, select {
+  padding: 10px 10px;
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+  border-style: solid;
+}
+
+button {
+  padding: 10px 20px;
+  font-family: "Poppins", Arial, sans-serif;
+}
+
+h1, h2, h3 {
+  margin: 0;
+}

@@ -1,0 +1,45 @@
+{
+  "name": "equalify-v2-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start:prod": "vite dev --mode production",
+    "start:staging": "vite dev --mode staging",
+    "build:prod": "vite build --mode production && aws s3 --profile equalify sync --delete ./dist s3://equalifyv2-web && aws --profile equalify cloudfront create-invalidation --distribution-id E3K6C7EHIVHI57 --paths \"/*\" > /dev/null",
+    "build:staging": "vite build --mode staging && aws s3 --profile equalify sync --delete ./dist s3://equalifyv2-web-staging && aws --profile equalify cloudfront create-invalidation --distribution-id E2A8998GIJ0FNF --paths \"/*\" > /dev/null",
+    "build": "yarn build:staging && yarn build:prod",
+    "ngrok": "ngrok http --domain c.ngrok.pro 5173"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-query": "^5.50.1",
+    "@tanstack/react-table": "^8.21.3",
+    "aws-amplify": "^6.3.8",
+    "posthog-js": "^1.144.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.2.1",
+    "react-router-dom": "^7.2.0",
+    "react-select": "^5.8.1",
+    "zustand": "^5.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.16",
+    "tailwindcss": "^4.0.9",
+    "typescript": "^5.5.3",
+    "vite": "^6.2.0",
+    "vite-plugin-pwa": "^1.0.0"
+  },
+  "imports": {
+    "#src/*": "./src/*"
+  }
+}

@@ -1,0 +1,1 @@
+export const formatId = id => id.replaceAll('-', '')
