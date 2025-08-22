@@ -1,0 +1,22 @@
+name: Deploy
+on:
+  push:
+    branches: ["main", "staging"]
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
+          role-session-name: github-deploy
+          aws-region: us-east-2
+      - name: Create Vite build, sync to S3, & invalidate Cloudfront
+        run: |
+          npm install --force
+          npx vite build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+          aws s3 sync --delete ./dist ${{ github.ref == 'refs/heads/main' && 's3://equalifyuic-web' || 's3://equalifyuic-web-staging' }}
+          aws cloudfront create-invalidation --distribution-id ${{ github.ref == 'refs/heads/main' && 'ERS6SZU2YGMXQ' || 'ET2ZPWOHURCZ0' }} --paths "/*" > /dev/null
