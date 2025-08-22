@@ -1,0 +1,1 @@
+export const isStaging = process.env.STAGING === '1'

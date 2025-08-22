@@ -5,6 +5,11 @@ on:
 permissions:
   id-token: write
   contents: read
+
+env:
+  AWS_ROLE: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
+  AWS_REGION: us-east-2
+
 jobs:
   frontend:
     runs-on: ubuntu-latest
@@ -14,13 +19,33 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
-          role-session-name: github-deploy
-          aws-region: us-east-2
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: github-deploy-frontend
+          aws-region: ${{ env.AWS_REGION }}
       - name: Create Vite build, sync to S3, & invalidate Cloudfront
         run: |
-          cd apps/frontend  # You can combine these into one line
+          cd apps/frontend
           npm install --force
           npx vite build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
           aws s3 sync --delete ./dist ${{ github.ref == 'refs/heads/main' && 's3://equalifyuic-web' || 's3://equalifyuic-web-staging' }}
           aws cloudfront create-invalidation --distribution-id ${{ github.ref == 'refs/heads/main' && 'ERS6SZU2YGMXQ' || 'ET2ZPWOHURCZ0' }} --paths "/*" > /dev/null
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: github-deploy-backend
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Deploy to Lambda
+        run: |
+          cd apps/backend
+          npm install
+          npx esbuild index.ts --bundle --platform=node --outdir=dist --external:@aws-sdk
+          cd dist
+          zip -r lambda.zip index.js > /dev/null
+          aws lambda update-function-code --function-name equalifyuic-api${{ github.ref != 'refs/heads/main' && '-staging' || '' }} --zip-file fileb://lambda.zip > /dev/null
