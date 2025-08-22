@@ -17,7 +17,9 @@ jobs:
           aws-region: us-east-2
       - name: Create Vite build, sync to S3, & invalidate Cloudfront
         run: |
-          cd apps/frontend
+          ls
+          cd apps
+          cd frontend
           npm install --force
           npx vite build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
           aws s3 sync --delete ./dist ${{ github.ref == 'refs/heads/main' && 's3://equalifyuic-web' || 's3://equalifyuic-web-staging' }}
