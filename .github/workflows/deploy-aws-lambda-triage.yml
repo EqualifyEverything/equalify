@@ -20,7 +20,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with: 
-         sparse-checkout: 'services/aws-lambda-triage'
+         sparse-checkout: 'services/aws-lambda-triage/'
+         sparse-checkout-cone-mode: false
 
       - name: Build artifacts
         run: |
