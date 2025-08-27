@@ -19,13 +19,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
-      - name: Setup node & create artifacts
-        uses: actions/setup-node@v2
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
         with:
-         node-version: '24.x'
-         
-      - name: Build & create artifacts
+          node-version: 24.x
+          cache: 'npm' 
+
+      - name: Build artifacts
         run: |
           npm ci
           npm run dist
