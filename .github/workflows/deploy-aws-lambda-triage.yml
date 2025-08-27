@@ -20,18 +20,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
+      - name: Setup node & create artifacts
+        uses: actions/setup-node@v2
+        with:
+         node-version: '24.x'
+         
+      - name: Build & create artifacts
+        run: |
+          npm ci
+          npm run dist
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE }}
           role-session-name: github-deploy-aws-lambda-triage
           aws-region: ${{ env.AWS_REGION }}
-        
-      - name: Build & create artifacts
-        run: |
-          npm ci
-          npm run dist
-      
+
       - name: Deploy Lambda Function
         uses: aws-actions/aws-lambda-deploy@v1
         with:
