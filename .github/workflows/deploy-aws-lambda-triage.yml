@@ -25,7 +25,7 @@ jobs:
 
       - name: Build artifacts
         run: |
-          ls -R
+          cd ./services/aws-lambda-triage/
           npm ci
           npm run dist
 
@@ -40,7 +40,7 @@ jobs:
         uses: aws-actions/aws-lambda-deploy@v1
         with:
           function-name: aws-lambda-triage
-          code-artifacts-dir: ./dist
+          code-artifacts-dir: ./services/aws-lambda-triage/dist
           handler: lambda.handler
           runtime: nodejs22.x
           dry-run: true
