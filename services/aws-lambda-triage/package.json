@@ -1,0 +1,32 @@
+{
+  "name": "aws-lambda-triage",
+  "version": "1.0.0",
+  "description": "AWS-Lambda function for processing Equalify URLs from SQS",
+  "keywords": [
+    "lambda",
+    "aws",
+    "scan"
+  ],
+  "license": "ISC",
+  "author": "T. Daniel",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild --bundle --minify --keep-names --sourcemap --sources-content=false --target=node22 --platform=node --outfile=dist/lambda.js src/lambda.ts",
+    "dist": "tsc && npm run build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-typescript": "^7.27.1",
+    "@tsconfig/node22": "^22.0.2",
+    "@types/node": "^24.3.0",
+    "esbuild": "^0.25.9",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.152"
+  }
+}

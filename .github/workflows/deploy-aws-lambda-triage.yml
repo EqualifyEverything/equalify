@@ -1,0 +1,42 @@
+name: Deploy AWS Lambda - Triage
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'services/aws-lambda-triage/**'
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_ROLE: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
+  AWS_REGION: us-east-2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: github-deploy-aws-lambda-triage
+          aws-region: ${{ env.AWS_REGION }}
+        
+      - name: Build & create artifacts
+        run: |
+          npm ci
+          npm run dist
+      
+      - name: Deploy Lambda Function
+        uses: aws-actions/aws-lambda-deploy@v1
+        with:
+          function-name: aws-lambda-triage
+          code-artifacts-dir: ./dist
+          handler: lambda.handler
+          runtime: nodejs22.x
+          dry-run: true

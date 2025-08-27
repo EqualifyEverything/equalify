@@ -1,7 +1,9 @@
-name: Deploy
+name: Deploy Apps
 on:
   push:
     branches: ["main", "staging"]
+    paths:
+      - 'apps/**'
 permissions:
   id-token: write
   contents: read
