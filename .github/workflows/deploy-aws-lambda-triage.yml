@@ -25,6 +25,7 @@ jobs:
 
       - name: Build artifacts
         run: |
+          ls -R
           npm ci
           npm run dist
 
