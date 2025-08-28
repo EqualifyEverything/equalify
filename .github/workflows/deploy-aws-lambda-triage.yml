@@ -43,4 +43,3 @@ jobs:
           code-artifacts-dir: ./services/aws-lambda-triage/dist
           handler: lambda.handler
           runtime: nodejs22.x
-          dry-run: true
