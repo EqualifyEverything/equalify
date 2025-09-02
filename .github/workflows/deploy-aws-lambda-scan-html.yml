@@ -1,10 +1,10 @@
-name: Deploy AWS Lambda - Triage
+name: Deploy AWS Lambda - Scan HTML
 
 on:
   push:
     branches: ["main"]
     paths:
-      - 'services/aws-lambda-triage/**'
+      - 'services/aws-lambda-scan-html/**'
 permissions:
   id-token: write
   contents: read
@@ -20,12 +20,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with: 
-         sparse-checkout: 'services/aws-lambda-triage/'
+         sparse-checkout: 'services/aws-lambda-scan-html/'
          sparse-checkout-cone-mode: false
 
       - name: Build artifacts
         run: |
-          cd ./services/aws-lambda-triage/
+          cd ./services/aws-lambda-scan-html/
           npm ci
           npm run dist
 
@@ -33,13 +33,13 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE }}
-          role-session-name: github-deploy-aws-lambda-triage
+          role-session-name: github-deploy-aws-lambda-scan-html
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy Lambda Function
         uses: aws-actions/aws-lambda-deploy@v1
         with:
-          function-name: aws-lambda-triage
-          code-artifacts-dir: ./services/aws-lambda-triage/dist
+          function-name: aws-lambda-scan-html
+          code-artifacts-dir: ./services/aws-lambda-scan-html/dist
           handler: lambda.handler
           runtime: nodejs22.x
