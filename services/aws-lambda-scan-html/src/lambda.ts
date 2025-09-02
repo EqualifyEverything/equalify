@@ -1,44 +1,58 @@
-import type { SQSEvent, SQSRecord } from 'aws-lambda'
-import middy from '@middy/core';
-import { captureLambdaHandler } from '@aws-lambda-powertools/tracer/middleware';
-import { processPartialResponse, SqsFifoPartialProcessor } from '@aws-lambda-powertools/batch';
-import { PartialItemFailureResponse } from '@aws-lambda-powertools/batch/types';
+import type { SQSEvent, SQSRecord } from "aws-lambda";
+import middy from "@middy/core";
+import {
+  BatchProcessor,
+  EventType,
+  processPartialResponse,
+} from "@aws-lambda-powertools/batch";
+import { PartialItemFailureResponse } from "@aws-lambda-powertools/batch/types";
+import { Logger } from "@aws-lambda-powertools/logger";
+import { Metrics, MetricUnit } from "@aws-lambda-powertools/metrics";
+import { logMetrics } from "@aws-lambda-powertools/metrics/middleware";
 
-import { Tracer } from '@aws-lambda-powertools/tracer';
-import { Logger } from '@aws-lambda-powertools/logger';
+const metrics = new Metrics({
+  namespace: "equalifyuic",
+  serviceName: "aws-lambda-scan-html",
+});
 
-
-const logger = new Logger({ serviceName: 'aws-lambda-scan-html' });
-const processor = new SqsFifoPartialProcessor();
-const tracer = new Tracer({ serviceName: 'serverlessAirline' });
+const logger = new Logger({ serviceName: "aws-lambda-scan-html" });
+const processor = new BatchProcessor(EventType.SQS);
 
 // Process a single SQS Record
 const recordHandler = (record: SQSRecord): void => {
-  const subsegment = tracer.getSegment()?.addNewSubsegment('### recordHandler'); 
-  subsegment?.addAnnotation('messageId', record.messageId); 
-
+  metrics.captureColdStartMetric();
+  const startTime = performance.now();
   const payload = record.body;
   if (payload) {
     try {
       const item = JSON.parse(payload);
       logger.info("Processing ", item);
+      metrics.addMetric("scansStarted", MetricUnit.Count, 1);
       // do something with the item
-      subsegment?.addMetadata('item', item);
     } catch (error) {
-      subsegment?.addError(error as Error);
       throw error;
+    } finally {
+      const endTime = performance.now(); // End timing
+      const executionDuration = endTime - startTime; // Calculate duration in milliseconds
+
+      // Add a custom metric for execution duration
+      metrics.addMetric(
+        "ScanDuration",
+        MetricUnit.Milliseconds,
+        executionDuration
+      );
     }
   }
-
-  subsegment?.close(); 
+  metrics.publishStoredMetrics();
 };
 
 // handle batch
-const batchHandler = async (event:SQSEvent, context: any) =>
+const batchHandler = async (event: SQSEvent, context: any) =>
   processPartialResponse(event, recordHandler, processor, {
     context,
-});
+  });
 
 // finally, export the handler
-export const handler = middy<SQSEvent, PartialItemFailureResponse>(batchHandler)
-  .use(captureLambdaHandler(tracer))
+export const handler = middy<SQSEvent, PartialItemFailureResponse>(
+  batchHandler
+).use(logMetrics(metrics, { captureColdStartMetric: true }));
