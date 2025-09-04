@@ -26,24 +26,24 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
     try {
       logger.info("Processing ", job.url);
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
-      const results = await scan(job);
+      const results = await scan(job).then(() => {
+        const endTime = performance.now(); // End timing
+        const executionDuration = endTime - startTime; // Calculate duration in milliseconds
+        logger.info("Finished", job.url);
+        // Add a custom metric for execution duration
+        metrics.addMetric(
+          "ScanDuration",
+          MetricUnit.Milliseconds,
+          executionDuration
+        );
+      });
       logger.info(JSON.stringify(results));
-      // do something with the item
     } catch (error) {
       throw error;
-    } finally {
-      const endTime = performance.now(); // End timing
-      const executionDuration = endTime - startTime; // Calculate duration in milliseconds
-      logger.info("Finished", job.url);
-      // Add a custom metric for execution duration
-      metrics.addMetric(
-        "ScanDuration",
-        MetricUnit.Milliseconds,
-        executionDuration
-      );
     }
   }
   metrics.publishStoredMetrics();
+  return;
 };
 
 // handle batch

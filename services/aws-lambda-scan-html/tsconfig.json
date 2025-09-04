@@ -2,7 +2,7 @@
   "extends": "@tsconfig/node22",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
     "declaration": false,
