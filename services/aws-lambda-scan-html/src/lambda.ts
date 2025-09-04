@@ -21,7 +21,8 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payload = record.body;
   if (payload) {
     try {
-      const job = JSON.parse(payload);
+      const payloadParsed = JSON.parse(payload);
+      const job = JSON.parse(payloadParsed);
       logger.info("Processing ", job);
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
       const results = await scan(job);
