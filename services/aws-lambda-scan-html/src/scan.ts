@@ -1,8 +1,8 @@
 import AxePuppeteer from "@axe-core/puppeteer";
 import puppeteer, { Browser } from "puppeteer";
-import { emptyAltTagRule } from "./rules/empty-alt-tag/empty-alt-tag-rule";
+//import { emptyAltTagRule } from "./rules/empty-alt-tag/empty-alt-tag-rule";
 //import path from "path";
-import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule";
+//import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule";
 import chromium from "@sparticuz/chromium-min";
 import { logger } from "./telemetry";
 
@@ -75,7 +75,7 @@ export default async function (job: SqsScanJob) {
   let results: unknown;
   try {
     results = await new AxePuppeteer(page)
-      .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
+      //.configure({ rules: [emptyAltTagRule, pdfLinkRule] })
       .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
       .analyze();
     logger.info(`HTML Scanner: Axe scan of ${job.url} finished!`);
