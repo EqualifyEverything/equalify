@@ -1,15 +1,20 @@
 {
   "extends": "@tsconfig/node22",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "declaration": false,
-    "sourceMap": true,
-    "noEmit": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    //"allowSyntheticDefaultImports": true
-  }
+    "target": "es2024", 
+    "module": "nodenext", 
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true, 
+    "declaration": false, 
+    "removeComments": true, 
+    "noEmit" : true,
+    "allowImportingTsExtensions": true 
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.test.ts"]
 }

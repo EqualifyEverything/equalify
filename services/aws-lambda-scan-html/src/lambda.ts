@@ -9,8 +9,8 @@ import { PartialItemFailureResponse } from "@aws-lambda-powertools/batch/types";
 import { logMetrics } from "@aws-lambda-powertools/metrics/middleware";
 import { MetricUnit } from "@aws-lambda-powertools/metrics";
 
-import { logger, metrics } from "./telemetry";
-import scan from "./scan";
+import { logger, metrics } from "./telemetry.ts";
+import scan from "./scan.ts";
 
 const processor = new BatchProcessor(EventType.SQS);
 
