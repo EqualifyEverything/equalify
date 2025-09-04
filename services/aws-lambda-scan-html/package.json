@@ -19,7 +19,6 @@
     "@babel/core": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@sparticuz/chromium": "^138.0.2",
     "@tsconfig/node22": "^22.0.2",
     "@types/aws-lambda": "^8.10.152",
     "@types/node": "^24.3.0",

@@ -3,7 +3,7 @@ import AxePuppeteer from "@axe-core/puppeteer";
 import { emptyAltTagRule } from "./rules/empty-alt-tag/empty-alt-tag-rule";
 import path from "path";
 import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule";
-import chromium from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
 
