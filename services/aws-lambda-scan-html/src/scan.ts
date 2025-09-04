@@ -46,7 +46,7 @@ export default async function (job: SqsScanJob) {
   const page = await browser.newPage();
 
   // Add listener to detect PDF files
-  page.on("response", async (response) => {
+  /* page.on("response", async (response) => {
     const contentType = response.headers()["content-type"]; // MIME Type
     if (contentType.includes("application/pdf")) {
       console.log("PDF Detected, aborting...");
@@ -57,7 +57,7 @@ export default async function (job: SqsScanJob) {
         });
       }
     }
-  });
+  }); */
 
   await page.setRequestInterception(false); // possible fix for memory leak (see https://github.com/puppeteer/puppeteer/issues/9186)
 
