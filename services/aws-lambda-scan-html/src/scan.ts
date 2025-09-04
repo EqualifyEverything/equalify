@@ -18,7 +18,7 @@ type SqsScanJob = {
 };
 
 export default async function (job: SqsScanJob) {
-  logger.info(`HTML Scanner: Job "${job.id}" (${job.url}) started.`);
+  logger.info(`HTML Scanner: Job [${job.id}](${job.url}) started.`);
   /* const browser = await puppeteer.launch(
     {
       headless: true,
@@ -64,7 +64,7 @@ export default async function (job: SqsScanJob) {
 
   try {
     await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(()=>{
-      logger.info(`HTML Scanner: Job "${job.id}" - URL:${job.url} loaded.`);
+      logger.info(`HTML Scanner: Job [${job.id}](${job.url}) loaded.`);
     });
   } catch (e) {
     await shutdown(browser).then(function () {
@@ -78,7 +78,7 @@ export default async function (job: SqsScanJob) {
       //.configure({ rules: [emptyAltTagRule, pdfLinkRule] })
       .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
       .analyze();
-    logger.info(`HTML Scanner: Axe scan of ${job.url} finished!`);
+    logger.info(`HTML Scanner: FINISHED axe scan of [${job.url}]`);
   } catch (e) {
     await shutdown(browser).then(function () {
       throw new Error(`Axe error: ${e}`);
@@ -124,7 +124,7 @@ export default async function (job: SqsScanJob) {
   // TODO integrate equalify format conversion
 
   await shutdown(browser).then(()=>{
-    logger.info(`HTML Scanner: Job "${job.id}" - Browser shutdown.`);
+    logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
   });
   return {
     createdDate: new Date(), // record to add
