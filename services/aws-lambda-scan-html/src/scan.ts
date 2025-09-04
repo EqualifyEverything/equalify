@@ -1,9 +1,10 @@
-import puppeteer, { Browser } from "puppeteer";
 import AxePuppeteer from "@axe-core/puppeteer";
+import puppeteer, { Browser } from "puppeteer";
 import { emptyAltTagRule } from "./rules/empty-alt-tag/empty-alt-tag-rule";
-import path from "path";
+//import path from "path";
 import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule";
 import chromium from "@sparticuz/chromium-min";
+import { logger } from "./telemetry";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
 
@@ -17,7 +18,7 @@ type SqsScanJob = {
 };
 
 export default async function (job: SqsScanJob) {
-  console.log(`Job ${job.id} started.`);
+  logger.info(`HTML Scanner: Job ${job.id} started.`);
   /* const browser = await puppeteer.launch(
     {
       headless: true,
@@ -75,6 +76,7 @@ export default async function (job: SqsScanJob) {
       .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
       .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
       .analyze();
+    logger.info(`HTML Scanner: scan of ${job.url} finished!`);
   } catch (e) {
     await shutdown(browser).then(function () {
       throw new Error(`Axe error: ${e}`);
@@ -82,6 +84,7 @@ export default async function (job: SqsScanJob) {
   }
 
   // Editoria11y injection
+  /* 
   let editoria11yResults: unknown;
   try {
     await page.addScriptTag({
@@ -113,7 +116,8 @@ export default async function (job: SqsScanJob) {
     await shutdown(browser).then(function () {
       throw new Error(`Editoria11y error: ${e}`);
     });
-  }
+  } 
+  */
 
   // TODO integrate equalify format conversion
 
@@ -122,7 +126,7 @@ export default async function (job: SqsScanJob) {
     createdDate: new Date(), // record to add
     axeresults: results,
     jobID: job.id,
-    editoria11yResults: editoria11yResults,
+    //editoria11yResults: editoria11yResults,
   };
 
   async function shutdown(browser: Browser) {
