@@ -40,9 +40,7 @@ export default async function (job: SqsScanJob) {
   const browser = await puppeteer.launch({
     args: puppeteer.defaultArgs({ args: chromium.args, headless: "shell" }),
     defaultViewport: viewport,
-    executablePath: await chromium.executablePath(
-      "/opt/chromium"
-    ),
+    executablePath: await chromium.executablePath(),
     headless: "shell",
   });
   const page = await browser.newPage();
