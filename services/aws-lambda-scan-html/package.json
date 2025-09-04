@@ -12,7 +12,7 @@
   "type": "module",
   "main": "./src/lambda.ts",
   "scripts": {
-    "build": "rm -rf dist && esbuild ./src/lambda.ts --format=esm --bundle --minify --sourcemap --platform=node --target=node22 --outdir=dist",
+    "build": "rm -rf dist && esbuild --bundle --minify --keep-names --sourcemap --sources-content=false --target=node22 --platform=node --outfile=dist/lambda.js src/lambda.ts",
     "dist": "tsc && npm run build"
   },
   "devDependencies": {

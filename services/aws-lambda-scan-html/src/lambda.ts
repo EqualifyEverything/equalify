@@ -5,7 +5,7 @@ import {
   EventType,
   processPartialResponse,
 } from "@aws-lambda-powertools/batch";
-import { PartialItemFailureResponse } from "@aws-lambda-powertools/batch/types";
+import type { PartialItemFailureResponse } from "@aws-lambda-powertools/batch/types";
 import { logMetrics } from "@aws-lambda-powertools/metrics/middleware";
 import { MetricUnit } from "@aws-lambda-powertools/metrics";
 
