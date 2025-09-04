@@ -6,28 +6,26 @@ import {
   processPartialResponse,
 } from "@aws-lambda-powertools/batch";
 import { PartialItemFailureResponse } from "@aws-lambda-powertools/batch/types";
-import { Logger } from "@aws-lambda-powertools/logger";
-import { Metrics, MetricUnit } from "@aws-lambda-powertools/metrics";
 import { logMetrics } from "@aws-lambda-powertools/metrics/middleware";
+import { MetricUnit } from "@aws-lambda-powertools/metrics";
 
-const metrics = new Metrics({
-  namespace: "equalifyuic",
-  serviceName: "aws-lambda-scan-html",
-});
+import {logger, metrics} from './telemetry'
+import scan from "./scan";
 
-const logger = new Logger({ serviceName: "aws-lambda-scan-html" });
 const processor = new BatchProcessor(EventType.SQS);
 
 // Process a single SQS Record
-const recordHandler = (record: SQSRecord): void => {
+const recordHandler = async (record: SQSRecord): Promise<void> => {
   metrics.captureColdStartMetric();
   const startTime = performance.now();
   const payload = record.body;
   if (payload) {
     try {
-      const item = JSON.parse(payload);
-      logger.info("Processing ", item);
+      const job = JSON.parse(payload);
+      logger.info("Processing ", job);
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
+      const results = await scan(job);
+      logger.info(JSON.stringify(results));
       // do something with the item
     } catch (error) {
       throw error;

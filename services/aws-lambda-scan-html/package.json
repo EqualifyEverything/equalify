@@ -19,6 +19,7 @@
     "@babel/core": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
+    "@sparticuz/chromium": "^138.0.2",
     "@tsconfig/node22": "^22.0.2",
     "@types/aws-lambda": "^8.10.152",
     "@types/node": "^24.3.0",
@@ -31,7 +32,11 @@
     "@aws-lambda-powertools/batch": "^2.25.2",
     "@aws-lambda-powertools/logger": "^2.25.2",
     "@aws-lambda-powertools/metrics": "^2.25.2",
+    "@axe-core/puppeteer": "^4.10.2",
     "@middy/core": "^6.4.4",
-    "@middy/sqs-partial-batch-failure": "^6.4.4"
+    "@middy/sqs-partial-batch-failure": "^6.4.4",
+    "@sparticuz/chromium-min": "^138.0.2",
+    "path": "^0.12.7",
+    "puppeteer-core": "^24.18.0"
   }
 }
