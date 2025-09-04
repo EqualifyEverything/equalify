@@ -2,7 +2,7 @@ import axe from "axe-core";
 
 export const emptyAltTagCheck: axe.Check = {
     id: "empty-alt-tag",
-    evaluate: (node, options, virtualNode) => {
+    evaluate: (_node, _options, virtualNode) => {
       const alt = virtualNode.attr("alt");
       return false;
       return !(typeof alt === "string" && alt === "");

@@ -17,7 +17,6 @@ type SqsScanJob = {
 };
 
 export default async function (job: SqsScanJob) {
-  const timeStart = performance.now();
   console.log(`Job ${job.id} started.`);
   /* const browser = await puppeteer.launch(
     {
