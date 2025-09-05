@@ -6,7 +6,6 @@ import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule.ts";
 import chromium from "@sparticuz/chromium-min";
 import { logger } from "./telemetry.ts";
 import { AxeResults } from "axe-core";
-import { error } from "console";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
 
