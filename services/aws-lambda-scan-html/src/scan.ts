@@ -5,6 +5,7 @@ import { emptyAltTagRule } from "./rules/empty-alt-tag/empty-alt-tag-rule.ts";
 import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule.ts";
 import chromium from "@sparticuz/chromium-min";
 import { logger } from "./telemetry.ts";
+import { AxeResults } from "axe-core";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
 
@@ -41,7 +42,9 @@ export default async function (job: SqsScanJob) {
   const browser = await puppeteer.launch({
     args: puppeteer.defaultArgs({ args: chromium.args, headless: "shell" }),
     defaultViewport: viewport,
-    executablePath: await chromium.executablePath("/opt/nodejs/node_modules/@sparticuz/chromium/bin"),
+    executablePath: await chromium.executablePath(
+      "/opt/nodejs/node_modules/@sparticuz/chromium/bin"
+    ),
     headless: "shell",
   });
   const page = await browser.newPage();
@@ -63,7 +66,7 @@ export default async function (job: SqsScanJob) {
   //await page.setRequestInterception(false); // possible fix for memory leak (see https://github.com/puppeteer/puppeteer/issues/9186)
 
   try {
-    await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(()=>{
+    await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(() => {
       logger.info(`HTML Scanner: Job [${job.id}](${job.url}) loaded.`);
     });
   } catch (e) {
@@ -72,18 +75,18 @@ export default async function (job: SqsScanJob) {
     });
   }
 
-  let results: unknown;
-  try {
-    results = await new AxePuppeteer(page)
-      .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
-      .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
-      .analyze();
-    logger.info(`HTML Scanner: FINISHED axe scan of [${job.url}]`);
-  } catch (e) {
-    await shutdown(browser).then(function () {
-      throw new Error(`Axe error: ${e}`);
+  const results = await new AxePuppeteer(page)
+    .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
+    .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
+    .analyze()
+    .then((results) => {
+      logger.info(`HTML Scanner: Scan complete for [${job.url}]!`);
+      return results;
+    })
+    .catch((error) => {
+      logger.error(`HTML Scanner: Error: [${job.url}]`, error);
+      return;
     });
-  }
 
   // Editoria11y injection
   /* 
@@ -123,7 +126,7 @@ export default async function (job: SqsScanJob) {
 
   // TODO integrate equalify format conversion
 
-  await shutdown(browser).then(()=>{
+  await shutdown(browser).then(() => {
     logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
   });
   return {
