@@ -49,6 +49,8 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
 const batchHandler = async (event: SQSEvent, context: any) =>
   processPartialResponse(event, recordHandler, processor, {
     context,
+    throwOnFullBatchFailure: false,
+    processInParallel: false,
   });
 
 // finally, export the handler
