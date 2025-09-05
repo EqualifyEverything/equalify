@@ -75,7 +75,7 @@ export default async function (job: SqsScanJob) {
     });
   }
 
-  const results = await new AxePuppeteer(page)
+  const results:AxeResults|void = await new AxePuppeteer(page)
     .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
     .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
     .analyze()
