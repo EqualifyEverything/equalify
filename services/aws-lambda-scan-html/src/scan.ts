@@ -126,15 +126,18 @@ export default async function (job: SqsScanJob) {
 
   // TODO integrate equalify format conversion
 
-  await shutdown(browser).then(() => {
+  const readyToExit = await shutdown(browser).then((val) => {
     logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
+    return val;
   });
-  return {
-    createdDate: new Date(), // record to add
-    axeresults: results,
-    jobID: job.id,
-    //editoria11yResults: editoria11yResults,
-  };
+  if (readyToExit) {
+    return {
+      createdDate: new Date(), // record to add
+      axeresults: results,
+      jobID: job.id,
+      //editoria11yResults: editoria11yResults,
+    };
+  }
 
   async function shutdown(browser: Browser) {
     const pages = await browser.pages();
@@ -142,6 +145,6 @@ export default async function (job: SqsScanJob) {
       await pages[i].close();
     }
     await browser.close();
-    return;
+    return true;
   }
 }
