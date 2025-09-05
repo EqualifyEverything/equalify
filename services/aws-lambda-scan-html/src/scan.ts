@@ -6,6 +6,7 @@ import { pdfLinkRule } from "./rules/pdf-link/pdf-link-rule.ts";
 import chromium from "@sparticuz/chromium-min";
 import { logger } from "./telemetry.ts";
 import { AxeResults } from "axe-core";
+import { error } from "console";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
 
@@ -39,6 +40,7 @@ export default async function (job: SqsScanJob) {
     isMobile: false,
     width: 1920,
   };
+  
   const browser = await puppeteer.launch({
     args: puppeteer.defaultArgs({ args: chromium.args, headless: "shell" }),
     defaultViewport: viewport,
@@ -47,6 +49,7 @@ export default async function (job: SqsScanJob) {
     ),
     headless: "shell",
   });
+
   const page = await browser.newPage();
 
   // Add listener to detect PDF files
@@ -69,10 +72,13 @@ export default async function (job: SqsScanJob) {
     await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(() => {
       logger.info(`HTML Scanner: Job [${job.id}](${job.url}) loaded.`);
     });
-  } catch (e) {
-    await shutdown(browser).then(function () {
-      throw new Error(`Page timeout error: ${e}`);
+  } catch (error) {
+    logger.error(`HTML Scanner: Job [${job.id}] page.goto error`, error as string);
+    const readyToExit = await shutdown(browser).then((val)=>{
+      logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
+      return val;
     });
+    if(readyToExit) return;
   }
 
   const results:AxeResults|void = await new AxePuppeteer(page)

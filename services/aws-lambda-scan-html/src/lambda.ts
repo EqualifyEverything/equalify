@@ -25,19 +25,23 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
-      const results = await scan(job).then(() => {
-        const endTime = performance.now(); // End timing
-        const executionDuration = endTime - startTime; // Calculate duration in milliseconds
-        logger.info("Finished", job.url);
-        // Add a custom metric for execution duration
+      const results = await scan(job).then((result) => {
+        const endTime = performance.now();
+        const executionDuration = endTime - startTime;
         metrics.addMetric(
           "ScanDuration",
           MetricUnit.Milliseconds,
           executionDuration
         );
+        return result;
       });
-      logger.info(JSON.stringify(results));
+      if(results){
+        logger.info(`Job [${job.id}] Scan Complete!`);
+        logger.info(JSON.stringify(results));
+      }
+      
     } catch (error) {
+      logger.error("Scan Error!", error as string);
       throw error;
     }
   }
