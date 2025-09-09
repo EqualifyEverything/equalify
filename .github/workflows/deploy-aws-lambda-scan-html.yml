@@ -23,6 +23,7 @@ jobs:
          sparse-checkout: | 
           services/aws-lambda-scan-html/
           shared/
+          .github/workflows
          sparse-checkout-cone-mode: false
 
       - name: Build artifacts
