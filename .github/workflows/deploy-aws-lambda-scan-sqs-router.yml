@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+         sparse-checkout: 'services/aws-lambda-scan-sqs-router/\nshared/'
+         sparse-checkout-cone-mode: false
 
       - name: Build artifacts
         run: |
