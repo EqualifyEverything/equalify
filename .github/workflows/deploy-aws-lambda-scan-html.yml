@@ -20,7 +20,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with: 
-         sparse-checkout: 'services/aws-lambda-scan-html/\nshared/'
+         sparse-checkout: | 
+          services/aws-lambda-scan-html/
+          shared/
          sparse-checkout-cone-mode: false
 
       - name: Build artifacts
