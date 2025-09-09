@@ -8,15 +8,10 @@ import { logger } from "./telemetry.ts";
 import { AxeResults } from "axe-core";
 
 const BROWSER_LOAD_TIMEOUT = 25000;
+import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
 
 // disable webgl
 chromium.setGraphicsMode = false;
-
-type SqsScanJob = {
-  id: string;
-  url: string;
-  type: string;
-};
 
 export default async function (job: SqsScanJob) {
   logger.info(`HTML Scanner: Job [${job.id}](${job.url}) started.`);

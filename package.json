@@ -1,0 +1,20 @@
+{
+  "name": "equalify",
+  "version": "1.0.0",
+  "description": "Simple, robust, and easy-to-use accessibility scanning and monitoring platform",
+  "keywords": [
+    "lambda",
+    "aws",
+    "scan"
+  ],
+  "license": "GPL-3.0-only",
+  "author": "Equalify UIC",
+  "type": "module",
+  "workspaces": [
+    "apps/backend",
+    "apps/backend",
+    "services/aws-lambda-scan-html",
+    "services/aws-lambda-scan-sqs-router",
+    "shared/types"
+  ]
+}
