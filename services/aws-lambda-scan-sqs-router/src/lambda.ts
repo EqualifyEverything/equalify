@@ -44,7 +44,7 @@ export const handler = middy()
           logger.info("Messages failed to send:", response.Failed.toString());
         }
       } catch (error) {
-        logger.info("Error sending batch:", error.toString());
+        logger.info("Error sending batch:", error as Error);
       }
     }
 
