@@ -30,7 +30,6 @@ jobs:
         run: |
           npm ci
           cd ./services/aws-lambda-scan-html/
-          npm ci
           npm run dist
 
       - name: Configure AWS credentials

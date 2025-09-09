@@ -10,6 +10,7 @@
   "license": "ISC",
   "author": "T. Daniel",
   "type": "module",
+  "prefix": "./",
   "scripts": {
     "build": "rm -rf dist && esbuild --bundle --minify --keep-names --sourcemap --sources-content=false --main-fields=moudule,main --target=node22 --platform=node --packages=bundle --outfile=dist/lambda.js src/lambda.ts",
     "dist": "tsc && npm run build"

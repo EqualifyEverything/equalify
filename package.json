@@ -11,7 +11,7 @@
   "author": "Equalify UIC",
   "type": "module",
   "workspaces": [
-    "apps/backend",
+    "apps/frontend",
     "apps/backend",
     "services/aws-lambda-scan-html",
     "services/aws-lambda-scan-sqs-router",
