@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - 'services/aws-lambda-scan-sqs-router/**'
+      - '.github/workflows/deploy-aws-lambda-scan-sqs-router.yml'
 permissions:
   id-token: write
   contents: read
@@ -23,11 +24,11 @@ jobs:
          sparse-checkout: |
           services/aws-lambda-scan-sqs-router/
           shared/
-          .github/workflows
          sparse-checkout-cone-mode: false
 
       - name: Build artifacts
         run: |
+          npm ci
           cd ./services/aws-lambda-scan-sqs-router/
           npm ci
           npm run dist
