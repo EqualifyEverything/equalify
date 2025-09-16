@@ -11,6 +11,7 @@ import { MetricUnit } from "@aws-lambda-powertools/metrics";
 
 import { logger, metrics } from "./telemetry.ts";
 import scan from "./scan.ts";
+import convertToEqualifyV2 from "../../../shared/convertors/AxeToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
 
@@ -37,7 +38,11 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
       });
       if(results){
         logger.info(`Job [${job.id}] Scan Complete!`);
-        logger.info(JSON.stringify(results));
+        if(results.axeresults){
+          logger.info(JSON.stringify(convertToEqualifyV2(results.axeresults)));
+        }else{
+          logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results))
+        }
       }
       
     } catch (error) {
