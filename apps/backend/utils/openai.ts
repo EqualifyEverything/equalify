@@ -1,6 +1,6 @@
-import { AzureOpenAI } from 'openai';
-export const openai = new AzureOpenAI({
-    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-    apiKey: process.env.AZURE_OPENAI_APIKEY,
-    apiVersion: process.env.AZURE_OPENAI_APIVERSION,
+import OpenAI from 'openai';
+
+export const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    organization: process.env.OPENAI_ORG_ID,
 });

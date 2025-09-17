@@ -20,7 +20,6 @@
     "openai": "^4.86.2",
     "serverless-postgres": "^2.1.1",
     "string-strip-html": "^13.4.8",
-    "stripe": "^18.0.0",
     "uuid": "^11.1.0"
   },
   "imports": {
