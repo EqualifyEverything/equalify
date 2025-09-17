@@ -44,7 +44,7 @@ export default async function (job: SqsScanJob) {
       ? ""
       : "--nonpdfext ";
     const stdout = await execRun(
-      "~/verapdf -f ua2 --format json " + nonpdfextFlag + filePath
+      "~/opt/vera/verapdf -f ua2 --format json " + nonpdfextFlag + filePath
     );
     let report = stdout as string;
     veraPdfReport = JSON.parse(report);
