@@ -10,6 +10,9 @@ const sqsClient = new SQSClient({ region: "us-east-1" });
 const htmlQueueUrl =
   "https://sqs.us-east-2.amazonaws.com/380610849750/scanHtml.fifo";
 
+const pdfQueueUrl =
+  "https://sqs.us-east-2.amazonaws.com/380610849750/scanPdf.fifo";
+
 export const handler = middy()
   .use(parser({ schema: scansSchema }))
   .handler(async (event): Promise<void> => {
@@ -47,6 +50,41 @@ export const handler = middy()
         logger.info("Error sending batch:", error as Error);
       }
     }
+
+    // PDF routing
+    const pdfUrls = event.urls.filter((item) => {
+      return item.type === "pdf";
+    });
+
+    // we can pass 10 events at a time to SQS
+    const PdfBatches = chunkArray(pdfUrls, 10);
+    // for each batch, send to SQS
+    for (const batch of PdfBatches) {
+      const formattedMessages = batch.map((item) => {
+        return {
+          Id: item.id,
+          MessageBody: JSON.stringify({
+            data: item,
+          }),
+        };
+      });
+      const command = new SendMessageBatchCommand({
+        QueueUrl: pdfQueueUrl,
+        Entries: formattedMessages,
+      });
+      try {
+        const response = await sqsClient.send(command);
+        if (response.Successful) {
+          logger.info("Batch send successful:", response.Successful.toString());
+        }
+        if (response.Failed && response.Failed.length > 0) {
+          logger.info("Messages failed to send:", response.Failed.toString());
+        }
+      } catch (error) {
+        logger.info("Error sending batch:", error as Error);
+      }
+    }
+
 
     logger.info("Finished sending batch");
     metrics.addMetric("scanRequest", MetricUnit.Count, 1);
