@@ -1,0 +1,50 @@
+name: Deploy AWS Lambda - Scan PDF
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'services/aws-lambda-scan-pdf/**'
+      - '.github/workflows/deploy-aws-lambda-scan-pdf.yml'
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_ROLE: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
+  AWS_REGION: us-east-2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with: 
+         sparse-checkout: | 
+          package.json
+          package-lock.json
+          services/aws-lambda-scan-pdf/
+          shared/
+         sparse-checkout-cone-mode: false
+
+      - name: Build artifacts
+        run: |
+          npm ci
+          cd ./services/aws-lambda-scan-pdf/
+          npm run dist
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: github-deploy-aws-lambda-scan-pdf
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Lambda Function
+        uses: aws-actions/aws-lambda-deploy@v1
+        with:
+          function-name: aws-lambda-scan-pdf
+          code-artifacts-dir: ./services/aws-lambda-scan-pdf/dist
+          handler: lambda.handler
+          runtime: nodejs22.x
