@@ -14,6 +14,7 @@ import scan from "./scan.ts";
 import convertToEqualifyV2 from "../../../shared/convertors/AxeToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
+const RESULTS_ENDPOINT = "https://api.equalifyapp.com/public/scanWebhook";
 
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
@@ -40,6 +41,14 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         logger.info(`Job [${job.id}] Scan Complete!`);
         if(results.axeresults){
           logger.info(JSON.stringify(convertToEqualifyV2(results.axeresults)));
+          const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+            method: 'post',
+            body: JSON.stringify(convertToEqualifyV2(results.axeresults)),
+            headers: {'Content-Type': 'application/json'}
+          });
+          logger.info("HTML-scan Results sent to API!", JSON.stringify(sendResultsResponse.json()))
+
+
         }else{
           logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results))
         }
