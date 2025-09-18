@@ -5,7 +5,7 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import { exec } from "child_process";
 
-const BROWSER_LOAD_TIMEOUT = 25000;
+//const BROWSER_LOAD_TIMEOUT = 25000;
 import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
 
 export default async function (job: SqsScanJob) {
