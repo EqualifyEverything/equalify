@@ -29,7 +29,7 @@ export default async function (job: SqsScanJob) {
 
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    filePath = path.join(__dirname, fileName); // Saves in the same directory as the script
+    filePath = path.join(__dirname, "/tmp", fileName); // Saves in the same directory as the script
     await fspromises.writeFile(filePath, buffer);
     console.log(`PDF downloaded! Path: ${filePath}`);
   } catch (err) {
