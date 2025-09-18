@@ -16,7 +16,6 @@ import scan from "./scan.ts";
 const processor = new BatchProcessor(EventType.SQS);
 const RESULTS_ENDPOINT = "https://api.equalifyapp.com/public/scanWebhook";
 
-
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
   metrics.captureColdStartMetric();
@@ -25,6 +24,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
 
   const payloadParsed = JSON.parse(payload);
   const job = JSON.parse(payloadParsed);
+  logger.info("PDF to scan payload:", job)
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
@@ -38,23 +38,23 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         );
         return result;
       });
-      if(results){
+      if (results) {
+        logger.info(results);
         logger.info(`Job [${job.id}] Scan Complete!`);
-        if(results){
-          logger.info(results);
-          const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
-            method: 'post',
-            body: JSON.stringify(results),
-            headers: {'Content-Type': 'application/json'}
-          });
-          logger.info("PDF-scan Results sent to API!", JSON.stringify(sendResultsResponse.json()))
+        const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+          method: "post",
+          body: JSON.stringify(results),
+          headers: { "Content-Type": "application/json" },
+        });
+        logger.info(
+          "PDF-scan Results sent to API!",
+          JSON.stringify(sendResultsResponse.json())
+        );
 
-          //logger.info(JSON.stringify(convertToEqualifyV2(JSON.parse(results))));
-        }else{
-          logger.error("Error converting to EqualifyV2 format:", results)
-        }
+        //logger.info(JSON.stringify(convertToEqualifyV2(JSON.parse(results))));
+      } else {
+        logger.error("Error:", results);
       }
-      
     } catch (error) {
       logger.error("Scan Error!", error as string);
       throw error;
