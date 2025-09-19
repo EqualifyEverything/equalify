@@ -5,7 +5,6 @@ export const createUser = async () => {
     const { name, email, password } = event.body;
     try {
         const username = randomUUID();
-        const organizationId = randomUUID();
         const { User } = await cognito.adminCreateUser({
             UserPoolId: process.env.USER_POOL_ID,
             Username: username,
@@ -14,7 +13,6 @@ export const createUser = async () => {
                 { Name: 'email', Value: email },
                 { Name: 'email_verified', Value: 'true' },
                 { Name: 'name', Value: name },
-                { Name: 'profile', Value: organizationId },
                 { Name: 'website', Value: 'api-flow' },
             ],
         });
@@ -27,12 +25,8 @@ export const createUser = async () => {
         const sub = User.Attributes.find(obj => obj.Name === 'sub')?.Value;
         await db.connect();
         await db.query({
-            text: `INSERT INTO "organizations" ("id", "name") VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-            values: [organizationId, `${name}'s Organization`],
-        });
-        await db.query({
-            text: `INSERT INTO "users" ("id", "email", "name", "organization_id") VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
-            values: [sub, email, name ?? 'User', organizationId],
+            text: `INSERT INTO "users" ("id", "email", "name") VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+            values: [sub, email, name ?? 'User'],
         });
         await db.clean();
 

@@ -1,6 +1,6 @@
 import { SES } from '@aws-sdk/client-ses';
 import { formatEmail } from './formatEmail';
-const ses = new SES({ region: 'us-east-1' });
+const ses = new SES({ region: 'us-east-2' });
 
 export const sendEmail = async ({ to, subject, body }) => {
     try {

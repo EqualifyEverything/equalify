@@ -3,5 +3,5 @@ export const formatEmail = ({ event, body }) => {
     Hey ${event?.request?.userAttributes?.name ?? 'user'},
     <p>${body}</p>
     <p>Thanks,
-    <br/>equalify</p>`;
+    <br/>Equalify</p>`;
 };
