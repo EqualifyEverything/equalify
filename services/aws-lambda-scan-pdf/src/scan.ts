@@ -47,8 +47,8 @@ export default async function (job: SqsScanJob) {
       "/opt/bin/vera/verapdf -f ua2 --format json " + nonpdfextFlag + filePath
     );
     let report = stdout as string;
+    logger.info("Vera exec() output:", report);
     veraPdfReport = JSON.parse(report);
-    //console.log("Vera exec() output:\n", stdout);
   } catch (error) {
     console.error("Error in vera exec():", error);
   }
