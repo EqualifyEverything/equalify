@@ -8,6 +8,8 @@ import { PostHogProvider } from 'posthog-js/react'
 import { CookieStorage } from 'aws-amplify/utils';
 import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
 const queryClient = new QueryClient();
+import { registerSW } from 'virtual:pwa-register';
+registerSW({ immediate: true });
 
 Amplify.configure({
   Auth: {
@@ -46,7 +48,7 @@ Amplify.configure({
 });
 
 cognitoUserPoolsTokenProvider.setKeyValueStorage(new CookieStorage({
-  domain: location.hostname.endsWith('equalify.app') ? 'equalify.app' : location.hostname,
+  domain: location.hostname.endsWith('equalifyapp.com') ? 'equalifyapp.com' : location.hostname,
   secure: false,
   sameSite: 'lax'
 }));
