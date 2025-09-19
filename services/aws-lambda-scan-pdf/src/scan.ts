@@ -1,22 +1,19 @@
 import { logger } from "./telemetry.ts";
 import * as path from "path";
 import * as fspromises from "fs/promises";
-import * as fs from "fs";
+//import * as fs from "fs";
 import fetch from "node-fetch";
 import { exec } from "child_process";
 
 //const BROWSER_LOAD_TIMEOUT = 25000;
-import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
+import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 
 export default async function (job: SqsScanJob) {
   logger.info(`PDF Scanner: Job [${job.id}](${job.url}) started.`);
   // download PDF from url
   const url = job.url;
   const fileName = url.split("/").pop();
-  if(!fileName) 
-    throw new Error(
-        `Error with PDF url: ${url}`
-      );
+  if (!fileName) throw new Error(`Error with PDF url: ${url}`);
 
   let filePath = "";
   try {
@@ -54,32 +51,28 @@ export default async function (job: SqsScanJob) {
   }
 
   // Delete the file
-  try {
+  /* try {
     fs.unlinkSync(filePath);
     console.log("PDF deleted successfully!");
   } catch (err) {
     console.error("Error deleting file:", err);
-  }
+  } */
 
   return veraPdfReport;
-  
 }
 
-const execRun = (cmd:string) => {
+function execRun(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout) => {
+    exec(command, (error, stdout, stderr) => {
       if (error) {
-        if (error.code === 1) {
-          // leaks present
-          resolve(stdout);
-        } else {
-          // gitleaks error
-          reject(error);
-        }
-      } else {
-        // no leaks
-        resolve(stdout);
+        logger.error(`exec error: ${error}`);
+        reject(error);
+        return;
       }
-    })
-  })
+      if (stderr) {
+        logger.warn(`stderr: ${stderr}`);
+      }
+      resolve(stdout.trim()); // Trim whitespace from stdout
+    });
+  });
 }
