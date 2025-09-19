@@ -54,7 +54,6 @@ export const Navigation = () => {
             <div className='w-full max-w-screen-lg mx-auto bg-background p-4 min-h-[calc(100vh_-_120px)]'>
                 <div className='flex flex-col sm:flex-row items-center justify-between mb-4'>
                     <Link to='/' className='relative hover:opacity-50'><img className='w-[150px]' src='/logo.svg' />
-                        <div className='absolute right-[-22px] top-[calc(50%_-_11px)] text-2xl font-extrabold italic text-[#7F6A00]'>v2</div>
                     </Link>
                     <div className='flex flex-row items-center gap-4'>
                         {(!authenticated ? [
