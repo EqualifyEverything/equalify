@@ -1,0 +1,52 @@
+name: Deploy AWS Lambda - VeraPDF Interface (Java)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'services/aws-lambda-verapdf-interface/**'
+      - '.github/workflows/deploy-aws-lambda-verapdf-interface.yml'
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_ROLE: arn:aws:iam::380610849750:role/github-deploy-equalifyeverything-equalify
+  AWS_REGION: us-east-2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+         sparse-checkout: |
+          services/aws-lambda-verapdf-interface/
+         sparse-checkout-cone-mode: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17' # Or your desired Java version
+
+      - name: Build artifacts
+        run: |
+          cd ./services/aws-lambda-verapdf-interface/
+          mvn clean package
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: github-deploy-aws-lambda-verapdf-interface
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Lambda Function
+        uses: aws-actions/aws-lambda-deploy@v1
+        with:
+          function-name: aws-lambda-verapdf-interface
+          code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target
+          handler: com.equalifyuic.app::handleRequest
+          runtime: java17
