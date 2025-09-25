@@ -34,7 +34,7 @@ jobs:
       - name: Build artifacts
         run: |
           cd ./services/aws-lambda-verapdf-interface/
-          mvn clean package shade:shade
+          mvn clean package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -48,5 +48,5 @@ jobs:
         with:
           function-name: aws-lambda-verapdf-interface
           code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target
-          handler: com.equalifyuic.app.Handler::handleRequest
+          handler: com.equalifyuic.app::Handler
           runtime: java17
