@@ -48,5 +48,5 @@ jobs:
         with:
           function-name: aws-lambda-verapdf-interface
           code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target
-          handler: com.equalifyuic.App
+          handler: com.equalifyuic.app::Handler
           runtime: java17
