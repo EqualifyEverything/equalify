@@ -100,6 +100,15 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.2.4</version>
+          <configuration>
+            <createDependencyReducedPom>false</createDependencyReducedPom>
+            <artifactSet>
+                  <excludes>
+                    <exclude>com.amazonaws:aws-lambda-java-events</exclude>
+                    <exclude>com.amazonaws:aws-lambda-java-core</exclude>
+                  </excludes>
+                </artifactSet>
+          </configuration>
           <executions>
             <execution>
               <phase>package</phase>
@@ -107,15 +116,7 @@
                 <goal>shade</goal>
               </goals>
 
-              <configuration>
-                <artifactSet>
-                  <excludes>
-                    <exclude>com.amazonaws:aws-lambda-java-events</exclude>
-                    <exclude>com.amazonaws:aws-lambda-java-core</exclude>
-                  </excludes>
-                </artifactSet>
-              </configuration>
-            </execution>
+              </execution>
           </executions>
         </plugin>
       </plugins>
