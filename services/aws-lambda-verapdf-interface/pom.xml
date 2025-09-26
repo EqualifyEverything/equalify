@@ -48,6 +48,16 @@
       <version>1.2.1</version>
     </dependency>
     <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-lambda-java-events</artifactId>
+      <version>3.11.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-lambda-java-log4j2</artifactId>
+      <version>1.5.1</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.20.0</version>
@@ -103,11 +113,14 @@
           <configuration>
             <createDependencyReducedPom>false</createDependencyReducedPom>
             <artifactSet>
-                  <excludes>
-                    <exclude>com.amazonaws:aws-lambda-java-events</exclude>
-                    <exclude>com.amazonaws:aws-lambda-java-core</exclude>
-                  </excludes>
-                </artifactSet>
+              <excludes>
+                <exclude>com.amazonaws:aws-lambda-java-events</exclude>
+                <exclude>com.amazonaws:aws-lambda-java-core</exclude>
+              </excludes>
+            </artifactSet>
+            <transformers>
+              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
+            </transformers>
           </configuration>
           <executions>
             <execution>
@@ -116,7 +129,7 @@
                 <goal>shade</goal>
               </goals>
 
-              </execution>
+            </execution>
           </executions>
         </plugin>
       </plugins>
