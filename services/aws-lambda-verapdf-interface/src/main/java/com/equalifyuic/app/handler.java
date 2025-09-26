@@ -37,7 +37,7 @@ public class handler implements RequestHandler<String, String> {
         String FILE_NAME = new File(path).getName() != "" ? new File(path).getName() : "file.pdf";
         int CONNECT_TIMEOUT = 30 * 1000;
         int READ_TIMEOUT = 30 * 1000;
-        File filePath = new File("tmp/" + FILE_NAME);
+        File filePath = new File("/tmp/" + FILE_NAME);
 
         // Save the PDF to /tmp
         try {
