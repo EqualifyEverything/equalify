@@ -19,7 +19,7 @@ public class handler implements RequestHandler<String, String> {
     @Override
     public String handleRequest(String input, Context context) {
         LambdaLogger logger = context.getLogger();
-        
+
         logger.log("Received URL: " + input);
 
         // Parse URL
@@ -54,10 +54,16 @@ public class handler implements RequestHandler<String, String> {
         String nonpdfextFlag = filePath.toString().endsWith(".pdf")
                 ? ""
                 : "--nonpdfext ";
-        ProcessBuilder pb = new ProcessBuilder("/opt/bin/vera/verapdf", "-f", "ua2", "--format", "json", nonpdfextFlag,
+        ProcessBuilder pb = new ProcessBuilder(
+                "/opt/bin/vera/verapdf",
+                "-f",
+                "ua2",
+                "--format",
+                "json",
+                nonpdfextFlag,
                 filePath.toString());
+        pb.redirectErrorStream(true); // also get errors
 
-        
         String output = "";
         try {
             Process process = pb.start();
@@ -74,10 +80,9 @@ public class handler implements RequestHandler<String, String> {
 
             if (exitCode != 0) {
                 logger.log("Command exited with non-zero code: " + exitCode);
-                logger.log(outputSb.toString());
             }
             output = outputSb.toString();
-            
+
         } catch (IOException | InterruptedException e) {
             logger.log(e.toString());
         }
