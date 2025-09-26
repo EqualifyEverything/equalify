@@ -74,6 +74,7 @@ public class handler implements RequestHandler<String, String> {
 
             if (exitCode != 0) {
                 logger.log("Command exited with non-zero code: " + exitCode);
+                logger.log(outputSb.toString());
             }
             output = outputSb.toString();
             
@@ -82,6 +83,7 @@ public class handler implements RequestHandler<String, String> {
         }
 
         logger.log("Processing complete for " + input);
+        logger.log(output);
         return output;
     }
 }
