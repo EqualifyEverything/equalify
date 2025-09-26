@@ -35,7 +35,12 @@ jobs:
         run: |
           cd ./services/aws-lambda-verapdf-interface/
           mvn clean package
-
+          mkdir ./out
+          mkdir ./out/lib
+          mv /services/aws-lambda-verapdf-interface/target/* /services/aws-lambda-verapdf-interface/target/.* ./out/lib/
+          
+          
+          
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -47,6 +52,6 @@ jobs:
         uses: aws-actions/aws-lambda-deploy@v1
         with:
           function-name: aws-lambda-verapdf-interface
-          code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target/
+          code-artifacts-dir: ./services/aws-lambda-verapdf-interface/out/
           handler: com.equalifyuic.app.handler
           runtime: java17
