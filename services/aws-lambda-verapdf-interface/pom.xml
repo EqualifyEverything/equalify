@@ -13,8 +13,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
@@ -88,6 +86,13 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.4.2</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <mainClass>com.equalifyuic.app.main</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -118,9 +123,8 @@
                 <exclude>com.amazonaws:aws-lambda-java-core</exclude>
               </excludes>
             </artifactSet>
-            <transformers>
-              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
-            </transformers>
+            <archive>
+            </archive>
           </configuration>
           <executions>
             <execution>
@@ -128,7 +132,7 @@
               <goals>
                 <goal>shade</goal>
               </goals>
-
+              
             </execution>
           </executions>
         </plugin>
