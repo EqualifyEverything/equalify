@@ -55,7 +55,7 @@ public class handler implements RequestHandler<String, String> {
                 ? ""
                 : "--nonpdfext ";
         ProcessBuilder pb = new ProcessBuilder(
-                "/opt/bin/vera/verapdf",
+                "/java/lib/vera/verapdf",
                 "-f",
                 "ua2",
                 "--format",
