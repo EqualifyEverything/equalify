@@ -37,7 +37,7 @@ jobs:
           mvn clean package
           mkdir ./out
           mkdir ./out/lib
-          mv /services/aws-lambda-verapdf-interface/target/* /services/aws-lambda-verapdf-interface/target/.* ./out/lib/
+          mv ./services/aws-lambda-verapdf-interface/target/* ./services/aws-lambda-verapdf-interface/target/.* ./out/lib/
           
           
           
