@@ -5,7 +5,7 @@ import { logger, metrics } from "./telemetry.ts";
 import { scansSchema } from "../../../shared/types/scansSchema.zod.ts";
 import { MetricUnit } from "@aws-lambda-powertools/metrics";
 
-import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs"; 
+import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
 const sqsClient = new SQSClient({ region: "us-east-2" });
 const htmlQueueUrl =
   "https://sqs.us-east-2.amazonaws.com/380610849750/scanHtml.fifo";
@@ -28,7 +28,8 @@ export const handler = middy()
     for (const batch of HtmlBatches) {
       const formattedMessages = batch.map((item) => {
         return {
-          Id: item.id,
+          MessageGroupId: item.auditId,
+          Id: item.urlId,
           MessageBody: JSON.stringify({
             data: item,
           }),
@@ -62,7 +63,8 @@ export const handler = middy()
     for (const batch of PdfBatches) {
       const formattedMessages = batch.map((item) => {
         return {
-          Id: item.id,
+          MessageGroupId: item.auditId,
+          Id: item.urlId,
           MessageBody: JSON.stringify({
             data: item,
           }),

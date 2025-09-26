@@ -14,7 +14,7 @@ import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
 chromium.setGraphicsMode = false;
 
 export default async function (job: SqsScanJob) {
-  logger.info(`HTML Scanner: Job [${job.id}](${job.url}) started.`);
+  logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) started.`);
   /* const browser = await puppeteer.launch(
     {
       headless: true,
@@ -64,12 +64,12 @@ export default async function (job: SqsScanJob) {
 
   try {
     await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(() => {
-      logger.info(`HTML Scanner: Job [${job.id}](${job.url}) loaded.`);
+      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) loaded.`);
     });
   } catch (error) {
-    logger.error(`HTML Scanner: Job [${job.id}] page.goto error`, error as string);
+    logger.error(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] page.goto error`, error as string);
     const readyToExit = await shutdown(browser).then((val)=>{
-      logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
+      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
       return val;
     });
     if(readyToExit) return;
@@ -127,14 +127,14 @@ export default async function (job: SqsScanJob) {
   // TODO integrate equalify format conversion
 
   const readyToExit = await shutdown(browser).then((val) => {
-    logger.info(`HTML Scanner: Job [${job.id}] - Browser shutdown.`);
+    logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
     return val;
   });
   if (readyToExit) {
     return {
       createdDate: new Date(), // record to add
       axeresults: results,
-      jobID: job.id,
+      jobID: job.urlId,
       //editoria11yResults: editoria11yResults,
     };
   }

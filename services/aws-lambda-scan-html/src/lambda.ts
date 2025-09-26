@@ -14,7 +14,7 @@ import scan from "./scan.ts";
 import convertToEqualifyV2 from "../../../shared/convertors/AxeToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT = "https://api.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT = "https://api-staging.equalifyapp.com/public/scanWebhook";
 
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
@@ -23,7 +23,9 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payload = record.body;
 
   const payloadParsed = JSON.parse(payload);
-  const job = JSON.parse(payloadParsed);
+  const job = payloadParsed.data;
+  
+  logger.info(`Processing job: ${JSON.stringify(job)}`);
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
@@ -37,30 +39,46 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         );
         return result;
       });
+      
       if(results){
-        logger.info(`Job [${job.id}] Scan Complete!`);
+        logger.info(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan Complete!`);
         if(results.axeresults){
-          logger.info(JSON.stringify(convertToEqualifyV2(results.axeresults)));
-          const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
-            method: 'post',
-            body: JSON.stringify(convertToEqualifyV2(results.axeresults)),
-            headers: {'Content-Type': 'application/json'}
-          });
-          logger.info("HTML-scan Results sent to API!", JSON.stringify(sendResultsResponse.json()))
-
-
-        }else{
-          logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results))
+          const convertedResults = convertToEqualifyV2(results.axeresults, job);
+          logger.info("Converted results:", JSON.stringify(convertedResults));
+          
+          try {
+            const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+              method: 'post',
+              body: JSON.stringify(convertedResults),
+              headers: {'Content-Type': 'application/json'}
+            });
+            
+            // FIX: Properly await the json() promise
+            const responseData = await sendResultsResponse.json() as any;
+            
+            if (!sendResultsResponse.ok) {
+              // Log but don't throw - let the message be deleted if scan succeeded
+              logger.error(`Webhook failed with status ${sendResultsResponse.status}`, responseData);
+            } else {
+              logger.info("HTML-scan Results sent to API!", responseData);
+            }
+          } catch (webhookError) {
+            // Log webhook errors but don't fail the entire message
+            logger.error("Failed to send results to webhook", webhookError as Error);
+            // Decide: throw here if you want to retry, or continue to mark as processed
+          }
+        } else {
+          logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results));
         }
       }
       
     } catch (error) {
       logger.error("Scan Error!", error as string);
-      throw error;
+      throw error; // Only throw for actual scan failures
     }
   }
   metrics.publishStoredMetrics();
-  return;
+  return; // Success - message will be deleted
 };
 
 // handle batch

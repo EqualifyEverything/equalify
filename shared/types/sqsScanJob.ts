@@ -1,6 +1,7 @@
 
 export type SqsScanJob = {
-  id: string;
+  auditId: string;
+  urlId: string;
   url: string;
   type: string;
 };

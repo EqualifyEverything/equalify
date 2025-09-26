@@ -9,7 +9,7 @@ import { Blocker, StreamResults } from "../types/streamResults.equalifyV2_format
 import { AxeResults } from 'axe-core'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function convertToEqualifyV2(axeResult: AxeResults):StreamResults {
+function convertToEqualifyV2(axeResult: AxeResults, job: any):StreamResults {
     const blockers: Blocker[] = [];
 
     if (axeResult) {
@@ -77,7 +77,6 @@ function convertToEqualifyV2(axeResult: AxeResults):StreamResults {
     }
 
     let date = "";
-    let id = "";
 
     if (axeResult.timestamp) {
         date = axeResult.timestamp;
@@ -90,7 +89,8 @@ function convertToEqualifyV2(axeResult: AxeResults):StreamResults {
     }
 
     const out: StreamResults = {
-        id,
+        auditId: job.auditId,
+        urlId: job.urlId,
         blockers,
         date,
         message
