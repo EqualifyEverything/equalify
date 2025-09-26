@@ -35,10 +35,10 @@ jobs:
         run: |
           cd ./services/aws-lambda-verapdf-interface/
           mvn clean package
-          mkdir /out
-          mkdir /out/lib
+          mkdir ./out
+          mkdir ./out/lib
           shopt -s dotglob
-          mv /target/* /out/lib/
+          mv ./target/* ./out/lib/
           shopt -u dotglob
           
       - name: Configure AWS credentials
