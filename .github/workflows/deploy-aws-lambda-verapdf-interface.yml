@@ -47,6 +47,6 @@ jobs:
         uses: aws-actions/aws-lambda-deploy@v1
         with:
           function-name: aws-lambda-verapdf-interface
-          code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target
-          handler: com.equalifyuic.app.main
+          code-artifacts-dir: ./services/aws-lambda-verapdf-interface/target/
+          handler: com.equalifyuic.app.main::handleRequest
           runtime: java17
