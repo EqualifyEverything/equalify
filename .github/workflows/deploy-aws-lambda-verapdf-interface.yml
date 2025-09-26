@@ -34,7 +34,7 @@ jobs:
       - name: Build artifacts
         run: |
           cd ./services/aws-lambda-verapdf-interface/
-          mvn clean package
+          mvn clean package shade:shade
           mkdir ./out
           mkdir ./out/lib
           shopt -s dotglob
