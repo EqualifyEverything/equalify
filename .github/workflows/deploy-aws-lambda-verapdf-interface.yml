@@ -34,7 +34,7 @@ jobs:
       - name: Build artifacts
         run: |
           cd ./services/aws-lambda-verapdf-interface/
-          mvn clean package shade:shade
+          mvn clean package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
