@@ -31,6 +31,7 @@ import org.verapdf.pdfa.results.ValidationResult;
 //import org.verapdf.processor.reports.multithread.writer.JsonReportWriter;
 import org.verapdf.pdfa.PDFAValidator;
 //import org.verapdf.pdfa.flavours.PDFAFlavour;
+import org.verapdf.pdfa.flavours.PDFAFlavour;
 
 public class handler implements RequestHandler<String, String> {
     @Override
@@ -69,59 +70,65 @@ public class handler implements RequestHandler<String, String> {
 
         VeraGreenfieldFoundryProvider.initialise();
         String output = "";
-        try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream(filePath))) {
-            PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
+        PDFAFlavour flavour = PDFAFlavour.PDFUA_2;
+        try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream("mydoc.pdf"), flavour)) {
+            PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false);
             ValidationResult result = validator.validate(parser);
-            
+
             // Use Jackson ObjectMapper to write the ValidationResult object as JSON
             ObjectMapper mapper = new ObjectMapper();
             output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.getFailedChecks());
 
-            /* if (result.isCompliant()) {
-                // File is a valid PDF/A 1b
-            } else {
-                // it isn't
-            } */
+            /*
+             * if (result.isCompliant()) {
+             * // File is a valid PDF/A 1b
+             * } else {
+             * // it isn't
+             * }
+             */
         } catch (IOException | ValidationException | ModelParsingException | EncryptedPdfException exception) {
             // Exception during validation
             logger.log(exception.toString());
         }
+
         // if the file doesn't end in PDF, pass the --nonpdfext flag
-        /* String nonpdfextFlag = filePath.toString().endsWith(".pdf")
-                ? ""
-                : "--nonpdfext ";
-        ProcessBuilder pb = new ProcessBuilder(
-                "/opt/java/lib/vera/verapdf",
-                "-f",
-                "ua2",
-                "--format",
-                "json",
-                nonpdfextFlag,
-                filePath.toString());
-        pb.redirectErrorStream(true); // also get errors
-
-        String output = "";
-        try {
-            Process process = pb.start();
-            StringBuilder outputSb = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()))) {
-                String line;
-                // 3. Read line by line until the stream ends
-                while ((line = reader.readLine()) != null) {
-                    outputSb.append(line).append(System.lineSeparator());
-                }
-            }
-            int exitCode = process.waitFor();
-
-            if (exitCode != 0) {
-                logger.log("Command exited with non-zero code: " + exitCode);
-            }
-            output = outputSb.toString();
-
-        } catch (IOException | InterruptedException e) {
-            logger.log(e.toString());
-        } */
+        /*
+         * String nonpdfextFlag = filePath.toString().endsWith(".pdf")
+         * ? ""
+         * : "--nonpdfext ";
+         * ProcessBuilder pb = new ProcessBuilder(
+         * "/opt/java/lib/vera/verapdf",
+         * "-f",
+         * "ua2",
+         * "--format",
+         * "json",
+         * nonpdfextFlag,
+         * filePath.toString());
+         * pb.redirectErrorStream(true); // also get errors
+         * 
+         * String output = "";
+         * try {
+         * Process process = pb.start();
+         * StringBuilder outputSb = new StringBuilder();
+         * try (BufferedReader reader = new BufferedReader(
+         * new InputStreamReader(process.getInputStream()))) {
+         * String line;
+         * // 3. Read line by line until the stream ends
+         * while ((line = reader.readLine()) != null) {
+         * outputSb.append(line).append(System.lineSeparator());
+         * }
+         * }
+         * int exitCode = process.waitFor();
+         * 
+         * if (exitCode != 0) {
+         * logger.log("Command exited with non-zero code: " + exitCode);
+         * }
+         * output = outputSb.toString();
+         * 
+         * } catch (IOException | InterruptedException e) {
+         * logger.log(e.toString());
+         * }
+         */
 
         logger.log("Processing complete for " + input);
         logger.log(output);
