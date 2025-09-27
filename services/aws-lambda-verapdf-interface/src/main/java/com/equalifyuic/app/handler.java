@@ -72,7 +72,8 @@ public class handler implements RequestHandler<String, String> {
         String output = "";
         PDFAFlavour flavour = PDFAFlavour.PDFUA_2;
         try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream(filePath), flavour)) {
-            PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false);
+            PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, 10000,
+			false, true, false);
             ValidationResult result = validator.validate(parser);
 
             // Use Jackson ObjectMapper to write the ValidationResult object as JSON
