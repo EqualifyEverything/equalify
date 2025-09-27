@@ -70,6 +70,7 @@
       <artifactId>validation-model</artifactId>
       <version>1.28.1</version>
     </dependency>
+    
   </dependencies>
 
   <build>

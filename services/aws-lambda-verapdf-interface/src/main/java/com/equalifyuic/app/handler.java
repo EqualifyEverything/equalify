@@ -1,10 +1,12 @@
 package com.equalifyuic.app;
 
-import java.io.BufferedReader;
+//import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+//import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+//import java.io.InputStream;
+//import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,17 +17,20 @@ import org.apache.commons.io.FileUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.verapdf.core.EncryptedPdfException;
 import org.verapdf.core.ModelParsingException;
 import org.verapdf.core.ValidationException;
+//import org.verapdf.core.VeraPDFException;
 import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.results.ValidationResult;
-import org.verapdf.processor.reports.multithread.writer.JsonReportWriter;
+//import org.verapdf.pdfa.validation.validators.ValidatorFactory;
+//import org.verapdf.processor.reports.multithread.writer.JsonReportWriter;
 import org.verapdf.pdfa.PDFAValidator;
-import org.verapdf.pdfa.flavours.PDFAFlavour;
+//import org.verapdf.pdfa.flavours.PDFAFlavour;
 
 public class handler implements RequestHandler<String, String> {
     @Override
@@ -67,7 +72,11 @@ public class handler implements RequestHandler<String, String> {
         try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream(filePath))) {
             PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
             ValidationResult result = validator.validate(parser);
-            output = result.getFailedChecks().toString();
+            
+            // Use Jackson ObjectMapper to write the ValidationResult object as JSON
+            ObjectMapper mapper = new ObjectMapper();
+            output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.getFailedChecks());
+
             /* if (result.isCompliant()) {
                 // File is a valid PDF/A 1b
             } else {
@@ -77,7 +86,6 @@ public class handler implements RequestHandler<String, String> {
             // Exception during validation
             logger.log(exception.toString());
         }
-
         // if the file doesn't end in PDF, pass the --nonpdfext flag
         /* String nonpdfextFlag = filePath.toString().endsWith(".pdf")
                 ? ""
