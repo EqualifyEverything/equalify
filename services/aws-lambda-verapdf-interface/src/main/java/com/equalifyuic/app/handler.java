@@ -71,7 +71,7 @@ public class handler implements RequestHandler<String, String> {
         VeraGreenfieldFoundryProvider.initialise();
         String output = "";
         PDFAFlavour flavour = PDFAFlavour.PDFUA_2;
-        try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream("mydoc.pdf"), flavour)) {
+        try (PDFAParser parser = Foundries.defaultInstance().createParser(new FileInputStream(filePath), flavour)) {
             PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false);
             ValidationResult result = validator.validate(parser);
 
