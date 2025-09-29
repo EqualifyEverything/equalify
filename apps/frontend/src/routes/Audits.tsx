@@ -13,7 +13,7 @@ export const Audits = () => {
         }))?.data?.audits,
     });
     return <div>
-        <div className='flex flex-row items-center justify-between'>
+        <div className='flex flex-row items-center justify-start gap-4'>
             <h1>Audits</h1>
             <button onClick={() => navigate('/create-audit')}>+ Add Audit</button>
         </div>

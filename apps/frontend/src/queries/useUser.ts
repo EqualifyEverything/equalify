@@ -8,7 +8,7 @@ export const useUser = () => {
     return useQuery({
         queryKey: ['user', authenticated],
         queryFn: async () => (await apiClient.graphql({
-            query: `query($id: uuid!) {users_by_pk(id: $id) {id name}}`,
+            query: `query($id: uuid!) {users_by_pk(id: $id) {id name email}}`,
             variables: { id: authenticated },
         }))?.data?.users_by_pk,
     });

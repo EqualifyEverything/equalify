@@ -6,7 +6,8 @@
   "scripts": {
     "build:prod": "esbuild index.ts --bundle --platform=node --outdir=dist --external:@aws-sdk --loader:.node=file && cd dist && zip -r lambda.zip index.js > /dev/null && aws --profile equalifyuic lambda update-function-code --function-name equalifyuic-api --zip-file \"fileb://lambda.zip\" > /dev/null && rm -rf lambda.zip",
     "build:staging": "esbuild index.ts --bundle --platform=node --outdir=dist --external:@aws-sdk --loader:.node=file && cd dist && zip -r lambda.zip index.js > /dev/null && aws --profile equalifyuic lambda update-function-code --function-name equalifyuic-api-staging --zip-file \"fileb://lambda.zip\" > /dev/null && rm -rf lambda.zip",
-    "build": "yarn build:staging && yarn build:prod"
+    "build": "yarn build:staging && yarn build:prod",
+    "sso": "aws sso login --profile equalifyuic"
   },
   "author": "",
   "license": "ISC",

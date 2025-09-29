@@ -56,7 +56,7 @@ export const Signup = () => {
                 API.post({ apiName: 'auth', path: '/trackUser' }).response
                 queryClient.refetchQueries({ queryKey: ['user'] })
             }, 1000);
-            navigate('/dashboard');
+            navigate('/audits');
         }
         catch (err) {
             console.log(err);
@@ -65,7 +65,7 @@ export const Signup = () => {
         }
     }
 
-    return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm mx-auto pt-24'>
+    return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm'>
         <h1 className='mx-auto'>Create an account</h1>
         <div className='flex flex-col'>
             <label htmlFor='name'>Name</label>

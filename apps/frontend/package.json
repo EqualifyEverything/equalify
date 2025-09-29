@@ -9,7 +9,8 @@
     "build:prod": "vite build --mode production && aws s3 --profile equalifyuic sync --delete ./dist s3://equalifyuic-web && aws --profile equalifyuic cloudfront create-invalidation --distribution-id ERS6SZU2YGMXQ --paths \"/*\" > /dev/null",
     "build:staging": "vite build --mode staging && aws s3 --profile equalifyuic sync --delete ./dist s3://equalifyuic-web-staging && aws --profile equalifyuic cloudfront create-invalidation --distribution-id ET2ZPWOHURCZ0 --paths \"/*\" > /dev/null",
     "build": "yarn build:staging && yarn build:prod",
-    "ngrok": "ngrok http --domain c.ngrok.pro 5173"
+    "ngrok": "ngrok http --domain c.ngrok.pro 5173",
+    "sso": "aws sso login --profile equalifyuic"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

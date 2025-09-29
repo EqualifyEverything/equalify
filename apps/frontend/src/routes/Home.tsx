@@ -7,7 +7,7 @@ export const Home = () => {
     const navigate = useNavigate();
     useEffect(() => {
         if (authenticated) {
-            setTimeout(() => navigate('/dashboard'), 0);
+            setTimeout(() => navigate('/audits'), 0);
         }
         else {
             setTimeout(() => navigate('/login'), 0);

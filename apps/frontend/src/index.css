@@ -7,7 +7,6 @@
   --text: #000000;
   --link: #2f00ff;
   --border: #aaaaaa;
-  --image: url(/bg.jpg);
 }
 
 .dark {
@@ -15,7 +14,6 @@
   --text: #ffffff;
   --link: #00a2ff;
   --border: #444444;
-  --image: url(/bg-dark.jpg);
 }
 
 @theme {
@@ -26,11 +24,8 @@
 
 body {
   margin: 0;
-  background-color: var(--border);
-  background: var(--image);
-  background-attachment: fixed;
   color: var(--text);
-  font-family: "Poppins", Arial, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 a {
@@ -47,7 +42,7 @@ input, select {
 
 button {
   padding: 10px 20px;
-  font-family: "Poppins", Arial, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 h1, h2, h3 {

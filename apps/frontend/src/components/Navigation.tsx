@@ -42,7 +42,7 @@ export const Navigation = () => {
                 posthog?.identify(attributes?.sub, { email: attributes?.email });
                 await Auth.fetchAuthSession({ forceRefresh: true });
                 if (location.pathname === '/') {
-                    navigate('/dashboard')
+                    navigate('/audits')
                 }
             }
         }
@@ -51,8 +51,8 @@ export const Navigation = () => {
 
     return (
         <div>
-            <div className='w-full max-w-screen-lg mx-auto bg-background p-4 min-h-[calc(100vh_-_120px)]'>
-                <div className='flex flex-col sm:flex-row items-center justify-between mb-4'>
+            <div className='p-4'>
+                <div className='flex flex-col sm:flex-row items-center justify-start mb-4 gap-4'>
                     <Link to='/' className='relative hover:opacity-50'><img className='w-[150px]' src='/logo.svg' />
                     </Link>
                     <div className='flex flex-row items-center gap-4'>
@@ -60,19 +60,16 @@ export const Navigation = () => {
                             { label: 'Log In', value: '/login' },
                             { label: 'Sign Up', value: '/signup' },
                         ] : [
-                            { label: 'Dashboard', value: '/dashboard' },
                             { label: 'Audits', value: '/audits' },
-                            { label: 'Pages', value: '/pages' },
                             { label: 'Logs', value: '/logs' },
                             { label: 'Account', value: '/account' },
-                            { label: 'Log Out', value: '/logout' },
                         ]).map(obj => <Link key={obj.value} to={obj.value} className={`hover:opacity-50 ${location.pathname === obj.value && 'font-bold'}`}>{obj.label}</Link>)}
                     </div>
                 </div>
                 {loading && <Loader />}
                 <Outlet />
             </div>
-            <div className='w-full max-w-screen-lg mx-auto py-4 flex flex-col sm:flex-row items-center justify-between'>
+            <div className='p-4 flex flex-col sm:flex-row items-center justify-between'>
                 <div>© {new Date().getFullYear()} Equalify. All rights reserved</div>
                 {/* <button onClick={() => setDarkMode(!darkMode)}>{`Switch to ${darkMode ? 'Light Mode' : 'Dark Mode'}`}</button> */}
             </div>

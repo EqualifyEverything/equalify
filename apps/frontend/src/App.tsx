@@ -1,7 +1,7 @@
 import { Amplify } from 'aws-amplify';
 import * as Auth from 'aws-amplify/auth'
 import { createBrowserRouter, Link, RouterProvider } from 'react-router-dom';
-import { Account, Audit, Audits, CreateAudit, Dashboard, Home, Log, Login, Logout, Logs, Page, Pages, Signup } from '#src/routes';
+import { Account, Audit, Audits, CreateAudit, Home, Log, Login, Logout, Logs, Signup } from '#src/routes';
 import { Navigation } from '#src/components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PostHogProvider } from 'posthog-js/react'
@@ -61,12 +61,9 @@ const router = createBrowserRouter([
       { path: '', element: <Home /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
-      { path: 'dashboard', element: <Dashboard /> },
       { path: 'audits', element: <Audits /> },
       { path: 'audits/:auditId', element: <Audit /> },
       { path: 'create-audit', element: <CreateAudit /> },
-      { path: 'pages', element: <Pages /> },
-      { path: 'pages/:pageId', element: <Page /> },
       { path: 'logs', element: <Logs /> },
       { path: 'log/:logId', element: <Log /> },
       { path: 'account', element: <Account /> },

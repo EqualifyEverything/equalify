@@ -42,7 +42,7 @@ export const Login = () => {
                 navigate(`/verify/${location.search}`);
             }
             else {
-                navigate('/dashboard');
+                navigate('/audits');
             }
 
             const hasuraClaims = JSON.parse(attributes?.['https://hasura.io/jwt/claims']);
@@ -58,7 +58,7 @@ export const Login = () => {
         }
     }
 
-    return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm mx-auto pt-24'>
+    return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
         <h1 className='mx-auto'>Welcome back!</h1>
         <div className='flex flex-col'>
             <label htmlFor='email'>Email address</label>
