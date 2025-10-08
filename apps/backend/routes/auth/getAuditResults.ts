@@ -2,7 +2,17 @@ import { db, event, graphqlQuery } from '#src/utils';
 
 export const getAuditResults = async () => {
     const audit_id = event.queryStringParameters.id;
-    const type = event.queryStringParameters.type ?? 'json';
+    await db.connect();
+    const data = (await db.query({
+        text: `SELECT * FROM "audits" WHERE "id"=$1`,
+        values: [audit_id],
+    })).rows?.[0];
+    await db.clean();
+    return {
+        statusCode: 200,
+        headers: { 'content-type': 'application/json' },
+        body: data,
+    };
 
     await db.connect();
     const urls = (await db.query({
@@ -46,74 +56,23 @@ export const getAuditResults = async () => {
         return acc;
     }, {});
 
-    if (type === 'csv') {
-        // Create CSV header
-        const csvHeader = [
-            'Node ID',
-            'URL',
-            'HTML',
-            'Targets',
-            'Status',
-            'Created At',
-            'Messages'
-        ].join(',');
-
-        const escapeField = (field) => {
-            if (field === null || field === undefined) return '';
-            const stringField = String(field);
-            if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
-                return `"${stringField.replace(/"/g, '""')}"`;
-            }
-            return stringField;
-        };
-
-        // Create CSV rows
-        const csvRows = filteredNodes.slice(0, 10000).map(node => {
-            const nodeMessages = node.message_nodes.map(mn =>
-                `${escapeField(mn.message.type)}: ${escapeField(mn.message.message)}`
-            ).join(' | ');
-
-            return [
-                escapeField(node.id),
-                escapeField(urlMap[node.url_id] || ''),
-                escapeField(node.html),
-                escapeField(Array.isArray(node.targets) ? node.targets.join(', ') : node.targets),
-                escapeField(node.equalified ? 'Equalified' : 'Active'),
-                escapeField(node.created_at),
-                escapeField(nodeMessages)
-            ].join(',');
-        });
-
-        // Combine header and rows
-        const csvContent = [csvHeader, ...csvRows].join('\r\n');
+    const jsonRows = filteredNodes.slice(0, 10000).map(node => {
         return {
-            statusCode: 200,
-            headers: {
-                'content-type': 'text/csv',
-                'content-disposition': `attachment; filename="report.csv"`,
-            },
-            body: csvContent,
-        };
-    }
-    else if (type === 'json') {
-        const jsonRows = filteredNodes.slice(0, 10000).map(node => {
-            return {
-                node_id: node.id,
-                url_id: urlMap[node.url_id] || '',
-                html: node.html,
-                targrets: node.targets,
-                equalified: node.equalified,
-                created_at: node.created_at,
-                messages: node.message_nodes.map(mn =>
-                    `${mn.message.type}: ${mn.message.message}`
-                )
-            }
-        });
+            node_id: node.id,
+            url_id: urlMap[node.url_id] || '',
+            html: node.html,
+            targrets: node.targets,
+            equalified: node.equalified,
+            created_at: node.created_at,
+            messages: node.message_nodes.map(mn =>
+                `${mn.message.type}: ${mn.message.message}`
+            )
+        }
+    });
 
-        return {
-            statusCode: 200,
-            headers: { 'content-type': 'application/json' },
-            body: jsonRows,
-        };
-    }
+    return {
+        statusCode: 200,
+        headers: { 'content-type': 'application/json' },
+        body: jsonRows,
+    };
 }
