@@ -55,7 +55,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
           const convertedResults = convertToEqualifyV2(results.axeresults, job);
         
           // shim the results payload object with status when we have results
-          convertedResults.status = results.status;
+          convertedResults.status = results.status;  
 
           logger.info("Converted results:", JSON.stringify(convertedResults));
 
