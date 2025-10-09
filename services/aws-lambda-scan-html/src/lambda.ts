@@ -31,7 +31,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
       
       // Wrap scan in timeout to prevent Lambda from hanging
-      const SCAN_TIMEOUT = 120000; // 2 minutes max for entire scan process
+      const SCAN_TIMEOUT = 2*60*1000; // 2 minutes max for entire scan process
       const scanPromise = scan(job).then((result) => {
         const endTime = performance.now();
         const executionDuration = endTime - startTime;
@@ -53,8 +53,12 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         logger.info(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan Complete!`);
         if(results.axeresults){
           const convertedResults = convertToEqualifyV2(results.axeresults, job);
+        
+          // shim the results payload object with status when we have results
+          convertedResults.status = results.status;
+
           logger.info("Converted results:", JSON.stringify(convertedResults));
-          
+
           try {
             const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
               method: 'post',

@@ -14,18 +14,12 @@ import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
 chromium.setGraphicsMode = false;
 
 export default async function (job: SqsScanJob) {
+
+  // vars we'll be populating
+  let status = "";
+  let message = "";
+
   logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) started.`);
-  /* const browser = await puppeteer.launch(
-    {
-      headless: true,
-      // headless: true, // trying old version of headless
-      args: [
-        '--disk-cache-size=0',
-        '–-media-cache-size=0',
-        '--disable-dev-shm-usage'
-      ]
-    }
-  ); */
   const viewport = {
     deviceScaleFactor: 1,
     hasTouch: false,
@@ -35,6 +29,7 @@ export default async function (job: SqsScanJob) {
     width: 1920,
   };
   
+  // launch the browser
   const browser = await puppeteer.launch({
     args: puppeteer.defaultArgs({ args: chromium.args, headless: "shell" }),
     defaultViewport: viewport,
@@ -60,14 +55,16 @@ export default async function (job: SqsScanJob) {
     }
   }); */
 
-  //await page.setRequestInterception(false); // possible fix for memory leak (see https://github.com/puppeteer/puppeteer/issues/9186)
-
+  // attempt to visit the page
   try {
     await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(() => {
       logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) loaded.`);
     });
   } catch (error) {
     logger.error(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] page.goto error`, error as string);
+    // error opening page: return the status and the error
+    status = "failed";
+    message = error as string;
     const readyToExit = await shutdown(browser).then((val)=>{
       logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
       return val;
@@ -75,16 +72,20 @@ export default async function (job: SqsScanJob) {
     if(readyToExit) return;
   }
 
+  // run axe
   const results:AxeResults|void = await new AxePuppeteer(page)
     .configure({ rules: [emptyAltTagRule, pdfLinkRule] })
     .options({ resultTypes: ["violations", "incomplete"] }) // we only need violations, ignore passing to save disk/transfer space (see: https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter)
     .analyze()
     .then((results) => {
       logger.info(`HTML Scanner: Scan complete for [${job.url}]!`);
+      status = "complete";
       return results;
     })
     .catch((error) => {
       logger.error(`HTML Scanner: Error: [${job.url}]`, error);
+      status = "failed";
+      message = `Error: [${job.url}] ${error}`;
       return;
     });
 
@@ -124,8 +125,6 @@ export default async function (job: SqsScanJob) {
   } 
   */
 
-  // TODO integrate equalify format conversion
-
   const readyToExit = await shutdown(browser).then((val) => {
     logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
     return val;
@@ -139,6 +138,8 @@ export default async function (job: SqsScanJob) {
       createdDate: new Date(), // record to add
       axeresults: results,
       jobID: job.urlId,
+      message,
+      status
       //editoria11yResults: editoria11yResults,
     };
   }
