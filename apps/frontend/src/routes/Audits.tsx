@@ -9,7 +9,7 @@ export const Audits = () => {
     const { data: audits } = useQuery({
         queryKey: ['audits'],
         queryFn: async () => (await apiClient.graphql({
-            query: `{audits {id created_at name}}`,
+            query: `{audits(order_by: {created_at: desc}) {id created_at name}}`,
         }))?.data?.audits,
     });
     return <div>

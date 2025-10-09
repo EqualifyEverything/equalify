@@ -137,6 +137,10 @@ export const BuildAudit = () => {
 
     const saveAndRunAudit = async (e: FormEvent) => {
         e.preventDefault();
+        if (pages.length === 0) {
+            window.alert(`You need to add at least 1 page to your audit.`);
+            return;
+        }
         const formData = new FormData(e.currentTarget as HTMLFormElement);
         const auditData = buildAuditData(formData);
         console.log('Audit Data (Save & Run):', JSON.stringify(auditData));
@@ -149,6 +153,10 @@ export const BuildAudit = () => {
 
     const saveAudit = async (e: FormEvent) => {
         e.preventDefault();
+        if (pages.length === 0) {
+            window.alert(`You need to add at least 1 page to your audit.`);
+            return;
+        }
         const form = (e.currentTarget as HTMLElement).closest('form');
         if (!form) return;
         const formData = new FormData(form);

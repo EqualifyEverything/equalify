@@ -1,53 +1,55 @@
 import { db, event, graphqlQuery } from '#src/utils';
 
 export const getAuditResults = async () => {
-    const audit_id = event.queryStringParameters.id;
-    await db.connect();
-    const data = (await db.query({
-        text: `SELECT * FROM "audits" WHERE "id"=$1`,
-        values: [audit_id],
-    })).rows?.[0];
-    await db.clean();
-    return {
-        statusCode: 200,
-        headers: { 'content-type': 'application/json' },
-        body: data,
-    };
+    const auditId = event.queryStringParameters.id;
 
     await db.connect();
+    const audit = (await db.query({
+        text: `SELECT * FROM "audits" WHERE "id" = $1`,
+        values: [auditId],
+    })).rows?.[0];
     const urls = (await db.query({
         text: `SELECT "id", "url" FROM "urls" WHERE "audit_id" = $1`,
-        values: [audit_id],
+        values: [auditId],
     })).rows;
     await db.clean();
 
     const query = {
         query: `query ($audit_id: uuid) {
-            nodes(where: {audit_id: {_eq: $audit_id}}) {
-                id
-                created_at
-                html
-                targets
-                url_id
-                equalified
-                node_updates { created_at equalified }
-                message_nodes {
-                    id
-                    node { equalified }
-                    message {
-                        id
-                        message
-                        type
-                        message_tags { tag { id tag } }
-                    }
-                }
-            }
-        }`,
-        variables: { audit_id: audit_id },
+  blockers(where: {audit_id: {_eq: $audit_id}}) {
+    id
+    created_at
+    content
+    targets
+    url_id
+    equalified
+    blocker_updates {
+      created_at
+      equalified
+    }
+    blocker_type_blockers {
+      id
+      blocker {
+        equalified
+      }
+      blocker_type {
+        id
+        message
+        type
+        blocker_type_tags {
+          blocker_tag {
+            id
+            tag
+          }
+        }
+      }
+    }
+  }
+}`,
+        variables: { audit_id: auditId },
     };
     console.log(JSON.stringify({ query }));
     const response = await graphqlQuery(query);
-    const filteredNodes = response.nodes ?? [];
     console.log(JSON.stringify({ response }));
 
     // Get URL lookup map for easier reference
@@ -56,16 +58,15 @@ export const getAuditResults = async () => {
         return acc;
     }, {});
 
-    const jsonRows = filteredNodes.slice(0, 10000).map(node => {
+    const jsonRows = response.blockers.map(blocker => {
         return {
-            node_id: node.id,
-            url_id: urlMap[node.url_id] || '',
-            html: node.html,
-            targrets: node.targets,
-            equalified: node.equalified,
-            created_at: node.created_at,
-            messages: node.message_nodes.map(mn =>
-                `${mn.message.type}: ${mn.message.message}`
+            blocker_id: blocker.id,
+            url_id: urlMap[blocker.url_id],
+            html: blocker.content,
+            equalified: blocker.equalified,
+            created_at: blocker.created_at,
+            messages: blocker.blocker_type_blockers.map(obj =>
+                `${obj.blocker_type.type}: ${obj.blocker_type.message}`
             )
         }
     });
@@ -73,6 +74,9 @@ export const getAuditResults = async () => {
     return {
         statusCode: 200,
         headers: { 'content-type': 'application/json' },
-        body: jsonRows,
+        body: {
+            ...audit,
+            blockers: jsonRows,
+        },
     };
 }

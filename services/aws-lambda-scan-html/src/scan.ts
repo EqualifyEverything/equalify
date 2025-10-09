@@ -145,17 +145,42 @@ export default async function (job: SqsScanJob) {
 
   async function shutdown(browser: Browser) {
     try {
-      const pages = await browser.pages();
-      logger.info(`HTML Scanner: Closing ${pages.length} browser pages`);
-      for (let i = 0; i < pages.length; i++) {
-        await pages[i].close();
+      logger.info(`HTML Scanner: Starting browser cleanup`);
+      
+      // Try to close pages first, but don't fail if it errors
+      try {
+        const pages = await browser.pages();
+        logger.info(`HTML Scanner: Closing ${pages.length} browser pages`);
+        await Promise.allSettled(pages.map(page => page.close()));
+      } catch (pageError) {
+        logger.warn(`HTML Scanner: Error closing pages (continuing cleanup)`, pageError as Error);
       }
+      
+      // Always try to close the browser with timeout
       logger.info(`HTML Scanner: Closing browser`);
-      await browser.close();
+      const BROWSER_CLOSE_TIMEOUT = 5000;
+      await Promise.race([
+        browser.close(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Browser close timeout')), BROWSER_CLOSE_TIMEOUT)
+        )
+      ]);
       logger.info(`HTML Scanner: Browser closed successfully`);
       return true;
     } catch (error) {
       logger.error(`HTML Scanner: Error during browser shutdown`, error as Error);
+      
+      // Try force kill if normal close fails
+      try {
+        const browserProcess = browser.process();
+        if (browserProcess) {
+          logger.info(`HTML Scanner: Force killing browser process`);
+          browserProcess.kill('SIGKILL');
+        }
+      } catch (killError) {
+        logger.error(`HTML Scanner: Failed to force kill browser`, killError as Error);
+      }
+      
       return true; // Still return true so we can send results even if cleanup fails
     }
   }

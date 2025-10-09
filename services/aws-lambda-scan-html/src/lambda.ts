@@ -79,6 +79,30 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         } else {
           logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results));
         }
+      } else {
+        // Scan failed or returned no results - notify webhook of failure
+        logger.error(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan failed - no results returned`);
+        try {
+          const failurePayload = {
+            auditId: job.auditId,
+            urlId: job.urlId,
+            status: 'failed',
+            error: 'Scan failed to produce results',
+            blockers: []
+          };
+          
+          const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+            method: 'post',
+            body: JSON.stringify(failurePayload),
+            headers: {'Content-Type': 'application/json'}
+          });
+          
+          if (!sendResultsResponse.ok) {
+            logger.error(`Failed to send failure notification to webhook`);
+          }
+        } catch (webhookError) {
+          logger.error("Failed to send failure notification", webhookError as Error);
+        }
       }
       
     } catch (error) {
