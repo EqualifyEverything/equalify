@@ -93,7 +93,8 @@ function convertToEqualifyV2(axeResult: AxeResults, job: any):StreamResults {
         urlId: job.urlId,
         blockers,
         date,
-        message
+        message,
+        status: "complete"
     };
 
     return out;

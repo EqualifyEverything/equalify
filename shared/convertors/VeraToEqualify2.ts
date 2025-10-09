@@ -96,6 +96,7 @@ function convertVeraToEqualifyV2(reportData: ReportData, job: any): StreamResult
       blockers,
       date: timeNow,
       message: `Vera scan of ${job.url} complete.`,
+      status: "complete"
     };
 
     return out;
