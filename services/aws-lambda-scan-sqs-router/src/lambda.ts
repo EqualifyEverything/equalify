@@ -17,6 +17,12 @@ export const handler = middy()
   .use(parser({ schema: scansSchema }))
   .handler(async (event): Promise<void> => {
     logger.info(`Received ${event.urls?.length || 0} URLs to route`);
+    
+    // Check for no URLs in request
+    if(event.urls?.length ===0){
+      logger.info(`No URLs received in request, exiting!`);
+      return;
+    }
     // get the type="html" URLs
     const htmlUrls = event.urls.filter((item) => {
       return item.type === "html";
