@@ -29,7 +29,10 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
-      const results = await scan(job).then((result) => {
+      
+      // Wrap scan in timeout to prevent Lambda from hanging
+      const SCAN_TIMEOUT = 120000; // 2 minutes max for entire scan process
+      const scanPromise = scan(job).then((result) => {
         const endTime = performance.now();
         const executionDuration = endTime - startTime;
         metrics.addMetric(
@@ -39,6 +42,12 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         );
         return result;
       });
+      
+      const timeoutPromise = new Promise<typeof scanPromise>((_, reject) => 
+        setTimeout(() => reject(new Error(`Scan timeout after ${SCAN_TIMEOUT}ms`)), SCAN_TIMEOUT)
+      );
+      
+      const results = await Promise.race([scanPromise, timeoutPromise]);
       
       if(results){
         logger.info(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan Complete!`);

@@ -129,7 +129,11 @@ export default async function (job: SqsScanJob) {
   const readyToExit = await shutdown(browser).then((val) => {
     logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
     return val;
+  }).catch((error) => {
+    logger.error(`HTML Scanner: Browser shutdown error for [auditId: ${job.auditId}, urlId: ${job.urlId}]`, error);
+    return false;
   });
+  
   if (readyToExit) {
     return {
       createdDate: new Date(), // record to add
@@ -140,11 +144,19 @@ export default async function (job: SqsScanJob) {
   }
 
   async function shutdown(browser: Browser) {
-    const pages = await browser.pages();
-    for (let i = 0; i < pages.length; i++) {
-      await pages[i].close();
+    try {
+      const pages = await browser.pages();
+      logger.info(`HTML Scanner: Closing ${pages.length} browser pages`);
+      for (let i = 0; i < pages.length; i++) {
+        await pages[i].close();
+      }
+      logger.info(`HTML Scanner: Closing browser`);
+      await browser.close();
+      logger.info(`HTML Scanner: Browser closed successfully`);
+      return true;
+    } catch (error) {
+      logger.error(`HTML Scanner: Error during browser shutdown`, error as Error);
+      return true; // Still return true so we can send results even if cleanup fails
     }
-    await browser.close();
-    return true;
   }
 }

@@ -16,10 +16,12 @@ const pdfQueueUrl =
 export const handler = middy()
   .use(parser({ schema: scansSchema }))
   .handler(async (event): Promise<void> => {
+    logger.info(`Received ${event.urls?.length || 0} URLs to route`);
     // get the type="html" URLs
     const htmlUrls = event.urls.filter((item) => {
       return item.type === "html";
     });
+    logger.info(`Found ${htmlUrls.length} HTML URLs and ${event.urls.length - htmlUrls.length} PDF URLs`);
 
     // we can pass 10 events at a time to SQS
     const HtmlBatches = chunkArray(htmlUrls, 10);
@@ -30,6 +32,7 @@ export const handler = middy()
         return {
           MessageGroupId: item.auditId,
           Id: item.urlId,
+          MessageDeduplicationId: item.urlId,
           MessageBody: JSON.stringify({
             data: item,
           }),
@@ -41,14 +44,14 @@ export const handler = middy()
       });
       try {
         const response = await sqsClient.send(command);
-        if (response.Successful) {
-          logger.info("Batch send successful:", response.Successful.toString());
+        if (response.Successful && response.Successful.length > 0) {
+          logger.info(`HTML Batch send successful: ${response.Successful.length} messages sent`);
         }
         if (response.Failed && response.Failed.length > 0) {
-          logger.info("Messages failed to send:", response.Failed.toString());
+          logger.error(`HTML Messages failed to send: ${JSON.stringify(response.Failed)}`);
         }
       } catch (error) {
-        logger.info("Error sending batch:", error as Error);
+        logger.error("Error sending HTML batch:", error as Error);
       }
     }
 
@@ -65,6 +68,7 @@ export const handler = middy()
         return {
           MessageGroupId: item.auditId,
           Id: item.urlId,
+          MessageDeduplicationId: item.urlId,
           MessageBody: JSON.stringify({
             data: item,
           }),
@@ -76,14 +80,14 @@ export const handler = middy()
       });
       try {
         const response = await sqsClient.send(command);
-        if (response.Successful) {
-          logger.info("Batch send successful:", response.Successful.toString());
+        if (response.Successful && response.Successful.length > 0) {
+          logger.info(`PDF Batch send successful: ${response.Successful.length} messages sent`);
         }
         if (response.Failed && response.Failed.length > 0) {
-          logger.info("Messages failed to send:", response.Failed.toString());
+          logger.error(`PDF Messages failed to send: ${JSON.stringify(response.Failed)}`);
         }
       } catch (error) {
-        logger.info("Error sending batch:", error as Error);
+        logger.error("Error sending PDF batch:", error as Error);
       }
     }
 
