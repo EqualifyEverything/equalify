@@ -90,7 +90,7 @@ const sendFailedStatusToResultsEndpoint = async (job: any) => {
     body: JSON.stringify(failurePayload),
     headers: { "Content-Type": "application/json" },
   });
-  return sendResultsResponse;
+  return sendResultsResponse;  
 };
 
 // handle batch
