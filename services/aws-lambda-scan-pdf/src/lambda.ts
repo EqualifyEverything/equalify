@@ -65,10 +65,22 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
           headers: { "Content-Type": "application/json" },
         });
 
-        logger.info(
-          "PDF-scan Results sent to API!",
-          JSON.stringify(sendResultsResponse.json())
-        );
+        if(sendResultsResponse.ok){
+          logger.info(
+            "PDF-scan Results sent to API results webhook!",
+            JSON.stringify(sendResultsResponse.json())
+          );
+        }else{
+          logger.error(
+            "Error sending results to API results webhook!",
+            sendResultsResponse.statusText
+          );
+          logger.error(
+            "Failed to send:",
+            JSON.stringify(sendResultsResponse.json())
+          )
+        }
+        
       } else {
         logger.error("Error with PDF scan!", results);
         await sendFailedStatusToResultsEndpoint(job);
