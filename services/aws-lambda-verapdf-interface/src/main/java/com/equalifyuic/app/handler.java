@@ -88,6 +88,7 @@ public class handler implements RequestHandler<String, String> {
                     CONNECT_TIMEOUT,
                     READ_TIMEOUT);
         } catch (IOException e) {
+            logger.log("Error downloading PDF.");
             logger.log(e.getMessage());
         }
 
@@ -132,6 +133,16 @@ public class handler implements RequestHandler<String, String> {
         } catch (IOException excep) {
             System.err.println("Exception raised closing MRR temp file.");
             excep.printStackTrace();
+        }
+        logger.log("Finished checking file, cleaning up...");
+         if (filePath.exists()) {
+            if (filePath.delete()) {
+                logger.log("Cleanup: File deleted successfully: " + filePath);
+                } else {
+                logger.log("Cleanup: Failed to delete file: " + filePath);
+                }
+        } else {
+            logger.log("Cleanup: File does not exist: " + filePath);
         }
         /*
          * try (PDFAParser parser = Foundries.defaultInstance().createParser(new
