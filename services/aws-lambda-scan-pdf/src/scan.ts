@@ -34,7 +34,7 @@ export default async function (job: SqsScanJob) {
     veraPdfReport = resultPayload;
     
   } catch (error) {
-    logger.error("Error invoking veraPDF-interface!", error as string);
+    logger.error("Error invoking veraPDF-interface", error as string);
   }
 
   return veraPdfReport;

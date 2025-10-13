@@ -14,10 +14,16 @@ import convertVeraToEqualifyV2, {
 
 import { logger, metrics } from "./telemetry.ts";
 import scan from "./scan.ts";
+import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 //import convertToEqualifyV2 from "../../../shared/convertors/VeraToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
 const RESULTS_ENDPOINT = "https://api.equalifyapp.com/public/scanWebhook";
+
+// {"data":{"auditId":"51a5077e-f8e6-4f75-939e-9c91b00a1f2e","urlId":"ea350f8f-5e56-4361-8cd5-570fcea0025d","url":"http://decubing.com/wp-content/uploads/2025/05/zombieplan.pdf","type":"pdf"}}
+interface sqsPayload {
+  data: SqsScanJob
+}
 
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
@@ -26,9 +32,9 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payload = record.body;
   
   logger.info("PDF to scan payload:", payload);
+  const payloadParsed = JSON.parse(payload) as sqsPayload;
 
-  const payloadParsed = JSON.parse(payload);
-  const job = JSON.parse(payloadParsed);
+  const job = payloadParsed.data;
   logger.info("PDF to scan payload:", job);
   if (payload) {
     try {
@@ -50,7 +56,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
           parsedResult as ReportData,
           job
         );
-        logger.info(`Job [${job.id}] Scan Complete!`);
+        logger.info(`Audit [${job.auditId}]:[${job.urlId}] Scan Complete!`);
 
         logger.info("Sending to API...", JSON.stringify(equalifiedResults));
 
