@@ -30,11 +30,11 @@ export default async function (job: SqsScanJob) {
     const response: InvokeCommandOutput = await lambdaClient.send(command);
 
     const resultPayload = response.Payload ? JSON.parse(new TextDecoder().decode(response.Payload)) : null;
-    logger.info(resultPayload);
+    logger.info("Results from veraPDF-interface:", resultPayload);
     veraPdfReport = resultPayload;
     
   } catch (error) {
-    logger.error(error as string);
+    logger.error("Error invoking veraPDF-interface!", error as string);
   }
 
   return veraPdfReport;

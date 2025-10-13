@@ -42,7 +42,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         return result;
       });
       if (results) {
-        logger.info(results);
+        logger.info("Results from PDF scan:", results);
         const parsedResult = JSON.parse(results);
         const equalifiedResults = convertVeraToEqualifyV2(
           parsedResult as ReportData,
@@ -63,11 +63,11 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
           JSON.stringify(sendResultsResponse.json())
         );
       } else {
-        logger.error("Error:", results);
+        logger.error("Error with PDF scan!", results);
         await sendFailedStatusToResultsEndpoint(job);
       }
     } catch (error) {
-      logger.error("Scan Error!", error as string);
+      logger.error("Error with payload!", error as string);
       await sendFailedStatusToResultsEndpoint(job);
       throw error;
     }
