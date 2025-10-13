@@ -24,6 +24,8 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   metrics.captureColdStartMetric();
   const startTime = performance.now();
   const payload = record.body;
+  
+  logger.info("PDF to scan payload:", payload);
 
   const payloadParsed = JSON.parse(payload);
   const job = JSON.parse(payloadParsed);
