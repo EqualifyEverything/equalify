@@ -35,7 +35,6 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payloadParsed = JSON.parse(payload) as sqsPayload;
 
   const job = payloadParsed.data;
-  logger.info("PDF to scan payload:", job);
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);

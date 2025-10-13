@@ -10,7 +10,7 @@ import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 import { InvocationType, InvokeCommand, InvokeCommandOutput, LambdaClient } from "@aws-sdk/client-lambda";
 
 export default async function (job: SqsScanJob) {
-  logger.info(`PDF Scanner: UrlId [${job.urlId}](${job.url}) started.`);
+  logger.info(`PDF Scanner: Sending UrlId [${job.urlId}](${job.url}) to veraPDF-interface.`);
   
   let veraPdfReport = "";
 
@@ -22,7 +22,7 @@ export default async function (job: SqsScanJob) {
   const invokeParams = {
     FunctionName: "aws-lambda-verapdf-interface", 
     InvocationType: InvocationType.RequestResponse, 
-    Payload: url,
+    Payload: JSON.stringify(url),
   };
 
   try {
