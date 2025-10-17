@@ -11,9 +11,12 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "luxon": "^3.7.2"
+  },
   "type": "module",
   "devDependencies": {
+    "@types/luxon": "^3.7.1",
     "@types/node": "^24.5.2",
     "aws-jwt-verify": "^5.1.0",
     "cheerio": "^1.1.2",
