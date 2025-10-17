@@ -2,19 +2,34 @@ import { useState, MouseEvent, FormEvent, KeyboardEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../queries';
 import * as API from 'aws-amplify/api';
+import { AuditEmailSubscriptionInput, EmailSubscriptionList } from '#src/components/AuditEmailSubscriptionInput.tsx';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Page {
     url: string;
     type: 'html' | 'pdf';
 }
 
+
+
 export const BuildAudit = () => {
     const [importBy, setImportBy] = useState('URLs');
     const [emailNotifications, setEmailNotifications] = useState(false);
     const [pages, setPages] = useState<Page[]>([]);
     const [urlError, setUrlError] = useState<string | null>(null);
-
+    
     const { data: user } = useUser();
+    
+    const defaultEmailList = {
+                emails : [{
+                    id: uuidv4(),
+                    email: user?.email ?? "user@uic.edu",
+                    frequency: "Weekly",
+                    lastSent: "" // we'll populate this on send in buildAuditData
+                }]
+            };
+    const [emailList, setEmailList] = useState<EmailSubscriptionList>(defaultEmailList);
+    
     const navigate = useNavigate();
 
     const validateAndFormatUrl = (input: string): string | null => {
@@ -123,11 +138,20 @@ export const BuildAudit = () => {
     }
 
     const buildAuditData = (formData: FormData) => {
+        let notifications:EmailSubscriptionList = { emails: [] }
+        if(emailNotifications){
+            // if notification are enabled, add the current date to newly-added emails
+            const theDate = new Date().toISOString();
+            notifications.emails = emailList.emails.map(item=>{
+                return{
+                    ...item,
+                    lastSent: theDate 
+                }});
+        }
         return {
             auditName: formData.get('auditName') as string,
             scanFrequency: formData.get('scanFrequency') as string,
-            emailNotifications: emailNotifications,
-            emailFrequency: emailNotifications ? formData.get('emailFrequency') as string : null,
+            emailNotifications: JSON.stringify(notifications),
             pages: pages.map(page => ({
                 url: page.url,
                 type: page.type
@@ -161,8 +185,9 @@ export const BuildAudit = () => {
         if (!form) return;
         const formData = new FormData(form);
         const auditData = buildAuditData(formData);
+        
         console.log('Audit Data (Save):', JSON.stringify(auditData));
-        console.log('Audit Data (Save & Run):', JSON.stringify(auditData));
+        
         const response = await (await API.post({
             apiName: 'auth', path: '/saveAudit', options: { body: { ...auditData, saveAndRun: false } }
         }).response).body.json();
@@ -193,16 +218,12 @@ export const BuildAudit = () => {
                 <label htmlFor='emailNotifications'>Email Notifications:</label>
                 <div>
                     <input type='checkbox' id='emailNotifications' name='emailNotifications' checked={emailNotifications} onChange={(e) => setEmailNotifications(e.target.checked)} />
-                    <label htmlFor='emailNotifications'>Email summary to {user?.name}, {user?.email}.</label>
+                    <label htmlFor='emailNotifications'>Enable email notifications?</label>
                 </div>
             </div>
-            {emailNotifications && <div className='flex flex-col'>
-                <label htmlFor='emailFrequency'>Email Frequency:</label>
-                <select id='emailFrequency' name='emailFrequency'>
-                    <option>Daily</option>
-                    <option>Weekly</option>
-                    <option>Monthly</option>
-                </select>
+            {emailNotifications && 
+            <div className='flex flex-col'>
+                <AuditEmailSubscriptionInput initialValue={emailList} onValueChange={setEmailList} />
             </div>}
 
             <h2>Add URLs</h2>

@@ -4,13 +4,13 @@ const lambda = new LambdaClient();
 
 export const saveAudit = async () => {
     try {
-        const { auditName, scanFrequency, pages, saveAndRun } = event.body;
+        const { auditName, scanFrequency, pages, saveAndRun, emailNotifications } = event.body;
         const scheduledAt = new Date();
         await db.connect();
         const id = (await db.query({
-            text: `INSERT INTO "audits" ("user_id", "name", "interval", "scheduled_at", "status", "payload")
-                VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"`,
-            values: [event.claims.sub, auditName, scanFrequency, scheduledAt, saveAndRun ? 'new' : 'draft', JSON.stringify(event.body)],
+            text: `INSERT INTO "audits" ("user_id", "name", "interval", "scheduled_at", "status", "payload", "email_notifications")
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"`,
+            values: [event.claims.sub, auditName, scanFrequency, scheduledAt, saveAndRun ? 'new' : 'draft', JSON.stringify(event.body), emailNotifications],
         })).rows[0].id;
 
         // Insert all URLs in a single query using UNNEST for clarity
