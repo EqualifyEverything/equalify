@@ -46,7 +46,7 @@ export const processScheduledAuditEmails = async () => {
   console.log(JSON.stringify({ response }));
   let sentCount = 0;
   // extract the email_notifications column
-  const emailListArray: graphResponse[] = response.data.audits.map((email) => {
+  const emailListArray: graphResponse[] = response.audits.map((email) => {
     return {
       email_notifications: JSON.parse(
         email.email_notifications
