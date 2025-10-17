@@ -41,10 +41,11 @@ export const processScheduledAuditEmails = async () => {
     }
   }`
   };
-  console.log(JSON.stringify({ query }));
+  //console.log(JSON.stringify({ query }));
   const response = await graphqlQuery(query);
-  console.log(JSON.stringify({ response }));
+  //console.log(JSON.stringify({ response }));
   let sentCount = 0;
+  let subscriptionsCount = 0;
   // extract the email_notifications column
   const emailListArray: graphResponse[] = response.audits.map((email) => {
     return {
@@ -54,7 +55,7 @@ export const processScheduledAuditEmails = async () => {
       reponse: email.reponse,
     };
   });
-  console.log(emailListArray);
+  //console.log(emailListArray);
   const currentTime = new Date();
   emailListArray.forEach(async (audit) => {
     if (
@@ -64,6 +65,7 @@ export const processScheduledAuditEmails = async () => {
       let newEmailNotificationField: EmailSubscriptionList =
         audit.email_notifications;
       audit.email_notifications.emails.forEach((email, index) => {
+        subscriptionsCount++;
         const lastSent = DateTime.fromISO(email.lastSent);
         let intervalDays = null;
         switch (email.frequency.toLowerCase()) {
@@ -86,6 +88,10 @@ export const processScheduledAuditEmails = async () => {
           //sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
           newEmailNotificationField.emails[index].lastSent =
             new Date().toISOString();
+        }else{
+            console.log(
+            `Skipping email to ${email.email}, last sent ${email.lastSent}, frequency: ${email.frequency}.`
+          );
         }
       });
       // check if we need to update the email_notifications field in the database
@@ -107,7 +113,7 @@ export const processScheduledAuditEmails = async () => {
   });
   await db.clean();
   console.log(
-    `Finished processing scheduled audit emails, ${sentCount} emails sent.`
+    `Finished processing ${subscriptionsCount} scheduled audit emails, ${sentCount} emails sent.`
   );
   return;
 };
