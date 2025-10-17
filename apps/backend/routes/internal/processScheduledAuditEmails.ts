@@ -45,6 +45,8 @@ export const processScheduledAuditEmails = async () => {
   console.log(JSON.stringify({ query }));
   const response = await graphqlQuery(query);
   console.log(JSON.stringify({ response }));
+  console.log("Started processing scheduled audit emails...");
+  let sentCount = 0;
   // extract the email_notifications column
   const emailListArray: graphResponse[] = response.data.audits.map((email) => {
     return {
@@ -82,7 +84,8 @@ export const processScheduledAuditEmails = async () => {
           console.log(
             `Sending email to ${email.email}. Last sent ${email.lastSent}, frequency: ${email.frequency}.`
           );
-          sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
+          sentCount++;
+          //sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
           newEmailNotificationField.emails[index].lastSent =
             new Date().toISOString();
         }
@@ -94,15 +97,15 @@ export const processScheduledAuditEmails = async () => {
       ) {
         console.log("Updating lastSent in database...", newEmailNotificationField);
         // update audit in database with new email_notification field
-        await db.query({
+        /* await db.query({
             text: `UPDATE "audits" SET "email_notifications"=$1 WHERE "id"=$2`,
             values: [JSON.stringify(newEmailNotificationField), audit.id]
-        });
+        }); */
       }
     }
   });
   await db.clean();
-  console.log("Finished processing scheduled audit emails.")
+  console.log(`Finished processing scheduled audit emails, ${sentCount} emails sent.`)
   return;
 };
 
