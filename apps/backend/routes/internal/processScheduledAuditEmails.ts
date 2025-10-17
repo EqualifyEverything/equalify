@@ -1,9 +1,13 @@
-//"{\"emails\":[{\"id\":\"742170ae-37a2-4c22-b732-af19029130e3\",\"email\":\"sdanie28@uic.edu\",\"frequency\":\"Weekly\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"},{\"id\":\"cd0bbc97-8e1c-4e2c-b3a3-3306a864dd61\",\"email\":\"negatia@gmail.com\",\"frequency\":\"Daily\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"}]}",
 import { db, event, graphqlQuery } from "#src/utils";
 import { DateTime } from "luxon";
+import { SendEmailCommand } from "@aws-sdk/client-ses";
+import { SESClient } from "@aws-sdk/client-ses";
 
-// copied from /frontend/src/components/AuditEmailSubscriptionList.tsx
+const REGION = "us-east-2";
+const sesClient = new SESClient({ region: REGION });
+const EMAIL_NOTIFICATION_FROM_ADDRESS = "support@equalifyapp.com"
 
+// interfaces copied from /frontend/src/components/AuditEmailSubscriptionList.tsx
 interface EmailSubscriptionList {
   emails: EmailSubscriptionEmail[];
 }
@@ -13,11 +17,16 @@ interface EmailSubscriptionEmail {
   frequency: string; // daily|weekly|monthly
   lastSent: string; // UTC date string
 }
+
 interface graphResponse {
   email_notifications: EmailSubscriptionList;
   response: JSON;
   id: string;
+  name: string;
 }
+
+
+//"{\"emails\":[{\"id\":\"742170ae-37a2-4c22-b732-af19029130e3\",\"email\":\"sdanie28@uic.edu\",\"frequency\":\"Weekly\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"},{\"id\":\"cd0bbc97-8e1c-4e2c-b3a3-3306a864dd61\",\"email\":\"negatia@gmail.com\",\"frequency\":\"Daily\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"}]}",
 
 export const processScheduledAuditEmails = async () => {
   // fetch the email_notification fields (when email_notifications and response are not null)
@@ -27,6 +36,8 @@ export const processScheduledAuditEmails = async () => {
             audits(where: {email_notifications: {_is_null: false}, response: {_is_null: false}}) {
                 email_notifications
                 response
+                id
+                name
             }
         }`,
     variables: {},
@@ -45,7 +56,7 @@ export const processScheduledAuditEmails = async () => {
   });
   console.log(emailListArray);
   const currentTime = new Date();
-  emailListArray.forEach((audit) => {
+  emailListArray.forEach(async (audit) => {
     if (
       audit.email_notifications.emails &&
       audit.email_notifications.emails.length > 0
@@ -71,7 +82,7 @@ export const processScheduledAuditEmails = async () => {
           console.log(
             `Sending email to ${email.email}. Last sent ${email.lastSent}, frequency: ${email.frequency}.`
           );
-          //TODO integrate with SES to send email
+          sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
           newEmailNotificationField.emails[index].lastSent =
             new Date().toISOString();
         }
@@ -82,12 +93,71 @@ export const processScheduledAuditEmails = async () => {
         JSON.stringify(audit.email_notifications)
       ) {
         console.log("Updating lastSent in database...", newEmailNotificationField);
-        //TODO update audit in database with new email_notification field
+        // update audit in database with new email_notification field
+        await db.query({
+            text: `UPDATE "audits" SET "email_notifications"=$1 WHERE "id"=$2`,
+            values: [JSON.stringify(newEmailNotificationField), audit.id]
+        });
       }
     }
   });
+  await db.clean();
+  console.log("Finished processing scheduled audit emails.")
+  return;
 };
 
-function sendEmail(address: string, content: string) {
-  // send email
+async function sendEmail(address: string, content: string, subjectLine:string) {
+  const sendEmailCommand = createSendEmailCommand(
+    address,
+    EMAIL_NOTIFICATION_FROM_ADDRESS,
+    content,
+    subjectLine
+  );
+
+  try {
+    //return await sesClient.send(sendEmailCommand);
+    console.log("Email data to be sent:", address, EMAIL_NOTIFICATION_FROM_ADDRESS, content, subjectLine);
+  } catch (caught) {
+    if (caught instanceof Error && caught.name === "MessageRejected") {
+      /** @type { import('@aws-sdk/client-ses').MessageRejected} */
+      const messageRejectedError = caught;
+      console.error("Email rejected:", messageRejectedError)
+      return messageRejectedError;
+    }
+    //throw caught;
+    console.error("Error sending email!", caught);
+  }
 }
+
+
+const createSendEmailCommand = (toAddress, fromAddress, content, subjectLine) => {
+  return new SendEmailCommand({
+    Destination: {
+      CcAddresses: [],
+      ToAddresses: [
+        toAddress,
+    ],
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: content,
+        },
+        Text: {
+          Charset: "UTF-8",
+          Data: content,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: subjectLine,
+      },
+    },
+    Source: fromAddress,
+    ReplyToAddresses: [],
+  });
+};
+
+
+
