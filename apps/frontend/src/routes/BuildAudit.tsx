@@ -10,8 +10,6 @@ interface Page {
     type: 'html' | 'pdf';
 }
 
-
-
 export const BuildAudit = () => {
     const [importBy, setImportBy] = useState('URLs');
     const [emailNotifications, setEmailNotifications] = useState(false);
