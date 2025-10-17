@@ -85,7 +85,7 @@ export const processScheduledAuditEmails = async () => {
             `Sending email to ${email.email}. Last sent ${email.lastSent}, frequency: ${email.frequency}.`
           );
           sentCount++;
-          //sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
+          sendEmail(email.email, JSON.stringify(audit.response), `${email.frequency} Equalify Report for Audit ${audit.name}`)
           newEmailNotificationField.emails[index].lastSent =
             new Date().toISOString();
         }else{
@@ -104,10 +104,10 @@ export const processScheduledAuditEmails = async () => {
           newEmailNotificationField
         );
         // update audit in database with new email_notification field
-        /* await db.query({
+        await db.query({
             text: `UPDATE "audits" SET "email_notifications"=$1 WHERE "id"=$2`,
             values: [JSON.stringify(newEmailNotificationField), audit.id]
-        }); */
+        });
       }
     }
   });
