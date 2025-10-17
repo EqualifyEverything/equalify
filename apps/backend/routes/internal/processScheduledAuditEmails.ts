@@ -5,7 +5,7 @@ import { SESClient } from "@aws-sdk/client-ses";
 
 const REGION = "us-east-2";
 const sesClient = new SESClient({ region: REGION });
-const EMAIL_NOTIFICATION_FROM_ADDRESS = "support@equalifyapp.com"
+const EMAIL_NOTIFICATION_FROM_ADDRESS = "support@equalifyapp.com";
 
 // interfaces copied from /frontend/src/components/AuditEmailSubscriptionList.tsx
 interface EmailSubscriptionList {
@@ -25,27 +25,25 @@ interface graphResponse {
   name: string;
 }
 
-
 //"{\"emails\":[{\"id\":\"742170ae-37a2-4c22-b732-af19029130e3\",\"email\":\"sdanie28@uic.edu\",\"frequency\":\"Weekly\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"},{\"id\":\"cd0bbc97-8e1c-4e2c-b3a3-3306a864dd61\",\"email\":\"negatia@gmail.com\",\"frequency\":\"Daily\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"}]}",
 
 export const processScheduledAuditEmails = async () => {
+  console.log("Started processing scheduled audit emails...");
   // fetch the email_notification fields (when email_notifications and response are not null)
   const query = {
     query: `
-        {
-            audits(where: {email_notifications: {_is_null: false}, response: {_is_null: false}}) {
-                email_notifications
-                response
-                id
-                name
-            }
-        }`,
-    variables: {},
+        query GetAudits {
+    audits(where: {email_notifications: {_is_null: false}, response: {_is_null: false}}) {
+      id
+      name
+      response
+      email_notifications
+    }
+  }`
   };
   console.log(JSON.stringify({ query }));
   const response = await graphqlQuery(query);
   console.log(JSON.stringify({ response }));
-  console.log("Started processing scheduled audit emails...");
   let sentCount = 0;
   // extract the email_notifications column
   const emailListArray: graphResponse[] = response.data.audits.map((email) => {
@@ -95,7 +93,10 @@ export const processScheduledAuditEmails = async () => {
         JSON.stringify(newEmailNotificationField) !=
         JSON.stringify(audit.email_notifications)
       ) {
-        console.log("Updating lastSent in database...", newEmailNotificationField);
+        console.log(
+          "Updating lastSent in database...",
+          newEmailNotificationField
+        );
         // update audit in database with new email_notification field
         /* await db.query({
             text: `UPDATE "audits" SET "email_notifications"=$1 WHERE "id"=$2`,
@@ -105,11 +106,17 @@ export const processScheduledAuditEmails = async () => {
     }
   });
   await db.clean();
-  console.log(`Finished processing scheduled audit emails, ${sentCount} emails sent.`)
+  console.log(
+    `Finished processing scheduled audit emails, ${sentCount} emails sent.`
+  );
   return;
 };
 
-async function sendEmail(address: string, content: string, subjectLine:string) {
+async function sendEmail(
+  address: string,
+  content: string,
+  subjectLine: string
+) {
   const sendEmailCommand = createSendEmailCommand(
     address,
     EMAIL_NOTIFICATION_FROM_ADDRESS,
@@ -119,12 +126,18 @@ async function sendEmail(address: string, content: string, subjectLine:string) {
 
   try {
     //return await sesClient.send(sendEmailCommand);
-    console.log("Email data to be sent:", address, EMAIL_NOTIFICATION_FROM_ADDRESS, content, subjectLine);
+    console.log(
+      "Email data to be sent:",
+      address,
+      EMAIL_NOTIFICATION_FROM_ADDRESS,
+      content,
+      subjectLine
+    );
   } catch (caught) {
     if (caught instanceof Error && caught.name === "MessageRejected") {
       /** @type { import('@aws-sdk/client-ses').MessageRejected} */
       const messageRejectedError = caught;
-      console.error("Email rejected:", messageRejectedError)
+      console.error("Email rejected:", messageRejectedError);
       return messageRejectedError;
     }
     //throw caught;
@@ -132,14 +145,16 @@ async function sendEmail(address: string, content: string, subjectLine:string) {
   }
 }
 
-
-const createSendEmailCommand = (toAddress, fromAddress, content, subjectLine) => {
+const createSendEmailCommand = (
+  toAddress,
+  fromAddress,
+  content,
+  subjectLine
+) => {
   return new SendEmailCommand({
     Destination: {
       CcAddresses: [],
-      ToAddresses: [
-        toAddress,
-    ],
+      ToAddresses: [toAddress],
     },
     Message: {
       Body: {
@@ -161,6 +176,3 @@ const createSendEmailCommand = (toAddress, fromAddress, content, subjectLine) =>
     ReplyToAddresses: [],
   });
 };
-
-
-
