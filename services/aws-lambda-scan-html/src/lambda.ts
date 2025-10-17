@@ -50,7 +50,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
       const results = await Promise.race([scanPromise, timeoutPromise]);
       
       if(results){
-        logger.info(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan Complete!`);
+        logger.info(`Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] Scan Complete!`);
         if(results.axeresults){
           const convertedResults = convertToEqualifyV2(results.axeresults, job);
         
@@ -85,10 +85,11 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         }
       } else {
         // Scan failed or returned no results - notify webhook of failure
-        logger.error(`Job [auditId: ${job.auditId}, urlId: ${job.urlId}] Scan failed - no results returned`);
+        logger.error(`Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] Scan failed - no results returned`);
         try {
           const failurePayload = {
             auditId: job.auditId,
+            scanId: job.scanId,
             urlId: job.urlId,
             status: 'failed',
             error: 'Scan failed to produce results',

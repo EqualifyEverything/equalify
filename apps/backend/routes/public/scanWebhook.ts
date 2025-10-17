@@ -2,7 +2,7 @@ import { db, event, hashStringToUuid, normalizeHtmlWithVdom } from "#src/utils"
 
 export const scanWebhook = async () => {
     console.log(JSON.stringify(event));
-    const { auditId, urlId, blockers, status, error } = event.body;
+    const { auditId, scanId, urlId, blockers, status, error } = event.body;
     await db.connect();
 
     // Handle failed scans
@@ -45,12 +45,12 @@ export const scanWebhook = async () => {
         // Insert or update blocker_update for today
         await db.query({
             text: `
-                INSERT INTO "blocker_updates" ("audit_id", "blocker_id", "equalified") 
-                VALUES ($1, $2, $3)
+                INSERT INTO "blocker_updates" ("audit_id", "blocker_id", "equalified", "scan_id") 
+                VALUES ($1, $2, $3, $4)
                 ON CONFLICT ("blocker_id", "created_at")
                 DO UPDATE SET "equalified" = false
             `,
-            values: [auditId, blockerId, false],
+            values: [auditId, blockerId, false, scanId],
         });
 
         const tagIds = [];

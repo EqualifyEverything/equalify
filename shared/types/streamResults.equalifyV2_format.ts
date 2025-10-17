@@ -1,6 +1,7 @@
 export interface StreamResults {
     status: string;
     auditId: string;
+    scanId: string;
     urlId: string;
     blockers: Blocker[];
     date: string

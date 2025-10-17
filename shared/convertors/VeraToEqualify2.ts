@@ -92,6 +92,7 @@ function convertVeraToEqualifyV2(reportData: ReportData, job: any): StreamResult
     const timeNow = new Date().toISOString();
     const out: StreamResults = {
       auditId: job.auditId,
+      scanId: job.scanId,
       urlId: job.urlId,
       blockers,
       date: timeNow,

@@ -98,6 +98,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
 const sendFailedStatusToResultsEndpoint = async (job: any) => {
   const failurePayload = {
     auditId: job.auditId,
+    scanId: job.scanId,
     urlId: job.urlId,
     status: "failed",
     error: "PDF Scan encountered an error.",

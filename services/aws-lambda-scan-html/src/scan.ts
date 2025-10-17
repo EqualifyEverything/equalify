@@ -19,7 +19,7 @@ export default async function (job: SqsScanJob) {
   let status = "";
   let message = "";
 
-  logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) started.`);
+  logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, scanId: ${job.scanId}, scanId: ${job.scanId}, urlId: ${job.urlId}](${job.url}) started.`);
   const viewport = {
     deviceScaleFactor: 1,
     hasTouch: false,
@@ -58,15 +58,15 @@ export default async function (job: SqsScanJob) {
   // attempt to visit the page
   try {
     await page.goto(job.url, { timeout: BROWSER_LOAD_TIMEOUT }).then(() => {
-      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}](${job.url}) loaded.`);
+      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}](${job.url}) loaded.`);
     });
   } catch (error) {
-    logger.error(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] page.goto error`, error as string);
+    logger.error(`HTML Scanner: Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] page.goto error`, error as string);
     // error opening page: return the status and the error
     status = "failed";
     message = error as string;
     const readyToExit = await shutdown(browser).then((val)=>{
-      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
+      logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] - Browser shutdown.`);
       return val;
     });
     if(readyToExit) return;
@@ -126,10 +126,10 @@ export default async function (job: SqsScanJob) {
   */
 
   const readyToExit = await shutdown(browser).then((val) => {
-    logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, urlId: ${job.urlId}] - Browser shutdown.`);
+    logger.info(`HTML Scanner: Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] - Browser shutdown.`);
     return val;
   }).catch((error) => {
-    logger.error(`HTML Scanner: Browser shutdown error for [auditId: ${job.auditId}, urlId: ${job.urlId}]`, error);
+    logger.error(`HTML Scanner: Browser shutdown error for [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}]`, error);
     return false;
   });
   

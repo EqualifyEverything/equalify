@@ -31,6 +31,10 @@ export const saveAudit = async () => {
         }
 
         if (saveAndRun) {
+            const scanId = (await db.query({
+                text: `INSERT INTO "scans" ("audit_id", "status") VALUES ($1, $2) RETURNING "id"`,
+                values: [id, 'processing'],
+            })).rows[0].id;
             const urls = (await db.query({
                 text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
                 values: [id],
@@ -40,7 +44,7 @@ export const saveAudit = async () => {
                 FunctionName: "aws-lambda-scan-sqs-router",
                 InvocationType: "Event",
                 Payload: JSON.stringify({
-                    urls: urls?.map(url => ({ auditId: id, urlId: url.id, url: url.url, type: url.type }))
+                    urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type }))
                 })
             }));
             console.log('Scan jobs queued for audit:', id);
