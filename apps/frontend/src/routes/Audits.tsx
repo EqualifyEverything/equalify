@@ -15,7 +15,7 @@ export const Audits = () => {
     return <div>
         <div className='flex flex-row items-center justify-start gap-4'>
             <h1>Audits</h1>
-            <button onClick={() => navigate('/audits/build')}>+ Add Audit</button>
+            <button onClick={() => navigate('/audits/build')}>Add Audit</button>
         </div>
         {audits?.map(row => <div className='flex flex-row items-center gap-2 py-4'>
             <Link className='hover:opacity-50' to={`/audits/${formatId(row.id)}`}>{row.name}</Link>
