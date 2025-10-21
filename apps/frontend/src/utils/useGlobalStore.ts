@@ -1,15 +1,28 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export const useGlobalStore = create(
+interface EqualifyState {
+  loading: boolean|string
+  setLoading: (val: string|boolean) => void
+  darkMode: boolean
+  setDarkMode: (val: boolean) => void
+  authenticated: boolean
+  setAuthenticated: (val: boolean) => void
+  ariaAnnounceMessage: string
+  setAriaAnnounceMessage: (val:string) => void
+}
+
+export const useGlobalStore = create<EqualifyState>()(
     persist(
         (set) => ({
             loading: false,
-            setLoading: (value) => set(() => ({ loading: value })),
+            setLoading: (val) => set(() => ({ loading: val })),
             darkMode: false,
-            setDarkMode: (value) => set(() => ({ darkMode: value })),
+            setDarkMode: (val) => set(() => ({ darkMode: val })),
             authenticated: false,
-            setAuthenticated: (value) => set(() => ({ authenticated: value })),
+            setAuthenticated: (val) => set(() => ({ authenticated: val })),
+            ariaAnnounceMessage: "",
+            setAriaAnnounceMessage: (val) => set(() => ({ ariaAnnounceMessage: val })),
         }), {
         name: 'equalify-storage',
         partialize: (state) => ({

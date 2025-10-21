@@ -250,7 +250,7 @@ export const Audit = () => {
         <div className='flex flex-col gap-2'>
             <Link to={'/audits'}>← Go Back</Link>
             <div className='flex flex-row items-center gap-2 justify-between'>
-                <h1>Audit: {audit?.name}</h1>
+                <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
                 <div className='flex flex-row items-center gap-2'>
                     <button onClick={renameAudit}>Rename</button>
                     <button onClick={deleteAudit}>Delete</button>

@@ -66,7 +66,7 @@ export const Signup = () => {
     }
 
     return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto'>Create an account</h1>
+        <h1 className='mx-auto initial-focus-element'>Create an account</h1>
         <div className='flex flex-col'>
             <label htmlFor='name'>Name</label>
             <input id='name' name='name' required type='text' placeholder='John Doe' />

@@ -49,3 +49,12 @@ button {
 h1, h2, h3 {
   margin: 0;
 }
+
+/* Suppress focus outline */
+[tabindex="-1"]:focus {
+	outline: none;
+}
+
+[tabindex="-1"]:focus-visible {
+	outline: 2px solid var(--color-focus);
+}

@@ -4,10 +4,11 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
+import { useAriaAnnounceContext } from '#src/components/AriaAnnounceProvider.tsx';
 
 export const Login = () => {
     const queryClient = useQueryClient();
-    const { loading, setLoading, setAuthenticated } = useGlobalStore();
+    const { loading, setLoading, setAuthenticated, setAriaAnnounceMessage } = useGlobalStore();
     const [error, setError] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
@@ -42,6 +43,7 @@ export const Login = () => {
                 navigate(`/verify/${location.search}`);
             }
             else {
+                setAriaAnnounceMessage("Login Success!");
                 navigate('/audits');
             }
 
@@ -59,7 +61,7 @@ export const Login = () => {
     }
 
     return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto'>Welcome back!</h1>
+        <h1 className='mx-auto initial-focus-element'>Welcome back!</h1>
         <div className='flex flex-col'>
             <label htmlFor='email'>Email address</label>
             <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} />

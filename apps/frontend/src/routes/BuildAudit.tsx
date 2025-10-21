@@ -2,9 +2,7 @@ import {
   useState,
   MouseEvent,
   FormEvent,
-  KeyboardEvent,
-  useEffect,
-  ChangeEventHandler,
+  KeyboardEvent
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../queries";
@@ -244,12 +242,12 @@ export const BuildAudit = () => {
   return (
     <div className="flex flex-col gap-4 max-w-screen-sm">
       <Link to="..">← Go Back</Link>
-      <h1>Audit Builder</h1>
+      <h1 className="initial-focus-element">Audit Builder</h1>
       <form className="flex flex-col gap-4" onSubmit={saveAndRunAudit}>
         <h2>General Info</h2>
         <div className="flex flex-col">
           <label htmlFor="auditName">Audit Name:</label>
-          <input id="auditName" name="auditName" />
+          <input id="auditName" name="auditName" required={true} />
         </div>
         <div className="flex flex-col">
           <label htmlFor="scanFrequency">Scan Frequency:</label>
@@ -384,7 +382,7 @@ export const BuildAudit = () => {
           <button
             type="button"
             onClick={saveAudit}
-            disabled={pages.length < 1}
+            disabled={pages.length < 1 }
             className="w-full"
           >
             Save Audit

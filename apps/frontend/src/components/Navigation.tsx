@@ -49,6 +49,15 @@ export const Navigation = () => {
         async();
     }, []);
 
+    
+  // on location change, focus to the first element with class 'initial-focus-element'
+	useEffect(() => {
+		const focusEl = document.getElementsByClassName("initial-focus-element")[0] as HTMLElement;
+		const tabIndex = focusEl?.getAttribute('tabindex');
+		focusEl?.setAttribute('tabindex', tabIndex ?? '-1');
+		focusEl?.focus();
+	}, [location]);
+
     return (
         <div>
             <div className='p-4'>

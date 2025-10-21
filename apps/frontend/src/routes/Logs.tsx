@@ -1,3 +1,3 @@
 export const Logs = () => {
-    return <h1>Logs</h1>
+    return <h1 className="initial-focus-element">Logs</h1>
 }
