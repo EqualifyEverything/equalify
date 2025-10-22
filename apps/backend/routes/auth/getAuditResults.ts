@@ -15,31 +15,29 @@ export const getAuditResults = async () => {
     await db.clean();
 
     const query = {
-        query: `query ($audit_id: uuid) {
-  blockers(where: {audit_id: {_eq: $audit_id}}) {
-    id
-    created_at
-    content
-    targets
-    url_id
-    equalified
-    blocker_updates {
-      created_at
-      equalified
-    }
-    blocker_type_blockers {
-      id
-      blocker {
-        equalified
-      }
-      blocker_type {
+        query: `query ($audit_id: uuid!) {
+  audits_by_pk(id: $audit_id) {
+    scans(order_by: {created_at: desc}, limit: 1) {
+      blockers {
         id
-        message
-        type
-        blocker_type_tags {
-          blocker_tag {
+        created_at
+        content
+        url_id
+        blocker_type_blockers {
+          id
+          blocker {
+            equalified
+          }
+          blocker_type {
             id
-            tag
+            message
+            type
+            blocker_type_tags {
+              blocker_tag {
+                id
+                tag
+              }
+            }
           }
         }
       }
@@ -58,7 +56,7 @@ export const getAuditResults = async () => {
         return acc;
     }, {});
 
-    const jsonRows = response.blockers.map(blocker => {
+    const jsonRows = response.audits_by_pk.scans[0].blockers.map(blocker => {
         return {
             blocker_id: blocker.id,
             url_id: urlMap[blocker.url_id],

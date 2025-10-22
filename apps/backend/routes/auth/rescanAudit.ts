@@ -2,18 +2,24 @@ import { db, event } from '#src/utils';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 const lambda = new LambdaClient();
 
-export const runScan = async () => {
-    const { audit_id } = event.body;
+export const rescanAudit = async () => {
+    const { id: audit_id } = event.body;
+
     await db.connect();
+    const scanId = (await db.query({
+        text: `INSERT INTO "scans" ("audit_id", "status") VALUES ($1, $2) RETURNING "id"`,
+        values: [audit_id, 'processing'],
+    })).rows[0].id;
     const urls = (await db.query({
         text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
         values: [audit_id],
     })).rows;
+    console.log('Found URLs for audit:', { auditId: audit_id, count: urls?.length, urls });
     const response = await lambda.send(new InvokeCommand({
         FunctionName: "aws-lambda-scan-sqs-router",
-        InvocationType: "RequestResponse",
+        InvocationType: "Event",
         Payload: JSON.stringify({
-            urls: urls?.map(url => ({ auditId: audit_id, urlId: url.id, url: url.url, type: url.type }))
+            urls: urls?.map(url => ({ auditId: audit_id, scanId: scanId, urlId: url.id, url: url.url, type: url.type }))
         })
     }));
     const responsePayload = JSON.parse(new TextDecoder().decode(response.Payload));
