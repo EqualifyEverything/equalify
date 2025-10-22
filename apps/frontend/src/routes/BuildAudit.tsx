@@ -1,4 +1,4 @@
-import {
+import React, {
   useState,
   MouseEvent,
   FormEvent,
@@ -12,6 +12,7 @@ import {
   EmailSubscriptionList,
 } from "#src/components/AuditEmailSubscriptionInput.tsx";
 import { v4 as uuidv4 } from "uuid";
+import { useGlobalStore } from "../utils";
 
 interface Page {
   url: string;
@@ -19,12 +20,17 @@ interface Page {
 }
 
 export const BuildAudit = () => {
+
+  const { setAriaAnnounceMessage } = useGlobalStore();
+      
+
   const [importBy, setImportBy] = useState("URLs");
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [urlError, setUrlError] = useState<string | null>(null);
 
   const [pagesToDeleteCount, setPagesToDeleteCount] = useState(0);
+  const [auditNameValid, setAuditNameValid] = useState(false);
 
   const { data: user } = useUser();
 
@@ -101,6 +107,7 @@ export const BuildAudit = () => {
     ) as HTMLInputElement;
     if (inputField) inputField.value = "";
     setUrlError(null);
+    setAriaAnnounceMessage(`Added URL ${validUrl}!`);
     return;
   };
 
@@ -110,11 +117,13 @@ export const BuildAudit = () => {
     const form = button.closest("form");
     if (!form) return;
 
-    const checkboxes = form.querySelectorAll('[name="pageCheckbox"]:checked');
+    const checkboxes = form.querySelectorAll('.page-checkbox:checked');
     const toRemove = Array.from(checkboxes).map(
       (cb) => (cb as HTMLInputElement).value
     );
     setPages(pages.filter((row) => !toRemove.includes(row.url)));
+    
+    setAriaAnnounceMessage(`Removed ${toRemove.length} URLs!`);
     uncheckAllPagesToDelete();
     setPagesToDeleteCount(0);
     return;
@@ -195,6 +204,7 @@ export const BuildAudit = () => {
         options: { body: { ...auditData, saveAndRun: true } },
       }).response
     ).body.json();
+    setAriaAnnounceMessage(`Audit saved and audit run started!`);
     navigate(`/audits/${response?.id}`);
     return;
   };
@@ -219,6 +229,7 @@ export const BuildAudit = () => {
         options: { body: { ...auditData, saveAndRun: false } },
       }).response
     ).body.json();
+    setAriaAnnounceMessage(`Audit saved!`);
     navigate(`/audits/${response?.id}`);
     return;
   };
@@ -227,7 +238,8 @@ export const BuildAudit = () => {
     const button = e.target;
     const form = button.closest("form");
     if (!form) return;
-    const checkboxes = form.querySelectorAll('[name="pageCheckbox"]:checked');
+    const checkboxes = form.querySelectorAll('.page-checkbox:checked');
+    console.log(checkboxes);
     setPagesToDeleteCount(checkboxes.length);
   };
 
@@ -239,6 +251,15 @@ export const BuildAudit = () => {
     }
   };
 
+  const validateAuditName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const auditName = e.target.value.trim();
+    if(auditName) { 
+      setAuditNameValid(true)
+    } else {
+      setAuditNameValid(false)
+    };
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-screen-sm">
       <Link to="..">← Go Back</Link>
@@ -246,8 +267,8 @@ export const BuildAudit = () => {
       <form className="flex flex-col gap-4" onSubmit={saveAndRunAudit}>
         <h2>General Info</h2>
         <div className="flex flex-col">
-          <label htmlFor="auditName">Audit Name:</label>
-          <input id="auditName" name="auditName" required={true} />
+          <label htmlFor="auditName">Audit Name <span>(required)</span>:</label>
+          <input id="auditName" name="auditName" onBlur={validateAuditName} required />
         </div>
         <div className="flex flex-col">
           <label htmlFor="scanFrequency">Scan Frequency:</label>
@@ -382,12 +403,12 @@ export const BuildAudit = () => {
           <button
             type="button"
             onClick={saveAudit}
-            disabled={pages.length < 1 }
+            disabled={pages.length < 1 || !auditNameValid}
             className="w-full"
           >
             Save Audit
           </button>
-          <button type="submit" disabled={pages.length < 1} className="w-full">
+          <button type="submit" disabled={pages.length < 1 || !auditNameValid} className="w-full">
             Save & Run Audit
           </button>
         </div>
