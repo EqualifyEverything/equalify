@@ -6,6 +6,7 @@ const apiClient = API.generateClient();
 import Editor from '@monaco-editor/react';
 import { useRef, useEffect, useState } from 'react';
 import type { editor } from 'monaco-editor';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Page {
     url: string;
@@ -32,7 +33,7 @@ export const Audit = () => {
     const { data: scans } = useQuery({
         queryKey: ['scans', auditId],
         queryFn: async () => (await apiClient.graphql({
-            query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: desc}) {id created_at}}`,
+            query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at}}`,
             variables: { audit_id: auditId }
         }))?.data?.scans,
         initialData: [],
@@ -49,6 +50,17 @@ export const Audit = () => {
         queryFn: async () => {
             const results = await (await API.get({
                 apiName: 'auth', path: '/getAuditResults', options: { queryParams: { id: auditId!, type: 'json' } }
+            }).response).body.json();
+            return results;
+        },
+        refetchInterval: 5000,
+    });
+
+    const { data: chartData } = useQuery({
+        queryKey: ['auditChart', auditId],
+        queryFn: async () => {
+            const results = await (await API.get({
+                apiName: 'auth', path: '/getAuditChart', options: { queryParams: { id: auditId!, days: '7' } }
             }).response).body.json();
             return results;
         },
@@ -280,9 +292,6 @@ export const Audit = () => {
                 </div>
             </div>
         </div>
-        <div>
-            {scans?.map((scan, index)=><div>Scan #{index+1}: {formatDate(scan.created_at)}</div>)}
-        </div>
         <form onSubmit={addPage}>
             <div className='flex flex-col'>
                 <label htmlFor='pageInput'>URLs:</label>
@@ -311,6 +320,98 @@ export const Audit = () => {
             </div>)}
             <button type='button' onClick={removePage}>Remove Pages</button>
         </form>
+
+        <div>
+            {scans?.map((scan, index) => <div>Scan #{index + 1}: {formatDate(scan.created_at)}</div>)}
+        </div>
+
+        {chartData?.data && chartData.data.length > 0 && (
+            <div className='mt-8 mb-8'>
+                <h2 id="blockers-chart-heading">Blockers Over Time (Last {chartData.period_days} Days)</h2>
+                <div className='bg-white p-4 rounded-lg shadow'>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart
+                            data={chartData.data}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                            accessibilityLayer={true}
+                            title="Blockers over time trend chart"
+                            desc="Line chart showing blocker counts over time. See the data table below for detailed values."
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                                dataKey="date"
+                                label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
+                                tickFormatter={(value) => {
+                                    const date = new Date(value);
+                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                }}
+                            />
+                            <YAxis
+                                label={{ value: 'Blockers', angle: -90, position: 'insideLeft' }}
+                            />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                                labelFormatter={(value) => {
+                                    const date = new Date(value);
+                                    return date.toLocaleDateString('en-US', { 
+                                        weekday: 'short', 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric' 
+                                    });
+                                }}
+                                formatter={(value: number, name: string) => [value, name === 'blockers' ? 'Blockers' : name]}
+                            />
+                            <Legend />
+                            <Line
+                                type="monotone"
+                                dataKey="blockers"
+                                stroke="#8884d8"
+                                strokeWidth={2}
+                                activeDot={{ r: 8 }}
+                                name="Blockers"
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className='mt-6'>
+                    <h3>Blockers Data Table</h3>
+                    <p className='text-sm text-gray-600 mb-2'>
+                        Detailed data for the chart above. Use this table to access exact blocker counts by date.
+                    </p>
+                    <table className='w-full border-collapse border border-gray-300' aria-labelledby="blockers-chart-heading">
+                        <thead>
+                            <tr className='bg-gray-100'>
+                                <th scope='col' className='border border-gray-300 px-4 py-2 text-left'>
+                                    Date
+                                </th>
+                                <th scope='col' className='border border-gray-300 px-4 py-2 text-left'>
+                                    Blockers
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {chartData.data.map((row: any, index: number) => (
+                                <tr key={row.date} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                    <td className='border border-gray-300 px-4 py-2'>
+                                        {new Date(row.date).toLocaleDateString('en-US', {
+                                            weekday: 'short',
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                        })}
+                                    </td>
+                                    <td className='border border-gray-300 px-4 py-2'>
+                                        {row.blockers}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )}
+        <h2>Full Audit Response</h2>
         {audit && <Editor
             className='mt-2'
             height="500px"
