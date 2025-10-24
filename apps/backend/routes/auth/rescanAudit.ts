@@ -15,15 +15,13 @@ export const rescanAudit = async () => {
         values: [audit_id],
     })).rows;
     console.log('Found URLs for audit:', { auditId: audit_id, count: urls?.length, urls });
-    const response = await lambda.send(new InvokeCommand({
+    await lambda.send(new InvokeCommand({
         FunctionName: "aws-lambda-scan-sqs-router",
         InvocationType: "Event",
         Payload: JSON.stringify({
             urls: urls?.map(url => ({ auditId: audit_id, scanId: scanId, urlId: url.id, url: url.url, type: url.type }))
         })
     }));
-    const responsePayload = JSON.parse(new TextDecoder().decode(response.Payload));
-    console.log(responsePayload);
     await db.clean();
 
     return {
