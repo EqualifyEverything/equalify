@@ -29,6 +29,16 @@ export const Audit = () => {
         initialData: [],
     });
 
+    const { data: scans } = useQuery({
+        queryKey: ['scans', auditId],
+        queryFn: async () => (await apiClient.graphql({
+            query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: desc}) {id created_at}}`,
+            variables: { audit_id: auditId }
+        }))?.data?.scans,
+        initialData: [],
+        refetchInterval: 1000,
+    });
+
     useEffect(() => {
         console.log(urls)
         setPages(urls)
@@ -62,6 +72,18 @@ export const Audit = () => {
             }).response).body.json();
             console.log(response);
             await queryClient.refetchQueries({ queryKey: ['audit', auditId] });
+            return;
+        }
+    }
+
+    const rescanAudit = async () => {
+        if (confirm(`Are you sure you want to re-scan this audit?`)) {
+            const response = await (await API.post({
+                apiName: 'auth', path: '/rescanAudit', options: { body: { id: auditId! } }
+            }).response).body.json();
+            console.log(response);
+            await queryClient.refetchQueries({ queryKey: ['audits'] });
+            navigate('/audits');
             return;
         }
     }
@@ -253,9 +275,13 @@ export const Audit = () => {
                 <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
                 <div className='flex flex-row items-center gap-2'>
                     <button onClick={renameAudit}>Rename</button>
+                    <button onClick={rescanAudit}>Re-scan</button>
                     <button onClick={deleteAudit}>Delete</button>
                 </div>
             </div>
+        </div>
+        <div>
+            {scans?.map((scan, index)=><div>Scan #{index+1}: {formatDate(scan.created_at)}</div>)}
         </div>
         <form onSubmit={addPage}>
             <div className='flex flex-col'>

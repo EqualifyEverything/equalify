@@ -29,29 +29,15 @@ export const scanWebhook = async () => {
         const contentNormalized = normalizeHtmlWithVdom(blocker.node);
         const contentHashId = hashStringToUuid(contentNormalized);
 
-        // Insert or update blocker, setting equalified=false
-        const blockerResult = await db.query({
+        // Insert blocker
+        const blockerId = (await db.query({
             text: `
-                INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "url_id", "equalified") 
+                INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "url_id", "scan_id") 
                 VALUES ($1, $2, $3, $4, $5, $6, $7)
-                ON CONFLICT ("content_hash_id", "url_id") 
-                DO UPDATE SET "equalified" = false
                 RETURNING "id"
             `,
-            values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, urlId, false],
-        });
-        const blockerId = blockerResult.rows[0].id;
-
-        // Insert or update blocker_update for today
-        await db.query({
-            text: `
-                INSERT INTO "blocker_updates" ("audit_id", "blocker_id", "equalified", "scan_id") 
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT ("blocker_id", "created_at")
-                DO UPDATE SET "equalified" = false
-            `,
-            values: [auditId, blockerId, false, scanId],
-        });
+            values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, urlId, scanId],
+        })).rows[0].id;
 
         const tagIds = [];
         for (const tag of blocker.tags) {
