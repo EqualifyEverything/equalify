@@ -20,7 +20,6 @@ import { CookieStorage } from "aws-amplify/utils";
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
 const queryClient = new QueryClient();
 import { registerSW } from "virtual:pwa-register";
-import { AriaAnnounceProvider } from "./components/AriaAnnounceProvider";
 import { useGlobalStore } from "./utils/useGlobalStore";
 registerSW({ immediate: true });
 
@@ -117,8 +116,8 @@ export const App = () => {
       apiKey={import.meta.env.VITE_POSTHOG_KEY}
       options={{ api_host: "https://us.posthog.com" }}
     >
-      <div aria-live="polite" aria-atomic="true" role="status" className="sr-only">
-            {ariaAnnounceMessage}
+      <div aria-live="assertive" role="status" className="sr-only">
+        {ariaAnnounceMessage}
       </div>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />

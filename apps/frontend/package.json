@@ -21,15 +21,15 @@
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-table": "^8.21.3",
     "aws-amplify": "^6.15.6",
+    "graphql-ws": "^6.0.6",
     "posthog-js": "^1.266.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.1",
     "react-select": "^5.10.2",
-    "zustand": "^5.0.8",
-    "graphql-ws": "^6.0.6",
-    "recharts": "^3.3.0"
+    "recharts": "^3.3.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.18",
