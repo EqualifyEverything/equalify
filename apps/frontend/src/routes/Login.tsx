@@ -4,7 +4,6 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
-import { useAriaAnnounceContext } from '#src/components/AriaAnnounceProvider.tsx';
 
 export const Login = () => {
     const queryClient = useQueryClient();

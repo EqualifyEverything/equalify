@@ -203,7 +203,7 @@ export const BuildAudit = () => {
         path: "/saveAudit",
         options: { body: { ...auditData, saveAndRun: true } },
       }).response
-    ).body.json();
+    ).body.json() as { id:string };
     setAriaAnnounceMessage(`Audit saved and audit run started!`);
     navigate(`/audits/${response?.id}`);
     return;
@@ -228,7 +228,7 @@ export const BuildAudit = () => {
         path: "/saveAudit",
         options: { body: { ...auditData, saveAndRun: false } },
       }).response
-    ).body.json();
+    ).body.json() as { id:string };
     setAriaAnnounceMessage(`Audit saved!`);
     navigate(`/audits/${response?.id}`);
     return;

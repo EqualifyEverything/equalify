@@ -38,7 +38,7 @@ export const Navigation = () => {
                 }
             }
             else {
-                setAuthenticated(attributes?.sub);
+                setAuthenticated(attributes?.sub as unknown as boolean);
                 posthog?.identify(attributes?.sub, { email: attributes?.email });
                 await Auth.fetchAuthSession({ forceRefresh: true });
                 if (location.pathname === '/') {
