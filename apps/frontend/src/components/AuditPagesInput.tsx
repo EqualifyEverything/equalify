@@ -193,12 +193,12 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         </div>
       )}
       <button type="button" onClick={addPage}>
-        Add Pages
+        Add URLs
       </button>
 
       {pages.length > 0 && (
         <>
-          <h2>Review Added Pages</h2>
+          <h2>Review Added URLs</h2>
           <table>
             <thead>
               <tr>
@@ -245,7 +245,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
           </table>
           {pagesToDeleteCount > 0 ? (
             <button type="button" onClick={removePage}>
-              Remove {pagesToDeleteCount} Pages
+              Remove {pagesToDeleteCount} URL(s)
             </button>
           ) : null}
         </>
