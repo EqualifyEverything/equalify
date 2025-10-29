@@ -20,12 +20,13 @@ interface Page {
 
 export const BuildAudit = () => {
 
+  const navigate = useNavigate();
   const { setAriaAnnounceMessage } = useGlobalStore();
+  const { data: user } = useUser();
+
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [auditNameValid, setAuditNameValid] = useState(false);
-
-  const { data: user } = useUser();
 
   const defaultEmailList = {
     emails: [
@@ -39,8 +40,6 @@ export const BuildAudit = () => {
   };
   const [emailList, setEmailList] =
     useState<EmailSubscriptionList>(defaultEmailList);
-
-  const navigate = useNavigate();
 
   const buildAuditData = (formData: FormData) => {
     let notifications: EmailSubscriptionList = { emails: [] };
