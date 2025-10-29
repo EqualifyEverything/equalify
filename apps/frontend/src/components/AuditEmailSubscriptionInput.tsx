@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 export interface EmailSubscriptionList {
   emails: EmailSubscriptionEmail[];
 }
+
 interface EmailSubscriptionEmail {
   id: string;
   email: string;
@@ -11,12 +12,12 @@ interface EmailSubscriptionEmail {
   lastSent: string; // UTC date string
 }
 
-const frequencyOpts = ["Daily", "Weekly", "Monthly"];
-
 interface ChildProps {
   initialValue: EmailSubscriptionList;
   onValueChange: (newValue: EmailSubscriptionList) => void; // Callback function prop
 }
+
+const frequencyOpts = ["Daily", "Weekly", "Monthly"];
 
 // main component
 export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
@@ -39,7 +40,12 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
   const handleAddEmail = () => {
     setEmails((prevEmails) => [
       ...prevEmails,
-      { id: uuidv4(), email: "user@uic.edu", frequency: "Weekly", lastSent: "" },
+      {
+        id: uuidv4(),
+        email: "user@uic.edu",
+        frequency: "Weekly",
+        lastSent: "",
+      },
     ]);
   };
 
@@ -55,10 +61,10 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
   );
 
   // whenever we change values, update the parent data
-  useEffect(()=>{
-    console.log("Updating...", emails)
-    onValueChange({ emails: emails })
-  },[emails]);
+  useEffect(() => {
+    console.log("Updating...", emails);
+    onValueChange({ emails: emails });
+  }, [emails]);
 
   return (
     <>
@@ -129,13 +135,13 @@ const EmailInputRow: React.FC<EmailInputRowProps> = ({
         ))}
       </select>
 
-        <button
-          onClick={handleRemoveClick}
-          type="button"
-          aria-label={`Remove email ${email}`}
-        >
-          Remove
-        </button>
+      <button
+        onClick={handleRemoveClick}
+        type="button"
+        aria-label={`Remove email ${email}`}
+      >
+        Remove
+      </button>
     </div>
   );
 };
