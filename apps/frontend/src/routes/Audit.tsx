@@ -7,6 +7,7 @@ import Editor from '@monaco-editor/react';
 import { useRef, useEffect, useState } from 'react';
 import type { editor } from 'monaco-editor';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BlockersTable } from '../components/BlockersTable';
 
 interface Page {
     url: string;
@@ -411,6 +412,9 @@ export const Audit = () => {
                 </div>
             </div>
         )}
+        
+        {auditId && <BlockersTable auditId={auditId} />}
+        
         <h2>Full Audit Response</h2>
         {audit && <Editor
             className='mt-2'
