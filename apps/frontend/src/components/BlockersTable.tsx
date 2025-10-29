@@ -6,7 +6,7 @@ import { formatDate } from '../utils';
 
 interface BlockerTag {
     id: string;
-    tag: string;
+    content: string;
 }
 
 interface Blocker {
@@ -18,6 +18,7 @@ interface Blocker {
     equalified: boolean;
     messages: string[];
     tags: BlockerTag[];
+    categories: string[];
 }
 
 interface BlockersTableProps {
@@ -27,18 +28,26 @@ interface BlockersTableProps {
 export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     const [page, setPage] = useState(0);
     const [pageSize] = useState(50);
-    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ['auditBlockers', auditId, page, pageSize, selectedTag],
+        queryKey: ['auditBlockers', auditId, page, pageSize, selectedTags, selectedTypes, selectedStatus],
         queryFn: async () => {
             const params: Record<string, string> = {
                 id: auditId,
                 page: page.toString(),
                 pageSize: pageSize.toString(),
             };
-            if (selectedTag) {
-                params.tag = selectedTag;
+            if (selectedTags.length > 0) {
+                params.tags = selectedTags.join(',');
+            }
+            if (selectedTypes.length > 0) {
+                params.types = selectedTypes.join(',');
+            }
+            if (selectedStatus) {
+                params.status = selectedStatus;
             }
             const response = await API.get({
                 apiName: 'auth',
@@ -104,7 +113,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                                 key={tag.id}
                                 className='inline-block bg-gray-200 rounded px-2 py-1 text-xs'
                             >
-                                {tag.tag}
+                                {tag.content}
                             </span>
                         ))}
                     </div>
@@ -147,33 +156,152 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
         return <div className='text-red-600'>Error loading blockers: {String(error)}</div>;
     }
 
+    const hasFilters = selectedTags.length > 0 || selectedTypes.length > 0 || selectedStatus;
+    const filterCount = selectedTags.length + selectedTypes.length + (selectedStatus ? 1 : 0);
+
+    const handleTagToggle = (tagId: string) => {
+        setSelectedTags(prev => 
+            prev.includes(tagId) 
+                ? prev.filter(id => id !== tagId)
+                : [...prev, tagId]
+        );
+        setPage(0);
+    };
+
+    const handleTypeToggle = (type: string) => {
+        setSelectedTypes(prev => 
+            prev.includes(type) 
+                ? prev.filter(t => t !== type)
+                : [...prev, type]
+        );
+        setPage(0);
+    };
+
+    const handleStatusChange = (status: string) => {
+        setSelectedStatus(status);
+        setPage(0);
+    };
+
+    const clearAllFilters = () => {
+        setSelectedTags([]);
+        setSelectedTypes([]);
+        setSelectedStatus('');
+        setPage(0);
+    };
+
     return (
         <div className='mt-8'>
             <div className='flex flex-row items-center justify-between mb-4'>
-                <h2>All Blockers {selectedTag && '- Filtered by Tag'}</h2>
-                <div className='flex flex-row items-center gap-4'>
-                    {data?.availableTags && (
-                        <div>
-                            <label htmlFor='tagFilter' className='mr-2 text-sm'>
-                                Filter by Tag:
-                            </label>
-                            <select
-                                id='tagFilter'
-                                value={selectedTag || ''}
-                                onChange={(e) => {
-                                    setSelectedTag(e.target.value || null);
-                                    setPage(0); // Reset to first page when filtering
-                                }}
-                                className='border rounded px-2 py-1'
-                                aria-label='Filter blockers by tag'
+                <h2>
+                    All Blockers 
+                    {hasFilters && ` (${filterCount} filter${filterCount !== 1 ? 's' : ''} active)`}
+                </h2>
+            </div>
+
+            {/* Filter Controls */}
+            <div className='mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200'>
+                <div className='flex flex-col gap-4'>
+                    {/* Status Filter */}
+                    <div>
+                        <label className='block text-sm font-semibold mb-2'>
+                            Status:
+                        </label>
+                        <div className='flex gap-2'>
+                            <button
+                                onClick={() => handleStatusChange('')}
+                                className={`px-3 py-1 rounded text-sm ${
+                                    selectedStatus === '' 
+                                        ? 'bg-blue-600 text-white' 
+                                        : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                }`}
+                                aria-pressed={selectedStatus === ''}
                             >
-                                <option value=''>All Tags</option>
+                                All
+                            </button>
+                            <button
+                                onClick={() => handleStatusChange('active')}
+                                className={`px-3 py-1 rounded text-sm ${
+                                    selectedStatus === 'active' 
+                                        ? 'bg-red-600 text-white' 
+                                        : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                }`}
+                                aria-pressed={selectedStatus === 'active'}
+                            >
+                                Active Only
+                            </button>
+                            <button
+                                onClick={() => handleStatusChange('fixed')}
+                                className={`px-3 py-1 rounded text-sm ${
+                                    selectedStatus === 'fixed' 
+                                        ? 'bg-green-600 text-white' 
+                                        : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                }`}
+                                aria-pressed={selectedStatus === 'fixed'}
+                            >
+                                Fixed Only
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Tag Filter */}
+                    {data?.availableTags && data.availableTags.length > 0 && (
+                        <div>
+                            <label className='block text-sm font-semibold mb-2'>
+                                Tags ({selectedTags.length} selected):
+                            </label>
+                            <div className='flex flex-wrap gap-2'>
                                 {data.availableTags.map((tag: BlockerTag) => (
-                                    <option key={tag.id} value={tag.id}>
-                                        {tag.tag}
-                                    </option>
+                                    <button
+                                        key={tag.id}
+                                        onClick={() => handleTagToggle(tag.id)}
+                                        className={`px-3 py-1 rounded text-sm ${
+                                            selectedTags.includes(tag.id)
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                        }`}
+                                        aria-pressed={selectedTags.includes(tag.id)}
+                                    >
+                                        {tag.content}
+                                    </button>
                                 ))}
-                            </select>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Type Filter */}
+                    {data?.availableCategories && data.availableCategories.length > 0 && (
+                        <div>
+                            <label className='block text-sm font-semibold mb-2'>
+                                Categories ({selectedTypes.length} selected):
+                            </label>
+                            <div className='flex flex-wrap gap-2'>
+                                {data.availableCategories.map((category: string) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => handleTypeToggle(category)}
+                                        className={`px-3 py-1 rounded text-sm font-mono ${
+                                            selectedTypes.includes(category)
+                                                ? 'bg-purple-600 text-white'
+                                                : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                        }`}
+                                        aria-pressed={selectedTypes.includes(category)}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Clear Filters Button */}
+                    {hasFilters && (
+                        <div>
+                            <button
+                                onClick={clearAllFilters}
+                                className='px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold'
+                            >
+                                Clear All Filters
+                            </button>
                         </div>
                     )}
                 </div>

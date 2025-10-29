@@ -23,19 +23,19 @@ export const getAuditResults = async () => {
         created_at
         content
         url_id
-        blocker_type_blockers {
+        blocker_messages {
           id
           blocker {
             equalified
           }
-          blocker_type {
+          message {
             id
-            message
-            type
-            blocker_type_tags {
-              blocker_tag {
+            content
+            category
+            message_tags {
+              tag {
                 id
-                tag
+                content
               }
             }
           }
@@ -63,8 +63,8 @@ export const getAuditResults = async () => {
             html: blocker.content,
             equalified: blocker.equalified,
             created_at: blocker.created_at,
-            messages: blocker.blocker_type_blockers.map(obj =>
-                `${obj.blocker_type.type}: ${obj.blocker_type.message}`
+            messages: blocker.blocker_messages.map(obj =>
+                `${obj.message.category}: ${obj.message.content}`
             )
         }
     });

@@ -44,7 +44,7 @@ export const scanWebhook = async () => {
             const tagId = hashStringToUuid(tag);
             tagIds.push(tagId);
             await db.query({
-                text: `INSERT INTO "blocker_tags" ("id", "tag") VALUES ($1, $2) ON CONFLICT ("id") DO NOTHING`,
+                text: `INSERT INTO "tags" ("id", "content") VALUES ($1, $2) ON CONFLICT ("id") DO NOTHING`,
                 values: [tagId, tag],
             });
         }
@@ -53,7 +53,7 @@ export const scanWebhook = async () => {
         const blockerTypeId = hashStringToUuid(blocker.description);
         await db.query({
             text: `
-                    INSERT INTO "blocker_types" ("id", "message", "type") 
+                    INSERT INTO "messages" ("id", "content", "category") 
                     VALUES ($1, $2, $3) 
                     ON CONFLICT ("id") DO NOTHING
                 `,
@@ -64,9 +64,9 @@ export const scanWebhook = async () => {
         for (const tagId of tagIds) {
             await db.query({
                 text: `
-                    INSERT INTO "blocker_type_tags" ("blocker_type_id", "blocker_tag_id") 
+                    INSERT INTO "message_tags" ("message_id", "tag_id") 
                     VALUES ($1, $2)
-                    ON CONFLICT ("blocker_type_id", "blocker_tag_id") DO NOTHING
+                    ON CONFLICT ("message_id", "tag_id") DO NOTHING
                 `,
                 values: [blockerTypeId, tagId],
             });
@@ -75,9 +75,9 @@ export const scanWebhook = async () => {
         // Link blocker type to blocker
         await db.query({
             text: `
-                INSERT INTO "blocker_type_blockers" ("blocker_type_id", "blocker_id") 
+                INSERT INTO "blocker_messages" ("message_id", "blocker_id") 
                 VALUES ($1, $2)
-                ON CONFLICT ("blocker_type_id", "blocker_id") DO NOTHING
+                ON CONFLICT ("message_id", "blocker_id") DO NOTHING
             `,
             values: [blockerTypeId, blockerId],
         });

@@ -4,7 +4,14 @@ export const getAuditTable = async () => {
     const auditId = event.queryStringParameters.id;
     const page = parseInt((event.queryStringParameters as any).page || '0', 10);
     const pageSize = parseInt((event.queryStringParameters as any).pageSize || '50', 10);
-    const tagFilter = (event.queryStringParameters as any).tag || null; // tag ID to filter by
+    
+    // Parse multiple filter parameters (comma-separated)
+    const tagsParam = (event.queryStringParameters as any).tags || null;
+    const categoriesParam = (event.queryStringParameters as any).categories || null;
+    const statusParam = (event.queryStringParameters as any).status || null;
+    
+    const tagFilters = tagsParam ? tagsParam.split(',').filter(Boolean) : [];
+    const typeFilters = categoriesParam ? categoriesParam.split(',').filter(Boolean) : [];
 
     await db.connect();
     const audit = (await db.query({
@@ -17,21 +24,58 @@ export const getAuditTable = async () => {
     })).rows;
     await db.clean();
 
-    // Build the where clause for tag filtering
-    let whereClause = {};
-    if (tagFilter) {
-        whereClause = {
-            blocker_type_blockers: {
-                blocker_type: {
-                    blocker_type_tags: {
-                        blocker_tag: {
-                            id: { _eq: tagFilter }
+    // Build the where clause with multiple filters
+    const whereConditions: any[] = [];
+    
+    // Tag filtering (OR condition - blocker has ANY of the selected tags)
+    if (tagFilters.length > 0) {
+        whereConditions.push({
+            blocker_messages: {
+                message: {
+                    message_tags: {
+                        tag: {
+                            id: { _in: tagFilters }
                         }
                     }
                 }
             }
-        };
+        });
     }
+    
+    // Category filtering (OR condition - blocker has ANY of the selected categories)
+    if (typeFilters.length > 0) {
+        whereConditions.push({
+            blocker_messages: {
+                message: {
+                    category: { _in: typeFilters }
+                }
+            }
+        });
+    }
+    
+    // Status filtering (equalified true/false)
+    if (statusParam) {
+        if (statusParam === 'active') {
+            whereConditions.push({
+                blocker_messages: {
+                    blocker: {
+                        equalified: { _eq: false }
+                    }
+                }
+            });
+        } else if (statusParam === 'fixed') {
+            whereConditions.push({
+                blocker_messages: {
+                    blocker: {
+                        equalified: { _eq: true }
+                    }
+                }
+            });
+        }
+    }
+    
+    // Combine all conditions with AND
+    const whereClause = whereConditions.length > 0 ? { _and: whereConditions } : {};
 
     // Query to get blockers from the latest scan with pagination
     const query = {
@@ -45,17 +89,19 @@ export const getAuditTable = async () => {
         created_at
         content
         url_id
-        equalified
-        blocker_type_blockers {
+        blocker_messages {
           id
-          blocker_type {
+          blocker {
+            equalified
+          }
+          message {
             id
-            message
-            type
-            blocker_type_tags {
-              blocker_tag {
+            content
+            category
+            message_tags {
+              tag {
                 id
-                tag
+                content
               }
             }
           }
@@ -68,9 +114,12 @@ export const getAuditTable = async () => {
       }
     }
   }
-  blocker_tags(order_by: {tag: asc}) {
+  tags(order_by: {content: asc}) {
     id
-    tag
+    content
+  }
+  messages(order_by: {category: asc}, distinct_on: category) {
+    category
   }
 }`,
         variables: { 
@@ -94,16 +143,32 @@ export const getAuditTable = async () => {
     const latestScan = response.audits_by_pk?.scans?.[0];
     const blockers = latestScan?.blockers || [];
     const totalCount = latestScan?.blockers_aggregate?.aggregate?.count || 0;
-    const availableTags = response.blocker_tags || [];
+    const availableTags = response.tags || [];
+    const availableCategories = response.messages || [];
 
     // Format the blockers data
     const formattedBlockers = blockers.map(blocker => {
-        const tags = blocker.blocker_type_blockers.flatMap(btb => 
-            btb.blocker_type.blocker_type_tags?.blocker_tag ? [btb.blocker_type.blocker_type_tags.blocker_tag] : []
+        // Extract tags from blocker_messages -> message -> message_tags -> tag
+        const tags = blocker.blocker_messages.flatMap(bm => 
+            bm.message.message_tags?.map(mt => mt.tag).filter(Boolean) || []
         );
         
         const uniqueTags = Array.from(
             new Map(tags.map(tag => [tag.id, tag])).values()
+        );
+
+        // Extract categories from blocker_messages -> message -> category
+        const categories = blocker.blocker_messages.map(bm => bm.message.category);
+        const uniqueCategories = Array.from(new Set(categories));
+
+        // Extract equalified status from blocker_messages -> blocker -> equalified
+        const equalified = blocker.blocker_messages.length > 0 
+            ? blocker.blocker_messages[0].blocker.equalified 
+            : false;
+
+        // Extract message contents
+        const messages = blocker.blocker_messages.map(bm => 
+            `${bm.message.category}: ${bm.message.content}`
         );
 
         return {
@@ -112,11 +177,10 @@ export const getAuditTable = async () => {
             url: urlMap[blocker.url_id] || blocker.url_id,
             url_id: blocker.url_id,
             content: blocker.content,
-            equalified: blocker.equalified,
-            messages: blocker.blocker_type_blockers.map(btb => 
-                `${btb.blocker_type.type}: ${btb.blocker_type.message}`
-            ),
+            equalified: equalified,
+            messages: messages,
             tags: uniqueTags,
+            categories: uniqueCategories,
         };
     });
 
@@ -135,7 +199,12 @@ export const getAuditTable = async () => {
                 totalPages: Math.ceil(totalCount / pageSize),
             },
             availableTags,
-            currentTagFilter: tagFilter,
+            availableCategories: availableCategories.map((m: any) => m.category).filter(Boolean),
+            filters: {
+                tags: tagFilters,
+                types: typeFilters,
+                status: statusParam,
+            },
         },
     };
 }
