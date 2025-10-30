@@ -1,4 +1,4 @@
-import { db, event, hashStringToUuid, normalizeHtmlWithVdom } from "#src/utils"
+import { db, event, hashStringToUuid, normalizeHtmlWithVdom, generateShortId } from "#src/utils"
 
 export const scanWebhook = async () => {
     console.log(JSON.stringify(event));
@@ -28,15 +28,16 @@ export const scanWebhook = async () => {
     for (const blocker of blockers) {
         const contentNormalized = normalizeHtmlWithVdom(blocker.node);
         const contentHashId = hashStringToUuid(contentNormalized);
+        const shortId = generateShortId();
 
         // Insert blocker
         const blockerId = (await db.query({
             text: `
-                INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "url_id", "scan_id") 
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id") 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 RETURNING "id"
             `,
-            values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, urlId, scanId],
+            values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, scanId],
         })).rows[0].id;
 
         const tagIds = [];

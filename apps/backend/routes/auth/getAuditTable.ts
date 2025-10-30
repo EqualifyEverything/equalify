@@ -86,6 +86,7 @@ export const getAuditTable = async () => {
       created_at
       blockers(where: $where, limit: $limit, offset: $offset, order_by: {created_at: desc}) {
         id
+        short_id
         created_at
         content
         url_id
@@ -173,6 +174,7 @@ export const getAuditTable = async () => {
 
         return {
             id: blocker.id,
+            short_id: blocker.short_id,
             created_at: blocker.created_at,
             url: urlMap[blocker.url_id] || blocker.url_id,
             url_id: blocker.url_id,

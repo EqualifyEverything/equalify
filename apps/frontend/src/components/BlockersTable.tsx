@@ -11,6 +11,7 @@ interface BlockerTag {
 
 interface Blocker {
     id: string;
+    short_id: string;
     created_at: string;
     url: string;
     url_id: string;
@@ -60,6 +61,18 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     });
 
     const columns = useMemo<ColumnDef<Blocker>[]>(() => [
+        {
+            accessorKey: 'short_id',
+            header: 'ID',
+            cell: ({ getValue }) => {
+                const shortId = getValue() as string;
+                return (
+                    <code className='text-sm font-bold bg-gray-100 px-2 py-1 rounded'>
+                        {shortId || 'N/A'}
+                    </code>
+                );
+            },
+        },
         {
             accessorKey: 'content',
             header: 'Blocker Code',
