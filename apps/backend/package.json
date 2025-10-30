@@ -25,7 +25,8 @@
     "openai": "^5.22.0",
     "serverless-postgres": "^2.1.2",
     "string-strip-html": "^13.4.13",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "nanoid": "^5.1.6"
   },
   "imports": {
     "#src/*": "./*"
