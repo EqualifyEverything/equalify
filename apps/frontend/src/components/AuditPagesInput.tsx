@@ -27,6 +27,96 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   const [urlError, setUrlError] = useState<string | null>(null);
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [pagesToDeleteCount, setPagesToDeleteCount] = useState(0);
+  const [csvError, setCsvError] = useState<string | null>(null);
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.endsWith('.csv') && !file.type.includes('csv') && !file.type.includes('text')) {
+      setCsvError("Please upload a CSV or text file");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (!text) {
+        setCsvError("Failed to read file");
+        return;
+      }
+
+      // Parse CSV - expecting one URL per line
+      const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+      
+      if (lines.length === 0) {
+        setCsvError("No URLs found in the file");
+        return;
+      }
+
+      const newPages: Page[] = [];
+      const errors: string[] = [];
+      const duplicates: string[] = [];
+
+      lines.forEach((line, index) => {
+        // Skip empty lines and potential header rows
+        if (!line || line.toLowerCase().includes('url') && index === 0) return;
+
+        // Validate and format URL
+        const validUrl = validateAndFormatUrl(line);
+        if (!validUrl) {
+          errors.push(`Line ${index + 1}: Invalid URL format`);
+          return;
+        }
+
+        // Check for duplicates in existing pages
+        if (pages.some(page => page.url === validUrl)) {
+          duplicates.push(validUrl);
+          return;
+        }
+
+        // Check for duplicates in new pages being added
+        if (newPages.some(page => page.url === validUrl)) {
+          duplicates.push(validUrl);
+          return;
+        }
+
+        newPages.push({ url: validUrl, type: "html" });
+      });
+
+      // Add all valid URLs to the pages
+      if (newPages.length > 0) {
+        setPages([...pages, ...newPages]);
+        setAriaAnnounceMessage(`Successfully imported ${newPages.length} URL(s) from CSV`);
+        setCsvError(null);
+      }
+
+      // Show warnings if there were issues
+      if (errors.length > 0 || duplicates.length > 0) {
+        const messages: string[] = [];
+        if (newPages.length > 0) {
+          messages.push(`Successfully imported ${newPages.length} URL(s).`);
+        }
+        if (duplicates.length > 0) {
+          messages.push(`${duplicates.length} duplicate(s) skipped.`);
+        }
+        if (errors.length > 0) {
+          messages.push(`${errors.length} invalid URL(s) skipped.`);
+        }
+        setCsvError(messages.join(' '));
+      }
+
+      // Clear the file input
+      e.target.value = '';
+    };
+
+    reader.onerror = () => {
+      setCsvError("Error reading file");
+    };
+
+    reader.readAsText(file);
+  };
 
   const addPage = (e: React.MouseEvent<HTMLButtonElement>) => {
     //e.preventDefault();
@@ -221,8 +311,16 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       )}
       {["CSV"].includes(importBy) && (
         <div className="flex flex-col">
-          <label htmlFor="pageInput">CSV Upload:</label>
-          <input id="pageInput" name="pageInput" type="file" />
+          <label htmlFor="csvInput">CSV Upload:</label>
+          <input 
+            id="csvInput" 
+            name="csvInput" 
+            type="file" 
+            accept=".csv,.txt,text/csv,text/plain"
+            onChange={handleCsvUpload}
+          />
+          <p className="text-sm text-gray-600 mt-1">Upload a CSV or text file with one URL per line</p>
+          {csvError && <p className="text-red-500 text-sm mt-1">{csvError}</p>}
         </div>
       )}
       <button type="button" onClick={addPage}>
