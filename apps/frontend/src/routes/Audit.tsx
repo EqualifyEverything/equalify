@@ -19,6 +19,7 @@ import {
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaClipboard } from "react-icons/fa";
+import * as Tabs from "@radix-ui/react-tabs";
 
 // TODO
 /*
@@ -27,7 +28,7 @@ X Rewrite Add/Remove URLs to use component
 - Add Count to "Active"|"Fixed"|"All" Response
 - Scan button should do something other than send you to the audit list
 - Does ID need its own column? 
-- Chart & Table in Tabs
+X Chart & Table in Tabs
 - Tags are duplicated from server
 - Categories not mapped/populated
 X Copy to clipboard
@@ -38,7 +39,7 @@ X Copy to clipboard
 - Scan state?
 - Supress Errors on audits without scans
 - Paged size in pagination options
-- Table taborder
+- Table taborder (needs testing)
 - How exactly are we handling the dates/range on the chart & table? (Days input someplace)
 */
 
@@ -234,8 +235,12 @@ export const Audit = () => {
 
   const copyCurrentLocationToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.origin+location.pathname);
-      console.log(`URL ${window.location.origin+location.pathname} copied to clipboard!`);
+      await navigator.clipboard.writeText(
+        window.location.origin + location.pathname
+      );
+      console.log(
+        `URL ${window.location.origin + location.pathname} copied to clipboard!`
+      );
     } catch (err) {
       console.error("Failed to copy URLs: ", err);
     }
@@ -288,117 +293,127 @@ export const Audit = () => {
           <h2 id="blockers-chart-heading">
             Blockers Over Time (Last {chartData.period_days} Days)
           </h2>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={chartData.data}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                accessibilityLayer={true}
-                title="Blockers over time trend chart"
-                desc="Line chart showing blocker counts over time. See the data table below for detailed values."
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  label={{
-                    value: "Date",
-                    position: "insideBottom",
-                    offset: -5,
-                  }}
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                />
-                <YAxis
-                  label={{
-                    value: "Blockers",
-                    angle: -90,
-                    position: "insideLeft",
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #ccc",
-                  }}
-                  labelFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                  formatter={(value: number, name: string) => [
-                    value,
-                    name === "blockers" ? "Blockers" : name,
-                  ]}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="blockers"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  activeDot={{ r: 8 }}
-                  name="Blockers"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-6">
-            <h3>Blockers Data Table</h3>
-            <p className="text-sm text-gray-600 mb-2">
-              Detailed data for the chart above. Use this table to access exact
-              blocker counts by date.
-            </p>
-            <table
-              className="w-full border-collapse border border-gray-300"
-              aria-labelledby="blockers-chart-heading"
-            >
-              <thead>
-                <tr className="bg-gray-100">
-                  <th
-                    scope="col"
-                    className="border border-gray-300 px-4 py-2 text-left"
+          <Tabs.Root defaultValue="chart" orientation="vertical">
+            <Tabs.List aria-label="Select a Chart View">
+              <Tabs.Trigger value="chart">Chart View</Tabs.Trigger>
+              <Tabs.Trigger value="table">Table View</Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="chart">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={chartData.data}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    accessibilityLayer={true}
+                    title="Blockers over time trend chart"
+                    desc="Line chart showing blocker counts over time. See the data table below for detailed values."
                   >
-                    Date
-                  </th>
-                  <th
-                    scope="col"
-                    className="border border-gray-300 px-4 py-2 text-left"
-                  >
-                    Blockers
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {chartData.data.map((row: any, index: number) => (
-                  <tr
-                    key={row.date}
-                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                  >
-                    <td className="border border-gray-300 px-4 py-2">
-                      {new Date(row.date).toLocaleDateString("en-US", {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {row.blockers}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      label={{
+                        value: "Date",
+                        position: "insideBottom",
+                        offset: -5,
+                      }}
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
+                    />
+                    <YAxis
+                      label={{
+                        value: "Blockers",
+                        angle: -90,
+                        position: "insideLeft",
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "white",
+                        border: "1px solid #ccc",
+                      }}
+                      labelFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
+                      formatter={(value: number, name: string) => [
+                        value,
+                        name === "blockers" ? "Blockers" : name,
+                      ]}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="blockers"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                      name="Blockers"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="table">
+              <div className="mt-6">
+                <h3>Blockers Data Table</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  Detailed data for the chart above. Use this table to access
+                  exact blocker counts by date.
+                </p>
+                <table
+                  className="w-full border-collapse border border-gray-300"
+                  aria-labelledby="blockers-chart-heading"
+                >
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th
+                        scope="col"
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        Date
+                      </th>
+                      <th
+                        scope="col"
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        Blockers
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartData.data.map((row: any, index: number) => (
+                      <tr
+                        key={row.date}
+                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      >
+                        <td className="border border-gray-300 px-4 py-2">
+                          {new Date(row.date).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          {row.blockers}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Tabs.Content>
+          </Tabs.Root>
         </div>
       )}
 
