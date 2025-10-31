@@ -25,16 +25,20 @@ import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 X Rewrite Add/Remove URLs to use component
 - Add change HTML/PDF type to component
 - Add Count to "Active"|"Fixed"|"All" Response
+- Scan button should do something other than send you to the audit list
+- Does ID need its own column? 
 - Chart & Table in Tabs
 - Tags are duplicated from server
 - Categories not mapped/populated
 - Copy to clipboard
 - Blocker code in panel
-- Tags: shorten/tooltip
+- Tags in table: shorten into tooltip
 - Sort by URL
-- URLs list behind accordion
+- URLs list and add/remove behind accordion
 - Scan state?
 - Supress Errors on audits without scans
+- Paged size in pagination options
+- How exactly are we handling the dates/range on the chart & table? (Days input someplace)
 */ 
 
 interface Page {
