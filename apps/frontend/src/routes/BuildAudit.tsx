@@ -67,7 +67,7 @@ export const BuildAudit = () => {
   const saveAndRunAudit = async (e: FormEvent) => {
     e.preventDefault();
     if (pages.length === 0) {
-      window.alert(`You need to add at least 1 page to your audit.`);
+      window.alert(`You need to add at least 1 URL to your audit.`);
       return;
     }
     const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -88,7 +88,7 @@ export const BuildAudit = () => {
   const saveAudit = async (e: FormEvent) => {
     e.preventDefault();
     if (pages.length === 0) {
-      window.alert(`You need to add at least 1 page to your audit.`);
+      window.alert(`You need to add at least 1 URL to your audit.`);
       return;
     }
     const form = (e.currentTarget as HTMLElement).closest("form");

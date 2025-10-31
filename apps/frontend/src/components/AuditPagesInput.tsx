@@ -4,15 +4,22 @@ import { useGlobalStore } from "../utils";
 interface Page {
   url: string;
   type: "html" | "pdf";
+  id?: string;
 }
 interface ChildProps {
   initialPages: Page[];
   setParentPages: (newValue: Page[]) => void; // Callback function prop
+  addParentPages?: (newValue: Page[]) => void; // Callback function prop
+  removeParentPages?: (newValue: Page[]) => void; // Callback function prop
+  returnMutation?: boolean; // if true, only return changed rows
 }
 
 export const AuditPagesInput: React.FC<ChildProps> = ({
   initialPages,
   setParentPages,
+  addParentPages,
+  removeParentPages,
+  returnMutation = false
 }) => {
   const { setAriaAnnounceMessage } = useGlobalStore();
 
@@ -142,7 +149,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     const form = button.closest("form");
     if (!form) return;
     const checkboxes = form.querySelectorAll(".page-checkbox:checked");
-    console.log(checkboxes);
+    //console.log(checkboxes);
     setPagesToDeleteCount(checkboxes.length);
   };
 
@@ -157,7 +164,33 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   // update parent value on change
   useEffect(() => {
       console.log("Updating pages...");
-      setParentPages(pages);
+      console.log("Pages:", pages);
+      console.log("InitialPages", initialPages);
+      
+      if(returnMutation){
+        let arrDelta:Page[] = [];
+        if( initialPages === pages ) return;
+        if( initialPages.length < pages.length) { // adding pages
+          console.log("Adding...")
+          arrDelta = pages.filter(page => !initialPages.includes(page));
+          if(addParentPages)
+          addParentPages(arrDelta);
+        }
+        if( initialPages.length > pages.length) { // removing pages
+          console.log("Removing...")
+          const initialUrls = initialPages.map(page=>page.url);
+          const pageUrls = pages.map(page=>page.url);
+          const overlap = initialUrls.filter(page => !pageUrls.includes(page));
+          arrDelta = initialPages.filter(page=> overlap.includes(page.url));
+          console.log("To remove:",arrDelta);
+          if(removeParentPages)
+          removeParentPages(arrDelta);
+        }
+        setParentPages(arrDelta);
+      }
+      else{
+        setParentPages(pages);
+      }
     }, [pages]);
 
   return (

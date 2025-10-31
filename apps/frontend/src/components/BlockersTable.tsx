@@ -3,6 +3,8 @@ import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from '@tanstack
 import * as API from 'aws-amplify/api';
 import { useState, useMemo } from 'react';
 import { formatDate } from '../utils';
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import Select, { MultiValue } from 'react-select'
 
 interface BlockerTag {
     id: string;
@@ -26,15 +28,25 @@ interface BlockersTableProps {
     auditId: string;
 }
 
+interface Option {
+  value: string;
+  label: string;
+}
+
 export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     const [page, setPage] = useState(0);
     const [pageSize] = useState(50);
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    
+    const [selectedTags, setSelectedTags] = useState<Option[]>([]);
+    const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
+    
+    const [selectedCategories, setSelectedCategories] = useState<Option[]>([]);
+    const [availableCategories, setAvailableCategories] = useState<Option[]>([]);  // Added to prevent content flicker while fetching
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['auditBlockers', auditId, page, pageSize, selectedTags, selectedTypes, selectedStatus],
+    const [selectedStatus, setSelectedStatus] = useState<string>('active');
+
+    const { data, isFetching, isLoading, error } = useQuery({
+        queryKey: ['auditBlockers', auditId, page, pageSize, selectedTags, selectedCategories, selectedStatus],
         queryFn: async () => {
             const params: Record<string, string> = {
                 id: auditId,
@@ -42,10 +54,11 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 pageSize: pageSize.toString(),
             };
             if (selectedTags.length > 0) {
-                params.tags = selectedTags.join(',');
+                //params.tags = selectedTags.join(',');
+                params.tags = selectedTags.map((tag)=>tag.value).join(",");
             }
-            if (selectedTypes.length > 0) {
-                params.types = selectedTypes.join(',');
+            if (selectedCategories.length > 0) {
+                params.types = selectedCategories.map((tag)=>tag.value).join(',');
             }
             if (selectedStatus) {
                 params.status = selectedStatus;
@@ -55,7 +68,17 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 path: '/getAuditTable',
                 options: { queryParams: params }
             }).response;
-            return await response.body.json() as any;
+            const resp = await response.body.json() as any;
+
+            // we need to parse the server data to convert BlockerTag[] to Options[]
+            resp.availableTags = resp.availableTags?.map((tag:BlockerTag)=>({value:tag.id, label:tag.content}));
+            // Then we store it in local state
+            setAvailableTags(resp.availableTags);
+            
+            resp.availableCategories = resp.availableCategories?.map((category:string) => ({value: category, label: category}));
+            setAvailableCategories(resp.availableCategories);
+
+            return resp;
         },
         refetchInterval: 5000,
     });
@@ -147,14 +170,14 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 );
             },
         },
-        {
+        /* {
             accessorKey: 'created_at',
             header: 'Date',
             cell: ({ getValue }) => {
                 const date = getValue() as string;
                 return <span className='text-sm whitespace-nowrap'>{formatDate(date)}</span>;
             },
-        },
+        }, */
     ], []);
 
     const table = useReactTable({
@@ -169,18 +192,27 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
         return <div className='text-red-600'>Error loading blockers: {String(error)}</div>;
     }
 
-    const hasFilters = selectedTags.length > 0 || selectedTypes.length > 0 || selectedStatus;
-    const filterCount = selectedTags.length + selectedTypes.length + (selectedStatus ? 1 : 0);
+    const hasFilters = selectedTags.length > 0 || selectedCategories.length > 0 || selectedStatus;
+    const filterCount = selectedTags.length + selectedCategories.length + (selectedStatus ? 1 : 0);
 
-    const handleTagToggle = (tagId: string) => {
+    /* const handleTagToggle = (tagId: string) => {
         setSelectedTags(prev => 
             prev.includes(tagId) 
                 ? prev.filter(id => id !== tagId)
                 : [...prev, tagId]
         );
         setPage(0);
-    };
+    }; */
+    const handleTagToggle = (selected:MultiValue<Option>) => {
+        setSelectedTags(selected as Option[]);
+        setPage(0);
+    }
 
+    const handleCategoryToggle = (newVal:MultiValue<Option>) => {
+        setSelectedCategories(newVal as Option[]);
+        setPage(0)
+    }
+    /* 
     const handleTypeToggle = (type: string) => {
         setSelectedTypes(prev => 
             prev.includes(type) 
@@ -188,7 +220,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 : [...prev, type]
         );
         setPage(0);
-    };
+    }; */ 
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
@@ -197,8 +229,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
 
     const clearAllFilters = () => {
         setSelectedTags([]);
-        setSelectedTypes([]);
-        setSelectedStatus('');
+        setSelectedCategories([]);
+        setSelectedStatus('all');
         setPage(0);
     };
 
@@ -220,6 +252,36 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                             Status:
                         </label>
                         <div className='flex gap-2'>
+                            <ToggleGroup.Root
+                                className="statusToggleGroup"
+                                type="single"
+                                defaultValue="all"
+                                aria-label="View by status:"
+                                value={selectedStatus}
+                                onValueChange={handleStatusChange}
+                            >
+                                <ToggleGroup.Item
+                                    value="active"
+                                    aria-label="Active"
+                                    className='data-[state=on]:bg-blue-500 data-[state=on]:text-white'
+                                >
+                                    Active
+                                </ToggleGroup.Item>
+                                <ToggleGroup.Item
+                                    value="fixed"
+                                    aria-label="Fixed"
+                                    className='data-[state=on]:bg-blue-500 data-[state=on]:text-white'
+                                >
+                                    Fixed
+                                </ToggleGroup.Item>
+                                <ToggleGroup.Item
+                                    value="all"
+                                    aria-label="All"
+                                    className='data-[state=on]:bg-blue-500 data-[state=on]:text-white'
+                                >
+                                    All
+                                </ToggleGroup.Item>
+                            </ToggleGroup.Root>{/* 
                             <button
                                 onClick={() => handleStatusChange('')}
                                 className={`px-3 py-1 rounded text-sm ${
@@ -252,11 +314,21 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                                 aria-pressed={selectedStatus === 'fixed'}
                             >
                                 Fixed Only
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 
                     {/* Tag Filter */}
+                    {availableTags && availableTags.length > 0 && (
+                        <Select
+                            options={availableTags}
+                            isMulti
+                            value={selectedTags}
+                            placeholder='Filter by Tags...'
+                            aria-label='Filter by Tags'
+                            onChange={handleTagToggle} 
+                        />
+                    )}{/* 
                     {data?.availableTags && data.availableTags.length > 0 && (
                         <div>
                             <label className='block text-sm font-semibold mb-2'>
@@ -280,8 +352,18 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                             </div>
                         </div>
                     )}
-
+ */}
                     {/* Type Filter */}
+                    {availableCategories && availableCategories.length > 0 && (
+                        <Select 
+                            options={availableCategories}
+                            isMulti
+                            value={selectedCategories}
+                            placeholder='Filter by Categories...'
+                            aria-label='Filter by Categories'
+                            onChange={handleCategoryToggle} 
+                        />
+                    )}{/* 
                     {data?.availableCategories && data.availableCategories.length > 0 && (
                         <div>
                             <label className='block text-sm font-semibold mb-2'>
@@ -304,7 +386,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                                 ))}
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {/* Clear Filters Button */}
                     {hasFilters && (

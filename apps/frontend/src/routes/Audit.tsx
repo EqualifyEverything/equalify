@@ -1,430 +1,399 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { formatDate, formatId } from '../utils';
-import * as API from 'aws-amplify/api';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatDate, formatId } from "../utils";
+import * as API from "aws-amplify/api";
+import { Link, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
-import Editor from '@monaco-editor/react';
-import { useRef, useEffect, useState } from 'react';
-import type { editor } from 'monaco-editor';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BlockersTable } from '../components/BlockersTable';
+import Editor from "@monaco-editor/react";
+import { useRef, useEffect, useState } from "react";
+import type { editor } from "monaco-editor";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { BlockersTable } from "../components/BlockersTable";
+import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
+
+
+// TODO
+/*
+X Rewrite Add/Remove URLs to use component
+- Add change HTML/PDF type to component
+- Add Count to "Active"|"Fixed"|"All" Response
+- Chart & Table in Tabs
+- Tags are duplicated from server
+- Categories not mapped/populated
+- Copy to clipboard
+- Blocker code in panel
+- Tags: shorten/tooltip
+- Sort by URL
+- URLs list behind accordion
+- Scan state?
+- Supress Errors on audits without scans
+*/ 
 
 interface Page {
-    url: string;
-    type: 'html' | 'pdf';
+  url: string;
+  type: "html" | "pdf";
 }
 
 export const Audit = () => {
-    const { auditId } = useParams();
-    const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
-    const [pages, setPages] = useState<Page[]>([]);
-    const [urlError, setUrlError] = useState<string | null>(null);
+  const { auditId } = useParams();
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [pages, setPages] = useState<Page[]>([]);
+  const [urlError, setUrlError] = useState<string | null>(null);
 
-    const { data: urls } = useQuery({
-        queryKey: ['urls', auditId],
-        queryFn: async () => (await apiClient.graphql({
-            query: `query($audit_id: uuid){urls(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: desc}) {id url type}}`,
-            variables: { audit_id: auditId }
-        }))?.data?.urls,
-        initialData: [],
-    });
-
-    const { data: scans } = useQuery({
-        queryKey: ['scans', auditId],
-        queryFn: async () => (await apiClient.graphql({
-            query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at}}`,
-            variables: { audit_id: auditId }
-        }))?.data?.scans,
-        initialData: [],
-        refetchInterval: 1000,
-    });
-
-    useEffect(() => {
-        console.log(urls)
-        setPages(urls)
-    }, [urls]);
-
-    const { data: audit } = useQuery({
-        queryKey: ['audit', auditId],
-        queryFn: async () => {
-            const results = await (await API.get({
-                apiName: 'auth', path: '/getAuditResults', options: { queryParams: { id: auditId!, type: 'json' } }
-            }).response).body.json();
-            return results;
-        },
-        refetchInterval: 5000,
-    });
-
-    const { data: chartData } = useQuery({
-        queryKey: ['auditChart', auditId],
-        queryFn: async () => {
-            const results = await (await API.get({
-                apiName: 'auth', path: '/getAuditChart', options: { queryParams: { id: auditId!, days: '7' } }
-            }).response).body.json();
-            return results;
-        },
-        refetchInterval: 5000,
-    });
-
-    // Format the JSON whenever audit data changes
-    useEffect(() => {
-        if (editorRef.current && audit) {
-            setTimeout(() => {
-                editorRef.current?.getAction('editor.action.formatDocument')?.run();
-            }, 100);
-        }
-    }, [audit]);
-
-    const renameAudit = async () => {
-        const newName = prompt(`What would you like to rename this audit to?`, audit?.name)
-        if (newName) {
-            const response = await (await API.post({
-                apiName: 'auth', path: '/updateAudit', options: { body: { id: auditId!, name: newName } }
-            }).response).body.json();
-            console.log(response);
-            await queryClient.refetchQueries({ queryKey: ['audit', auditId] });
-            return;
-        }
-    }
-
-    const rescanAudit = async () => {
-        if (confirm(`Are you sure you want to re-scan this audit?`)) {
-            const response = await (await API.post({
-                apiName: 'auth', path: '/rescanAudit', options: { body: { id: auditId! } }
-            }).response).body.json();
-            console.log(response);
-            await queryClient.refetchQueries({ queryKey: ['audits'] });
-            navigate('/audits');
-            return;
-        }
-    }
-
-    const deleteAudit = async () => {
-        if (confirm(`Are you sure you want to delete this audit?`)) {
-            const response = await (await API.post({
-                apiName: 'auth', path: '/deleteAudit', options: { body: { id: auditId! } }
-            }).response).body.json();
-            console.log(response);
-            await queryClient.refetchQueries({ queryKey: ['audits'] });
-            navigate('/audits');
-            return;
-        }
-    }
-
-    const validateAndFormatUrl = (input: string): string | null => {
-        // Trim whitespace
-        let url = input.trim();
-        if (!url) return null;
-
-        // Add https:// if no protocol is specified
-        if (!url.match(/^https?:\/\//i)) {
-            url = 'https://' + url;
-        }
-
-        // Validate URL format
-        try {
-            const urlObj = new URL(url);
-            // Check if it's http or https
-            if (!['http:', 'https:'].includes(urlObj.protocol)) {
-                setUrlError('Only HTTP and HTTPS URLs are supported');
-                return null;
-            }
-            setUrlError(null);
-            return urlObj.href;
-        } catch {
-            setUrlError('Invalid URL format. Please enter a valid URL (e.g., example.com or https://example.com)');
-            return null;
-        }
-    }
-
-    const addPage = async (e: MouseEvent) => {
-        e.preventDefault();
-        const button = e.currentTarget;
-        const form = button.closest('form');
-        if (!form) return;
-
-        const formData = new FormData(form);
-        const input = formData.get('pageInput') as string;
-        if (!input || input.length === 0) {
-            return;
-        }
-
-        // Validate and format URL
-        const validUrl = validateAndFormatUrl(input);
-        if (!validUrl) return;
-
-        // Check for duplicates
-        if (pages.some(page => page.url === validUrl)) {
-            setUrlError('This URL has already been added');
-            return;
-        }
-        // Add page with default type of 'html'
+  const { data: urls, isSuccess: urlsLoaded } = useQuery({
+    queryKey: ["urls", auditId],
+    queryFn: async () =>
+      (
         await apiClient.graphql({
-            query: `mutation ($audit_id: uuid, $url: String, $type: String) {
+          query: `query($audit_id: uuid){urls(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: desc}) {id url type}}`,
+          variables: { audit_id: auditId },
+        })
+      )?.data?.urls,
+    initialData: [],
+  });
+
+  const { data: scans } = useQuery({
+    queryKey: ["scans", auditId],
+    queryFn: async () =>
+      (
+        await apiClient.graphql({
+          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at}}`,
+          variables: { audit_id: auditId },
+        })
+      )?.data?.scans,
+    initialData: [],
+    refetchInterval: 1000,
+  });
+
+  useEffect(() => {
+    setPages(urls);
+  }, [urls]);
+
+  const { data: audit } = useQuery({
+    queryKey: ["audit", auditId],
+    queryFn: async () => {
+      const results = await (
+        await API.get({
+          apiName: "auth",
+          path: "/getAuditResults",
+          options: { queryParams: { id: auditId!, type: "json" } },
+        }).response
+      ).body.json();
+      return results;
+    },
+    refetchInterval: 5000,
+  });
+
+  const { data: chartData } = useQuery({
+    queryKey: ["auditChart", auditId],
+    queryFn: async () => {
+      const results = await (
+        await API.get({
+          apiName: "auth",
+          path: "/getAuditChart",
+          options: { queryParams: { id: auditId!, days: "7" } },
+        }).response
+      ).body.json();
+      return results;
+    },
+    refetchInterval: 5000,
+  });
+
+  // Format the JSON whenever audit data changes
+  useEffect(() => {
+    if (editorRef.current && audit) {
+      setTimeout(() => {
+        editorRef.current?.getAction("editor.action.formatDocument")?.run();
+      }, 100);
+    }
+  }, [audit]);
+
+  const renameAudit = async () => {
+    const newName = prompt(
+      `What would you like to rename this audit to?`,
+      audit?.name
+    );
+    if (newName) {
+      const response = await (
+        await API.post({
+          apiName: "auth",
+          path: "/updateAudit",
+          options: { body: { id: auditId!, name: newName } },
+        }).response
+      ).body.json();
+      //console.log(response);
+      await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
+      return;
+    }
+  };
+
+  const rescanAudit = async () => {
+    if (confirm(`Are you sure you want to re-scan this audit?`)) {
+      const response = await (
+        await API.post({
+          apiName: "auth",
+          path: "/rescanAudit",
+          options: { body: { id: auditId! } },
+        }).response
+      ).body.json();
+      //console.log(response);
+      await queryClient.refetchQueries({ queryKey: ["audits"] });
+      navigate("/audits");
+      return;
+    }
+  };
+
+  const deleteAudit = async () => {
+    if (confirm(`Are you sure you want to delete this audit?`)) {
+      const response = await (
+        await API.post({
+          apiName: "auth",
+          path: "/deleteAudit",
+          options: { body: { id: auditId! } },
+        }).response
+      ).body.json();
+      //console.log(response);
+      await queryClient.refetchQueries({ queryKey: ["audits"] });
+      navigate("/audits");
+      return;
+    }
+  };
+
+  const handleUrlInput = async (_changedPages: Page[]) => {
+    // just here to have a void function to hand to AuditPagesInput
+    console.log("Url Input...");
+  };
+
+  const addUrls = async (changedPages: Page[]) => {
+    await apiClient.graphql({
+      query: `mutation ($audit_id: uuid, $url: String, $type: String) {
                 insert_urls_one(object: {audit_id: $audit_id, url: $url, type: $type}) {id}
             }`,
-            variables: {
-                audit_id: auditId,
-                url: validUrl,
-                type: 'html',
-            }
-        })
-        await apiClient.graphql({
-            query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
+      variables: {
+        audit_id: auditId,
+        url: changedPages[0].url,
+        type: changedPages[0].type,
+      },
+    });
+
+    await apiClient.graphql({
+      query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
                 insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
             }`,
-            variables: {
-                audit_id: auditId,
-                message: `User added ${validUrl}`,
-                data: { url: validUrl, type: 'html' },
-            }
-        })
-        await queryClient.refetchQueries({ queryKey: ['urls', auditId] })
-        // Clear the input field
-        const inputField = form.querySelector('[name="pageInput"]') as HTMLInputElement;
-        if (inputField) inputField.value = '';
-        setUrlError(null);
-        return;
-    }
+      variables: {
+        audit_id: auditId,
+        message: `User added ${changedPages[0].url}`,
+        data: { url: changedPages[0].url, type: changedPages[0].type },
+      },
+    });
+    await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
+    console.log("DB update complete.");
+  };
 
-    const removePage = async (e: MouseEvent) => {
-        e.preventDefault();
-        const button = e.currentTarget;
-        const form = button.closest('form');
-        if (!form) return;
+  const removeUrls = async (changedPages: Page[]) => {
+    console.log(`removing ${changedPages.length} URLs from db...`);
+    for (const row of changedPages) {
+      console.log(`removing ${row.url}`);
+      await apiClient.graphql({
+        query: `mutation($audit_id:uuid,$url:String) {delete_urls(where: {audit_id: {_eq: $audit_id}, url: {_eq: $url}}) {affected_rows}}`,
+        variables: {
+          audit_id: auditId,
+          url: row.url,
+        },
+      });
 
-        const checkboxes = form.querySelectorAll('[name="pageCheckbox"]:checked');
-        const toRemove = Array.from(checkboxes).map(cb => (cb as HTMLInputElement).value);
-        // setPages(pages.filter(row => !toRemove.includes(row.url)));
-        for (const row of toRemove) {
-            await apiClient.graphql({
-                query: `mutation($audit_id:uuid,$url:String) {delete_urls(where: {audit_id: {_eq: $audit_id}, url: {_eq: $url}}) {affected_rows}}`,
-                variables: {
-                    audit_id: auditId,
-                    url: row,
-                }
-            })
-
-            await apiClient.graphql({
-                query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
+      await apiClient.graphql({
+        query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
                 insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
             }`,
-                variables: {
-                    audit_id: auditId,
-                    message: `User removed ${row}`,
-                    data: { url: row, type: 'html' },
-                }
-            })
-        }
-        await queryClient.refetchQueries({ queryKey: ['urls', auditId] })
-        return;
+        variables: {
+          audit_id: auditId,
+          message: `User removed ${row.url}`,
+          data: { url: row.url, type: row.type },
+        },
+      });
     }
+    console.log("DB update complete.");
+  };
 
-    const updatePageType = (url: string, type: 'html' | 'pdf') => {
-        setPages(pages.map(page =>
-            page.url === url ? { ...page, type } : page
-        ));
-    }
-
-    const handleUrlInputKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const input = e.currentTarget;
-            const form = input.closest('form');
-            if (!form) return;
-
-            const inputValue = input.value;
-            if (!inputValue || inputValue.length === 0) {
-                return;
-            }
-
-            // Validate and format URL
-            const validUrl = validateAndFormatUrl(inputValue);
-            if (!validUrl) return;
-
-            // Check for duplicates
-            if (pages.some(page => page.url === validUrl)) {
-                setUrlError('This URL has already been added');
-                return;
-            }
-
-            // Add page with default type of 'html'
-
-            // Add page with default type of 'html'
-            await apiClient.graphql({
-                query: `mutation ($audit_id: uuid, $url: String, $type: String) {
-                insert_urls_one(object: {audit_id: $audit_id, url: $url, type: $type}) {id}
-            }`,
-                variables: {
-                    audit_id: auditId,
-                    url: validUrl,
-                    type: 'html',
-                }
-            })
-
-            await apiClient.graphql({
-                query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
-                insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
-            }`,
-                variables: {
-                    audit_id: auditId,
-                    message: `User added ${validUrl}`,
-                    data: { url: validUrl, type: 'html' },
-                }
-            })
-            await queryClient.refetchQueries({ queryKey: ['urls', auditId] })
-            // Clear the input field
-            input.value = '';
-            setUrlError(null);
-        }
-    }
-
-    return <div className='max-w-screen-sm'>
-        <div className='flex flex-col gap-2'>
-            <Link to={'/audits'}>← Go Back</Link>
-            <div className='flex flex-row items-center gap-2 justify-between'>
-                <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
-                <div className='flex flex-row items-center gap-2'>
-                    <button onClick={renameAudit}>Rename</button>
-                    <button onClick={rescanAudit}>Re-scan</button>
-                    <button onClick={deleteAudit}>Delete</button>
-                </div>
-            </div>
+  return (
+    <div className="max-w-screen-sm">
+      <div className="flex flex-col gap-2">
+        <Link to={"/audits"}>← Go Back</Link>
+        <div className="flex flex-row items-center gap-2 justify-between">
+          <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
+          <div className="flex flex-row items-center gap-2">
+            <button onClick={renameAudit}>Rename</button>
+            <button onClick={rescanAudit}>Re-scan</button>
+            <button onClick={deleteAudit}>Delete</button>
+          </div>
         </div>
-        <form onSubmit={addPage}>
-            <div className='flex flex-col'>
-                <label htmlFor='pageInput'>URLs:</label>
-                <input
-                    id='pageInput'
-                    name='pageInput'
-                    onKeyDown={handleUrlInputKeyDown}
-                    placeholder='example.com'
-                />
-                {urlError && <p className='text-red-500 text-sm mt-1'>{urlError}</p>}
-            </div>
-            <button type='button' onClick={addPage}>Add Pages</button>
-            <h2>Review Added Pages</h2>
-            {urls.map(page => <div key={page.url}>
-                <input id={page.url} name='pageCheckbox' type='checkbox' value={page.url} />
-                <label htmlFor={page.url}>{page.url}</label>
-                <select
-                    name={`pageType_${page.url}`}
-                    value={page.type}
-                    onChange={(e) => updatePageType(page.url, e.target.value as 'html' | 'pdf')}
-                    className='!p-0 mx-1'
-                >
-                    <option value='html'>HTML</option>
-                    <option value='pdf'>PDF</option>
-                </select>
-            </div>)}
-            <button type='button' onClick={removePage}>Remove Pages</button>
-        </form>
-
-        <div>
-            {scans?.map((scan, index) => <div>Scan #{index + 1}: {formatDate(scan.created_at)}</div>)}
-        </div>
-
-        {chartData?.data && chartData.data.length > 0 && (
-            <div className='mt-8 mb-8'>
-                <h2 id="blockers-chart-heading">Blockers Over Time (Last {chartData.period_days} Days)</h2>
-                <div className='bg-white p-4 rounded-lg shadow'>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart
-                            data={chartData.data}
-                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                            accessibilityLayer={true}
-                            title="Blockers over time trend chart"
-                            desc="Line chart showing blocker counts over time. See the data table below for detailed values."
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis
-                                dataKey="date"
-                                label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
-                                tickFormatter={(value) => {
-                                    const date = new Date(value);
-                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                                }}
-                            />
-                            <YAxis
-                                label={{ value: 'Blockers', angle: -90, position: 'insideLeft' }}
-                            />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
-                                labelFormatter={(value) => {
-                                    const date = new Date(value);
-                                    return date.toLocaleDateString('en-US', { 
-                                        weekday: 'short', 
-                                        year: 'numeric', 
-                                        month: 'short', 
-                                        day: 'numeric' 
-                                    });
-                                }}
-                                formatter={(value: number, name: string) => [value, name === 'blockers' ? 'Blockers' : name]}
-                            />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="blockers"
-                                stroke="#8884d8"
-                                strokeWidth={2}
-                                activeDot={{ r: 8 }}
-                                name="Blockers"
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-                <div className='mt-6'>
-                    <h3>Blockers Data Table</h3>
-                    <p className='text-sm text-gray-600 mb-2'>
-                        Detailed data for the chart above. Use this table to access exact blocker counts by date.
-                    </p>
-                    <table className='w-full border-collapse border border-gray-300' aria-labelledby="blockers-chart-heading">
-                        <thead>
-                            <tr className='bg-gray-100'>
-                                <th scope='col' className='border border-gray-300 px-4 py-2 text-left'>
-                                    Date
-                                </th>
-                                <th scope='col' className='border border-gray-300 px-4 py-2 text-left'>
-                                    Blockers
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {chartData.data.map((row: any, index: number) => (
-                                <tr key={row.date} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                    <td className='border border-gray-300 px-4 py-2'>
-                                        {new Date(row.date).toLocaleDateString('en-US', {
-                                            weekday: 'short',
-                                            year: 'numeric',
-                                            month: 'short',
-                                            day: 'numeric'
-                                        })}
-                                    </td>
-                                    <td className='border border-gray-300 px-4 py-2'>
-                                        {row.blockers}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      </div>
+      <hr/>
+      <form>
+        {pages.length > 0 && (
+          <AuditPagesInput
+            initialPages={pages}
+            setParentPages={handleUrlInput}
+            addParentPages={addUrls}
+            removeParentPages={removeUrls}
+            returnMutation
+          />
         )}
-        
-        {auditId && <BlockersTable auditId={auditId} />}
-        
-        <h2>Full Audit Response</h2>
-        {audit && <Editor
-            className='mt-2'
-            height="500px"
-            defaultLanguage="json"
-            value={JSON.stringify(audit, null, 2)}
-            onMount={(editor) => {
-                editorRef.current = editor;
-                editor.getAction('editor.action.formatDocument')?.run();
-            }}
-        />}
+      </form>
+      <hr/>
+      <div>
+        {scans?.map((scan, index) => (
+          <div>
+            Scan #{index + 1}: {formatDate(scan.created_at)}
+          </div>
+        ))}
+      </div>
+
+      {chartData?.data && chartData.data.length > 0 && (
+        <div className="mt-8 mb-8">
+          <h2 id="blockers-chart-heading">
+            Blockers Over Time (Last {chartData.period_days} Days)
+          </h2>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart
+                data={chartData.data}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                accessibilityLayer={true}
+                title="Blockers over time trend chart"
+                desc="Line chart showing blocker counts over time. See the data table below for detailed values."
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  label={{
+                    value: "Date",
+                    position: "insideBottom",
+                    offset: -5,
+                  }}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                />
+                <YAxis
+                  label={{
+                    value: "Blockers",
+                    angle: -90,
+                    position: "insideLeft",
+                  }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #ccc",
+                  }}
+                  labelFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      weekday: "short",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                  formatter={(value: number, name: string) => [
+                    value,
+                    name === "blockers" ? "Blockers" : name,
+                  ]}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="blockers"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                  name="Blockers"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-6">
+            <h3>Blockers Data Table</h3>
+            <p className="text-sm text-gray-600 mb-2">
+              Detailed data for the chart above. Use this table to access exact
+              blocker counts by date.
+            </p>
+            <table
+              className="w-full border-collapse border border-gray-300"
+              aria-labelledby="blockers-chart-heading"
+            >
+              <thead>
+                <tr className="bg-gray-100">
+                  <th
+                    scope="col"
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    Blockers
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {chartData.data.map((row: any, index: number) => (
+                  <tr
+                    key={row.date}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="border border-gray-300 px-4 py-2">
+                      {new Date(row.date).toLocaleDateString("en-US", {
+                        weekday: "short",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {row.blockers}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {auditId && <BlockersTable auditId={auditId} />}
+
+      <h2>Full Audit Response</h2>
+      {audit && (
+        <Editor
+          className="mt-2"
+          height="500px"
+          defaultLanguage="json"
+          value={JSON.stringify(audit, null, 2)}
+          onMount={(editor) => {
+            editorRef.current = editor;
+            editor.getAction("editor.action.formatDocument")?.run();
+          }}
+        />
+      )}
     </div>
-}
+  );
+};
