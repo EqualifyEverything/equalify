@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDate, formatId } from "../utils";
 import * as API from "aws-amplify/api";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import Editor from "@monaco-editor/react";
 import { useRef, useEffect, useState } from "react";
@@ -18,7 +18,7 @@ import {
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
-
+import { FaClipboard } from "react-icons/fa";
 
 // TODO
 /*
@@ -30,7 +30,7 @@ X Rewrite Add/Remove URLs to use component
 - Chart & Table in Tabs
 - Tags are duplicated from server
 - Categories not mapped/populated
-- Copy to clipboard
+X Copy to clipboard
 - Blocker code in panel
 - Tags in table: shorten into tooltip
 - Sort by URL
@@ -38,8 +38,9 @@ X Rewrite Add/Remove URLs to use component
 - Scan state?
 - Supress Errors on audits without scans
 - Paged size in pagination options
+- Table taborder
 - How exactly are we handling the dates/range on the chart & table? (Days input someplace)
-*/ 
+*/
 
 interface Page {
   url: string;
@@ -51,6 +52,7 @@ export const Audit = () => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
   const [urlError, setUrlError] = useState<string | null>(null);
 
@@ -230,6 +232,15 @@ export const Audit = () => {
     console.log("DB update complete.");
   };
 
+  const copyCurrentLocationToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.origin+location.pathname);
+      console.log(`URL ${window.location.origin+location.pathname} copied to clipboard!`);
+    } catch (err) {
+      console.error("Failed to copy URLs: ", err);
+    }
+  };
+
   return (
     <div className="max-w-screen-sm">
       <div className="flex flex-col gap-2">
@@ -243,7 +254,15 @@ export const Audit = () => {
           </div>
         </div>
       </div>
-      <hr/>
+      <hr />
+      <button
+        className="flex justify-center"
+        onClick={copyCurrentLocationToClipboard}
+      >
+        <FaClipboard />
+        <span>Copy link</span>
+      </button>
+      <hr />
       <form>
         {pages.length > 0 && (
           <AuditPagesInput
@@ -255,7 +274,7 @@ export const Audit = () => {
           />
         )}
       </form>
-      <hr/>
+      <hr />
       <div>
         {scans?.map((scan, index) => (
           <div>
