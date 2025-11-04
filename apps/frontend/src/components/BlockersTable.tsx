@@ -57,6 +57,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
 
   const [selectedStatus, setSelectedStatus] = useState<string>("active");
 
+  const [selectedContentType, setSelectedContentType] = useState<string>("all");
+
   const { data, isFetching, isLoading, error } = useQuery({
     queryKey: [
       "auditBlockers",
@@ -66,12 +68,14 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
       selectedTags,
       selectedCategories,
       selectedStatus,
+      selectedContentType
     ],
     queryFn: async () => {
       const params: Record<string, string> = {
         id: auditId,
         page: page.toString(),
         pageSize: pageSize.toString(),
+        contentType: selectedContentType
       };
       if (selectedTags.length > 0) {
         //params.tags = selectedTags.join(',');
@@ -332,6 +336,11 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     setPage(0);
   };
 
+  const handleContentTypeChange = (contentType: string) => {
+    setSelectedContentType(contentType);
+    setPage(0);
+  };
+
   const clearAllFilters = () => {
     setSelectedTags([]);
     setSelectedCategories([]);
@@ -384,6 +393,43 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
                   All
+                </ToggleGroup.Item>
+              </ToggleGroup.Root>
+            </div>
+          </div>
+
+          {/* Content Type Filter */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">Content Type:</label>
+            <div className="flex gap-2">
+              <ToggleGroup.Root
+                className="statusToggleGroup"
+                type="single"
+                defaultValue="all"
+                aria-label="View by status:"
+                value={selectedContentType}
+                onValueChange={handleContentTypeChange}
+              >
+                <ToggleGroup.Item
+                  value="all"
+                  aria-label="All"
+                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+                >
+                  All
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="html"
+                  aria-label="HTML"
+                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+                >
+                  HTML
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="pdf"
+                  aria-label="PDF"
+                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+                >
+                  PDF
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
             </div>

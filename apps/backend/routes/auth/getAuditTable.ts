@@ -4,6 +4,7 @@ export const getAuditTable = async () => {
     const auditId = event.queryStringParameters.id;
     const page = parseInt((event.queryStringParameters as any).page || '0', 10);
     const pageSize = parseInt((event.queryStringParameters as any).pageSize || '50', 10);
+    const contentType = (event.queryStringParameters as any).contentType || 'all';
     
     // Parse multiple filter parameters (comma-separated)
     const tagsParam = (event.queryStringParameters as any).tags || null;
@@ -148,7 +149,7 @@ export const getAuditTable = async () => {
     const availableCategories = response.messages || [];
 
     // Format the blockers data
-    const formattedBlockers = blockers.map(blocker => {
+    let formattedBlockers = blockers.map(blocker => {
         // Extract tags from blocker_messages -> message -> message_tags -> tag
         const tags = blocker.blocker_messages.flatMap(bm => 
             bm.message.message_tags?.map(mt => mt.tag).filter(Boolean) || []
@@ -186,6 +187,13 @@ export const getAuditTable = async () => {
             categories: uniqueCategories,
         };
     });
+
+    // filter for content type. We need to do it last because the type field is set by URL, not blocker
+    if(contentType.toLowerCase() === "html" || contentType.toLowerCase() === "pdf"){
+        formattedBlockers = formattedBlockers.filter((blocker)=>{
+            return blocker.type.toLowerCase() === contentType.toLowerCase()
+        })
+    }
 
     return {
         statusCode: 200,
