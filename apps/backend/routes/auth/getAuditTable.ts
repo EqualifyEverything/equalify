@@ -176,7 +176,7 @@ export const getAuditTable = async () => {
             id: blocker.id,
             short_id: blocker.short_id,
             created_at: blocker.created_at,
-            url: urlMap[blocker.url_id] || blocker.url_id,
+            url: urlMap[blocker.url_id].url || blocker.url_id,
             type: urlMap[blocker.url_id].type,
             url_id: blocker.url_id,
             content: blocker.content,
