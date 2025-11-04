@@ -58,7 +58,7 @@ export const scanWebhook = async () => {
                     VALUES ($1, $2, $3) 
                     ON CONFLICT ("id") DO NOTHING
                 `,
-            values: [blockerTypeId, blocker.description, blocker.type || 'unknown'],
+            values: [blockerTypeId, blocker.description, blocker.test || 'unknown'],
         });
 
         // Link blocker type tags
