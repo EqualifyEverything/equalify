@@ -13,6 +13,7 @@ import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import Select, { MultiValue } from "react-select";
 import { FaCode } from "react-icons/fa";
 import { Drawer } from "vaul-base";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 interface BlockerTag {
   id: string;
@@ -110,6 +111,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     return extractedElementTag ?? content;
   };
 
+  const TAGS_TO_SHOW_IN_TABLE = 3;
+
   const columns = useMemo<ColumnDef<Blocker>[]>(
     () => [
       {
@@ -124,44 +127,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
           );
         },
       },
-      {
-        accessorKey: "content",
-        header: "Blocker Code",
-        cell: ({ getValue }) => {
-          const content = getValue() as string;
-          return (
-            <>
-              <code className="text-xs break-all block max-w-md">
-                {getElementTagFromContent(content)}
-              </code>
 
-              <Drawer.Root>
-                <Drawer.Trigger
-                  render={(props) => (
-                    <button {...props} aria-label="View Code" title="View Code">
-                      <FaCode/>
-                    </button>
-                  )}
-                />
-                <Drawer.Portal>
-                  <Drawer.Overlay className="fixed inset-0 bg-black/80" />
-                  <Drawer.Content className="bg-background text-foreground fixed inset-x-0 bottom-0 h-[70vh] w-full rounded-t-lg border">
-                    <Drawer.Handle className="top-4" />
-                    <div className="mx-auto flex h-full max-w-sm flex-col justify-center space-y-4 px-4">
-                      <h4 className="font-semibold">Blocker Code</h4>
-                      <code>{content}</code>
-                      <Drawer.Close>
-                        Close
-                      </Drawer.Close>
-                      
-                    </div>
-                  </Drawer.Content>
-                </Drawer.Portal>
-              </Drawer.Root>
-            </>
-          );
-        },
-      },
       {
         accessorKey: "url",
         header: "URL",
@@ -192,13 +158,48 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
         },
       },
       {
+        accessorKey: "content",
+        header: "Blocker Code",
+        cell: ({ getValue }) => {
+          const content = getValue() as string;
+          return (
+            <>
+              <code className="text-xs break-all block max-w-md">
+                {getElementTagFromContent(content)}
+              </code>
+
+              <Drawer.Root>
+                <Drawer.Trigger
+                  render={(props) => (
+                    <button {...props} aria-label="View Code" title="View Code">
+                      <FaCode />
+                    </button>
+                  )}
+                />
+                <Drawer.Portal>
+                  <Drawer.Overlay className="fixed inset-0 bg-black/80" />
+                  <Drawer.Content className="bg-background text-foreground fixed inset-x-0 bottom-0 h-[70vh] w-full rounded-t-lg border">
+                    <Drawer.Handle className="top-4" />
+                    <div className="mx-auto flex h-full max-w-sm flex-col justify-center space-y-4 px-4">
+                      <h4 className="font-semibold">Blocker Code</h4>
+                      <code>{content}</code>
+                      <Drawer.Close>Close</Drawer.Close>
+                    </div>
+                  </Drawer.Content>
+                </Drawer.Portal>
+              </Drawer.Root>
+            </>
+          );
+        },
+      },
+      {
         accessorKey: "tags",
         header: "Tags",
         cell: ({ getValue }) => {
           const tags = getValue() as BlockerTag[];
           return (
             <div className="flex flex-wrap gap-1">
-              {tags.map((tag) => (
+              {tags.slice(0, TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                 <span
                   key={tag.id}
                   className="inline-block bg-gray-200 rounded px-2 py-1 text-xs"
@@ -206,6 +207,26 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                   {tag.content}
                 </span>
               ))}
+              {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger>+{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}</Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom" className="flex flex-wrap gap-1 bg-white p-1">
+                        {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-block bg-gray-200 rounded px-2 py-1 text-xs"
+                          >
+                            {tag.content}
+                          </span>
+                        ))}
+                        <Tooltip.Arrow />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              )}
             </div>
           );
         },

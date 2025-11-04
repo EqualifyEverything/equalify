@@ -30,7 +30,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 -  Tags are duplicated from server
 -  Categories not mapped/populated
 X  Blocker code in panel
--  Tags in table: shorten into tooltip
+X  Tags in table: shorten into tooltip
 -  Sort by URL
 -  URLs list and add/remove functionality behind accordion
 -  Scans should percent complete 
