@@ -326,8 +326,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     setPage(0);
   };
 
-  const handleCategoryToggle = (newVal: MultiValue<Option>) => {
-    setSelectedCategories(newVal as Option[]);
+  const handleCategoryToggle = (selected: MultiValue<Option>) => {
+    setSelectedCategories(selected as Option[]);
     setPage(0);
   };
 

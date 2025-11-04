@@ -51,7 +51,7 @@ export const scanWebhook = async () => {
         }
 
         // Insert or get blocker type based on description
-        const blockerTypeId = hashStringToUuid(blocker.description);
+        const blockerTypeId = hashStringToUuid(blocker.description+blocker.test);
         await db.query({
             text: `
                     INSERT INTO "messages" ("id", "content", "category") 
