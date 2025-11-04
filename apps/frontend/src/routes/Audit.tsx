@@ -23,24 +23,25 @@ import * as Tabs from "@radix-ui/react-tabs";
 
 // TODO
 /*
-X Rewrite Add/Remove URLs to use component
-- Add change HTML/PDF type to component
-- Add Count to "Active"|"Fixed"|"All" Response
-- Scan button should do something other than send you to the audit list
-- Does ID need its own column? 
-X Chart & Table in Tabs
-- Tags are duplicated from server
-- Categories not mapped/populated
-X Copy to clipboard
-- Blocker code in panel
-- Tags in table: shorten into tooltip
-- Sort by URL
-- URLs list and add/remove behind accordion
-- Scan state?
-- Supress Errors on audits without scans
-- Paged size in pagination options
-- Table taborder (needs testing)
-- How exactly are we handling the dates/range on the chart & table? (Days input someplace)
+-  Add change HTML/PDF type to Audit component
+-  Add Count to "Active"|"Fixed"|"All" Response
+-  Scan button should do something other than send you to the audit list
+-  Does ID need its own column? 
+-  Tags are duplicated from server
+-  Categories not mapped/populated
+X  Blocker code in panel
+-  Tags in table: shorten into tooltip
+-  Sort by URL
+-  URLs list and add/remove functionality behind accordion
+-  Scans should percent complete 
+-  Supress Errors on audits without scans
+-  Paged size in pagination options
+-  Table taborder (needs testing)
+-  How exactly are we handling the dates/range on the chart & table? (Days input someplace)
+-  Audit Page Filters: Add PDF/HTML option
+-  Audit Page should be public
+-  Add "ignore" checkbox/button for blockers
+-  Ignored blockers should stay ignored
 */
 
 interface Page {
