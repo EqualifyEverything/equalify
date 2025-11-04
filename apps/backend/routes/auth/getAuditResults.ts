@@ -9,7 +9,7 @@ export const getAuditResults = async () => {
         values: [auditId],
     })).rows?.[0];
     const urls = (await db.query({
-        text: `SELECT "id", "url" FROM "urls" WHERE "audit_id" = $1`,
+        text: `SELECT "id", "url", "type" FROM "urls" WHERE "audit_id" = $1`,
         values: [auditId],
     })).rows;
     await db.clean();
@@ -52,17 +52,18 @@ export const getAuditResults = async () => {
 
     // Get URL lookup map for easier reference
     const urlMap = urls.reduce((acc, url) => {
-        acc[url.id] = url.url;
+        acc[url.id] = { url: url.url, type: url.type};
         return acc;
     }, {});
 
     const jsonRows = response.audits_by_pk.scans[0].blockers.map(blocker => {
         return {
             blocker_id: blocker.id,
-            url_id: urlMap[blocker.url_id],
+            url_id: urlMap[blocker.url_id].url,
             html: blocker.content,
             equalified: blocker.equalified,
             created_at: blocker.created_at,
+            type: urlMap[blocker.url_id].type,
             messages: blocker.blocker_messages.map(obj =>
                 `${obj.message.category}: ${obj.message.content}`
             )

@@ -136,8 +136,8 @@ export const getAuditTable = async () => {
     console.log(JSON.stringify({ response }));
 
     // Get URL lookup map
-    const urlMap = urls.reduce((acc, url) => {
-        acc[url.id] = url.url;
+    const urlMap = urls.reduce((acc, url) => { 
+        acc[url.id] = { url: url.url, type: url.type};
         return acc;
     }, {} as Record<string, string>);
 
