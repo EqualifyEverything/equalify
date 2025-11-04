@@ -6,7 +6,7 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
-import { useState, useMemo } from "react";
+import { useState, useMemo, ChangeEvent } from "react";
 //import { formatDate } from "../utils";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
@@ -47,7 +47,7 @@ interface Option {
 
 export const BlockersTable = ({ auditId }: BlockersTableProps) => {
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(50);
 
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
   const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
@@ -68,14 +68,14 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
       selectedTags,
       selectedCategories,
       selectedStatus,
-      selectedContentType
+      selectedContentType,
     ],
     queryFn: async () => {
       const params: Record<string, string> = {
         id: auditId,
         page: page.toString(),
         pageSize: pageSize.toString(),
-        contentType: selectedContentType
+        contentType: selectedContentType,
       };
       if (selectedTags.length > 0) {
         //params.tags = selectedTags.join(',');
@@ -341,6 +341,10 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
     setPage(0);
   };
 
+  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>)=>{
+    setPageSize(parseInt(e.target.value))
+  }
+
   const clearAllFilters = () => {
     setSelectedTags([]);
     setSelectedCategories([]);
@@ -400,7 +404,9 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
 
           {/* Content Type Filter */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Content Type:</label>
+            <label className="block text-sm font-semibold mb-2">
+              Content Type:
+            </label>
             <div className="flex gap-2">
               <ToggleGroup.Root
                 className="statusToggleGroup"
@@ -549,6 +555,12 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 ` (Page ${page + 1} of ${data.pagination.totalPages})`}
             </div>
             <div className="flex gap-2">
+              <label htmlFor="pageSize" className="text-sm">Blockers per page:</label>
+              <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
               <button
                 onClick={() => setPage(0)}
                 disabled={page === 0}
