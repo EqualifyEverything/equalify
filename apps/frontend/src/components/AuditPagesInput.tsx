@@ -253,26 +253,26 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
   // update parent value on change
   useEffect(() => {
-      console.log("Updating pages...");
-      console.log("Pages:", pages);
-      console.log("InitialPages", initialPages);
+      //console.log("Updating pages...");
+      //console.log("Pages:", pages);
+      //console.log("InitialPages", initialPages);
       
       if(returnMutation){
         let arrDelta:Page[] = [];
         if( initialPages === pages ) return;
         if( initialPages.length < pages.length) { // adding pages
-          console.log("Adding...")
+          //console.log("Adding...")
           arrDelta = pages.filter(page => !initialPages.includes(page));
           if(addParentPages)
           addParentPages(arrDelta);
         }
         if( initialPages.length > pages.length) { // removing pages
-          console.log("Removing...")
+          //console.log("Removing...")
           const initialUrls = initialPages.map(page=>page.url);
           const pageUrls = pages.map(page=>page.url);
           const overlap = initialUrls.filter(page => !pageUrls.includes(page));
           arrDelta = initialPages.filter(page=> overlap.includes(page.url));
-          console.log("To remove:",arrDelta);
+          //console.log("To remove:",arrDelta);
           if(removeParentPages)
           removeParentPages(arrDelta);
         }
