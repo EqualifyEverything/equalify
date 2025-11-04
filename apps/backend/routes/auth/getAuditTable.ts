@@ -19,7 +19,7 @@ export const getAuditTable = async () => {
         values: [auditId],
     })).rows?.[0];
     const urls = (await db.query({
-        text: `SELECT "id", "url" FROM "urls" WHERE "audit_id" = $1`,
+        text: `SELECT "id", "url", "type" FROM "urls" WHERE "audit_id" = $1`,
         values: [auditId],
     })).rows;
     await db.clean();
@@ -177,6 +177,7 @@ export const getAuditTable = async () => {
             short_id: blocker.short_id,
             created_at: blocker.created_at,
             url: urlMap[blocker.url_id] || blocker.url_id,
+            type: urlMap[blocker.url_id].type,
             url_id: blocker.url_id,
             content: blocker.content,
             equalified: equalified,

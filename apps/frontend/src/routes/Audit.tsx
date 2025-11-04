@@ -56,9 +56,9 @@ export const Audit = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
-  const [urlError, setUrlError] = useState<string | null>(null);
+  //const [urlError, setUrlError] = useState<string | null>(null);
 
-  const { data: urls, isSuccess: urlsLoaded } = useQuery({
+  const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
     queryFn: async () =>
       (

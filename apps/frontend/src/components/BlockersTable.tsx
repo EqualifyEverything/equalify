@@ -9,9 +9,11 @@ import * as API from "aws-amplify/api";
 import { useState, useMemo } from "react";
 //import { formatDate } from "../utils";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
-//import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
-import { FaCode } from "react-icons/fa";
+import { FaCode, FaRegFilePdf } from "react-icons/fa";
+import { PiFileHtml } from "react-icons/pi";
+import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
@@ -31,6 +33,7 @@ interface Blocker {
   messages: string[];
   tags: BlockerTag[];
   categories: string[];
+  type: string;
 }
 
 interface BlockersTableProps {
@@ -116,6 +119,32 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
   const columns = useMemo<ColumnDef<Blocker>[]>(
     () => [
       {
+        accessorKey: "type",
+        header: "Type",
+        cell: ({ getValue }) => {
+          const theType = getValue() as string;
+          if (theType?.toLowerCase() === "html") {
+            return (
+              <AccessibleIcon label="HTML">
+                <PiFileHtml />
+              </AccessibleIcon>
+            );
+          } else if (theType?.toLowerCase() === "pdf") {
+            return (
+              <AccessibleIcon label="PDF">
+                <FaRegFilePdf />
+              </AccessibleIcon>
+            );
+          } else {
+            return (
+              <AccessibleIcon label="File Type Unknown">
+                <AiOutlineFileUnknown />
+              </AccessibleIcon>
+            );
+          }
+        },
+      },
+      {
         accessorKey: "short_id",
         header: "ID",
         cell: ({ getValue }) => {
@@ -147,7 +176,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
       },
       {
         accessorKey: "messages",
-        header: "Issue Type",
+        header: "Issue",
         cell: ({ getValue }) => {
           const messages = getValue() as string[];
           return (
@@ -168,7 +197,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 {getElementTagFromContent(content)}
               </code>
 
-              <Drawer.Root>
+              <Drawer.Root direction="right">
                 <Drawer.Trigger
                   render={(props) => (
                     <button {...props} aria-label="View Code" title="View Code">
@@ -178,8 +207,9 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                 />
                 <Drawer.Portal>
                   <Drawer.Overlay className="fixed inset-0 bg-black/80" />
-                  <Drawer.Content className="bg-background text-foreground fixed inset-x-0 bottom-0 h-[70vh] w-full rounded-t-lg border">
-                    <Drawer.Handle className="top-4" />
+                  <Drawer.Content className="bg-background text-foreground fixed right-0 top-0 flex h-full w-[90vw] flex-row rounded-l-lg border p-6 sm:w-[70vw] lg:w-[50vw]">
+                    {/* <Drawer.Handle className="top-4" />
+                     */}
                     <div className="mx-auto flex h-full max-w-sm flex-col justify-center space-y-4 px-4">
                       <h4 className="font-semibold">Blocker Code</h4>
                       <code>{content}</code>
@@ -210,9 +240,14 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
               {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
                 <Tooltip.Provider>
                   <Tooltip.Root>
-                    <Tooltip.Trigger>+{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}</Tooltip.Trigger>
+                    <Tooltip.Trigger className="rounded-xl border-0">
+                      +{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}
+                    </Tooltip.Trigger>
                     <Tooltip.Portal>
-                      <Tooltip.Content side="bottom" className="flex flex-wrap gap-1 bg-white p-1">
+                      <Tooltip.Content
+                        side="bottom"
+                        className="flex flex-wrap gap-1 bg-white p-1 shadow-sm"
+                      >
                         {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                           <span
                             key={tag.id}
