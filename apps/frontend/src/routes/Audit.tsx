@@ -77,7 +77,7 @@ export const Audit = () => {
     queryFn: async () =>
       (
         await apiClient.graphql({
-          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at}}`,
+          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage}}`,
           variables: { audit_id: auditId },
         })
       )?.data?.scans,
@@ -158,7 +158,6 @@ export const Audit = () => {
       ).body.json();
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audits"] });
-      navigate("/audits");
       return;
     }
   };
@@ -310,7 +309,7 @@ export const Audit = () => {
       <div>
         {scans?.map((scan, index) => (
           <div>
-            Scan #{index + 1}: {formatDate(scan.created_at)}
+            Scan #{index + 1}: {formatDate(scan.created_at)} ({scan.percentage ?? 0}%)
           </div>
         ))}
       </div>

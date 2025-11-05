@@ -59,6 +59,9 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
 
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
 
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
   const { data, isFetching, isLoading, error } = useQuery({
     queryKey: [
       "auditBlockers",
@@ -69,6 +72,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
       selectedCategories,
       selectedStatus,
       selectedContentType,
+      sortBy,
+      sortOrder,
     ],
     queryFn: async () => {
       const params: Record<string, string> = {
@@ -76,6 +81,8 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
         page: page.toString(),
         pageSize: pageSize.toString(),
         contentType: selectedContentType,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
       };
       if (selectedTags.length > 0) {
         //params.tags = selectedTags.join(',');
@@ -110,6 +117,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
       return resp;
     },
     refetchInterval: 5000,
+    placeholderData: (previousData) => previousData,
   });
 
   const getElementTagFromContent = (content: string) => {
@@ -163,7 +171,20 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
 
       {
         accessorKey: "url",
-        header: "URL",
+        header: () => (
+          <button
+            onClick={handleSortByUrl}
+            className="flex items-center gap-1 hover:text-blue-600"
+            aria-label={`Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
+          >
+            URL
+            {sortBy === "url" && (
+              <span className="text-xs">
+                {sortOrder === "asc" ? "▲" : "▼"}
+              </span>
+            )}
+          </button>
+        ),
         cell: ({ getValue }) => {
           const url = getValue() as string;
           return (
@@ -297,7 +318,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
             },
         }, */
     ],
-    []
+    [sortBy, sortOrder]
   );
 
   const table = useReactTable({
@@ -344,6 +365,18 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
   const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>)=>{
     setPageSize(parseInt(e.target.value))
   }
+
+  const handleSortByUrl = () => {
+    if (sortBy === "url") {
+      // Toggle sort order if already sorting by URL
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Start sorting by URL in ascending order
+      setSortBy("url");
+      setSortOrder("asc");
+    }
+    setPage(0);
+  };
 
   const clearAllFilters = () => {
     setSelectedTags([]);

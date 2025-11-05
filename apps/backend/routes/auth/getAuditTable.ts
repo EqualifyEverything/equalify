@@ -5,6 +5,8 @@ export const getAuditTable = async () => {
     const page = parseInt((event.queryStringParameters as any).page || '0', 10);
     const pageSize = parseInt((event.queryStringParameters as any).pageSize || '50', 10);
     const contentType = (event.queryStringParameters as any).contentType || 'all';
+    const sortBy = (event.queryStringParameters as any).sortBy || 'created_at';
+    const sortOrder = (event.queryStringParameters as any).sortOrder || 'desc';
     
     // Parse multiple filter parameters (comma-separated)
     const tagsParam = (event.queryStringParameters as any).tags || null;
@@ -19,10 +21,6 @@ export const getAuditTable = async () => {
         text: `SELECT * FROM "audits" WHERE "id" = $1`,
         values: [auditId],
     })).rows?.[0];
-    const urls = (await db.query({
-        text: `SELECT "id", "url", "type" FROM "urls" WHERE "audit_id" = $1`,
-        values: [auditId],
-    })).rows;
     await db.clean();
 
     // Build the where clause with multiple filters
@@ -78,19 +76,33 @@ export const getAuditTable = async () => {
     // Combine all conditions with AND
     const whereClause = whereConditions.length > 0 ? { _and: whereConditions } : {};
 
+    // Build order_by clause based on sortBy parameter
+    let orderByClause;
+    if (sortBy === 'url') {
+        // Sort by the related url table's url field
+        orderByClause = { url: { url: sortOrder } };
+    } else {
+        // Default to sorting by created_at or other fields on the blocker table
+        orderByClause = { created_at: sortOrder };
+    }
+
     // Query to get blockers from the latest scan with pagination
     const query = {
-        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!) {
+        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!]) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: desc}, limit: 1) {
       id
       created_at
-      blockers(where: $where, limit: $limit, offset: $offset, order_by: {created_at: desc}) {
+      blockers(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
         id
         short_id
         created_at
         content
         url_id
+        url {
+          url
+          type
+        }
         blocker_messages {
           id
           blocker {
@@ -128,19 +140,14 @@ export const getAuditTable = async () => {
             audit_id: auditId,
             limit: pageSize,
             offset: page * pageSize,
-            where: whereClause
+            where: whereClause,
+            order_by: [orderByClause]
         },
     };
     
     console.log(JSON.stringify({ query }));
     const response = await graphqlQuery(query);
     console.log(JSON.stringify({ response }));
-
-    // Get URL lookup map
-    const urlMap = urls.reduce((acc, url) => { 
-        acc[url.id] = { url: url.url, type: url.type};
-        return acc;
-    }, {} as Record<string, string>);
 
     const latestScan = response.audits_by_pk?.scans?.[0];
     const blockers = latestScan?.blockers || [];
@@ -177,8 +184,8 @@ export const getAuditTable = async () => {
             id: blocker.id,
             short_id: blocker.short_id,
             created_at: blocker.created_at,
-            url: urlMap[blocker.url_id].url || blocker.url_id,
-            type: urlMap[blocker.url_id].type,
+            url: blocker.url?.url || blocker.url_id,
+            type: blocker.url?.type || 'unknown',
             url_id: blocker.url_id,
             content: blocker.content,
             equalified: equalified,
