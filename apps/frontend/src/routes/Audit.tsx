@@ -235,6 +235,36 @@ export const Audit = () => {
     console.log("DB update complete.");
   };
 
+  const updateUrlType = async (changedPage: Page) => {
+    //console.log(changedPage);
+    const updatedPage = await apiClient.graphql({
+      query: `
+        mutation ($audit_id: uuid, $url: String, $type: String) {
+            update_urls(
+                where: {
+                    audit_id: {_eq: $audit_id},
+                    _and: {url: {_eq: $url}}
+                }, _set: {type: $type}
+            ) 
+                {
+                    returning {
+                        audit_id
+                        type
+                        updated_at
+                        url
+                        user_id
+                }
+            }
+        }`,
+      variables: {
+        audit_id: auditId,
+        url: changedPage.url,
+        type: changedPage.type,
+      },
+    });
+    console.log("DB Updated with new URL Type.", updatedPage);
+  };
+
   const copyCurrentLocationToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
@@ -283,7 +313,8 @@ export const Audit = () => {
           }}
         >
           <span>
-            Audit: <b>{audit?.name}</b> <br/> Scanning {pages.length} <b>URL{pages.length > 1 ? "s" : ""}</b>
+            Audit: <b>{audit?.name}</b> <br /> Scanning {pages.length}{" "}
+            <b>URL{pages.length > 1 ? "s" : ""}</b>
           </span>
           <Collapsible.Trigger>
             {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
@@ -298,6 +329,7 @@ export const Audit = () => {
                 setParentPages={handleUrlInput}
                 addParentPages={addUrls}
                 removeParentPages={removeUrls}
+                updateParentPageType={updateUrlType}
                 returnMutation
               />
             )}
@@ -309,7 +341,8 @@ export const Audit = () => {
       <div>
         {scans?.map((scan, index) => (
           <div>
-            Scan #{index + 1}: {formatDate(scan.created_at)} ({scan.percentage ?? 0}%)
+            Scan #{index + 1}: {formatDate(scan.created_at)} (
+            {scan.percentage ?? 0}%)
           </div>
         ))}
       </div>

@@ -11,6 +11,7 @@ interface ChildProps {
   setParentPages: (newValue: Page[]) => void; // Callback function prop
   addParentPages?: (newValue: Page[]) => void; // Callback function prop
   removeParentPages?: (newValue: Page[]) => void; // Callback function prop
+  updateParentPageType?: (newValue: Page) => void; // Callback function prop
   returnMutation?: boolean; // if true, only return changed rows
 }
 
@@ -19,6 +20,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   setParentPages,
   addParentPages,
   removeParentPages,
+  updateParentPageType,
   returnMutation = false
 }) => {
   const { setAriaAnnounceMessage } = useGlobalStore();
@@ -202,6 +204,10 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     setPages(
       pages.map((page) => (page.url === url ? { ...page, type } : page))
     );
+    
+    if(updateParentPageType){ //update in DB if we have a function to do so
+      updateParentPageType({ url: url, type: type });
+    }
   };
 
   const handleUrlInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
