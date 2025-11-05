@@ -415,21 +415,21 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
                   aria-label="Active"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  Active
+                  Active {data?.statusCounts?.active !== undefined && `(${data.statusCounts.active})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="fixed"
                   aria-label="Fixed"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  Fixed
+                  Fixed {data?.statusCounts?.fixed !== undefined && `(${data.statusCounts.fixed})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="all"
                   aria-label="All"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  All
+                  All {data?.statusCounts?.all !== undefined && `(${data.statusCounts.all})`}
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
             </div>

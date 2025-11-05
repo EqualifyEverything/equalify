@@ -86,9 +86,41 @@ export const getAuditTable = async () => {
         orderByClause = { created_at: sortOrder };
     }
 
+    // Build where clauses for status counts (excluding status filter)
+    const baseWhereConditions = whereConditions.filter(cond => 
+        !cond.blocker_messages?.blocker?.equalified
+    );
+    const baseWhereClause = baseWhereConditions.length > 0 ? { _and: baseWhereConditions } : {};
+    
+    const activeWhereClause = {
+        _and: [
+            ...baseWhereConditions,
+            {
+                blocker_messages: {
+                    blocker: {
+                        equalified: { _eq: false }
+                    }
+                }
+            }
+        ]
+    };
+    
+    const fixedWhereClause = {
+        _and: [
+            ...baseWhereConditions,
+            {
+                blocker_messages: {
+                    blocker: {
+                        equalified: { _eq: true }
+                    }
+                }
+            }
+        ]
+    };
+
     // Query to get blockers from the latest scan with pagination
     const query = {
-        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!]) {
+        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $fixedWhere: blockers_bool_exp!) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: desc}, limit: 1) {
       id
@@ -126,6 +158,21 @@ export const getAuditTable = async () => {
           count
         }
       }
+      all_blockers_count: blockers_aggregate(where: $baseWhere) {
+        aggregate {
+          count
+        }
+      }
+      active_blockers_count: blockers_aggregate(where: $activeWhere) {
+        aggregate {
+          count
+        }
+      }
+      fixed_blockers_count: blockers_aggregate(where: $fixedWhere) {
+        aggregate {
+          count
+        }
+      }
     }
   }
   tags(order_by: {content: asc}) {
@@ -141,7 +188,10 @@ export const getAuditTable = async () => {
             limit: pageSize,
             offset: page * pageSize,
             where: whereClause,
-            order_by: [orderByClause]
+            order_by: [orderByClause],
+            baseWhere: baseWhereClause,
+            activeWhere: activeWhereClause,
+            fixedWhere: fixedWhereClause
         },
     };
     
@@ -152,6 +202,9 @@ export const getAuditTable = async () => {
     const latestScan = response.audits_by_pk?.scans?.[0];
     const blockers = latestScan?.blockers || [];
     const totalCount = latestScan?.blockers_aggregate?.aggregate?.count || 0;
+    const allBlockersCount = latestScan?.all_blockers_count?.aggregate?.count || 0;
+    const activeBlockersCount = latestScan?.active_blockers_count?.aggregate?.count || 0;
+    const fixedBlockersCount = latestScan?.fixed_blockers_count?.aggregate?.count || 0;
     const availableTags = response.tags || [];
     const availableCategories = response.messages || [];
 
@@ -215,6 +268,11 @@ export const getAuditTable = async () => {
                 pageSize,
                 totalCount,
                 totalPages: Math.ceil(totalCount / pageSize),
+            },
+            statusCounts: {
+                all: allBlockersCount,
+                active: activeBlockersCount,
+                fixed: fixedBlockersCount,
             },
             availableTags,
             availableCategories: availableCategories.map((m: any) => m.category).filter(Boolean),
