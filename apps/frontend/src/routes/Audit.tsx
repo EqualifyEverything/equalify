@@ -18,8 +18,9 @@ import {
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
-import { FaClipboard } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
+import * as Collapsible from "@radix-ui/react-collapsible";
 
 // TODO
 /*
@@ -57,6 +58,7 @@ export const Audit = () => {
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
   //const [urlError, setUrlError] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -269,17 +271,41 @@ export const Audit = () => {
         <span>Copy link</span>
       </button>
       <hr />
-      <form>
-        {pages.length > 0 && (
-          <AuditPagesInput
-            initialPages={pages}
-            setParentPages={handleUrlInput}
-            addParentPages={addUrls}
-            removeParentPages={removeUrls}
-            returnMutation
-          />
-        )}
-      </form>
+      <Collapsible.Root
+        className="CollapsibleRoot"
+        open={showUrlInput}
+        onOpenChange={setShowUrlInput}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>
+            Audit: <b>{audit?.name}</b> <br/> Scanning {pages.length} <b>URL{pages.length > 1 ? "s" : ""}</b>
+          </span>
+          <Collapsible.Trigger>
+            {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
+            View or Edit Audit URLs
+          </Collapsible.Trigger>
+        </div>
+        <Collapsible.Content>
+          <form>
+            {pages.length > 0 && (
+              <AuditPagesInput
+                initialPages={pages}
+                setParentPages={handleUrlInput}
+                addParentPages={addUrls}
+                removeParentPages={removeUrls}
+                returnMutation
+              />
+            )}
+          </form>
+        </Collapsible.Content>
+      </Collapsible.Root>
+
       <hr />
       <div>
         {scans?.map((scan, index) => (
