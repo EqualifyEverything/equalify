@@ -84,6 +84,21 @@ export const scanWebhook = async () => {
         });
     }
 
+    // Should we update the scan status? Let's do that.
+    const totalPages = (await db.query({
+        text: `SELECT "pages" FROM "scans" WHERE "id"=$1`,
+        values: [scanId],
+    })).rows[0].pages.length;
+    const scannedPages = parseInt((await db.query({
+        text: `SELECT COUNT(DISTINCT "url_id") FROM "blockers" WHERE "scan_id"=$1`,
+        values: [scanId],
+    })).rows[0].count);
+    const percentage = Math.min(parseInt(((scannedPages / totalPages) * 100).toFixed(0)), 100);
+    await db.query({
+        text: `UPDATE "scans" SET "percentage"=$1 WHERE "id"=$2`,
+        values: [percentage, scanId],
+    })
+
     await db.clean();
     return;
 } 

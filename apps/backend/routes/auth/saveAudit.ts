@@ -32,8 +32,8 @@ export const saveAudit = async () => {
 
         if (saveAndRun) {
             const scanId = (await db.query({
-                text: `INSERT INTO "scans" ("audit_id", "status") VALUES ($1, $2) RETURNING "id"`,
-                values: [id, 'processing'],
+                text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
+                values: [id, 'processing', JSON.stringify(pages)],
             })).rows[0].id;
             const urls = (await db.query({
                 text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
