@@ -22,29 +22,6 @@ import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
 
-// TODO
-/*
--  Add change HTML/PDF type to Audit component
--  Add Count to "Active"|"Fixed"|"All" Response
--  Scan button should do something other than send you to the audit list
--  Does ID need its own column? 
--  Tags are duplicated from server
--  Categories not mapped/populated
-X  Blocker code in panel
-X  Tags in table: shorten into tooltip
--  Sort by URL
--  URLs list and add/remove functionality behind accordion
--  Scans should percent complete 
--  Supress Errors on audits without scans
--  Paged size in pagination options
--  Table taborder (needs testing)
--  How exactly are we handling the dates/range on the chart & table? (Days input someplace)
--  Audit Page Filters: Add PDF/HTML option
--  Audit Page should be public
--  Add "ignore" checkbox/button for blockers
--  Ignored blockers should stay ignored
-*/
-
 interface Page {
   url: string;
   type: "html" | "pdf";
@@ -184,27 +161,30 @@ export const Audit = () => {
   };
 
   const addUrls = async (changedPages: Page[]) => {
-    await apiClient.graphql({
-      query: `mutation ($audit_id: uuid, $url: String, $type: String) {
+    //TODO this should really be a mutation that accepts an array, not a loop
+    for (const changedPage of changedPages) {
+      await apiClient.graphql({
+        query: `mutation ($audit_id: uuid, $url: String, $type: String) {
                 insert_urls_one(object: {audit_id: $audit_id, url: $url, type: $type}) {id}
             }`,
-      variables: {
-        audit_id: auditId,
-        url: changedPages[0].url,
-        type: changedPages[0].type,
-      },
-    });
+        variables: {
+          audit_id: auditId,
+          url: changedPage.url,
+          type: changedPage.type,
+        },
+      });
 
-    await apiClient.graphql({
-      query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
+      await apiClient.graphql({
+        query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
                 insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
             }`,
-      variables: {
-        audit_id: auditId,
-        message: `User added ${changedPages[0].url}`,
-        data: { url: changedPages[0].url, type: changedPages[0].type },
-      },
-    });
+        variables: {
+          audit_id: auditId,
+          message: `User added ${changedPage.url}`,
+          data: { url: changedPage.url, type: changedPage.type },
+        },
+      });
+    }
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     console.log("DB update complete.");
   };
