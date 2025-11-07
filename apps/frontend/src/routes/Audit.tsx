@@ -37,6 +37,8 @@ export const Audit = () => {
   //const [urlError, setUrlError] = useState<string | null>(null);
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
+  const isShared = location.pathname.startsWith('/shared/');
+  console.log(isShared)
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -72,7 +74,7 @@ export const Audit = () => {
     queryFn: async () => {
       const results = await (
         await API.get({
-          apiName: "auth",
+          apiName: isShared ? "public" : "auth",
           path: "/getAuditResults",
           options: { queryParams: { id: auditId!, type: "json" } },
         }).response
@@ -87,7 +89,7 @@ export const Audit = () => {
     queryFn: async () => {
       const results = await (
         await API.get({
-          apiName: "auth",
+          apiName: isShared ? "public" : "auth",
           path: "/getAuditChart",
           options: { queryParams: { id: auditId!, days: chartRange } },
         }).response
@@ -249,7 +251,7 @@ export const Audit = () => {
   const copyCurrentLocationToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
-        window.location.origin + location.pathname
+        window.location.origin + location.pathname.replace('/audits/','/shared/')
       );
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
@@ -260,15 +262,15 @@ export const Audit = () => {
   };
 
   return (
-    <div className="max-w-screen-sm">
+    <div className="max-w-screen-md">
       <div className="flex flex-col gap-2">
-        <Link to={"/audits"}>← Go Back</Link>
+        {!isShared && <Link to={"/audits"}>← Go Back</Link>}
         <div className="flex flex-row items-center gap-2 justify-between">
           <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
           <div className="flex flex-row items-center gap-2">
-            <button onClick={renameAudit}>Rename</button>
-            <button onClick={rescanAudit}>Re-scan</button>
-            <button onClick={deleteAudit}>Delete</button>
+            {!isShared && <button onClick={renameAudit}>Rename</button>}
+            {!isShared && <button onClick={rescanAudit}>Re-scan</button>}
+            {!isShared && <button onClick={deleteAudit}>Delete</button>}
           </div>
         </div>
       </div>
@@ -299,7 +301,7 @@ export const Audit = () => {
           </span>
           <Collapsible.Trigger>
             {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-            View or Edit Audit URLs
+            {isShared ? 'View Audit URLs' : 'View or Edit Audit URLs'}
           </Collapsible.Trigger>
         </div>
         <Collapsible.Content>
@@ -312,6 +314,7 @@ export const Audit = () => {
                 removeParentPages={removeUrls}
                 updateParentPageType={updateUrlType}
                 returnMutation
+                isShared={isShared}
               />
             )}
           </form>
@@ -472,21 +475,7 @@ export const Audit = () => {
         </div>
       )}
 
-      {auditId && <BlockersTable auditId={auditId} />}
-
-      <h2>Full Audit Response</h2>
-      {audit && (
-        <Editor
-          className="mt-2"
-          height="500px"
-          defaultLanguage="json"
-          value={JSON.stringify(audit, null, 2)}
-          onMount={(editor) => {
-            editorRef.current = editor;
-            editor.getAction("editor.action.formatDocument")?.run();
-          }}
-        />
-      )}
+      {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
     </div>
   );
 };

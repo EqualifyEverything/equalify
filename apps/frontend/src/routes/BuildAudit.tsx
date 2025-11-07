@@ -120,7 +120,7 @@ export const BuildAudit = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 max-w-screen-sm">
+    <div className="flex flex-col gap-4 max-w-screen-md">
       <Link to="..">← Go Back</Link>
       <h1 className="initial-focus-element">Audit Builder</h1>
       <form className="flex flex-col gap-4" onSubmit={saveAndRunAudit}>

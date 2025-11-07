@@ -26,14 +26,14 @@ export const Navigation = () => {
         }
     }, [darkMode]);
 
-    const authRoutes = ['/login'];
+    const authRoutes = ['/login', '/signup', '/shared'];
 
     useEffect(() => {
         const async = async () => {
             const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload;
             if (!attributes) {
                 setAuthenticated(false);
-                if (!authRoutes.includes(location.pathname) || location.pathname === '/') {
+                if (!location.pathname.startsWith('/shared/')) {
                     navigate(`/${location.search}`);
                 }
             }

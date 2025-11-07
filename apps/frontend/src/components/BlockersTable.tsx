@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,6 +16,8 @@ import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
+
+const apiClient = API.generateClient();
 
 interface BlockerTag {
   id: string;
@@ -38,6 +40,7 @@ interface Blocker {
 
 interface BlockersTableProps {
   auditId: string;
+  isShared: boolean;
 }
 
 interface Option {
@@ -45,7 +48,8 @@ interface Option {
   label: string;
 }
 
-export const BlockersTable = ({ auditId }: BlockersTableProps) => {
+export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
 
@@ -62,7 +66,70 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { data, isFetching, isLoading, error } = useQuery({
+  // Query to get ignored blockers for this audit
+  const { data: ignoredBlockers } = useQuery({
+    queryKey: ["ignoredBlockers", auditId],
+    queryFn: async () => {
+      const response = await apiClient.graphql({
+        query: `query ($audit_id: uuid!) {
+          ignored_blockers(where: {audit_id: {_eq: $audit_id}}) {
+            blocker_id
+          }
+        }`,
+        variables: { audit_id: auditId },
+      });
+      const data = response as any;
+      return new Set(
+        data.data.ignored_blockers.map((ib: any) => ib.blocker_id)
+      );
+    },
+  });
+
+  // Mutation to toggle ignore status
+  const toggleIgnoreMutation = useMutation({
+    mutationFn: async ({
+      blockerId,
+      isCurrentlyIgnored,
+    }: {
+      blockerId: string;
+      isCurrentlyIgnored: boolean;
+    }) => {
+      if (isCurrentlyIgnored) {
+        // Delete from ignored_blockers
+        await apiClient.graphql({
+          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!) {
+            delete_ignored_blockers(where: {
+              audit_id: {_eq: $audit_id},
+              blocker_id: {_eq: $blocker_id}
+            }) {
+              affected_rows
+            }
+          }`,
+          variables: { audit_id: auditId, blocker_id: blockerId },
+        });
+      } else {
+        // Insert into ignored_blockers
+        await apiClient.graphql({
+          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!) {
+            insert_ignored_blockers_one(object: {
+              audit_id: $audit_id,
+              blocker_id: $blocker_id
+            }) {
+              audit_id
+              blocker_id
+            }
+          }`,
+          variables: { audit_id: auditId, blocker_id: blockerId },
+        });
+      }
+    },
+    onSuccess: () => {
+      // Refetch the ignored blockers list
+      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
+    },
+  });
+
+  const { data, isLoading, error } = useQuery({
     queryKey: [
       "auditBlockers",
       auditId,
@@ -95,7 +162,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
         params.status = selectedStatus;
       }
       const response = await API.get({
-        apiName: "auth",
+        apiName: isShared ? "public" : "auth",
         path: "/getAuditTable",
         options: { queryParams: params },
       }).response;
@@ -309,6 +376,28 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
           );
         },
       },
+      {
+        accessorKey: "id",
+        header: "Ignore",
+        cell: ({ getValue }) => {
+          const blockerId = getValue() as string;
+          const isIgnored = ignoredBlockers?.has(blockerId) || false;
+          return (
+            <input
+              type="checkbox"
+              checked={isIgnored}
+              onChange={() =>
+                toggleIgnoreMutation.mutate({
+                  blockerId,
+                  isCurrentlyIgnored: isIgnored,
+                })
+              }
+              aria-label={`Ignore blocker ${blockerId}`}
+              className="w-4 h-4 cursor-pointer"
+            />
+          );
+        },
+      },
       /* {
             accessorKey: 'created_at',
             header: 'Date',
@@ -318,7 +407,7 @@ export const BlockersTable = ({ auditId }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation]
   );
 
   const table = useReactTable({

@@ -13,6 +13,7 @@ interface ChildProps {
   removeParentPages?: (newValue: Page[]) => void; // Callback function prop
   updateParentPageType?: (newValue: Page) => void; // Callback function prop
   returnMutation?: boolean; // if true, only return changed rows
+  isShared?: boolean;
 }
 
 export const AuditPagesInput: React.FC<ChildProps> = ({
@@ -21,7 +22,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   addParentPages,
   removeParentPages,
   updateParentPageType,
-  returnMutation = false
+  returnMutation = false,
+  isShared = false,
 }) => {
   const { setAriaAnnounceMessage } = useGlobalStore();
 
@@ -51,7 +53,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
       // Parse CSV - expecting one URL per line
       const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
-      
+
       if (lines.length === 0) {
         setCsvError("No URLs found in the file");
         return;
@@ -182,7 +184,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     }
   };
 
-  const removePage = (e:React.MouseEvent<HTMLButtonElement>) => {
+  const removePage = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const button = e.currentTarget;
     const form = button.closest("form");
@@ -204,8 +206,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     setPages(
       pages.map((page) => (page.url === url ? { ...page, type } : page))
     );
-    
-    if(updateParentPageType){ //update in DB if we have a function to do so
+
+    if (updateParentPageType) { //update in DB if we have a function to do so
       updateParentPageType({ url: url, type: type });
     }
   };
@@ -259,87 +261,90 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
   // update parent value on change
   useEffect(() => {
-      //console.log("Updating pages...");
-      //console.log("Pages:", pages);
-      //console.log("InitialPages", initialPages);
-      
-      if(returnMutation){
-        let arrDelta:Page[] = [];
-        if( initialPages === pages ) return;
-        if( initialPages.length < pages.length) { // adding pages
-          //console.log("Adding...")
-          arrDelta = pages.filter(page => !initialPages.includes(page));
-          if(addParentPages)
+    //console.log("Updating pages...");
+    //console.log("Pages:", pages);
+    //console.log("InitialPages", initialPages);
+
+    if (returnMutation) {
+      let arrDelta: Page[] = [];
+      if (initialPages === pages) return;
+      if (initialPages.length < pages.length) { // adding pages
+        //console.log("Adding...")
+        arrDelta = pages.filter(page => !initialPages.includes(page));
+        if (addParentPages)
           addParentPages(arrDelta);
-        }
-        if( initialPages.length > pages.length) { // removing pages
-          //console.log("Removing...")
-          const initialUrls = initialPages.map(page=>page.url);
-          const pageUrls = pages.map(page=>page.url);
-          const overlap = initialUrls.filter(page => !pageUrls.includes(page));
-          arrDelta = initialPages.filter(page=> overlap.includes(page.url));
-          //console.log("To remove:",arrDelta);
-          if(removeParentPages)
+      }
+      if (initialPages.length > pages.length) { // removing pages
+        //console.log("Removing...")
+        const initialUrls = initialPages.map(page => page.url);
+        const pageUrls = pages.map(page => page.url);
+        const overlap = initialUrls.filter(page => !pageUrls.includes(page));
+        arrDelta = initialPages.filter(page => overlap.includes(page.url));
+        //console.log("To remove:",arrDelta);
+        if (removeParentPages)
           removeParentPages(arrDelta);
-        }
-        setParentPages(arrDelta);
       }
-      else{
-        setParentPages(pages);
-      }
-    }, [pages]);
+      setParentPages(arrDelta);
+    }
+    else {
+      setParentPages(pages);
+    }
+  }, [pages]);
 
   return (
     <>
-      <div className="flex flex-col">
-        <label htmlFor="importBy">Import By:</label>
-        <select
-          id="importBy"
-          name="importBy"
-          value={importBy}
-          onChange={(e) => setImportBy(e.target.value)}
-        >
-          <option>URLs</option>
-          <option>CSV</option>
-        </select>
-      </div>
-      {["URLs"].includes(importBy) && (
-        <div className="flex flex-col">
-          <label htmlFor="pageInput">URLs:</label>
-          <input
-            id="pageInput"
-            name="pageInput"
-            onKeyDown={handleUrlInputKeyDown}
-            placeholder="example.com"
-          />
-          {urlError && <p className="text-red-500 text-sm mt-1">{urlError}</p>}
-        </div>
-      )}
-      {["CSV"].includes(importBy) && (
-        <div className="flex flex-col">
-          <label htmlFor="csvInput">CSV Upload:</label>
-          <input 
-            id="csvInput" 
-            name="csvInput" 
-            type="file" 
-            accept=".csv,.txt,text/csv,text/plain"
-            onChange={handleCsvUpload}
-          />
-          <p className="text-sm text-gray-600 mt-1">Upload a CSV or text file with one URL per line</p>
-          {csvError && <p className="text-red-500 text-sm mt-1">{csvError}</p>}
-        </div>
-      )}
-      <button type="button" onClick={addPage}>
-        Add URLs
-      </button>
-
+      {!isShared &&
+        <>
+          <div className="flex flex-col">
+            <label htmlFor="importBy">Import By:</label>
+            <select
+              id="importBy"
+              name="importBy"
+              value={importBy}
+              onChange={(e) => setImportBy(e.target.value)}
+            >
+              <option>URLs</option>
+              <option>CSV</option>
+            </select>
+          </div>
+          {["URLs"].includes(importBy) && (
+            <div className="flex flex-col">
+              <label htmlFor="pageInput">URLs:</label>
+              <input
+                id="pageInput"
+                name="pageInput"
+                onKeyDown={handleUrlInputKeyDown}
+                placeholder="example.com"
+              />
+              {urlError && <p className="text-red-500 text-sm mt-1">{urlError}</p>}
+            </div>
+          )}
+          {["CSV"].includes(importBy) && (
+            <div className="flex flex-col">
+              <label htmlFor="csvInput">CSV Upload:</label>
+              <input
+                id="csvInput"
+                name="csvInput"
+                type="file"
+                accept=".csv,.txt,text/csv,text/plain"
+                onChange={handleCsvUpload}
+              />
+              <p className="text-sm text-gray-600 mt-1">Upload a CSV or text file with one URL per line</p>
+              {csvError && <p className="text-red-500 text-sm mt-1">{csvError}</p>}
+            </div>
+          )}
+          <button type="button" onClick={addPage}>
+            Add URLs
+          </button>
+        </>
+      }
       {pages.length > 0 && (
         <>
           <h2>Review Added URLs</h2>
           <table>
             <thead>
               <tr>
-                <th>Select</th>
+                {!isShared && <th>Select</th>}
                 <th>URL</th>
                 <th>Scan Type</th>
               </tr>
@@ -347,7 +352,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
             <tbody>
               {pages.map((page) => (
                 <tr key={page.url}>
-                  <td>
+                  {!isShared && <td>
                     <input
                       id={page.url}
                       name={page.url}
@@ -358,7 +363,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                       onChange={updatePagesSelectedCount}
                       aria-label={`Checkbox for ${page.url}`}
                     />
-                  </td>
+                  </td>}
                   <td>{page.url}</td>
                   <td>
                     <select
@@ -371,6 +376,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                         )
                       }
                       className="!p-0 mx-1"
+                      disabled={isShared}
                     >
                       <option value="html">HTML</option>
                       <option value="pdf">PDF</option>
@@ -380,7 +386,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
               ))}
             </tbody>
           </table>
-          {pagesToDeleteCount > 0 ? (
+          {!isShared && pagesToDeleteCount > 0 ? (
             <button type="button" onClick={removePage}>
               Remove {pagesToDeleteCount} URL(s)
             </button>

@@ -89,6 +89,7 @@ const router = createBrowserRouter([
       { path: "signup", element: <Signup /> },
       { path: "audits", element: <Audits /> },
       { path: "audits/:auditId", element: <Audit /> },
+      { path: "shared/:auditId", element: <Audit /> },
       { path: "audits/build", element: <BuildAudit /> },
       { path: "logs", element: <Logs /> },
       { path: "log/:logId", element: <Log /> },
