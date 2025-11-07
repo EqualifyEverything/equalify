@@ -1,21 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDate, formatId } from "../utils";
+import { formatDate } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
-import Editor from "@monaco-editor/react";
-import { useRef, useEffect, useState, ChangeEventHandler, ChangeEvent } from "react";
-import type { editor } from "monaco-editor";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { useEffect, useState, ChangeEvent } from "react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
@@ -29,16 +18,13 @@ interface Page {
 
 export const Audit = () => {
   const { auditId } = useParams();
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
-  //const [urlError, setUrlError] = useState<string | null>(null);
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
   const isShared = location.pathname.startsWith('/shared/');
-  console.log(isShared)
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -71,17 +57,12 @@ export const Audit = () => {
 
   const { data: audit } = useQuery({
     queryKey: ["audit", auditId],
-    queryFn: async () => {
-      const results = await (
-        await API.get({
-          apiName: isShared ? "public" : "auth",
-          path: "/getAuditResults",
-          options: { queryParams: { id: auditId!, type: "json" } },
-        }).response
-      ).body.json();
-      return results;
-    },
-    refetchInterval: 5000,
+    queryFn: async () => (
+      await apiClient.graphql({
+        query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name}}`,
+        variables: { audit_id: auditId },
+      })
+    )?.data?.audits_by_pk,
   });
 
   const { data: chartData } = useQuery({
@@ -98,15 +79,6 @@ export const Audit = () => {
     },
     refetchInterval: 5000,
   });
-
-  // Format the JSON whenever audit data changes
-  useEffect(() => {
-    if (editorRef.current && audit) {
-      setTimeout(() => {
-        editorRef.current?.getAction("editor.action.formatDocument")?.run();
-      }, 100);
-    }
-  }, [audit]);
 
   const renameAudit = async () => {
     const newName = prompt(
@@ -251,7 +223,7 @@ export const Audit = () => {
   const copyCurrentLocationToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
-        window.location.origin + location.pathname.replace('/audits/','/shared/')
+        window.location.origin + location.pathname.replace('/audits/', '/shared/')
       );
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
@@ -336,21 +308,21 @@ export const Audit = () => {
           <h2 id="blockers-chart-heading">
             Blockers Over Time (Last {chartData.period_days} Days)
           </h2>
-           <label htmlFor="chart-range-select">Date Range:</label>
-            <select
-                id="chart-range-select"
-                name="ChartRangeSelect"
-                value={chartRange}
-                onChange={(event:ChangeEvent<HTMLSelectElement>)=>{
-                    setChartRange(parseInt(event.target.value))
-                }}
-                aria-label="Select Date Range"
-            >
-                <option value={7}>Week</option>
-                <option value={30}>Month</option>
-                <option value={90}>Quarter</option>
-                <option value={365}>Year</option>
-            </select>
+          <label htmlFor="chart-range-select">Date Range:</label>
+          <select
+            id="chart-range-select"
+            name="ChartRangeSelect"
+            value={chartRange}
+            onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+              setChartRange(parseInt(event.target.value))
+            }}
+            aria-label="Select Date Range"
+          >
+            <option value={7}>Week</option>
+            <option value={30}>Month</option>
+            <option value={90}>Quarter</option>
+            <option value={365}>Year</option>
+          </select>
           <Tabs.Root defaultValue="chart" orientation="vertical">
             <Tabs.List aria-label="Select a Chart View">
               <Tabs.Trigger value="chart">Chart View</Tabs.Trigger>
