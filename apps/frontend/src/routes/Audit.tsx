@@ -4,7 +4,7 @@ import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import Editor from "@monaco-editor/react";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, ChangeEventHandler, ChangeEvent } from "react";
 import type { editor } from "monaco-editor";
 import {
   LineChart,
@@ -36,6 +36,7 @@ export const Audit = () => {
   const [pages, setPages] = useState<Page[]>([]);
   //const [urlError, setUrlError] = useState<string | null>(null);
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+  const [chartRange, setChartRange] = useState<number>(7);
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -88,7 +89,7 @@ export const Audit = () => {
         await API.get({
           apiName: "auth",
           path: "/getAuditChart",
-          options: { queryParams: { id: auditId!, days: "7" } },
+          options: { queryParams: { id: auditId!, days: chartRange } },
         }).response
       ).body.json();
       return results;
@@ -320,7 +321,7 @@ export const Audit = () => {
       <hr />
       <div>
         {scans?.map((scan, index) => (
-          <div>
+          <div key={index}>
             Scan #{index + 1}: {formatDate(scan.created_at)} (
             {scan.percentage ?? 0}%)
           </div>
@@ -332,6 +333,21 @@ export const Audit = () => {
           <h2 id="blockers-chart-heading">
             Blockers Over Time (Last {chartData.period_days} Days)
           </h2>
+           <label htmlFor="chart-range-select">Date Range:</label>
+            <select
+                id="chart-range-select"
+                name="ChartRangeSelect"
+                value={chartRange}
+                onChange={(event:ChangeEvent<HTMLSelectElement>)=>{
+                    setChartRange(parseInt(event.target.value))
+                }}
+                aria-label="Select Date Range"
+            >
+                <option value={7}>Week</option>
+                <option value={30}>Month</option>
+                <option value={90}>Quarter</option>
+                <option value={365}>Year</option>
+            </select>
           <Tabs.Root defaultValue="chart" orientation="vertical">
             <Tabs.List aria-label="Select a Chart View">
               <Tabs.Trigger value="chart">Chart View</Tabs.Trigger>
