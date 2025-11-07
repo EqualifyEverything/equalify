@@ -55,7 +55,7 @@ export const getAuditResults = async () => {
         acc[url.id] = { url: url.url, type: url.type};
         return acc;
     }, {});
-
+    
     const jsonRows = response.audits_by_pk.scans[0].blockers.map(blocker => {
         return {
             blocker_id: blocker.id,
@@ -68,7 +68,7 @@ export const getAuditResults = async () => {
                 `${obj.message.category}: ${obj.message.content}`
             )
         }
-    });
+    }) ?? [];
 
     return {
         statusCode: 200,
