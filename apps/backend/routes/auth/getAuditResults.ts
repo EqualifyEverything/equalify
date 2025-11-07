@@ -56,7 +56,7 @@ export const getAuditResults = async () => {
         return acc;
     }, {});
     
-    const jsonRows = response.audits_by_pk.scans[0].blockers.map(blocker => {
+    const jsonRows = response.audits_by_pk.scans[0]?.blockers?.map(blocker => {
         return {
             blocker_id: blocker.id,
             url_id: urlMap[blocker.url_id].url,
