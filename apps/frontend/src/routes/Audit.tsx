@@ -4,12 +4,16 @@ import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import { useEffect, useState, ChangeEvent } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Dot } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import {
+  ValueType,
+  NameType,
+} from "recharts/types/component/DefaultTooltipContent";
 
 interface Page {
   url: string;
@@ -233,6 +237,78 @@ export const Audit = () => {
     }
   };
 
+  const CustomizedDot = (props: any) => {
+    const { cx, cy, dataKey, payload } = props;
+    if (payload.timestamp) {
+      return (
+        <Dot
+          key={dataKey}
+          cx={cx}
+          cy={cy}
+          r={6}
+          stroke={"green"}
+          fill={"white"}
+          strokeWidth={2}
+        ></Dot>
+      );
+    } else {
+      return <div key={cx}></div>;
+    }
+  };
+
+interface CustomTooltipProps {
+      active?: boolean; // Optional, as it might be undefined when not active
+      payload?: Array<any>; // Or a more specific type if your data structure is known
+      label?: string | number; // Or a more specific type based on your label data
+}
+
+  const TooltipContent = ({
+    active,
+    payload,
+    label,
+  }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      const date = label
+        ? new Date(label).toLocaleDateString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        : null;
+      let scannedTime = "";
+      if (payload.length > 0 && payload[0].payload?.timestamp) {
+        const scanTimeDate = new Date(payload[0].payload?.timestamp);
+        scannedTime =
+          "Scanned at " +
+          scanTimeDate.toLocaleTimeString(navigator.language, {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+      }
+      return (
+        <div
+          style={{
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+          }}
+        >
+          <p className="py-0 px-2">
+            <span className="block">{date}</span>
+            <span className="block">Blockers: <b>{payload[0].payload.blockers}</b></span>
+            {scannedTime && (
+              <span className="block">
+                <b>{scannedTime}</b>
+              </span>
+            )}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="max-w-screen-md">
       <div className="flex flex-col gap-2">
@@ -308,21 +384,21 @@ export const Audit = () => {
           <h2 id="blockers-chart-heading">
             Blockers Over Time (Last {chartData.period_days} Days)
           </h2>
-          <label htmlFor="chart-range-select">Date Range:</label>
-          <select
-            id="chart-range-select"
-            name="ChartRangeSelect"
-            value={chartRange}
-            onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-              setChartRange(parseInt(event.target.value))
-            }}
-            aria-label="Select Date Range"
-          >
-            <option value={7}>Week</option>
-            <option value={30}>Month</option>
-            <option value={90}>Quarter</option>
-            <option value={365}>Year</option>
-          </select>
+           <label htmlFor="chart-range-select">Date Range:</label>
+            <select
+                id="chart-range-select"
+                name="ChartRangeSelect"
+                value={chartRange}
+                onChange={(event:ChangeEvent<HTMLSelectElement>)=>{
+                    setChartRange(parseInt(event.target.value))
+                }}
+                aria-label="Select Date Range"
+            >
+                <option value={7}>Week</option>
+                <option value={30}>Month</option>
+                <option value={90}>Quarter</option>
+                <option value={365}>Year</option>
+            </select>
           <Tabs.Root defaultValue="chart" orientation="vertical">
             <Tabs.List aria-label="Select a Chart View">
               <Tabs.Trigger value="chart">Chart View</Tabs.Trigger>
@@ -361,32 +437,14 @@ export const Audit = () => {
                         position: "insideLeft",
                       }}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #ccc",
-                      }}
-                      labelFormatter={(value) => {
-                        const date = new Date(value);
-                        return date.toLocaleDateString("en-US", {
-                          weekday: "short",
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        });
-                      }}
-                      formatter={(value: number, name: string) => [
-                        value,
-                        name === "blockers" ? "Blockers" : name,
-                      ]}
-                    />
+                    <Tooltip content={<TooltipContent />} />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="blockers"
                       stroke="#8884d8"
                       strokeWidth={2}
-                      activeDot={{ r: 8 }}
+                      dot={CustomizedDot}
                       name="Blockers"
                     />
                   </LineChart>
@@ -410,7 +468,7 @@ export const Audit = () => {
                         scope="col"
                         className="border border-gray-300 px-4 py-2 text-left"
                       >
-                        Date
+                        Scan Date
                       </th>
                       <th
                         scope="col"
@@ -421,24 +479,33 @@ export const Audit = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {chartData.data.map((row: any, index: number) => (
-                      <tr
-                        key={row.date}
-                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                      >
-                        <td className="border border-gray-300 px-4 py-2">
-                          {new Date(row.date).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2">
-                          {row.blockers}
-                        </td>
-                      </tr>
-                    ))}
+                    {chartData.data.map((row: any, index: number) => {
+                      if (row.timestamp) {
+                        //console.log(row);
+                        return (
+                          <tr
+                            key={row.date}
+                            className={
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                            }
+                          >
+                            <td className="border border-gray-300 px-4 py-2">
+                              {new Date(row.date).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                              {row.blockers}
+                            </td>
+                          </tr>
+                        );
+                      } else {
+                        return false;
+                      }
+                    })}
                   </tbody>
                 </table>
               </div>
