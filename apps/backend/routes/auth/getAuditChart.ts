@@ -73,12 +73,21 @@ export const getAuditChart = async () => {
             });
         } else {
             // Fill with the last known value
-            if(days>30 && i % 7 === 0) // If the range is >30 days, only return weekly points
-            chartData.push({
-                date: dateKey,
-                blockers: lastKnownValue,
-                timestamp: null
-            });
+            if(days>30){ // If the range is >30 days, only return weekly points
+                if(i % 7 === 0){
+                    chartData.push({
+                        date: dateKey,
+                        blockers: lastKnownValue,
+                        timestamp: null
+                    });
+                }
+            }else{
+                chartData.push({
+                        date: dateKey,
+                        blockers: lastKnownValue,
+                        timestamp: null
+                });
+            }
         }
     }
 
