@@ -1,3 +1,29 @@
+import { useQuery } from "@tanstack/react-query";
+import * as API from "aws-amplify/api";
+
+
 export const Logs = () => {
-    return <h1 className="initial-focus-element">Logs</h1>
-}
+
+  const { data: logs } = useQuery({
+    queryKey: ["logs"],
+    queryFn: async () => {
+      const results = await (
+        await API.get({
+          apiName: "auth",
+          path: "/getLogs",
+          options: { queryParams: { page: "1", pageSize: "10" } },
+        }).response
+      ).body.json();
+      return results;
+    },
+    refetchInterval: 5000,
+  });
+
+  console.log(logs);
+
+  return (
+    <>
+      <h1 className="initial-focus-element">Logs</h1>
+    </>
+  );
+};

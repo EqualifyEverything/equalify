@@ -10,10 +10,6 @@ import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import {
-  ValueType,
-  NameType,
-} from "recharts/types/component/DefaultTooltipContent";
 
 interface Page {
   url: string;
@@ -159,7 +155,7 @@ export const Audit = () => {
             }`,
         variables: {
           audit_id: auditId,
-          message: `User added ${changedPage.url}`,
+          message: `URL added ${changedPage.url}`,
           data: { url: changedPage.url, type: changedPage.type },
         },
       });
@@ -186,7 +182,7 @@ export const Audit = () => {
             }`,
         variables: {
           audit_id: auditId,
-          message: `User removed ${row.url}`,
+          message: `URL removed ${row.url}`,
           data: { url: row.url, type: row.type },
         },
       });
