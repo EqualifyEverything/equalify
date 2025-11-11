@@ -22,8 +22,8 @@ export const getLogs = async () => {
                         name
                     }
                 }
-                logs_aggregate: {
-                    aggregate: {
+                logs_aggregate {
+                    aggregate {
                         count
                     }
                 }
