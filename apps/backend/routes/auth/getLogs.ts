@@ -1,16 +1,5 @@
 import { db, event, graphqlQuery } from "#src/utils";
-
-interface getLogsResponseLog {
-    created_at: string,
-    data: Object,
-    message: string,
-    LogToUser: { name: string, email: string },
-    LogToAudit: { name: string } | null
-}
-
-interface getLogsResponse {
-    logs: getLogsResponseLog[];
-}
+import getLogsResponse from "../../../../shared/types/logs"
 
 export const getLogs = async () => {
   const page = parseInt((event.queryStringParameters as any).page || "0", 10);
@@ -31,6 +20,11 @@ export const getLogs = async () => {
                     }
                     LogToAudit {
                         name
+                    }
+                }
+                logs_aggregate: {
+                    aggregate: {
+                        count: 71
                     }
                 }
             }`,

@@ -4,6 +4,7 @@ on:
     branches: ["main", "staging"]
     paths:
       - 'apps/**'
+      - '.github/workflows/deploy-apps.yml'
 permissions:
   id-token: write
   contents: read
