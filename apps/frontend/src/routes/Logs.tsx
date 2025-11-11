@@ -7,14 +7,13 @@ export const Logs = () => {
   const { data: logs } = useQuery({
     queryKey: ["logs"],
     queryFn: async () => {
-      const results = await (
+      return await (
         await API.get({
           apiName: "auth",
           path: "/getLogs",
           options: { queryParams: { page: "1", pageSize: "10" } },
         }).response
       ).body.json();
-      return results;
     },
     refetchInterval: 5000,
   });

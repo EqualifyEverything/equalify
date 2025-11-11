@@ -1,5 +1,17 @@
 import { db, event, graphqlQuery } from "#src/utils";
 
+interface getLogsResponseLog {
+    created_at: string,
+    data: Object,
+    message: string,
+    LogToUser: { name: string, email: string },
+    LogToAudit: { name: string } | null
+}
+
+interface getLogsResponse {
+    logs: getLogsResponseLog[];
+}
+
 export const getLogs = async () => {
   const page = parseInt((event.queryStringParameters as any).page || "0", 10);
   const pageSize = parseInt(
@@ -10,16 +22,15 @@ export const getLogs = async () => {
   const query = {
     query: `query($limit: Int!, $offset: Int!){
                 logs(limit: $limit, offset: $offset, order_by: {created_at: desc}) {
-                    audit_id
                     created_at
                     data
                     message
                     LogToUser {
-                    name
-                    email
+                        name
+                        email
                     }
                     LogToAudit {
-                    name
+                        name
                     }
                 }
             }`,
@@ -28,8 +39,7 @@ export const getLogs = async () => {
       offset: page * pageSize,
     },
   };
-  console.log(JSON.stringify({ query }));
-  const response = await graphqlQuery(query);
-  console.log(response);
-  return;
+  const response = await graphqlQuery(query) as getLogsResponse;
+  console.log(JSON.stringify(response));
+  return response;
 };
