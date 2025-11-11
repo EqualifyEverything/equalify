@@ -263,7 +263,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           >
             URL
             {sortBy === "url" && (
-              <span className="text-xs">
+              <span className="text-xs" aria-label={`Sorted ${sortOrder}`}>
                 {sortOrder === "asc" ? "▲" : "▼"}
               </span>
             )}
@@ -409,11 +409,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             <input
               type="checkbox"
               checked={isIgnored}
-              onChange={() =>
+              onChange={() => {
                 toggleIgnoreMutation.mutate({
                   blockerId,
                   isCurrentlyIgnored: isIgnored,
                 })
+                setAriaAnnounceMessage(`Blocker ID ${blockerId} set to ignored status: ${isIgnored}`)
+                }
               }
               aria-label={`Ignore blocker ${blockerId}`}
               className="w-4 h-4 cursor-pointer"
@@ -482,6 +484,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     if (sortBy === "url") {
       // Toggle sort order if already sorting by URL
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setAriaAnnounceMessage(`Sorting by URL ${sortOrder}`);
     } else {
       // Start sorting by URL in ascending order
       setSortBy("url");
