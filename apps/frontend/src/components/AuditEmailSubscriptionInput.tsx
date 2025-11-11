@@ -62,12 +62,13 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
 
   // whenever we change values, update the parent data
   useEffect(() => {
-    console.log("Updating...", emails);
+    //console.log("Updating...", emails);
     onValueChange({ emails: emails });
   }, [emails]);
 
   return (
-    <>
+    <div>
+      <div>
       {emails.map((entry) => (
         <EmailInputRow
           key={entry.id}
@@ -76,10 +77,11 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
           onRemove={handleRemoveEmail}
         />
       ))}
+      </div>
       <button onClick={handleAddEmail} type="button">
-        Add Another Email
+        {emails.length > 0 ? "Add Another Email" : "Add Email Notification" }
       </button>
-    </>
+    </div>
   );
 };
 

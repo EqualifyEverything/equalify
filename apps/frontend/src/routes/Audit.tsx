@@ -4,13 +4,27 @@ import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import { useEffect, useState, ChangeEvent } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Dot } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Dot,
+} from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { createLog } from "#src/utils/createLog.ts";
+import {
+  AuditEmailSubscriptionInput,
+  EmailSubscriptionList,
+} from "#src/components/AuditEmailSubscriptionInput.tsx";
 
 interface Page {
   url: string;
@@ -23,9 +37,10 @@ export const Audit = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
+  const [emailNotifications, setEmailNotifications] = useState<string>("");
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
-  const isShared = location.pathname.startsWith('/shared/');
+  const isShared = location.pathname.startsWith("/shared/");
   const { setAriaAnnounceMessage } = useGlobalStore();
 
   const { data: urls, isSuccess } = useQuery({
@@ -59,12 +74,13 @@ export const Audit = () => {
 
   const { data: audit } = useQuery({
     queryKey: ["audit", auditId],
-    queryFn: async () => (
-      await apiClient.graphql({
-        query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name}}`,
-        variables: { audit_id: auditId },
-      })
-    )?.data?.audits_by_pk,
+    queryFn: async () =>
+      (
+        await apiClient.graphql({
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications}}`,
+          variables: { audit_id: auditId },
+        })
+      )?.data?.audits_by_pk,
   });
 
   const { data: chartData } = useQuery({
@@ -134,7 +150,7 @@ export const Audit = () => {
       // aria & logging
       setAriaAnnounceMessage(`Deleted audit ${audit.name}.`);
       await createLog(`Deleted audit ${audit.name}.`, auditId);
-      
+
       navigate("/audits");
       return;
     }
@@ -159,12 +175,17 @@ export const Audit = () => {
         },
       });
 
-      await createLog(`URL added ${changedPage.url}`, auditId, { url: changedPage.url, type: changedPage.type });
+      await createLog(`URL added ${changedPage.url}`, auditId, {
+        url: changedPage.url,
+        type: changedPage.type,
+      });
     }
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     // aria
-    setAriaAnnounceMessage(`Added ${changedPages.length} URLs to audit ${audit.name}.`);
-      
+    setAriaAnnounceMessage(
+      `Added ${changedPages.length} URLs to audit ${audit.name}.`
+    );
+
     console.log("DB update complete.");
   };
 
@@ -180,11 +201,16 @@ export const Audit = () => {
         },
       });
 
-      await createLog( `URL removed ${row.url}`, auditId, { url: row.url, type: row.type });
+      await createLog(`URL removed ${row.url}`, auditId, {
+        url: row.url,
+        type: row.type,
+      });
     }
     // aria
-    setAriaAnnounceMessage(`Removed ${changedPages.length} URLs from audit ${audit.name}.`);
-    
+    setAriaAnnounceMessage(
+      `Removed ${changedPages.length} URLs from audit ${audit.name}.`
+    );
+
     console.log("DB update complete.");
   };
 
@@ -218,22 +244,53 @@ export const Audit = () => {
     console.log("DB Updated with new URL Type.", updatedPage);
 
     // aria & logging
-    setAriaAnnounceMessage(`Changed ${changedPage.url} to type ${changedPage.type}.`);
-    await createLog( `Changed ${changedPage.url} to type ${changedPage.type}.`, auditId);
-    
-    
+    setAriaAnnounceMessage(
+      `Changed ${changedPage.url} to type ${changedPage.type}.`
+    );
+    await createLog(
+      `Changed ${changedPage.url} to type ${changedPage.type}.`,
+      auditId
+    );
+  };
+
+  useEffect(()=>{
+    if(audit?.email_notifications)
+    setEmailNotifications(audit.email_notifications)
+  },[audit])
+
+  const updateEmailNotifications = async (newValue: EmailSubscriptionList) => {
+    //throw new Error("Function not implemented.");
+    if (emailNotifications !== JSON.stringify(newValue)) {
+      const newEmails = JSON.stringify( newValue )
+      console.log("Updating email notifications:", newEmails);
+
+      const updatedEmailNotifications = await apiClient.graphql({
+        query: `mutation ($audit_id:uuid, $emails: String) {
+                update_audits(where: {id: {_eq: $audit_id}}, _set: {email_notifications: $emails}) {
+                  affected_rows
+                }
+              }`,
+        variables: {
+          audit_id: auditId,
+          emails: newEmails,
+        },
+      });
+      //console.log("Email notification update success!", updatedEmailNotifications);
+    }
   };
 
   const copyCurrentLocationToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
-        window.location.origin + location.pathname.replace('/audits/', '/shared/')
+        window.location.origin +
+          location.pathname.replace("/audits/", "/shared/")
       );
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
       );
-      setAriaAnnounceMessage(`URL ${window.location.origin + location.pathname} copied to clipboard!`);
-    
+      setAriaAnnounceMessage(
+        `URL ${window.location.origin + location.pathname} copied to clipboard!`
+      );
     } catch (err) {
       console.error("Failed to copy URLs: ", err);
     }
@@ -258,17 +315,13 @@ export const Audit = () => {
     }
   };
 
-interface CustomTooltipProps {
-      active?: boolean; // Optional, as it might be undefined when not active
-      payload?: Array<any>; // Or a more specific type if your data structure is known
-      label?: string | number; // Or a more specific type based on your label data
-}
+  interface CustomTooltipProps {
+    active?: boolean; // Optional, as it might be undefined when not active
+    payload?: Array<any>; // Or a more specific type if your data structure is known
+    label?: string | number; // Or a more specific type based on your label data
+  }
 
-  const TooltipContent = ({
-    active,
-    payload,
-    label,
-  }: CustomTooltipProps) => {
+  const TooltipContent = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const date = label
         ? new Date(label).toLocaleDateString("en-US", {
@@ -297,7 +350,9 @@ interface CustomTooltipProps {
         >
           <p className="py-0 px-2">
             <span className="block">{date}</span>
-            <span className="block">Blockers: <b>{payload[0].payload.blockers}</b></span>
+            <span className="block">
+              Blockers: <b>{payload[0].payload.blockers}</b>
+            </span>
             {scannedTime && (
               <span className="block">
                 <b>{scannedTime}</b>
@@ -333,6 +388,22 @@ interface CustomTooltipProps {
         <span>Copy link</span>
       </button>
       <hr />
+      {emailNotifications && (
+        <>
+          <span>
+            {JSON.parse(emailNotifications).emails.length > 0
+              ? `${JSON.parse(emailNotifications).emails.length} Email Notifications`
+              : "No Email Notifications"}
+          </span>
+          <div>
+            <AuditEmailSubscriptionInput
+              initialValue={JSON.parse(emailNotifications)}
+              onValueChange={updateEmailNotifications}
+            />
+          </div>
+        </>
+      )}
+      <hr />
       <Collapsible.Root
         className="CollapsibleRoot"
         open={showUrlInput}
@@ -351,7 +422,7 @@ interface CustomTooltipProps {
           </span>
           <Collapsible.Trigger>
             {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-            {isShared ? 'View Audit URLs' : 'View or Edit Audit URLs'}
+            {isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
           </Collapsible.Trigger>
         </div>
         <Collapsible.Content>
@@ -386,21 +457,21 @@ interface CustomTooltipProps {
           <h2 id="blockers-chart-heading">
             Blockers Over Time (Last {chartData.period_days} Days)
           </h2>
-           <label htmlFor="chart-range-select">Date Range:</label>
-            <select
-                id="chart-range-select"
-                name="ChartRangeSelect"
-                value={chartRange}
-                onChange={(event:ChangeEvent<HTMLSelectElement>)=>{
-                    setChartRange(parseInt(event.target.value))
-                }}
-                aria-label="Select Date Range"
-            >
-                <option value={7}>Week</option>
-                <option value={30}>Month</option>
-                <option value={90}>Quarter</option>
-                <option value={365}>Year</option>
-            </select>
+          <label htmlFor="chart-range-select">Date Range:</label>
+          <select
+            id="chart-range-select"
+            name="ChartRangeSelect"
+            value={chartRange}
+            onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+              setChartRange(parseInt(event.target.value));
+            }}
+            aria-label="Select Date Range"
+          >
+            <option value={7}>Week</option>
+            <option value={30}>Month</option>
+            <option value={90}>Quarter</option>
+            <option value={365}>Year</option>
+          </select>
           <Tabs.Root defaultValue="chart" orientation="vertical">
             <Tabs.List aria-label="Select a Chart View">
               <Tabs.Trigger value="chart">Chart View</Tabs.Trigger>
