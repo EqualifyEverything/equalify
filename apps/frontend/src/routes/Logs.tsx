@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import * as API from "aws-amplify/api";
 import getLogsResponse from "../../../../shared/types/logs";
+import getLogsResponseLog from "../../../../shared/types/logs";
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   ColumnDef,
@@ -8,13 +9,12 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import getLogsResponseLog from "../../../../shared/types/logs";
 
 export const Logs = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
 
-  const { data: logs, isLoading } = useQuery({
+  const { data: logs, isLoading, isError } = useQuery({
     queryKey: ["logs"],
     queryFn: async () => {
       return (await (
@@ -29,7 +29,7 @@ export const Logs = () => {
     placeholderData: (previousData) => previousData,
   });
 
-  console.log(logs);
+  //console.log(logs);
 
   interface userObj {
     name:string,
@@ -83,7 +83,7 @@ export const Logs = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    //pageCount: data?.pagination?.totalPages || 0,
+    pageCount: logs ? Math.ceil(logs?.logs_aggregate?.aggregate?.count / pageSize) : 0,
   });
 
   const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>)=>{
@@ -92,15 +92,18 @@ export const Logs = () => {
 
   return (
     <>
-      <h1 className="initial-focus-element">Logs</h1>
+      <h1 className="initial-focus-element pb-3">Logs</h1>
+      {isError && (
+        <div className="text-center py-8">Error Loading Logs Data</div>
+      )}
       {isLoading ? (
-        <div className="text-center py-8">Loading blockers...</div>
+        <div className="text-center py-8">Loading Logs...</div>
       ) : (
         <>
           <div className="overflow-x-auto">
             <table
               className="w-full border-collapse border border-gray-300"
-              aria-label="Blockers table"
+              aria-label="Logs table"
             >
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -170,7 +173,7 @@ export const Logs = () => {
                       ` (Page ${page + 1} of ${Math.ceil(logs.logs_aggregate.aggregate.count / pageSize)})`}
                   </div>
                   <div className="flex gap-2">
-                    <label htmlFor="pageSize" className="text-sm">Blockers per page:</label>
+                    <label htmlFor="pageSize" className="text-sm">Logs per page:</label>
                     <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
                       <option value="10">10</option>
                       <option value="50">50</option>
