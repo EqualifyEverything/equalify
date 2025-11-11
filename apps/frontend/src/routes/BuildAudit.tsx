@@ -12,6 +12,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useGlobalStore } from "../utils";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
+import { createLog } from "#src/utils/createLog.ts";
 
 interface Page {
   url: string;
@@ -81,6 +82,8 @@ export const BuildAudit = () => {
       }).response
     ).body.json() as { id:string };
     setAriaAnnounceMessage(`Audit saved and audit run started!`);
+    await createLog( `Audit created and audit run started!`, response.id);
+        
     navigate(`/audits/${response?.id}`);
     return;
   };
@@ -106,6 +109,7 @@ export const BuildAudit = () => {
       }).response
     ).body.json() as { id:string };
     setAriaAnnounceMessage(`Audit saved!`);
+    await createLog( `Audit created!`, response.id);
     navigate(`/audits/${response?.id}`);
     return;
   };

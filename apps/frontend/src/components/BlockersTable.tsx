@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   flexRender,
   ColumnDef,
+  RowExpanding,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
 import { useState, useMemo, ChangeEvent } from "react";
@@ -11,11 +12,12 @@ import { useState, useMemo, ChangeEvent } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
-import { FaCode, FaRegFilePdf } from "react-icons/fa";
+import { FaClipboard, FaCode, FaRegFilePdf } from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { useGlobalStore } from "../utils";
 
 const apiClient = API.generateClient();
 
@@ -65,6 +67,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const { setAriaAnnounceMessage } = useGlobalStore();
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -183,7 +187,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
       return resp;
     },
-    refetchInterval: 5000,
+    refetchInterval: Infinity,
     placeholderData: (previousData) => previousData,
   });
 
@@ -191,6 +195,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     const parser = new DOMParser();
     const extractedElementTag = `<${parser.parseFromString(content, "text/html").body?.firstChild?.nodeName.toLowerCase()}>`;
     return extractedElementTag ?? content;
+  };
+
+  const copyToClipboard = async (val:string) => {
+    try {
+      await navigator.clipboard.writeText(val);
+      console.log(
+        `"${val}" copied to clipboard!`
+      );
+      setAriaAnnounceMessage(`"${val}" copied to clipboard!`);
+    
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
   };
 
   const TAGS_TO_SHOW_IN_TABLE = 3;
@@ -223,7 +240,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           }
         },
       },
-      {
+     /*  {
         accessorKey: "short_id",
         header: "ID",
         cell: ({ getValue }) => {
@@ -235,7 +252,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           );
         },
       },
-
+ */
       {
         accessorKey: "url",
         header: () => (
@@ -269,12 +286,18 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "messages",
         header: "Issue",
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const messages = getValue() as string[];
+          const shortId = row.original.short_id;
           return (
+            <>
             <div className="text-sm max-w-sm">
               {messages[0] || "No message"}
             </div>
+             <button onClick={()=>copyToClipboard(shortId)} className="text-sm font-bold bg-gray-100 px-2 py-1 rounded border-1 cursor-pointer flex items-center">
+              {shortId || "N/A"}<FaClipboard />
+            </button>
+            </>
           );
         },
       },

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDate } from "../utils";
+import { formatDate, useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
@@ -10,6 +10,7 @@ import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { createLog } from "#src/utils/createLog.ts";
 
 interface Page {
   url: string;
@@ -25,6 +26,7 @@ export const Audit = () => {
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
   const isShared = location.pathname.startsWith('/shared/');
+  const { setAriaAnnounceMessage } = useGlobalStore();
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -95,6 +97,8 @@ export const Audit = () => {
       ).body.json();
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
+      // aria & logging
+      setAriaAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`);
       return;
     }
   };
@@ -110,6 +114,8 @@ export const Audit = () => {
       ).body.json();
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audits"] });
+      // aria & logging
+      setAriaAnnounceMessage(`Scanning audit ${audit.name}...`);
       return;
     }
   };
@@ -125,6 +131,10 @@ export const Audit = () => {
       ).body.json();
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audits"] });
+      // aria & logging
+      setAriaAnnounceMessage(`Deleted audit ${audit.name}.`);
+      await createLog(`Deleted audit ${audit.name}.`, auditId);
+      
       navigate("/audits");
       return;
     }
@@ -149,18 +159,12 @@ export const Audit = () => {
         },
       });
 
-      await apiClient.graphql({
-        query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
-                insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
-            }`,
-        variables: {
-          audit_id: auditId,
-          message: `URL added ${changedPage.url}`,
-          data: { url: changedPage.url, type: changedPage.type },
-        },
-      });
+      await createLog(`URL added ${changedPage.url}`, auditId, { url: changedPage.url, type: changedPage.type });
     }
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
+    // aria
+    setAriaAnnounceMessage(`Added ${changedPages.length} URLs to audit ${audit.name}.`);
+      
     console.log("DB update complete.");
   };
 
@@ -176,17 +180,11 @@ export const Audit = () => {
         },
       });
 
-      await apiClient.graphql({
-        query: `mutation ($audit_id: uuid, $message: String, $data: jsonb) {
-                insert_logs_one(object: {audit_id: $audit_id, message: $message, data: $data}) {id}
-            }`,
-        variables: {
-          audit_id: auditId,
-          message: `URL removed ${row.url}`,
-          data: { url: row.url, type: row.type },
-        },
-      });
+      await createLog( `URL removed ${row.url}`, auditId, { url: row.url, type: row.type });
     }
+    // aria
+    setAriaAnnounceMessage(`Removed ${changedPages.length} URLs from audit ${audit.name}.`);
+    
     console.log("DB update complete.");
   };
 
@@ -218,6 +216,12 @@ export const Audit = () => {
       },
     });
     console.log("DB Updated with new URL Type.", updatedPage);
+
+    // aria & logging
+    setAriaAnnounceMessage(`Changed ${changedPage.url} to type ${changedPage.type}.`);
+    await createLog( `Changed ${changedPage.url} to type ${changedPage.type}.`, auditId);
+    
+    
   };
 
   const copyCurrentLocationToClipboard = async () => {
@@ -228,6 +232,8 @@ export const Audit = () => {
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
       );
+      setAriaAnnounceMessage(`URL ${window.location.origin + location.pathname} copied to clipboard!`);
+    
     } catch (err) {
       console.error("Failed to copy URLs: ", err);
     }
@@ -238,7 +244,7 @@ export const Audit = () => {
     if (payload.timestamp) {
       return (
         <Dot
-          key={dataKey}
+          key={payload.timestamp}
           cx={cx}
           cy={cy}
           r={6}
@@ -248,7 +254,7 @@ export const Audit = () => {
         ></Dot>
       );
     } else {
-      return <div key={cx}></div>;
+      return <div key={Math.random()}></div>; //this is a hack :/
     }
   };
 
