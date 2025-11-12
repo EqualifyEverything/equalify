@@ -147,6 +147,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       sortOrder,
     ],
     queryFn: async () => {
+      //console.log("Blockers table refresh...");
       const params: Record<string, string> = {
         id: auditId,
         page: page.toString(),
@@ -160,7 +161,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         params.tags = selectedTags.map((tag) => tag.value).join(",");
       }
       if (selectedCategories.length > 0) {
-        params.types = selectedCategories.map((tag) => tag.value).join(",");
+        params.categories = selectedCategories.map((tag) => tag.value).join(",");
       }
       if (selectedStatus) {
         params.status = selectedStatus;

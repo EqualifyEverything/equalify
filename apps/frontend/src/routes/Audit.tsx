@@ -25,6 +25,7 @@ import {
   AuditEmailSubscriptionInput,
   EmailSubscriptionList,
 } from "#src/components/AuditEmailSubscriptionInput.tsx";
+import * as Progress from "@radix-ui/react-progress";
 
 interface Page {
   url: string;
@@ -39,6 +40,7 @@ export const Audit = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [emailNotifications, setEmailNotifications] = useState<string>("");
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+  const [showAllScans, setShowAllScans] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
   const isShared = location.pathname.startsWith("/shared/");
   const { setAriaAnnounceMessage } = useGlobalStore();
@@ -253,15 +255,15 @@ export const Audit = () => {
     );
   };
 
-  useEffect(()=>{
-    if(audit?.email_notifications)
-    setEmailNotifications(audit.email_notifications)
-  },[audit])
+  useEffect(() => {
+    if (audit?.email_notifications)
+      setEmailNotifications(audit.email_notifications);
+  }, [audit]);
 
   const updateEmailNotifications = async (newValue: EmailSubscriptionList) => {
     //throw new Error("Function not implemented.");
     if (emailNotifications !== JSON.stringify(newValue)) {
-      const newEmails = JSON.stringify( newValue )
+      const newEmails = JSON.stringify(newValue);
       console.log("Updating email notifications:", newEmails);
 
       const updatedEmailNotifications = await apiClient.graphql({
@@ -444,12 +446,56 @@ export const Audit = () => {
 
       <hr />
       <div>
-        {scans?.map((scan, index) => (
-          <div key={index}>
-            Scan #{index + 1}: {formatDate(scan.created_at)} (
-            {scan.percentage ?? 0}%)
+        {scans && scans?.length > 0 && (
+          <div>
+            <div>
+              Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
+            </div>
+            <div className="flex">
+              <Progress.Root
+                value={scans[scans.length - 1].percentage}
+                className="w-full bg-gray-200 h-4 rounded-full overflow-hidden"
+              >
+                <Progress.Indicator
+                  className="bg-gray-800 w-full h-6"
+                  style={{
+                    transform: `translateX(-${100 - scans[scans.length - 1].percentage}%)`,
+                  }}
+                />
+              </Progress.Root>
+              <div>{scans[scans.length - 1].percentage}%</div>
+            </div>
+            <Collapsible.Root
+              open={showAllScans}
+              onOpenChange={setShowAllScans}
+            >
+              <Collapsible.CollapsibleTrigger>
+                Show Scan History ({scans.length} Scans)
+              </Collapsible.CollapsibleTrigger>
+              <Collapsible.CollapsibleContent>
+                <table>
+                  <caption>Scan History</caption>
+                  <thead>
+                    <tr>
+                      <th>Scan</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scans?.map((scan, index) => (
+                      <tr key={index}>
+                        <td>#{index + 1}</td>
+                        <td>{formatDate(scan.created_at)}</td>
+                        <td>{scan.percentage ?? 0}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Collapsible.CollapsibleContent>
+            </Collapsible.Root>
           </div>
-        ))}
+        )}
       </div>
 
       {chartData?.data && chartData.data.length > 0 && (
