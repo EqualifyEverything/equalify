@@ -12,6 +12,7 @@ import {
   Logout,
   Logs,
   Signup,
+  Sso,
 } from "#src/routes";
 import { Navigation } from "#src/components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -95,6 +96,7 @@ const router = createBrowserRouter([
       { path: "log/:logId", element: <Log /> },
       { path: "account", element: <Account /> },
       { path: "logout", element: <Logout /> },
+      { path: "sso", element: <Sso /> },
     ],
     errorElement: (
       <>
@@ -110,9 +112,25 @@ const router = createBrowserRouter([
   },
 ]);
 
+import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
+
+const msalInstance = new PublicClientApplication({
+  auth: {
+    clientId: "e7fe39b1-94c6-42e3-ad38-6bccb61ae221",
+    authority: "https://login.microsoftonline.com/e202cd47-7a56-4baa-99e3-e3b71a7c77dd",
+    redirectUri: window.location.origin + '/sso',
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: false,
+  }
+});
+
 export const App = () => {
   const { ariaAnnounceMessage } = useGlobalStore();
   return (
+  <MsalProvider instance={msalInstance}>
     <PostHogProvider
       apiKey={import.meta.env.VITE_POSTHOG_KEY}
       options={{ api_host: "https://us.posthog.com" }}
@@ -124,5 +142,6 @@ export const App = () => {
         <RouterProvider router={router} />
       </QueryClientProvider>
     </PostHogProvider>
+  </MsalProvider>
   );
 };
