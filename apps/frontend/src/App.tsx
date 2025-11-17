@@ -12,7 +12,7 @@ import {
   Logout,
   Logs,
   Signup,
-  Sso,
+  SsoCallback,
 } from "#src/routes";
 import { Navigation } from "#src/components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -51,6 +51,12 @@ Amplify.configure(
     API: {
       GraphQL: {
         headers: async () => {
+          // Check for SSO token first
+          const ssoToken = localStorage.getItem('sso_token');
+          if (ssoToken) {
+            return { Authorization: `Bearer ${ssoToken}` };
+          }
+          // Fallback to Cognito
           const jwtToken = (
             await Auth.fetchAuthSession()
           ).tokens?.idToken?.toString();
@@ -58,12 +64,20 @@ Amplify.configure(
         },
       },
       REST: {
-        headers: async ({ apiName }) =>
-          apiName === "auth"
-            ? {
-                Authorization: `Bearer ${(await Auth.fetchAuthSession()).tokens?.idToken?.toString()}`,
-              }
-            : { "X-Api-Key": "1" },
+        headers: async ({ apiName }) => {
+          if (apiName === "auth") {
+            // Check for SSO token first
+            const ssoToken = localStorage.getItem('sso_token');
+            if (ssoToken) {
+              return { Authorization: `Bearer ${ssoToken}` } as any;
+            }
+            // Fallback to Cognito
+            return {
+              Authorization: `Bearer ${(await Auth.fetchAuthSession()).tokens?.idToken?.toString()}`,
+            } as any;
+          }
+          return { "X-Api-Key": "1" } as any;
+        },
         retryStrategy: { strategy: "no-retry" },
       },
     },
@@ -88,6 +102,7 @@ const router = createBrowserRouter([
       { path: "", element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "signup", element: <Signup /> },
+      { path: "sso", element: <SsoCallback /> },
       { path: "audits", element: <Audits /> },
       { path: "audits/:auditId", element: <Audit /> },
       { path: "shared/:auditId", element: <Audit /> },
@@ -96,7 +111,6 @@ const router = createBrowserRouter([
       { path: "log/:logId", element: <Log /> },
       { path: "account", element: <Account /> },
       { path: "logout", element: <Logout /> },
-      { path: "sso", element: <Sso /> },
     ],
     errorElement: (
       <>

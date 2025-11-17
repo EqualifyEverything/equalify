@@ -67,23 +67,25 @@ export const Signup = () => {
 
     return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm'>
         <h1 className='mx-auto initial-focus-element'>Create an account</h1>
-        <div className='flex flex-col'>
-            <label htmlFor='name'>Name</label>
-            <input id='name' name='name' required type='text' placeholder='John Doe' />
-        </div>
-        <div className='flex flex-col'>
-            <label htmlFor='email'>Email address</label>
-            <input id='email' name='email' required type='email' placeholder='johndoe@example.com' />
-        </div>
-        <div className='flex flex-col'>
-            <label htmlFor='password'>Password</label>
-            <input id='password' name='password' required type='password' placeholder='Password' />
-        </div>
-        <div className='flex flex-row gap-1'>
-            <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
-            <label htmlFor='terms'>I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a></label>
-        </div>
-        <button disabled={loading} className=''>Sign Up</button>
-        {error && <div className=''>{error}</div>}
+        {import.meta.env.VITE_SSO_ENABLED ? <div>Sorry, you may only login using your SSO provider.</div> : <>
+            <div className='flex flex-col'>
+                <label htmlFor='name'>Name</label>
+                <input id='name' name='name' required type='text' placeholder='John Doe' />
+            </div>
+            <div className='flex flex-col'>
+                <label htmlFor='email'>Email address</label>
+                <input id='email' name='email' required type='email' placeholder='johndoe@example.com' />
+            </div>
+            <div className='flex flex-col'>
+                <label htmlFor='password'>Password</label>
+                <input id='password' name='password' required type='password' placeholder='Password' />
+            </div>
+            <div className='flex flex-row gap-1'>
+                <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
+                <label htmlFor='terms'>I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a></label>
+            </div>
+            <button disabled={loading} className=''>Sign Up</button>
+            {error && <div className=''>{error}</div>}
+        </>}
     </form>)
 }

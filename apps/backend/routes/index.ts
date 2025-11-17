@@ -1,4 +1,4 @@
-import { router, event, setEvent, logEvent } from '#src/utils';
+import { router, event, setEvent, logEvent, verifySsoToken, ensureSsoUser } from '#src/utils';
 import * as authRoutes from "./auth";
 import { postConfirmationConfirmSignUp, preSignUpSignUp, tokenGeneration } from "./cognito";
 import * as internalRoutes from "./internal";
@@ -10,9 +10,26 @@ const verifier = CognitoJwtVerifier.create({ userPoolId: process.env.USER_POOL_I
 
 export const authRouter = async () => {
     try {
-        const claims = await verifier.verify(event.headers.authorization.replace('Bearer ', ''));
-        const updatedEvent = setEvent({ ...event, claims });
-        logEvent(updatedEvent);
+        if (process.env.SSO_ENABLED) {
+            const rawClaims: any = await verifySsoToken(event.headers.authorization.replace('Bearer ', ''));
+            
+            // Ensure SSO user exists in DB and get normalized claims + Hasura claims
+            const { normalizedClaims, hasuraClaims } = await ensureSsoUser(rawClaims);
+            
+            // Add Hasura claims to the normalized claims (matches Cognito structure)
+            const enrichedClaims = {
+                ...normalizedClaims,
+                'https://hasura.io/jwt/claims': hasuraClaims,
+            };
+            
+            const updatedEvent = setEvent({ ...event, claims: enrichedClaims });
+            logEvent(updatedEvent);
+        }
+        else {
+            const claims = await verifier.verify(event.headers.authorization.replace('Bearer ', ''));
+            const updatedEvent = setEvent({ ...event, claims });
+            logEvent(updatedEvent);
+        }
         return router(authRoutes);
     }
     catch (err) {

@@ -8,6 +8,8 @@ interface EqualifyState {
   setDarkMode: (val: boolean) => void
   authenticated: boolean
   setAuthenticated: (val: boolean) => void
+  ssoAuthenticated: boolean
+  setSsoAuthenticated: (val: boolean) => void
   ariaAnnounceMessage: string
   setAriaAnnounceMessage: (val:string) => void
 }
@@ -21,6 +23,8 @@ export const useGlobalStore = create<EqualifyState>()(
             setDarkMode: (val) => set(() => ({ darkMode: val })),
             authenticated: false,
             setAuthenticated: (val) => set(() => ({ authenticated: val })),
+            ssoAuthenticated: false,
+            setSsoAuthenticated: (val) => set(() => ({ ssoAuthenticated: val })),
             ariaAnnounceMessage: "",
             setAriaAnnounceMessage: (val) => set(() => ({ ariaAnnounceMessage: val })),
         }), {
@@ -28,6 +32,7 @@ export const useGlobalStore = create<EqualifyState>()(
         partialize: (state) => ({
             darkMode: state.darkMode,
             authenticated: state.authenticated,
+            ssoAuthenticated: state.ssoAuthenticated,
         })
     })
 );

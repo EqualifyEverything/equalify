@@ -10,7 +10,7 @@ export const Home = () => {
             setTimeout(() => navigate('/audits'), 0);
         }
         else {
-            setTimeout(() => navigate('/sso'), 0);
+            setTimeout(() => navigate('/login'), 0);
         }
     }, [authenticated])
     return null;

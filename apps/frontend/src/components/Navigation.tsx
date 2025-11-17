@@ -33,6 +33,17 @@ export const Navigation = () => {
 
   useEffect(() => {
     const async = async () => {
+      // Check for SSO session first
+      const ssoToken = localStorage.getItem('sso_token');
+      if (ssoToken) {
+        // SSO is logged in, keep authenticated
+        if (location.pathname === "/") {
+          navigate("/audits");
+        }
+        return;
+      }
+      
+      // Check Cognito session
       const attributes = (await Auth.fetchAuthSession()).tokens?.idToken
         ?.payload;
       if (!attributes) {
