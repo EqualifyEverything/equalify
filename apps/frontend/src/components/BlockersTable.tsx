@@ -33,7 +33,8 @@ interface Blocker {
   url: string;
   url_id: string;
   content: string;
-  equalified: boolean;
+  ignored: boolean;
+  //equalified: boolean;
   messages: string[];
   tags: BlockerTag[];
   categories: string[];
@@ -383,19 +384,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         },
       },
       {
-        accessorKey: "equalified",
+        accessorKey: "ignored",
         header: "Status",
         cell: ({ getValue }) => {
-          const equalified = getValue() as boolean;
+          const ignored = getValue() as boolean;
           return (
             <span
               className={`px-2 py-1 rounded text-xs ${
-                equalified
-                  ? "bg-green-200 text-green-800"
-                  : "bg-red-200 text-red-800"
+                ignored
+                  ? "bg-gray-200 text-gray-800"
+                  : "bg-green-200 text-green-800"
               }`}
             >
-              {equalified ? "Fixed" : "Active"}
+              {ignored ? "Ignored" : "Active"}
             </span>
           );
         },
@@ -403,6 +404,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "id",
         header: "Ignore",
+
         cell: ({ getValue }) => {
           const blockerId = getValue() as string;
           const isIgnored = ignoredBlockers?.has(blockerId) || false;
@@ -538,7 +540,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   aria-label="Fixed"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  Fixed {data?.statusCounts?.fixed !== undefined && `(${data.statusCounts.fixed})`}
+                  Ignored {data?.statusCounts?.ignored !== undefined && `(${data.statusCounts.ignored})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="all"

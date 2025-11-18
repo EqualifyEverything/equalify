@@ -39,6 +39,8 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@azure/msal-browser": "^4.26.1",
+    "@azure/msal-react": "^3.0.21",
     "@tailwindcss/typography": "^0.5.18",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
@@ -47,9 +49,7 @@
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "vite": "^7.1.6",
-    "vite-plugin-pwa": "^1.0.3",
-    "@azure/msal-browser": "^4.26.1",
-    "@azure/msal-react": "^3.0.21"
+    "vite-plugin-pwa": "^1.1.0"
   },
   "imports": {
     "#src/*": "./src/*"

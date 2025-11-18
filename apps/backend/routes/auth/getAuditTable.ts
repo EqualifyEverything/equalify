@@ -1,7 +1,7 @@
 import { db, event, graphqlQuery } from '#src/utils';
 
 export const getAuditTable = async () => {
-    const auditId = event.queryStringParameters.id;
+    const auditId = (event.queryStringParameters as any).id;
     const page = parseInt((event.queryStringParameters as any).page || '0', 10);
     const pageSize = parseInt((event.queryStringParameters as any).pageSize || '50', 10);
     const contentType = (event.queryStringParameters as any).contentType || 'all';
@@ -52,21 +52,21 @@ export const getAuditTable = async () => {
         });
     }
     
-    // Status filtering (equalified true/false)
+    // Status filtering ('ignore' field true/false)
     if (statusParam) {
         if (statusParam === 'active') {
             whereConditions.push({
                 blocker_messages: {
                     blocker: {
-                        equalified: { _eq: false }
+                        ignore: { _eq: false }
                     }
                 }
             });
-        } else if (statusParam === 'fixed') {
+        } else if (statusParam === 'ignored') {
             whereConditions.push({
                 blocker_messages: {
                     blocker: {
-                        equalified: { _eq: true }
+                        ignore: { _eq: true }
                     }
                 }
             });
@@ -88,7 +88,7 @@ export const getAuditTable = async () => {
 
     // Build where clauses for status counts (excluding status filter)
     const baseWhereConditions = whereConditions.filter(cond => 
-        !cond.blocker_messages?.blocker?.equalified
+        !cond.blocker_messages?.blocker?.ignore
     );
     const baseWhereClause = baseWhereConditions.length > 0 ? { _and: baseWhereConditions } : {};
     
@@ -98,20 +98,20 @@ export const getAuditTable = async () => {
             {
                 blocker_messages: {
                     blocker: {
-                        equalified: { _eq: false }
+                        ignore: { _eq: false }
                     }
                 }
             }
         ]
     };
     
-    const fixedWhereClause = {
+    const ignoredWhereClause = {
         _and: [
             ...baseWhereConditions,
             {
                 blocker_messages: {
                     blocker: {
-                        equalified: { _eq: true }
+                        ignore: { _eq: true }
                     }
                 }
             }
@@ -131,6 +131,7 @@ export const getAuditTable = async () => {
         created_at
         content
         url_id
+        ignore
         url {
           url
           type
@@ -138,7 +139,7 @@ export const getAuditTable = async () => {
         blocker_messages {
           id
           blocker {
-            equalified
+            ignore
           }
           message {
             id
@@ -168,7 +169,7 @@ export const getAuditTable = async () => {
           count
         }
       }
-      fixed_blockers_count: blockers_aggregate(where: $fixedWhere) {
+      ignored_blockers_count: blockers_aggregate(where: $ignoredWhere) {
         aggregate {
           count
         }
@@ -191,7 +192,7 @@ export const getAuditTable = async () => {
             order_by: [orderByClause],
             baseWhere: baseWhereClause,
             activeWhere: activeWhereClause,
-            fixedWhere: fixedWhereClause
+            ignoredWhere: ignoredWhereClause
         },
     };
     
@@ -204,7 +205,7 @@ export const getAuditTable = async () => {
     const totalCount = latestScan?.blockers_aggregate?.aggregate?.count || 0;
     const allBlockersCount = latestScan?.all_blockers_count?.aggregate?.count || 0;
     const activeBlockersCount = latestScan?.active_blockers_count?.aggregate?.count || 0;
-    const fixedBlockersCount = latestScan?.fixed_blockers_count?.aggregate?.count || 0;
+    const ignoredBlockersCount = latestScan?.ignored_blockers_count?.aggregate?.count || 0;
     const availableTags = response.tags || [];
     const availableCategories = response.messages || [];
 
@@ -224,9 +225,9 @@ export const getAuditTable = async () => {
         const uniqueCategories = Array.from(new Set(categories));
 
         // Extract equalified status from blocker_messages -> blocker -> equalified
-        const equalified = blocker.blocker_messages.length > 0 
+        /* const equalified = blocker.blocker_messages.length > 0 
             ? blocker.blocker_messages[0].blocker.equalified 
-            : false;
+            : false; */
 
         // Extract message contents
         const messages = blocker.blocker_messages.map(bm => 
@@ -241,7 +242,8 @@ export const getAuditTable = async () => {
             type: blocker.url?.type || 'unknown',
             url_id: blocker.url_id,
             content: blocker.content,
-            equalified: equalified,
+            ignore: blocker.ignore,
+            //equalified: equalified,
             messages: messages,
             tags: uniqueTags,
             categories: uniqueCategories,
@@ -272,7 +274,7 @@ export const getAuditTable = async () => {
             statusCounts: {
                 all: allBlockersCount,
                 active: activeBlockersCount,
-                fixed: fixedBlockersCount,
+                ignored: ignoredBlockersCount,
             },
             availableTags,
             availableCategories: availableCategories.map((m: any) => m.category).filter(Boolean),
