@@ -131,8 +131,8 @@ import { MsalProvider } from '@azure/msal-react';
 
 const msalInstance = new PublicClientApplication({
   auth: {
-    clientId: import.meta.env.VITE_SSO_CLIENT_ID,
-    authority: import.meta.env.VITE_SSO_AUTHORITY,
+    clientId: "e7fe39b1-94c6-42e3-ad38-6bccb61ae221",
+    authority: "https://login.microsoftonline.com/e202cd47-7a56-4baa-99e3-e3b71a7c77dd",
     redirectUri: window.location.origin + '/sso',
   },
   cache: {
