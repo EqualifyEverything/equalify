@@ -148,7 +148,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       sortOrder,
     ],
     queryFn: async () => {
-      //console.log("Blockers table refresh...");
       const params: Record<string, string> = {
         id: auditId,
         page: page.toString(),
@@ -167,6 +166,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       if (selectedStatus) {
         params.status = selectedStatus;
       }
+      
+      console.log("Blockers table refresh...", params);
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/getAuditTable",
@@ -536,7 +537,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   Active {data?.statusCounts?.active !== undefined && `(${data.statusCounts.active})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
-                  value="fixed"
+                  value="ignored"
                   aria-label="Fixed"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
