@@ -17,6 +17,7 @@ import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import * as Switch from "@radix-ui/react-switch";
 import { useGlobalStore } from "../utils";
 
 const apiClient = API.generateClient();
@@ -161,12 +162,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         params.tags = selectedTags.map((tag) => tag.value).join(",");
       }
       if (selectedCategories.length > 0) {
-        params.categories = selectedCategories.map((tag) => tag.value).join(",");
+        params.categories = selectedCategories
+          .map((tag) => tag.value)
+          .join(",");
       }
       if (selectedStatus) {
         params.status = selectedStatus;
       }
-      
+
       console.log("Blockers table refresh...", params);
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
@@ -200,14 +203,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     return extractedElementTag ?? content;
   };
 
-  const copyToClipboard = async (val:string) => {
+  const copyToClipboard = async (val: string) => {
     try {
       await navigator.clipboard.writeText(val);
-      console.log(
-        `"${val}" copied to clipboard!`
-      );
+      console.log(`"${val}" copied to clipboard!`);
       setAriaAnnounceMessage(`"${val}" copied to clipboard!`);
-    
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
@@ -243,7 +243,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           }
         },
       },
-     /*  {
+      /*  {
         accessorKey: "short_id",
         header: "ID",
         cell: ({ getValue }) => {
@@ -294,12 +294,16 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           const shortId = row.original.short_id;
           return (
             <>
-            <div className="text-sm max-w-sm">
-              {messages[0] || "No message"}
-            </div>
-             <button onClick={()=>copyToClipboard(shortId)} className="text-sm font-bold bg-gray-100 px-2 py-1 rounded border-1 cursor-pointer flex items-center">
-              {shortId || "N/A"}<FaClipboard />
-            </button>
+              <div className="text-sm max-w-sm">
+                {messages[0] || "No message"}
+              </div>
+              <button
+                onClick={() => copyToClipboard(shortId)}
+                className="text-sm font-bold bg-gray-100 px-2 py-1 rounded border-1 cursor-pointer flex items-center"
+              >
+                {shortId || "N/A"}
+                <FaClipboard />
+              </button>
             </>
           );
         },
@@ -383,7 +387,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </div>
           );
         },
-      },
+      },/* 
       {
         accessorKey: "ignored",
         header: "Status",
@@ -401,8 +405,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </span>
           );
         },
-      },
-      {
+      }, */
+      /* {
         accessorKey: "id",
         header: "Ignore",
 
@@ -417,13 +421,54 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 toggleIgnoreMutation.mutate({
                   blockerId,
                   isCurrentlyIgnored: isIgnored,
-                })
-                setAriaAnnounceMessage(`Blocker ID ${blockerId} set to ignored status: ${isIgnored}`)
-                }
-              }
+                });
+                setAriaAnnounceMessage(
+                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored}`
+                );
+              }}
               aria-label={`Ignore blocker ${blockerId}`}
               className="w-4 h-4 cursor-pointer"
             />
+          );
+        },
+      }, */
+      {
+        accessorKey: "id",
+        header: "Ignore",
+        cell: ({ getValue }) => {
+          const blockerId = getValue() as string;
+          const isIgnored = ignoredBlockers?.has(blockerId) || false;
+          return (
+            <>
+              <label
+                htmlFor={blockerId+"-ignore-switch"}
+                className={`px-2 py-1 rounded text-xs ${
+                isIgnored
+                  ? "bg-gray-200 text-gray-800"
+                  : "bg-green-200 text-green-800"
+              }`}
+              >
+                {isIgnored ? "Ignored" : "Active"}
+              </label>
+              <Switch.Root
+                id={blockerId+"-ignore-switch"}
+                checked={isIgnored}
+                onCheckedChange={() => {
+                  toggleIgnoreMutation.mutate({
+                    blockerId,
+                    isCurrentlyIgnored: isIgnored,
+                  });
+                  setAriaAnnounceMessage(
+                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
+                  );
+                }}
+                aria-label={`Change blocker ${blockerId} ignore status`}
+                className="m-2 w-10 h-6 bg-green-200 rounded-full relative  
+            data-[state=checked]:bg-gray-200 border-0 cursor-pointer"
+              >
+                <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow-md duration-300 data-[state=checked]:bg-gray-500 data-[state=checked]:translate-x-3" />
+              </Switch.Root>
+            </>
           );
         },
       },
@@ -480,9 +525,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
-  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>)=>{
-    setPageSize(parseInt(e.target.value))
-  }
+  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(parseInt(e.target.value));
+  };
 
   const handleSortByUrl = () => {
     if (sortBy === "url") {
@@ -534,21 +579,27 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   aria-label="Active"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  Active {data?.statusCounts?.active !== undefined && `(${data.statusCounts.active})`}
+                  Active{" "}
+                  {data?.statusCounts?.active !== undefined &&
+                    `(${data.statusCounts.active})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="ignored"
                   aria-label="Fixed"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  Ignored {data?.statusCounts?.ignored !== undefined && `(${data.statusCounts.ignored})`}
+                  Ignored{" "}
+                  {data?.statusCounts?.ignored !== undefined &&
+                    `(${data.statusCounts.ignored})`}
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="all"
                   aria-label="All"
                   className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
                 >
-                  All {data?.statusCounts?.all !== undefined && `(${data.statusCounts.all})`}
+                  All{" "}
+                  {data?.statusCounts?.all !== undefined &&
+                    `(${data.statusCounts.all})`}
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
             </div>
@@ -707,8 +758,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 ` (Page ${page + 1} of ${data.pagination.totalPages})`}
             </div>
             <div className="flex gap-2">
-              <label htmlFor="pageSize" className="text-sm">Blockers per page:</label>
-              <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
+              <label htmlFor="pageSize" className="text-sm">
+                Blockers per page:
+              </label>
+              <select
+                id="pageSize"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
                 <option value="10">10</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
