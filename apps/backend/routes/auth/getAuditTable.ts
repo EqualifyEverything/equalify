@@ -120,7 +120,7 @@ export const getAuditTable = async () => {
 
     // Query to get blockers from the latest scan with pagination
     const query = {
-        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $fixedWhere: blockers_bool_exp!) {
+        query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $ignoredWhere: blockers_bool_exp!) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: desc}, limit: 1) {
       id
