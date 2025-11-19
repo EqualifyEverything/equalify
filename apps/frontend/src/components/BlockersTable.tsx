@@ -170,7 +170,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         params.status = selectedStatus;
       }
 
-      console.log("Blockers table refresh...", params);
+      //console.log("Blockers table refresh...", params);
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/getAuditTable",
