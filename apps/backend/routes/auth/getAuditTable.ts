@@ -108,7 +108,7 @@ export const getAuditTable = async () => {
   // Build where clauses for status counts (excluding status filter)
   // Get Where conditions without ignore conditions
   const baseWhereConditions = whereConditions.filter(
-    (cond) => !cond.blocker_messages?.blocker?.ignored_blocker || !cond.blocker_messages?.blocker?._not?.ignored_blocker
+    (cond) => !(cond.blocker_messages?.blocker?.ignored_blocker || cond.blocker_messages?.blocker?._not?.ignored_blocker)
   );
   const baseWhereClause =
     baseWhereConditions.length > 0 ? { _and: baseWhereConditions } : {};
