@@ -60,7 +60,7 @@ export const getAuditTable = async () => {
                     blocker: {
                         ignored_blocker: { 
                             id: {
-                                _is_null:false
+                                _is_null:true
                             }
                         }
                     }
@@ -72,7 +72,7 @@ export const getAuditTable = async () => {
                     blocker: {
                         ignored_blocker: { 
                             id: {
-                                _is_null:true
+                                _is_null:false
                             }
                         }
                     }
@@ -95,6 +95,7 @@ export const getAuditTable = async () => {
     }
 
     // Build where clauses for status counts (excluding status filter)
+    // Get Where conditions without ignore conditions
     const baseWhereConditions = whereConditions.filter(cond => 
         !cond.blocker_messages?.blocker?.ignored_blocker
     );
