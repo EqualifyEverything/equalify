@@ -51,11 +51,11 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
 
   const handleRemoveEmail = useCallback(
     (idToRemove: string) => {
-      if (emails.length > 1) {
+      //if (emails.length > 1) {
         setEmails((prevEmails) =>
           prevEmails.filter((email) => email.id !== idToRemove)
         );
-      }
+      //}
     },
     [emails.length]
   );

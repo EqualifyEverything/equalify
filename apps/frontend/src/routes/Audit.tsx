@@ -38,12 +38,17 @@ export const Audit = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
-  const [emailNotifications, setEmailNotifications] = useState<string>("");
+  const [emailNotifications, setEmailNotifications] = useState<string|null>(null);
+  const [emailNotificationsCount, setEmailNotificationsCount] = useState<number>(emailNotifications ? JSON.parse(emailNotifications).emails.length : 0)
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [showAllScans, setShowAllScans] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(7);
   const isShared = location.pathname.startsWith("/shared/");
   const { setAriaAnnounceMessage } = useGlobalStore();
+  useEffect(()=>{
+    if(emailNotifications)
+    setEmailNotificationsCount(JSON.parse(emailNotifications).emails.length)
+  },[emailNotifications])
 
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
@@ -74,7 +79,7 @@ export const Audit = () => {
     setPages(urls);
   }, [urls]);
 
-  const { data: audit } = useQuery({
+  const { data: audit, refetch:refetchAudit } = useQuery({
     queryKey: ["audit", auditId],
     queryFn: async () =>
       (
@@ -256,8 +261,10 @@ export const Audit = () => {
   };
 
   useEffect(() => {
-    if (audit?.email_notifications)
+    if (audit?.email_notifications){
+      console.log("setting email notifications");
       setEmailNotifications(audit.email_notifications);
+    }
   }, [audit]);
 
   const updateEmailNotifications = async (newValue: EmailSubscriptionList) => {
@@ -265,11 +272,15 @@ export const Audit = () => {
     if (emailNotifications !== JSON.stringify(newValue)) {
       const newEmails = JSON.stringify(newValue);
       console.log("Updating email notifications:", newEmails);
+      console.log("Email count", JSON.parse(newEmails).emails.length);
+      setEmailNotificationsCount(JSON.parse(newEmails).emails.length);
 
       const updatedEmailNotifications = await apiClient.graphql({
         query: `mutation ($audit_id:uuid, $emails: String) {
                 update_audits(where: {id: {_eq: $audit_id}}, _set: {email_notifications: $emails}) {
-                  affected_rows
+                  returning {
+                    email_notifications
+                  }
                 }
               }`,
         variables: {
@@ -277,7 +288,7 @@ export const Audit = () => {
           emails: newEmails,
         },
       });
-      //console.log("Email notification update success!", updatedEmailNotifications);
+      refetchAudit();
     }
   };
 
@@ -393,8 +404,8 @@ export const Audit = () => {
       {emailNotifications && (
         <>
           <span>
-            {JSON.parse(emailNotifications).emails.length > 0
-              ? `${JSON.parse(emailNotifications).emails.length} Email Notifications`
+            {emailNotificationsCount > 0
+              ? `${emailNotificationsCount} Email Notifications`
               : "No Email Notifications"}
           </span>
           <div>
