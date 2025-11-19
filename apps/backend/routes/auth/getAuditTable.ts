@@ -266,7 +266,7 @@ export const getAuditTable = async () => {
 
     // Extract message contents
     const messages = blocker.blocker_messages.map(
-      (bm) => `${bm.message.category}: ${bm.message.content}`
+      (bm) => `${bm.message.content}`
     );
 
     return {
