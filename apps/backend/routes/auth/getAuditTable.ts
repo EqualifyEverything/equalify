@@ -58,7 +58,11 @@ export const getAuditTable = async () => {
             whereConditions.push({
                 blocker_messages: {
                     blocker: {
-                        ignore: { _eq: false }
+                        ignored_blocker: { 
+                            id: {
+                                _is_null:false
+                            }
+                        }
                     }
                 }
             });
@@ -66,7 +70,11 @@ export const getAuditTable = async () => {
             whereConditions.push({
                 blocker_messages: {
                     blocker: {
-                        ignore: { _eq: true }
+                        ignored_blocker: { 
+                            id: {
+                                _is_null:true
+                            }
+                        }
                     }
                 }
             });
@@ -88,7 +96,7 @@ export const getAuditTable = async () => {
 
     // Build where clauses for status counts (excluding status filter)
     const baseWhereConditions = whereConditions.filter(cond => 
-        !cond.blocker_messages?.blocker?.ignore
+        !cond.blocker_messages?.blocker?.ignored_blocker
     );
     const baseWhereClause = baseWhereConditions.length > 0 ? { _and: baseWhereConditions } : {};
     
@@ -98,7 +106,11 @@ export const getAuditTable = async () => {
             {
                 blocker_messages: {
                     blocker: {
-                        ignore: { _eq: false }
+                        ignored_blocker: { 
+                            id: {
+                                _is_null:true
+                            }
+                        }
                     }
                 }
             }
@@ -111,7 +123,11 @@ export const getAuditTable = async () => {
             {
                 blocker_messages: {
                     blocker: {
-                        ignore: { _eq: true }
+                        ignored_blocker: { 
+                            id: {
+                                _is_null:false
+                            }
+                        }
                     }
                 }
             }
@@ -131,7 +147,6 @@ export const getAuditTable = async () => {
         created_at
         content
         url_id
-        ignore
         url {
           url
           type

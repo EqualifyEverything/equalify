@@ -70,7 +70,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAriaAnnounceMessage, authenticated } = useGlobalStore();
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -387,7 +387,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </div>
           );
         },
-      },/* 
+      } /* 
       {
         accessorKey: "ignored",
         header: "Status",
@@ -405,7 +405,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </span>
           );
         },
-      }, */
+      }, */,
       /* {
         accessorKey: "id",
         header: "Ignore",
@@ -441,33 +441,35 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           return (
             <>
               <label
-                htmlFor={blockerId+"-ignore-switch"}
+                htmlFor={blockerId + "-ignore-switch"}
                 className={`px-2 py-1 rounded text-xs ${
-                isIgnored
-                  ? "bg-gray-200 text-gray-800"
-                  : "bg-green-200 text-green-800"
-              }`}
+                  isIgnored
+                    ? "bg-gray-200 text-gray-800"
+                    : "bg-green-200 text-green-800"
+                }`}
               >
                 {isIgnored ? "Ignored" : "Active"}
               </label>
-              <Switch.Root
-                id={blockerId+"-ignore-switch"}
-                checked={isIgnored}
-                onCheckedChange={() => {
-                  toggleIgnoreMutation.mutate({
-                    blockerId,
-                    isCurrentlyIgnored: isIgnored,
-                  });
-                  setAriaAnnounceMessage(
-                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
-                  );
-                }}
-                aria-label={`Change blocker ${blockerId} ignore status`}
-                className="m-2 w-10 h-6 bg-green-200 rounded-full relative  
+              {authenticated && (
+                <Switch.Root
+                  id={blockerId + "-ignore-switch"}
+                  checked={isIgnored}
+                  onCheckedChange={() => {
+                    toggleIgnoreMutation.mutate({
+                      blockerId,
+                      isCurrentlyIgnored: isIgnored,
+                    });
+                    setAriaAnnounceMessage(
+                      `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
+                    );
+                  }}
+                  aria-label={`Change blocker ${blockerId} ignore status`}
+                  className="m-2 w-10 h-6 bg-green-200 rounded-full relative  
             data-[state=checked]:bg-gray-200 border-0 cursor-pointer"
-              >
-                <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow-md duration-300 data-[state=checked]:bg-gray-500 data-[state=checked]:translate-x-3" />
-              </Switch.Root>
+                >
+                  <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow-md duration-300 data-[state=checked]:bg-gray-500 data-[state=checked]:translate-x-3" />
+                </Switch.Root>
+              )}
             </>
           );
         },
