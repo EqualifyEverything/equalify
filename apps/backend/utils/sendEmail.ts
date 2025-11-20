@@ -9,7 +9,7 @@ export const sendEmail = async ({ to, subject, body }) => {
             Source: `noreply@equalifyapp.com`,
             Message: {
                 Subject: { Data: subject },
-                Body: { Html: { Data: formatEmail(body) } },
+                Body: { Html: { Data: formatEmail({ body }) } },
             },
         });
     }

@@ -1,21 +1,25 @@
 import { useGlobalStore } from "#src/utils";
 import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Loader } from ".";
+import { Loader, GlobalErrorHandler } from ".";
 import * as Auth from "aws-amplify/auth";
 import { usePostHog } from "posthog-js/react";
 import { useUser } from "../queries";
 import * as Avatar from "@radix-ui/react-avatar";
 import generateAbbreviation from "#src/utils/generateAbbreviation.ts";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useMsalTokenRefresh } from "../hooks";
 
 export const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, authenticated, setAuthenticated, darkMode, setDarkMode } =
+  const { loading, authenticated, setAuthenticated, darkMode } =
     useGlobalStore();
   const posthog = usePostHog();
   const { data: user } = useUser();
+  
+  // Handle MSAL token refresh
+  useMsalTokenRefresh();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,14 +33,27 @@ export const Navigation = () => {
     }
   }, [darkMode]);
 
-  const authRoutes = ["/login", "/signup", "/shared"];
-
   useEffect(() => {
-    const async = async () => {
+    const checkAuth = async () => {
       // Check for SSO session first
       const ssoToken = localStorage.getItem('sso_token');
       if (ssoToken) {
-        // SSO is logged in, keep authenticated
+        // Parse the JWT to get the OID
+        try {
+          const payload = JSON.parse(atob(ssoToken.split('.')[1]));
+          const userId = payload.oid || payload.sub;
+          
+          // Set authenticated to the user ID (OID)
+          if (userId) {
+            setAuthenticated(userId);
+            posthog?.identify(userId, { email: payload?.email });
+          }
+        } catch (error) {
+          console.error('Failed to parse SSO token:', error);
+          localStorage.removeItem('sso_token');
+          setAuthenticated(false);
+        }
+        
         if (location.pathname === "/") {
           navigate("/audits");
         }
@@ -44,8 +61,7 @@ export const Navigation = () => {
       }
       
       // Check Cognito session
-      const attributes = (await Auth.fetchAuthSession()).tokens?.idToken
-        ?.payload;
+      const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload;
       if (!attributes) {
         setAuthenticated(false);
         if (!location.pathname.startsWith("/shared/")) {
@@ -54,13 +70,13 @@ export const Navigation = () => {
       } else {
         setAuthenticated(attributes?.sub as unknown as boolean);
         posthog?.identify(attributes?.sub, { email: attributes?.email });
-        await Auth.fetchAuthSession({ forceRefresh: true });
         if (location.pathname === "/") {
           navigate("/audits");
         }
       }
     };
-    async();
+    
+    checkAuth();
   }, []);
 
   // on location change, focus to the first element with class 'initial-focus-element'
@@ -75,6 +91,7 @@ export const Navigation = () => {
 
   return (
     <div>
+      <GlobalErrorHandler />
       <div className="p-4">
         <div className="flex flex-col sm:flex-row items-center justify-start mb-4 gap-4">
           <Link to="/" className="relative hover:opacity-50">

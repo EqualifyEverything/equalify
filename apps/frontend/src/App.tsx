@@ -19,10 +19,49 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PostHogProvider } from "posthog-js/react";
 import { CookieStorage } from "aws-amplify/utils";
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
-const queryClient = new QueryClient();
 import { registerSW } from "virtual:pwa-register";
 import { useGlobalStore } from "./utils/useGlobalStore";
+import { isJwtExpiredError, handleJwtExpiration } from "./utils/jwtErrorHandler";
 registerSW({ immediate: true });
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error: any) => {
+        // Don't retry on JWT expiration errors
+        if (isJwtExpiredError(error)) {
+          handleJwtExpiration();
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+    mutations: {
+      retry: (failureCount, error: any) => {
+        // Don't retry on JWT expiration errors
+        if (isJwtExpiredError(error)) {
+          handleJwtExpiration();
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
+
+import { PublicClientApplication } from '@azure/msal-browser';
+
+// Create MSAL instance for token refresh
+export const msalInstance = new PublicClientApplication({
+  auth: {
+    clientId: "e7fe39b1-94c6-42e3-ad38-6bccb61ae221",
+    authority: "https://login.microsoftonline.com/e202cd47-7a56-4baa-99e3-e3b71a7c77dd",
+    redirectUri: window.location.origin + '/sso',
+  },
+  cache: {
+    cacheLocation: "localStorage"
+  }
+});
 
 Amplify.configure(
   {
@@ -126,20 +165,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
-
-const msalInstance = new PublicClientApplication({
-  auth: {
-    clientId: "e7fe39b1-94c6-42e3-ad38-6bccb61ae221",
-    authority: "https://login.microsoftonline.com/e202cd47-7a56-4baa-99e3-e3b71a7c77dd",
-    redirectUri: window.location.origin + '/sso',
-  },
-  cache: {
-    cacheLocation: "sessionStorage",
-    storeAuthStateInCookie: false,
-  }
-});
 
 export const App = () => {
   const { ariaAnnounceMessage } = useGlobalStore();

@@ -11,5 +11,6 @@ export const useUser = () => {
             query: `query($id: uuid!) {users_by_pk(id: $id) {id name email type}}`,
             variables: { id: authenticated },
         }))?.data?.users_by_pk,
+        enabled: !!authenticated, // Only run query when authenticated
     });
 }

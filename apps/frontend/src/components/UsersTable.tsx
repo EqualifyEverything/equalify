@@ -141,7 +141,7 @@ export const UsersTable = () => {
               className="px-2 py-1 border rounded text-sm"
               aria-label={`Change type for ${row.original.email}`}
             >
-              <option value="user">User</option>
+              <option value="member">Member</option>
               <option value="admin">Admin</option>
             </select>
           );
