@@ -17,13 +17,17 @@ export const Login = () => {
     const email = searchParams.get('email');
     const code = searchParams.get('code');
     const type = searchParams.get('type');
+    const errorParam = searchParams.get('error');
     const { instance, accounts } = useMsal();
 
     useEffect(() => {
         if (code && type) {
             setError(`You must login before you can verify your new ${type?.replace('_', ' ')}`)
         }
-    }, [code, type]);
+        if (errorParam) {
+            setError(errorParam);
+        }
+    }, [code, type, errorParam]);
 
     const login = async (e) => {
         e.preventDefault();
@@ -63,36 +67,96 @@ export const Login = () => {
 
     const ssoLogin = async () => {
         setLoading('Logging in with SSO...');
+        setError(''); // Clear any previous errors
+        
+        let response;
         try {
-            const response = await instance.loginPopup({
+            response = await instance.loginPopup({
                 scopes: ["User.Read"]
             });
+        } catch (popupError: any) {
+            // This catches SSO popup errors only
+            console.error('SSO login popup error:', popupError);
+            console.error('Error code:', popupError?.errorCode);
+            console.error('Error name:', popupError?.name);
+            console.error('Error message:', popupError?.message);
             
-            // Store SSO token in localStorage (keep token in localStorage for security/API headers)
-            localStorage.setItem('sso_token', response.idToken);
+            // Don't show error for user cancellation or interaction_in_progress
+            const errorCode = popupError?.errorCode || popupError?.name || '';
+            const errorMessage = popupError?.message || '';
             
-            // Set authenticated state
-            const claims: any = response.idTokenClaims;
-            setAuthenticated(claims?.oid || claims?.sub); // oid is Azure AD user ID
-            setSsoAuthenticated(true); // Track that this is SSO auth in the store
+            if (errorCode.includes('user_cancelled') || 
+                errorCode.includes('interaction_in_progress') ||
+                errorMessage.includes('interaction_in_progress') ||
+                errorCode === 'BrowserAuthError') {
+                console.log('Ignoring expected SSO error:', errorCode);
+                setLoading(false);
+                return;
+            }
+            
+            console.error('Showing SSO popup error to user');
             setLoading(false);
+            setError('There was an issue logging in with SSO. Please try again.');
+            return;
+        }
+        
+        // Store SSO token TEMPORARILY to test backend validation
+        localStorage.setItem('sso_token', response.idToken);
+        
+        // Validate with backend BEFORE setting authenticated state
+        const claims: any = response.idTokenClaims;
+        try {
+            const API = await import('aws-amplify/api');
+            await API.get({
+                apiName: 'auth',
+                path: '/getAccount',
+            }).response;
+            
+            // Only set authenticated if backend validation succeeds
+            setAuthenticated(claims?.oid || claims?.sub);
+            setSsoAuthenticated(true);
             posthog?.identify(claims?.oid || claims?.sub, { email: claims?.email });
             
+            setLoading(false);
             setAriaAnnounceMessage("Login Success!");
             navigate('/audits');
             
             setTimeout(() => queryClient.refetchQueries({ queryKey: ['user'] }), 100);
-        } catch (error) {
-            console.error(error);
+        } catch (backendError: any) {
+            // Backend rejected the user - remove token and show error
+            localStorage.removeItem('sso_token');
             setLoading(false);
-            setError('There was an issue logging in with SSO. Please try again.');
+            console.error('Backend validation failed:', backendError);
+            
+            // Parse error message from response - AWS Amplify wraps errors differently
+            let errorMessage = 'You are not authorized to access Equalify. Please contact an administrator to request access.';
+            
+            // Check direct message property
+            if (backendError?.message) {
+                errorMessage = backendError.message;
+            }
+            // Check response body
+            else if (backendError?.response?.body) {
+                try {
+                    const errorBody = backendError.response.body;
+                    const parsed = typeof errorBody === 'string' ? JSON.parse(errorBody) : errorBody;
+                    errorMessage = parsed?.message || errorMessage;
+                } catch (e) {
+                    // Keep default error message
+                }
+            }
+            
+            setError(errorMessage);
         }
     };
 
 
     return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
         <h1 className='mx-auto initial-focus-element'>Welcome back!</h1>
-        {import.meta.env.VITE_SSO_ENABLED ? <button onClick={ssoLogin}>Sign In with SSO</button> : <>
+        {import.meta.env.VITE_SSO_ENABLED ? <>
+            <button type="button" onClick={ssoLogin}>Sign In with SSO</button>
+            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
+        </> : <>
             <div className='flex flex-col'>
                 <label htmlFor='email'>Email address</label>
                 <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} />
@@ -102,7 +166,7 @@ export const Login = () => {
                 <input id='password' name="password" required type="password" placeholder='Password' />
             </div>
             <button disabled={!!loading} className=''>Log In</button>
-            {error && <div className=''>{error}</div>}
+            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
         </>}
     </form>)
 }

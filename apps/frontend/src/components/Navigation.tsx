@@ -43,10 +43,47 @@ export const Navigation = () => {
           const payload = JSON.parse(atob(ssoToken.split('.')[1]));
           const userId = payload.oid || payload.sub;
           
-          // Set authenticated to the user ID (OID)
+          // Validate with backend before trusting the token
           if (userId) {
-            setAuthenticated(userId);
-            posthog?.identify(userId, { email: payload?.email });
+            try {
+              const API = await import('aws-amplify/api');
+              await API.get({
+                apiName: 'auth',
+                path: '/getAccount',
+              }).response;
+              
+              // Only set authenticated if backend validation succeeds
+              setAuthenticated(userId);
+              posthog?.identify(userId, { email: payload?.email });
+            } catch (backendError: any) {
+              // Backend rejected - token is invalid or user not authorized
+              console.error('Backend validation failed on page load:', backendError);
+              localStorage.removeItem('sso_token');
+              setAuthenticated(false);
+              
+              // Parse error message from response - AWS Amplify wraps errors differently
+              let errorMessage = 'You are not authorized to access Equalify.';
+              
+              // Check direct message property
+              if (backendError?.message) {
+                errorMessage = backendError.message;
+              }
+              // Check response body
+              else if (backendError?.response?.body) {
+                try {
+                  const errorBody = backendError.response.body;
+                  const parsed = typeof errorBody === 'string' ? JSON.parse(errorBody) : errorBody;
+                  errorMessage = parsed?.message || errorMessage;
+                } catch (e) {
+                  // Keep default error message
+                }
+              }
+              
+              if (!location.pathname.startsWith('/login') && !location.pathname.startsWith('/shared/')) {
+                navigate('/login?error=' + encodeURIComponent(errorMessage));
+              }
+              return;
+            }
           }
         } catch (error) {
           console.error('Failed to parse SSO token:', error);

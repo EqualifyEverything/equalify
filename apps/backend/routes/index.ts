@@ -14,16 +14,29 @@ export const authRouter = async () => {
             const rawClaims: any = await verifySsoToken(event.headers.authorization.replace('Bearer ', ''));
             
             // Ensure SSO user exists in DB and get normalized claims + Hasura claims
-            const { normalizedClaims, hasuraClaims } = await ensureSsoUser(rawClaims);
-            
-            // Add Hasura claims to the normalized claims (matches Cognito structure)
-            const enrichedClaims = {
-                ...normalizedClaims,
-                'https://hasura.io/jwt/claims': hasuraClaims,
-            };
-            
-            const updatedEvent = setEvent({ ...event, claims: enrichedClaims });
-            logEvent(updatedEvent);
+            try {
+                const { normalizedClaims, hasuraClaims } = await ensureSsoUser(rawClaims);
+                
+                // Add Hasura claims to the normalized claims (matches Cognito structure)
+                const enrichedClaims = {
+                    ...normalizedClaims,
+                    'https://hasura.io/jwt/claims': hasuraClaims,
+                };
+                
+                const updatedEvent = setEvent({ ...event, claims: enrichedClaims });
+                logEvent(updatedEvent);
+            } catch (ensureUserErr) {
+                // User is authenticated with SSO but not authorized to use Equalify
+                console.log('User authorization failed:', ensureUserErr);
+                return {
+                    statusCode: 403,
+                    body: JSON.stringify({ 
+                        error: 'Forbidden', 
+                        message: ensureUserErr.message 
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
+                };
+            }
         }
         else {
             const claims = await verifier.verify(event.headers.authorization.replace('Bearer ', ''));
@@ -34,7 +47,14 @@ export const authRouter = async () => {
     }
     catch (err) {
         console.log(err);
-        return "Your authorization token is invalid";
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ 
+                error: 'Unauthorized', 
+                message: 'Your authorization token is invalid' 
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        };
     }
 }
 
