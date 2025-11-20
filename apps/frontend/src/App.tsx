@@ -54,8 +54,8 @@ import { PublicClientApplication } from '@azure/msal-browser';
 // Create MSAL instance for token refresh
 export const msalInstance = new PublicClientApplication({
   auth: {
-    clientId: "e7fe39b1-94c6-42e3-ad38-6bccb61ae221",
-    authority: "https://login.microsoftonline.com/e202cd47-7a56-4baa-99e3-e3b71a7c77dd",
+    clientId: import.meta.env.VITE_SSO_CLIENT_ID,
+    authority: import.meta.env.VITE_SSO_AUTHORITY,
     redirectUri: window.location.origin + '/sso',
   },
   cache: {

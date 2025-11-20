@@ -1,10 +1,32 @@
-import { event, sendEmail } from "#src/utils";
+import { db, event, sendEmail } from "#src/utils";
 
 export const inviteUser = async () => {
-    await sendEmail({
-        to: event.body.email,
-        subject: `You are invited to join Equalify`,
-        body: `<tr>
+  if (process.env.SSO_ENABLED && process.env.SSO_EMAIL_DOMAINS) {
+    const ssoEmailDomains = JSON.parse(process.env.SSO_EMAIL_DOMAINS);
+    if (!ssoEmailDomains.includes(event.body.email.split('@')[1])) {
+      return { status: 'error', message: `Email domain not authorized for invitation.` };
+    }
+  }
+  await db.connect();
+  const inviteExists = (await db.query({
+    text: `SELECT id FROM invites WHERE email=$1`,
+    values: [event.body.email],
+  })).rows?.[0]?.id;
+
+  if (inviteExists) {
+    await db.clean();
+    return { status: 'error', message: `Invite already exists for this email address.` };
+  }
+
+  await db.query({
+    text: `INSERT INTO "invites" ("user_id", "email") VALUES ($1, $2)`,
+    values: [event.claims.sub, event.body.email],
+  });
+  await db.clean();
+  await sendEmail({
+    to: event.body.email,
+    subject: `You are invited to join Equalify`,
+    body: `<tr>
             <td style="padding:24px 24px 8px 24px; font-size:16px; line-height:1.5; color:#334155;">
               Hello,
             </td>
@@ -31,6 +53,6 @@ export const inviteUser = async () => {
             </td>
           </tr>
         </p>`
-    });
-    return;
+  });
+  return { status: 'success' };
 }
