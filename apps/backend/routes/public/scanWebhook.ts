@@ -51,14 +51,14 @@ export const scanWebhook = async () => {
         }
 
         // Insert or get blocker type based on description
-        const blockerTypeId = hashStringToUuid(blocker.description);
+        const blockerTypeId = hashStringToUuid(blocker.description+blocker.test);
         await db.query({
             text: `
                     INSERT INTO "messages" ("id", "content", "category") 
                     VALUES ($1, $2, $3) 
                     ON CONFLICT ("id") DO NOTHING
                 `,
-            values: [blockerTypeId, blocker.description, blocker.type || 'unknown'],
+            values: [blockerTypeId, blocker.description, blocker.test || 'unknown'],
         });
 
         // Link blocker type tags

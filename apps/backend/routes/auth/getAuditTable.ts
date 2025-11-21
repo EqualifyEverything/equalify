@@ -168,9 +168,6 @@ export const getAuditTable = async () => {
         }
         blocker_messages {
           id
-          blocker {
-            ignore
-          }
           message {
             id
             content
@@ -266,7 +263,7 @@ export const getAuditTable = async () => {
 
     // Extract message contents
     const messages = blocker.blocker_messages.map(
-      (bm) => `${bm.message.content}`
+      (bm) => `[${bm.message.category}] ${bm.message.content}`
     );
 
     return {
