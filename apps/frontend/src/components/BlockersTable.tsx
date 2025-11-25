@@ -19,6 +19,8 @@ import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import * as Switch from "@radix-ui/react-switch";
 import { useGlobalStore } from "../utils";
+import { MdOutlineCancel } from "react-icons/md";
+import themeVariables from '../global-styles/variables.module.scss';
 
 const apiClient = API.generateClient();
 
@@ -363,7 +365,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                       +{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
-                      <Tooltip.Content side="bottom" className="tooltip">
+                      <Tooltip.Content
+                        side="bottom"
+                        className="tooltip"
+                        collisionPadding={8}
+                      >
                         <div className="tags">
                           {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                             <span key={tag.id} className="tag">
@@ -371,7 +377,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                             </span>
                           ))}
                         </div>
-                        <Tooltip.Arrow />
+                        <Tooltip.Arrow className="tooltip-arrow" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   </Tooltip.Root>
@@ -555,13 +561,15 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
       {/* Filter Controls */}
       <div>
-        <div>
+        <div className="filter-group">
           {/* Status Filter */}
-          <div>
-            <label>Status:</label>
+          <div className="status-toggle-group">
+            <label htmlFor="statusToggleGroup" className="sr-only">
+              Status:
+            </label>
             <div>
               <ToggleGroup.Root
-                className="statusToggleGroup"
+                id="statusToggleGroup"
                 type="single"
                 defaultValue="all"
                 aria-label="View by status:"
@@ -573,7 +581,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   {data?.statusCounts?.active !== undefined &&
                     `(${data.statusCounts.active})`}
                 </ToggleGroup.Item>
-                <ToggleGroup.Item value="ignored" aria-label="Fixed">
+                <ToggleGroup.Item value="ignored" aria-label="Ignored">
                   Ignored{" "}
                   {data?.statusCounts?.ignored !== undefined &&
                     `(${data.statusCounts.ignored})`}
@@ -588,11 +596,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           </div>
 
           {/* Content Type Filter */}
-          <div>
-            <label>Content Type:</label>
+          <div className="content-toggle-group">
+            <label htmlFor="contentToggleGroup" className="sr-only">
+              Content Type:
+            </label>
             <div>
               <ToggleGroup.Root
-                className="statusToggleGroup"
+                className="root"
+                id="contentToggleGroup"
                 type="single"
                 defaultValue="all"
                 aria-label="View by status:"
@@ -615,31 +626,70 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           {/* Tag Filter */}
           {availableTags && availableTags.length > 0 && (
             <Select
+              className="react-select tag-select"
               options={availableTags}
               isMulti
               value={selectedTags}
               placeholder="Filter by Tags..."
               aria-label="Filter by Tags"
               onChange={handleTagToggle}
+              
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderRadius: themeVariables.spacing,
+                  fontSize: "13px",
+                  minHeight: "24px",                  
+                }),
+                dropdownIndicator: (baseStyles, state) => ({
+                  ...baseStyles,
+                  padding: "4px"           
+                }),
+                clearIndicator : (baseStyles, state) => ({
+                  ...baseStyles,
+                  padding: "4px"           
+                }),
+              }}
             />
           )}
 
           {/* Type Filter */}
           {availableCategories && availableCategories.length > 0 && (
             <Select
+              className="react-select categories-select"
               options={availableCategories}
               isMulti
               value={selectedCategories}
               placeholder="Filter by Categories..."
               aria-label="Filter by Categories"
               onChange={handleCategoryToggle}
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderRadius: themeVariables.spacing,
+                  fontSize: "13px",
+                  minHeight: "24px",                  
+                }),
+                dropdownIndicator: (baseStyles, state) => ({
+                  ...baseStyles,
+                  padding: "4px"           
+                }),
+                clearIndicator : (baseStyles, state) => ({
+                  ...baseStyles,
+                  padding: "4px"           
+                }),
+              }}
             />
           )}
 
           {/* Clear Filters Button */}
           {hasFilters && (
             <div>
-              <button onClick={clearAllFilters}>Clear All Filters</button>
+              <button onClick={clearAllFilters} className="clear-button">
+                <AccessibleIcon label="Clear All Filters">
+                  <MdOutlineCancel className="icon-small" />
+                </AccessibleIcon>
+              </button>
             </div>
           )}
         </div>
@@ -663,7 +713,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                               header.getContext()
                             )}
                       </th>
-                    ))}
+                    ))} 
                   </tr>
                 ))}
               </thead>

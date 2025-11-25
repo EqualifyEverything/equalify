@@ -1,4 +1,4 @@
-@use "../global-styles/variables.scss";
+@use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
 .navigation {
@@ -22,7 +22,7 @@
         border-radius: 999px;
         margin-left: calc(variables.$spacing/2);
         margin-right: calc(variables.$spacing/2);
-        opacity:.9;
+        opacity:.7;
         
         &:hover {
             background-color: variables.$gray;

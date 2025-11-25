@@ -2,11 +2,12 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
  */
-@use "./global-styles/variables";
+@use "./global-styles/variables.module";
 @use "./global-styles/fonts";
 @use "./global-styles/tables";
 @use "./global-styles/icons";
 @use "./global-styles/tooltip";
+@use "./global-styles/sr-only";
 
 body {
   margin: 0;

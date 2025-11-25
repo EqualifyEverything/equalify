@@ -1,4 +1,4 @@
-@use "./variables.scss";
+@use "./variables.module.scss";
 @use "../global-styles/fonts.scss";
 
 .table-container {
@@ -7,6 +7,7 @@
   overflow: hidden;
 
   table {
+    width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     @include fonts.font-size-small;
@@ -89,3 +90,58 @@
 }
 
 // Filters
+.filter-group {
+  display: inline-flex;
+  justify-content: space-between;
+  align-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+  .status-toggle-group {
+    margin-left:variables.$spacing;
+    button {
+      background: transparent;
+      border: 0;
+      padding: variables.$spacing;
+      cursor: pointer;
+      &[aria-checked="true"] {
+        @include fonts.raleway-bold;
+        border-bottom: calc(variables.$spacing/2) solid variables.$red;
+      }
+    }
+  }
+  .content-toggle-group {
+    margin-bottom: calc(variables.$spacing);
+    .root {
+      padding: calc(variables.$spacing/4) calc(variables.$spacing/2);
+      background-color: variables.$gray;
+      border-radius: 999px;
+      width: auto;
+      display: inline-block;
+
+      button {
+        cursor: pointer;
+        border: 0;
+        background: transparent;
+        border-radius: 999px;
+        padding: calc(variables.$spacing/4) variables.$spacing;
+        &[aria-checked="true"] {
+          background: variables.$black;
+          color: variables.$white;
+        }
+      }
+    }
+  }
+  .react-select {
+    margin-bottom: calc(variables.$spacing/1.5);
+  }
+  .clear-button {
+    margin-bottom: calc(variables.$spacing/1.5);
+    border: 0;
+    background: transparent;
+    opacity: 0.2;
+    cursor: pointer;
+    &:hover{
+        opacity: 1;
+    }
+  }
+}

@@ -211,7 +211,7 @@ export const UsersTable = () => {
         <div className="text-center py-8">Loading users...</div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="table-container">
             <table
               className="w-full border-collapse border border-gray-300"
               aria-label="Users table"

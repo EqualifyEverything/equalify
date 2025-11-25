@@ -196,7 +196,7 @@ export const InvitesTable = () => {
                 <div className="text-center py-8">Loading invites...</div>
             ) : (
                 <>
-                    <div className="overflow-x-auto">
+                    <div className="table-container">
                         <table
                             className="w-full border-collapse border border-gray-300"
                             aria-label="Invites table"

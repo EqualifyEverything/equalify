@@ -100,7 +100,7 @@ export const Logs = () => {
         <div className="text-center py-8">Loading Logs...</div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="table-container">
             <table
               className="w-full border-collapse border border-gray-300"
               aria-label="Logs table"
@@ -157,7 +157,7 @@ export const Logs = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          
 
           {/* Pagination Controls */}
            
@@ -219,6 +219,7 @@ export const Logs = () => {
                     </button>
                   </div>
                 </div> 
+                </div>
         </>
       )}
     </>
