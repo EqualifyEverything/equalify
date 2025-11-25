@@ -1,5 +1,5 @@
 @use "./variables.module.scss";
-@use "../global-styles/fonts.scss";
+@use "./fonts.scss";
 
 .table-container {
   border: 1px solid variables.$gray;
@@ -175,6 +175,19 @@
     cursor: pointer;
     &:hover {
       opacity: 1;
+    }
+  }
+}
+
+// tables in cards
+.card {
+  &.dark {
+    table {
+      color: variables.$black;
+      table {
+        thead {
+        }
+      }
     }
   }
 }

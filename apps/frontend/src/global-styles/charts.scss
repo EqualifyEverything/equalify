@@ -1,0 +1,29 @@
+@use "./variables.module.scss";
+@use "./fonts.scss";
+
+.blockers-chart-heading-wrapper{
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width:100%;
+    .chart-ranger-select{
+        label{
+            display: block;
+            @include fonts.font-size-small
+        }
+    }
+}
+
+.chart-tabs {
+    button {
+      background: transparent;
+      border: 0;
+      padding: variables.$spacing;
+      color:variables.$white;
+      cursor: pointer; 
+      &[aria-selected="true"] {
+        @include fonts.raleway-bold;
+        border-bottom: calc(variables.$spacing/2) solid variables.$white;
+      }
+    }
+}

@@ -1,0 +1,27 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.card {
+  border-radius: variables.$spacing;
+  padding: calc(variables.$spacing * 3) calc(variables.$spacing * 2);
+  h1,h2,h3 {
+    margin:0;
+    @include fonts.font-size-normal;
+  }
+  &.dark {
+    background: variables.$black;
+    color: variables.$paper;
+  }
+  &.light {
+    background: variables.$white;
+  }
+  &.red {
+    background: variables.$red;
+  }
+  &.green {
+    background: variables.$green;
+    color: variables.$paper;
+  }
+}
+
+
