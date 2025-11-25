@@ -1,0 +1,30 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.footer {
+  text-decoration: none;
+  background: variables.$black;
+  color: variables.$paper;
+  @include fonts.font-size-small;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  width:100%;
+  margin-top: calc(variables.$spacing*4);
+  justify-content: center;
+  padding-top:variables.$spacing;
+  padding-bottom:variables.$spacing;
+  a, a:visited {   
+    display: inline-block;
+    padding:variables.$spacing;
+    text-decoration: none;
+    color: variables.$paper;
+    opacity:0.6;
+    display:flex;
+    align-items: center;
+    gap: variables.$spacing;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

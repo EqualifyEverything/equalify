@@ -32,13 +32,13 @@ body {
   //max-width: variables.$max-width;
   max-width:100%;
   margin:0 auto;
-  padding-right: variables.$spacing;
-  padding-left: variables.$spacing;
+  min-height:100dvh;
 }
 
 .container {
   max-width: variables.$max-width;
-  width:100%;
+  padding-right: variables.$spacing;
+  padding-left: variables.$spacing;
   margin:0 auto;
 }
 

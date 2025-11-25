@@ -13,6 +13,7 @@ import styles from "./Navigation.module.scss";
 import { Logo } from "./Logo";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
 import { MdDarkMode, MdOutlineDarkMode } from "react-icons/md";
+import { Footer } from "./Footer";
 
 export const Navigation = () => {
   const location = useLocation();
@@ -141,6 +142,7 @@ export const Navigation = () => {
   }, [location]);
 
   return (
+    <>
     <div className="app-container">
       <GlobalErrorHandler />
       <div className="container">
@@ -199,12 +201,10 @@ export const Navigation = () => {
         {loading && <Loader />}
         <Outlet />
       </div>
-      <div className={styles.footer}>
-        <div>
-          Subscribe to our newsletter: it.uic.edu/accessibility/engineering Star
-          or contribute on GitHub: github.com/equalifyEverything/equalify
-        </div>
-      </div>
+      
+    <Footer />
     </div>
+    
+    </>
   );
 };
