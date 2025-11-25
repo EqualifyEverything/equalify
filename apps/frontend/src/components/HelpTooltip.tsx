@@ -1,7 +1,7 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { MdInfoOutline } from "react-icons/md";
 
-export const Tooltip = ({ trigger = <MdInfoOutline className='text-xs inline-flex mb-[4px] ml-[2px]' />, content }) => {
+export const HelpTooltip = ({ trigger = <MdInfoOutline className='text-xs inline-flex mb-[4px] ml-[2px]' />, content }) => {
     return (
         <RadixTooltip.Provider>
             <RadixTooltip.Root>

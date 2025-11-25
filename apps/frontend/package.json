@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
-    "@radix-ui/react-accessible-icon": "^1.1.7",
+    "@radix-ui/react-accessible-icon": "^1.1.8",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -42,12 +42,11 @@
   "devDependencies": {
     "@azure/msal-browser": "^4.26.1",
     "@azure/msal-react": "^3.0.21",
-    "@tailwindcss/typography": "^0.5.18",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "autoprefixer": "^10.4.21",
-    "tailwindcss": "^4.1.13",
+    "sass-embedded": "^1.93.3",
     "typescript": "^5.9.2",
     "vite": "^7.1.6",
     "vite-plugin-pwa": "^1.1.0"

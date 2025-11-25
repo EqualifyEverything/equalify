@@ -1,0 +1,51 @@
+/* @layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+ */
+@use "./global-styles/variables";
+@use "./global-styles/fonts";
+@use "./global-styles/tables";
+@use "./global-styles/icons";
+@use "./global-styles/tooltip";
+
+body {
+  margin: 0;
+  color: variables.$black;
+  background: variables.$paper;
+  @include fonts.raleway-medium;
+  @include fonts.font-size-normal;
+
+  a,
+  a:visited {
+    color: variables.$red;
+    text-decoration: underline;
+  }
+
+  &.dark {
+    background: variables.$black;
+    color:  variables.$paper;
+  }
+}
+
+.app-container {
+  //max-width: variables.$max-width;
+  max-width:100%;
+  margin:0 auto;
+  padding-right: variables.$spacing;
+  padding-left: variables.$spacing;
+}
+
+.container {
+  max-width: variables.$max-width;
+  width:100%;
+  margin:0 auto;
+}
+
+/* Suppress focus outline */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+[tabindex="-1"]:focus-visible {
+  outline: 2px solid variables.$red;
+}

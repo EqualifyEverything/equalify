@@ -1,6 +1,6 @@
 export * from './Loader'
 export * from './Navigation'
-export * from './Tooltip'
+export * from './HelpTooltip'
 export * from './Modal'
 export * from './Dropdown'
 export * from './InvitesTable'

@@ -225,19 +225,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           if (theType?.toLowerCase() === "html") {
             return (
               <AccessibleIcon label="HTML">
-                <PiFileHtml />
+                <PiFileHtml className="icon-small" />
               </AccessibleIcon>
             );
           } else if (theType?.toLowerCase() === "pdf") {
             return (
               <AccessibleIcon label="PDF">
-                <FaRegFilePdf />
+                <FaRegFilePdf className="icon-small" />
               </AccessibleIcon>
             );
           } else {
             return (
               <AccessibleIcon label="File Type Unknown">
-                <AiOutlineFileUnknown />
+                <AiOutlineFileUnknown className="icon-small" />
               </AccessibleIcon>
             );
           }
@@ -310,7 +310,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "content",
-        header: "Blocker Code",
+        header: "Code",
         cell: ({ getValue }) => {
           const content = getValue() as string;
           return (
@@ -350,34 +350,27 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         cell: ({ getValue }) => {
           const tags = getValue() as BlockerTag[];
           return (
-            <div className="flex flex-wrap gap-1">
+            <div className="tags">
               {tags.slice(0, TAGS_TO_SHOW_IN_TABLE).map((tag) => (
-                <span
-                  key={tag.id}
-                  className="inline-block bg-gray-200 rounded px-2 py-1 text-xs"
-                >
+                <span key={tag.id} className="tag">
                   {tag.content}
                 </span>
               ))}
               {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
                 <Tooltip.Provider>
                   <Tooltip.Root>
-                    <Tooltip.Trigger className="rounded-xl border-0">
+                    <Tooltip.Trigger>
                       +{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
-                      <Tooltip.Content
-                        side="bottom"
-                        className="flex flex-wrap gap-1 bg-white p-1 shadow-sm"
-                      >
-                        {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="inline-block bg-gray-200 rounded px-2 py-1 text-xs"
-                          >
-                            {tag.content}
-                          </span>
-                        ))}
+                      <Tooltip.Content side="bottom" className="tooltip">
+                        <div className="tags">
+                          {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
+                            <span key={tag.id} className="tag">
+                              {tag.content}
+                            </span>
+                          ))}
+                        </div>
                         <Tooltip.Arrow />
                       </Tooltip.Content>
                     </Tooltip.Portal>
@@ -464,10 +457,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                     );
                   }}
                   aria-label={`Change blocker ${blockerId} ignore status`}
-                  className="m-2 w-10 h-6 bg-green-200 rounded-full relative  
-            data-[state=checked]:bg-gray-200 border-0 cursor-pointer"
+                  className="switch"
                 >
-                  <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow-md duration-300 data-[state=checked]:bg-gray-500 data-[state=checked]:translate-x-3" />
+                  <Switch.Thumb className="switch-thumb" />
                 </Switch.Root>
               )}
             </>
@@ -552,22 +544,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   };
 
   return (
-    <div className="mt-8">
-      <div className="flex flex-row items-center justify-between mb-4">
+    <div>
+      <div>
         <h2>
-          All Blockers
-          {hasFilters &&
-            ` (${filterCount} filter${filterCount !== 1 ? "s" : ""} active)`}
+          Blockers
+          {/* {hasFilters &&
+            ` (${filterCount} filter${filterCount !== 1 ? "s" : ""} active)`} */}
         </h2>
       </div>
 
       {/* Filter Controls */}
-      <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="flex flex-col gap-4">
+      <div>
+        <div>
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Status:</label>
-            <div className="flex gap-2">
+            <label>Status:</label>
+            <div>
               <ToggleGroup.Root
                 className="statusToggleGroup"
                 type="single"
@@ -576,29 +568,17 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 value={selectedStatus}
                 onValueChange={handleStatusChange}
               >
-                <ToggleGroup.Item
-                  value="active"
-                  aria-label="Active"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="active" aria-label="Active">
                   Active{" "}
                   {data?.statusCounts?.active !== undefined &&
                     `(${data.statusCounts.active})`}
                 </ToggleGroup.Item>
-                <ToggleGroup.Item
-                  value="ignored"
-                  aria-label="Fixed"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="ignored" aria-label="Fixed">
                   Ignored{" "}
                   {data?.statusCounts?.ignored !== undefined &&
                     `(${data.statusCounts.ignored})`}
                 </ToggleGroup.Item>
-                <ToggleGroup.Item
-                  value="all"
-                  aria-label="All"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="all" aria-label="All">
                   All{" "}
                   {data?.statusCounts?.all !== undefined &&
                     `(${data.statusCounts.all})`}
@@ -609,10 +589,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
           {/* Content Type Filter */}
           <div>
-            <label className="block text-sm font-semibold mb-2">
-              Content Type:
-            </label>
-            <div className="flex gap-2">
+            <label>Content Type:</label>
+            <div>
               <ToggleGroup.Root
                 className="statusToggleGroup"
                 type="single"
@@ -621,25 +599,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 value={selectedContentType}
                 onValueChange={handleContentTypeChange}
               >
-                <ToggleGroup.Item
-                  value="all"
-                  aria-label="All"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="all" aria-label="All">
                   All
                 </ToggleGroup.Item>
-                <ToggleGroup.Item
-                  value="html"
-                  aria-label="HTML"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="html" aria-label="HTML">
                   HTML
                 </ToggleGroup.Item>
-                <ToggleGroup.Item
-                  value="pdf"
-                  aria-label="PDF"
-                  className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
-                >
+                <ToggleGroup.Item value="pdf" aria-label="PDF">
                   PDF
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
@@ -673,35 +639,23 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           {/* Clear Filters Button */}
           {hasFilters && (
             <div>
-              <button
-                onClick={clearAllFilters}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold"
-              >
-                Clear All Filters
-              </button>
+              <button onClick={clearAllFilters}>Clear All Filters</button>
             </div>
           )}
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading blockers...</div>
+        <div>Loading blockers...</div>
       ) : (
         <>
-          <div className="overflow-x-auto">
-            <table
-              className="w-full border-collapse border border-gray-300"
-              aria-label="Blockers table"
-            >
+          <div className="table-container">
+            <table aria-label="Blockers table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id} className="bg-gray-100">
+                  <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        scope="col"
-                        className="border border-gray-300 px-4 py-2 text-left font-semibold"
-                      >
+                      <th key={header.id} scope="col">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -716,24 +670,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <tbody>
                 {table.getRowModel().rows.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="border border-gray-300 px-4 py-8 text-center text-gray-500"
-                    >
-                      No blockers found
-                    </td>
+                    <td colSpan={columns.length}>No blockers found</td>
                   </tr>
                 ) : (
                   table.getRowModel().rows.map((row, index) => (
-                    <tr
-                      key={row.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                    >
+                    <tr key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className="border border-gray-300 px-4 py-2"
-                        >
+                        <td key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -745,71 +688,65 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 )}
               </tbody>
             </table>
-          </div>
 
-          {/* Pagination Controls */}
-          <div
-            className="mt-4 flex items-center justify-between"
-            role="navigation"
-            aria-label="Pagination"
-          >
-            <div className="text-sm text-gray-600">
-              Showing {data?.blockers?.length || 0} of{" "}
-              {data?.pagination?.totalCount || 0} blockers
-              {data?.pagination &&
-                ` (Page ${page + 1} of ${data.pagination.totalPages})`}
-            </div>
-            <div className="flex gap-2">
-              <label htmlFor="pageSize" className="text-sm">
-                Blockers per page:
-              </label>
-              <select
-                id="pageSize"
-                value={pageSize}
-                onChange={handlePageSizeChange}
-              >
-                <option value="10">10</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <button
-                onClick={() => setPage(0)}
-                disabled={page === 0}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to first page"
-              >
-                First
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to previous page"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={
-                  !data?.pagination || page >= data.pagination.totalPages - 1
-                }
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to next page"
-              >
-                Next
-              </button>
-              <button
-                onClick={() =>
-                  data?.pagination && setPage(data.pagination.totalPages - 1)
-                }
-                disabled={
-                  !data?.pagination || page >= data.pagination.totalPages - 1
-                }
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to last page"
-              >
-                Last
-              </button>
+            {/* Pagination Controls */}
+            <div
+              className="pagination"
+              role="navigation"
+              aria-label="Pagination"
+            >
+              <div>
+                Showing {data?.blockers?.length || 0} of{" "}
+                {data?.pagination?.totalCount || 0} blockers
+                {data?.pagination &&
+                  ` (Page ${page + 1} of ${data.pagination.totalPages})`}
+              </div>
+              <div>
+                <label htmlFor="pageSize">Blockers per page:</label>
+                <select
+                  id="pageSize"
+                  value={pageSize}
+                  onChange={handlePageSizeChange}
+                >
+                  <option value="10">10</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <button
+                  onClick={() => setPage(0)}
+                  disabled={page === 0}
+                  aria-label="Go to first page"
+                >
+                  First
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  aria-label="Go to previous page"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={
+                    !data?.pagination || page >= data.pagination.totalPages - 1
+                  }
+                  aria-label="Go to next page"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() =>
+                    data?.pagination && setPage(data.pagination.totalPages - 1)
+                  }
+                  disabled={
+                    !data?.pagination || page >= data.pagination.totalPages - 1
+                  }
+                  aria-label="Go to last page"
+                >
+                  Last
+                </button>
+              </div>
             </div>
           </div>
         </>

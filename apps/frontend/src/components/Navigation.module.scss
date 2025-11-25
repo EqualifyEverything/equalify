@@ -1,0 +1,44 @@
+@use "../global-styles/variables.scss";
+@use "../global-styles/fonts.scss";
+
+.navigation {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom:1px solid variables.$gray;
+  margin-top:variables.$spacing;
+  padding-bottom: calc(variables.$spacing/2);
+  margin-bottom:variables.$spacing;
+  a {
+    text-decoration: none;
+  }
+  .nav_menu {
+    display: inline-flex;
+    align-items: center;
+    .link {
+        color:variables.$black;
+        padding: calc(variables.$spacing/2) variables.$spacing;
+        border-radius: 999px;
+        margin-left: calc(variables.$spacing/2);
+        margin-right: calc(variables.$spacing/2);
+        opacity:.9;
+        
+        &:hover {
+            background-color: variables.$gray;
+            opacity:1;
+        }
+        &.active {
+            background-color: variables.$black;
+            color: variables.$paper;
+            opacity: 1;
+        }
+    }
+  }
+  .nav_buttons {
+    button {
+        background: transparent;
+        border:0;
+    }
+  }
+}

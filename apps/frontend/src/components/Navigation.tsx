@@ -9,15 +9,19 @@ import * as Avatar from "@radix-ui/react-avatar";
 import generateAbbreviation from "#src/utils/generateAbbreviation.ts";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useMsalTokenRefresh } from "../hooks";
+import styles from "./Navigation.module.scss";
+import { Logo } from "./Logo";
+import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
+import { MdDarkMode, MdOutlineDarkMode } from "react-icons/md";
 
 export const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, authenticated, setAuthenticated, darkMode } =
+  const { loading, authenticated, setAuthenticated, darkMode, setDarkMode } =
     useGlobalStore();
   const posthog = usePostHog();
   const { data: user } = useUser();
-  
+
   // Handle MSAL token refresh
   useMsalTokenRefresh();
 
@@ -27,43 +31,46 @@ export const Navigation = () => {
 
   useEffect(() => {
     if (darkMode) {
-      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
     } else {
-      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
     }
   }, [darkMode]);
 
   useEffect(() => {
     const checkAuth = async () => {
       // Check for SSO session first
-      const ssoToken = localStorage.getItem('sso_token');
+      const ssoToken = localStorage.getItem("sso_token");
       if (ssoToken) {
         // Parse the JWT to get the OID
         try {
-          const payload = JSON.parse(atob(ssoToken.split('.')[1]));
+          const payload = JSON.parse(atob(ssoToken.split(".")[1]));
           const userId = payload.oid || payload.sub;
-          
+
           // Validate with backend before trusting the token
           if (userId) {
             try {
-              const API = await import('aws-amplify/api');
+              const API = await import("aws-amplify/api");
               await API.get({
-                apiName: 'auth',
-                path: '/getAccount',
+                apiName: "auth",
+                path: "/getAccount",
               }).response;
-              
+
               // Only set authenticated if backend validation succeeds
               setAuthenticated(userId);
               posthog?.identify(userId, { email: payload?.email });
             } catch (backendError: any) {
               // Backend rejected - token is invalid or user not authorized
-              console.error('Backend validation failed on page load:', backendError);
-              localStorage.removeItem('sso_token');
+              console.error(
+                "Backend validation failed on page load:",
+                backendError
+              );
+              localStorage.removeItem("sso_token");
               setAuthenticated(false);
-              
+
               // Parse error message from response - AWS Amplify wraps errors differently
-              let errorMessage = 'You are not authorized to access Equalify.';
-              
+              let errorMessage = "You are not authorized to access Equalify.";
+
               // Check direct message property
               if (backendError?.message) {
                 errorMessage = backendError.message;
@@ -72,33 +79,40 @@ export const Navigation = () => {
               else if (backendError?.response?.body) {
                 try {
                   const errorBody = backendError.response.body;
-                  const parsed = typeof errorBody === 'string' ? JSON.parse(errorBody) : errorBody;
+                  const parsed =
+                    typeof errorBody === "string"
+                      ? JSON.parse(errorBody)
+                      : errorBody;
                   errorMessage = parsed?.message || errorMessage;
                 } catch (e) {
                   // Keep default error message
                 }
               }
-              
-              if (!location.pathname.startsWith('/login') && !location.pathname.startsWith('/shared/')) {
-                navigate('/login?error=' + encodeURIComponent(errorMessage));
+
+              if (
+                !location.pathname.startsWith("/login") &&
+                !location.pathname.startsWith("/shared/")
+              ) {
+                navigate("/login?error=" + encodeURIComponent(errorMessage));
               }
               return;
             }
           }
         } catch (error) {
-          console.error('Failed to parse SSO token:', error);
-          localStorage.removeItem('sso_token');
+          console.error("Failed to parse SSO token:", error);
+          localStorage.removeItem("sso_token");
           setAuthenticated(false);
         }
-        
+
         if (location.pathname === "/") {
           navigate("/audits");
         }
         return;
       }
-      
+
       // Check Cognito session
-      const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload;
+      const attributes = (await Auth.fetchAuthSession()).tokens?.idToken
+        ?.payload;
       if (!attributes) {
         setAuthenticated(false);
         if (!location.pathname.startsWith("/shared/")) {
@@ -112,7 +126,7 @@ export const Navigation = () => {
         }
       }
     };
-    
+
     checkAuth();
   }, []);
 
@@ -127,14 +141,13 @@ export const Navigation = () => {
   }, [location]);
 
   return (
-    <div>
+    <div className="app-container">
       <GlobalErrorHandler />
-      <div className="p-4">
-        <div className="flex flex-col sm:flex-row items-center justify-start mb-4 gap-4">
-          <Link to="/" className="relative hover:opacity-50">
-            <img className="w-[150px]" src="/logo.svg" />
-          </Link>
-          <div className="flex flex-row items-center gap-4">
+      <div className="container">
+        <div className={styles.navigation}>
+          
+            <Logo />
+            <div className={styles.nav_menu}>
             {(!authenticated
               ? [
                   { label: "Log In", value: "/login" },
@@ -149,14 +162,18 @@ export const Navigation = () => {
               <Link
                 key={obj.value}
                 to={obj.value}
-                className={`hover:opacity-50 ${location.pathname === obj.value && "font-bold"}`}
+                className={
+                  styles["link"] + " " + (location.pathname === obj.value ? styles["active"] : "")
+                }
               >
                 {obj.label}
               </Link>
             ))}
+          </div>
+          <div className={styles.nav_buttons}>
             {authenticated && user && (
               <DropdownMenu.Root>
-                <DropdownMenu.Trigger className="bg-teal-800 text-white uppercase p-3 border-0 rounded-full w-10 h-10">
+                <DropdownMenu.Trigger>
                   <Avatar.Root>
                     <Avatar.Fallback>
                       {generateAbbreviation(user.name)}
@@ -164,18 +181,29 @@ export const Navigation = () => {
                   </Avatar.Root>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
-                  <DropdownMenu.Item><Link to='/logout'>Logout</Link></DropdownMenu.Item>
+                  <DropdownMenu.Item>
+                    <Link to="/logout">Logout</Link>
+                  </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
+            <button onClick={() => setDarkMode(!darkMode)}>
+              <AccessibleIcon.Root
+                label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
+              >
+                {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
+              </AccessibleIcon.Root>
+            </button>
           </div>
         </div>
         {loading && <Loader />}
         <Outlet />
       </div>
-      <div className="p-4 flex flex-col sm:flex-row items-center justify-between">
-        <div>© {new Date().getFullYear()} Equalify. All rights reserved</div>
-        {/* <button onClick={() => setDarkMode(!darkMode)}>{`Switch to ${darkMode ? 'Light Mode' : 'Dark Mode'}`}</button> */}
+      <div className={styles.footer}>
+        <div>
+          Subscribe to our newsletter: it.uic.edu/accessibility/engineering Star
+          or contribute on GitHub: github.com/equalifyEverything/equalify
+        </div>
       </div>
     </div>
   );

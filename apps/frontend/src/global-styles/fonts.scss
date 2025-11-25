@@ -1,0 +1,45 @@
+@mixin raleway-medium {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 450;
+  font-style: normal;
+}
+
+@mixin raleway-bold {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@mixin font-size-small {
+  font-size: .833rem;
+}
+
+@mixin font-size-normal {
+  font-size: 16px;
+}
+
+h1,h2,h3,h4,h5,h5 {
+  line-height:1.6rem;
+  letter-spacing:-0.022;
+}
+
+h1	{ 
+  font-size: 2.027rem;
+}
+h2 { 
+  font-size: 1.802rem;
+}
+h3 { 
+  font-size: 1.602rem;
+}
+h4 { 
+  font-size: 1.424rem;
+}
+h5 { 
+  font-size: 1.266rem;
+}
+h6 { 
+  font-size: 1.125rem;
+}
