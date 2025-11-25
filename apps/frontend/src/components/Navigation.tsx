@@ -187,13 +187,13 @@ export const Navigation = () => {
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
-            <button onClick={() => setDarkMode(!darkMode)}>
+            {/* <button onClick={() => setDarkMode(!darkMode)}>
               <AccessibleIcon.Root
                 label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
               >
                 {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
               </AccessibleIcon.Root>
-            </button>
+            </button> */}
           </div>
         </div>
         {loading && <Loader />}

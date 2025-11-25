@@ -75,6 +75,38 @@
       }
     }
   }
+  .pagination {
+    background: variables.$white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: variables.$spacing;
+
+    @include fonts.font-size-small;
+    .pagination-text {
+    }
+    .pagination-buttons {
+      display: inline-flex;
+      justify-content: space-between;
+      align-content: center;
+      align-items: center;
+      gap: calc(variables.$spacing/2);
+      button {
+        padding-left: variables.$spacing;
+        padding-right: variables.$spacing;
+        padding-top: calc(variables.$spacing/2);
+        padding-bottom: calc(variables.$spacing/2);
+        border-width: 1px;
+        border-style: solid;
+        border-radius: calc(variables.$spacing/2);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 
 .tags {
@@ -97,7 +129,7 @@
   align-items: flex-end;
   width: 100%;
   .status-toggle-group {
-    margin-left:variables.$spacing;
+    margin-left: variables.$spacing;
     button {
       background: transparent;
       border: 0;
@@ -133,6 +165,7 @@
   }
   .react-select {
     margin-bottom: calc(variables.$spacing/1.5);
+    min-width: 180px;
   }
   .clear-button {
     margin-bottom: calc(variables.$spacing/1.5);
@@ -140,8 +173,8 @@
     background: transparent;
     opacity: 0.2;
     cursor: pointer;
-    &:hover{
-        opacity: 1;
+    &:hover {
+      opacity: 1;
     }
   }
 }

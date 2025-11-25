@@ -268,52 +268,49 @@ export const UsersTable = () => {
                 )}
               </tbody>
             </table>
-          </div>
 
-          {/* Pagination Controls */}
-          <div
-            className="mt-4 flex items-center justify-between"
-            role="navigation"
-            aria-label="Pagination"
-          >
-            <div className="text-sm text-gray-600">
-              Showing {data?.users?.length || 0} of {data?.totalCount || 0}{" "}
-              users
-              {data && ` (Page ${page + 1} of ${data.totalPages})`}
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage(0)}
-                disabled={page === 0}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to first page"
-              >
-                First
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to previous page"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={!data || page >= data.totalPages - 1}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to next page"
-              >
-                Next
-              </button>
-              <button
-                onClick={() => data && setPage(data.totalPages - 1)}
-                disabled={!data || page >= data.totalPages - 1}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Go to last page"
-              >
-                Last
-              </button>
+            {/* Pagination Controls */}
+            <div
+              className="pagination"
+              role="navigation"
+              aria-label="Pagination"
+              
+            >
+              <div className="pagination-text">
+                Showing {data?.users?.length || 0} of {data?.totalCount || 0}{" "}
+                users
+                {data && ` (Page ${page + 1} of ${data.totalPages})`}
+              </div>
+              <div className="pagination-buttons">
+                <button
+                  onClick={() => setPage(0)}
+                  disabled={page === 0}
+                  aria-label="Go to first page"
+                >
+                  First
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  aria-label="Go to previous page"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!data || page >= data.totalPages - 1}
+                  aria-label="Go to next page"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => data && setPage(data.totalPages - 1)}
+                  disabled={!data || page >= data.totalPages - 1}
+                  aria-label="Go to last page"
+                >
+                  Last
+                </button>
+              </div>
             </div>
           </div>
         </>

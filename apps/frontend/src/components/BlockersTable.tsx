@@ -745,13 +745,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               role="navigation"
               aria-label="Pagination"
             >
-              <div>
+              <div className="pagination-text">
                 Showing {data?.blockers?.length || 0} of{" "}
                 {data?.pagination?.totalCount || 0} blockers
                 {data?.pagination &&
                   ` (Page ${page + 1} of ${data.pagination.totalPages})`}
               </div>
-              <div>
+              <div className="pagination-buttons">
                 <label htmlFor="pageSize">Blockers per page:</label>
                 <select
                   id="pageSize"

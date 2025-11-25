@@ -162,17 +162,17 @@ export const Logs = () => {
           {/* Pagination Controls */}
            
                 <div
-                  className="mt-4 flex items-center justify-between"
+                  className="pagination"
                   role="navigation"
                   aria-label="Pagination"
                 >
-                  <div className="text-sm text-gray-600">
+                  <div className="pagination-text">
                     Showing {logs?.logs?.length || 0} of{" "}
                     {logs?.logs_aggregate.aggregate.count || 0} logs
                     {logs?.logs_aggregate.aggregate.count &&
                       ` (Page ${page + 1} of ${Math.ceil(logs.logs_aggregate.aggregate.count / pageSize)})`}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="pagination-buttons">
                     <label htmlFor="pageSize" className="text-sm">Logs per page:</label>
                     <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
                       <option value="10">10</option>
@@ -182,7 +182,6 @@ export const Logs = () => {
                     <button
                       onClick={() => setPage(0)}
                       disabled={page === 0}
-                      className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Go to first page"
                     >
                       First
@@ -190,7 +189,6 @@ export const Logs = () => {
                     <button
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
                       disabled={page === 0}
-                      className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Go to previous page"
                     >
                       Previous
@@ -200,7 +198,6 @@ export const Logs = () => {
                       disabled={
                         !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
                       }
-                      className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Go to next page"
                     >
                       Next
@@ -212,7 +209,6 @@ export const Logs = () => {
                       disabled={
                         !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
                       }
-                      className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Go to last page"
                     >
                       Last
