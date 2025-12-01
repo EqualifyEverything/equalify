@@ -18,6 +18,16 @@ export const inviteUser = async () => {
     return { status: 'error', message: `Invite already exists for this email address.` };
   }
 
+  const userExists = (await db.query({
+    text: `SELECT id FROM users WHERE email=$1`,
+    values: [event.body.email],
+  })).rows?.[0]?.id;
+  
+  if (userExists) {
+    await db.clean();
+    return { status: 'error', message: `User already exists for this email address.` };
+  }
+
   await db.query({
     text: `INSERT INTO "invites" ("user_id", "email") VALUES ($1, $2)`,
     values: [event.claims.sub, event.body.email],
