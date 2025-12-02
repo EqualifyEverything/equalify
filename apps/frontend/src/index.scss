@@ -9,6 +9,11 @@
 @use "./global-styles/tooltip";
 @use "./global-styles/charts"; 
 @use "./global-styles/sr-only";
+@use "./global-styles/drawer";
+
+html {
+  scrollbar-gutter: auto !important;
+}
 
 body {
   margin: 0;

@@ -20,7 +20,12 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import * as Switch from "@radix-ui/react-switch";
 import { useGlobalStore } from "../utils";
 import { MdOutlineCancel } from "react-icons/md";
-import themeVariables from '../global-styles/variables.module.scss';
+import themeVariables from "../global-styles/variables.module.scss";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+//import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
+//import prism from 'react-syntax-highlighter/dist/esm/styles/prism/prism';
+import { a11yDark  as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+//SyntaxHighlighter.registerLanguage('jsx', jsx);
 
 const apiClient = API.generateClient();
 
@@ -321,7 +326,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 {getElementTagFromContent(content)}
               </code>
 
-              <Drawer.Root direction="right">
+              <Drawer.Root direction="right" shouldScaleBackground>
                 <Drawer.Trigger
                   render={(props) => (
                     <button {...props} aria-label="View Code" title="View Code">
@@ -330,14 +335,24 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   )}
                 />
                 <Drawer.Portal>
-                  <Drawer.Overlay className="fixed inset-0 bg-black/80" />
-                  <Drawer.Content className="bg-background text-foreground fixed right-0 top-0 flex h-full w-[90vw] flex-row rounded-l-lg border p-6 sm:w-[70vw] lg:w-[50vw]">
+                  <Drawer.Overlay className="drawer-overlay" />
+                  <Drawer.Content className="drawer-content">
                     {/* <Drawer.Handle className="top-4" />
                      */}
-                    <div className="mx-auto flex h-full max-w-sm flex-col justify-center space-y-4 px-4">
-                      <h4 className="font-semibold">Blocker Code</h4>
-                      <code>{content}</code>
-                      <Drawer.Close>Close</Drawer.Close>
+                    <div className="drawer-content-inner">
+                      <h4>Blocker Code</h4>
+                      <SyntaxHighlighter 
+                        style={prism} 
+                        language={"jsx"}
+                        className="drawer-code"
+                        /* wrapLines={true}
+                        wrapLongLines={true} */
+                        >
+                        {content}
+                      </SyntaxHighlighter>
+                      <Drawer.Close className={"drawer-content-close"}>
+                        Close
+                      </Drawer.Close>
                     </div>
                   </Drawer.Content>
                 </Drawer.Portal>
@@ -633,21 +648,20 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               placeholder="Filter by Tags..."
               aria-label="Filter by Tags"
               onChange={handleTagToggle}
-              
               styles={{
                 control: (baseStyles, state) => ({
                   ...baseStyles,
                   borderRadius: themeVariables.spacing,
                   fontSize: "13px",
-                  minHeight: "24px",                  
+                  minHeight: "24px",
                 }),
                 dropdownIndicator: (baseStyles, state) => ({
                   ...baseStyles,
-                  padding: "4px"           
+                  padding: "4px",
                 }),
-                clearIndicator : (baseStyles, state) => ({
+                clearIndicator: (baseStyles, state) => ({
                   ...baseStyles,
-                  padding: "4px"           
+                  padding: "4px",
                 }),
               }}
             />
@@ -668,22 +682,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   ...baseStyles,
                   borderRadius: themeVariables.spacing,
                   fontSize: "13px",
-                  minHeight: "24px",                  
+                  minHeight: "24px",
                 }),
                 dropdownIndicator: (baseStyles, state) => ({
                   ...baseStyles,
-                  padding: "4px"           
+                  padding: "4px",
                 }),
-                clearIndicator : (baseStyles, state) => ({
+                clearIndicator: (baseStyles, state) => ({
                   ...baseStyles,
-                  padding: "4px"           
+                  padding: "4px",
                 }),
               }}
             />
           )}
 
           {/* Clear Filters Button */}
-          {hasFilters && (
+          {/* {hasFilters && (
             <div>
               <button onClick={clearAllFilters} className="clear-button">
                 <AccessibleIcon label="Clear All Filters">
@@ -691,7 +705,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 </AccessibleIcon>
               </button>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -713,7 +727,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                               header.getContext()
                             )}
                       </th>
-                    ))} 
+                    ))}
                   </tr>
                 ))}
               </thead>

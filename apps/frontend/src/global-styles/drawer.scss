@@ -1,0 +1,44 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.drawer-content {
+  position: fixed;
+  right: 0;
+  top: 10vh;
+  min-height: 70vh;
+  width: 50vw;
+  border-radius: variables.$spacing;
+  overflow: hidden;
+  margin-right: variables.$spacing;
+  border-width: 1px; /* Equivalent to border */
+  max-width: 50vw;
+  color: variables.$black;
+  background: variables.$paper;
+  margin: calc(2*variables.$spacing);
+
+  .drawer-content-inner {
+    margin:calc(2*variables.$spacing);
+    h4 {
+      margin:0;
+    }
+    .drawer-code {
+      max-width: 100%;
+      border-radius: variables.$spacing;
+      user-select: text;
+      flex-wrap: wrap;
+      code {
+      white-space: pre-wrap !important;
+      }
+    }
+    .drawer-content-close {
+    }
+  }
+}
