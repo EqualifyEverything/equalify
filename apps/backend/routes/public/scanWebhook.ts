@@ -5,6 +5,11 @@ export const scanWebhook = async () => {
     const { auditId, scanId, urlId, blockers, status, error } = event.body;
     await db.connect();
 
+    const ignoredBlockerHashes = (await db.query({
+        text: `SELECT b.content_hash_id FROM ignored_blockers as ib LEFT OUTER JOIN blockers as b ON ib.blocker_id = b.id WHERE ib.audit_id=$1`,
+        values: [auditId],
+    }))?.rows?.map(obj => obj.content_hash_id.replaceAll('-', ''));
+
     // Handle failed scans
     if (status === 'failed') {
         await db.query({
@@ -30,6 +35,10 @@ export const scanWebhook = async () => {
         const contentHashId = hashStringToUuid(contentNormalized);
         const shortId = generateShortId();
 
+        // if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
+        //     continue;
+        // }
+
         // Insert blocker
         const blockerId = (await db.query({
             text: `
@@ -39,6 +48,13 @@ export const scanWebhook = async () => {
             `,
             values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, scanId],
         })).rows[0].id;
+
+        if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
+            await db.query({
+                text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id") VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+                values: [auditId, blockerId],
+            })
+        }
 
         const tagIds = [];
         for (const tag of blocker.tags) {
@@ -51,7 +67,7 @@ export const scanWebhook = async () => {
         }
 
         // Insert or get blocker type based on description
-        const blockerTypeId = hashStringToUuid(blocker.description+blocker.test);
+        const blockerTypeId = hashStringToUuid(blocker.description + blocker.test);
         await db.query({
             text: `
                     INSERT INTO "messages" ("id", "content", "category") 

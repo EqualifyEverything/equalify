@@ -18,7 +18,7 @@ export const getAuditChart = async () => {
     scans(order_by: {created_at: asc}) {
       id
       created_at
-      blockers_aggregate {
+      blockers_aggregate(where: {_not: {ignored_blocker: {id: {_is_null: false}}}}) {
         aggregate {
           count
         }
