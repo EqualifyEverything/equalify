@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { StyledButton } from "./StyledButton";
-import { TbMailX } from "react-icons/tb";
+import { TbMailX, TbTrashX } from "react-icons/tb";
 import auditEmailStyles from "./AuditEmailSubscriptionInput.module.scss";
+import { StyledLabeledInput } from "./StyledLabeledInput";
 
 export interface EmailSubscriptionList {
   emails: EmailSubscriptionEmail[];
@@ -55,9 +56,9 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
   const handleRemoveEmail = useCallback(
     (idToRemove: string) => {
       //if (emails.length > 1) {
-        setEmails((prevEmails) =>
-          prevEmails.filter((email) => email.id !== idToRemove)
-        );
+      setEmails((prevEmails) =>
+        prevEmails.filter((email) => email.id !== idToRemove)
+      );
       //}
     },
     [emails.length]
@@ -71,21 +72,22 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
 
   return (
     <div className={auditEmailStyles.AuditEmailSubscriptionInput}>
-      <div>
-      {emails.map((entry) => (
-        <EmailInputRow
-          key={entry.id}
-          entry={entry}
-          onChange={handleUpdateField}
-          onRemove={handleRemoveEmail}
-        />
-      ))}
+      <div className={auditEmailStyles["rows"]}>
+        {emails.map((entry) => (
+          <EmailInputRow
+            key={entry.id}
+            entry={entry}
+            onChange={handleUpdateField}
+            onRemove={handleRemoveEmail}
+          />
+        ))}
       </div>
       <StyledButton
         onClick={handleAddEmail}
-        label={emails.length > 0 ? "Add Another Email" : "Add Email Notification"}
+        label={
+          emails.length > 0 ? "Add Another Email" : "Add Email Notification"
+        }
       />
-      
     </div>
   );
 };
@@ -118,41 +120,38 @@ const EmailInputRow: React.FC<EmailInputRowProps> = ({
 
   return (
     <div className={auditEmailStyles["row"]}>
-      <label htmlFor={`email-${id}`}>Email</label>
-      <input
-        id={`email-${id}`}
-        name="email"
-        type="email"
-        placeholder="user@example.com"
-        value={email}
-        onChange={handleChange}
-      />
+      <StyledLabeledInput>
+        <label htmlFor={`email-${id}`}>Email</label>
+        <input
+          id={`email-${id}`}
+          name="email"
+          type="email"
+          placeholder="user@example.com"
+          value={email}
+          onChange={handleChange}
+        />
+      </StyledLabeledInput>
 
-      <label htmlFor={`frequency-${id}`}>Frequency</label>
-      <select
-        id={`frequency-${id}`}
-        name="frequency"
-        value={frequency}
-        onChange={handleChange}
-      >
-        {frequencyOpts.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      <StyledLabeledInput>
+        <label htmlFor={`frequency-${id}`}>Frequency</label>
+        <select
+          id={`frequency-${id}`}
+          name="frequency"
+          value={frequency}
+          onChange={handleChange}
+        >
+          {frequencyOpts.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </StyledLabeledInput>
 
-      {/* <button
-        onClick={handleRemoveClick}
-        type="button"
-        aria-label={`Remove email ${email}`}
-      >
-        Remove
-      </button> */}
-      <StyledButton 
+      <StyledButton
         onClick={handleRemoveClick}
         label={`Remove email ${email}`}
-        icon={<TbMailX />}
+        icon={<TbTrashX />}
         showLabel={false}
       />
     </div>

@@ -1,0 +1,22 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.styledLabeledInput {
+  
+  &.stacked {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    align-content: flex-start;
+    label {
+      @include fonts.font-size-small
+    }
+    input, select {
+      margin-top:0;
+    }
+    margin-right:calc(variables.$spacing*2);
+  }
+  
+}

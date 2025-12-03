@@ -18,7 +18,7 @@ export const StyledButton = ({
   label,
   showLabel = true,
 }: ButtonProps) => {
-  const iconOnly = !showLabel ? styles["icon-only"]:"";
+  const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   return (
     <button
       className={

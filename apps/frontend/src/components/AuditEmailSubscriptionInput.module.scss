@@ -3,14 +3,22 @@
 
 .AuditEmailSubscriptionInput {
   margin-top:calc(2*variables.$spacing);
+  .rows {
+    margin-bottom: calc(2*variables.$spacing);
+  }
   .row {
     display: inline-flex;
+    button {
+      margin-bottom:0;
+      padding-bottom:0;
+    }
     svg {
-      width:24px;
-      height:24px;
+      width:28px;
+      height:28px;
+      margin-bottom: 0;
     }
   }
-  
+
 }
 
 
