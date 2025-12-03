@@ -10,6 +10,7 @@
 @use "./global-styles/charts"; 
 @use "./global-styles/sr-only";
 @use "./global-styles/drawer";
+@use "./global-styles/selects";
 
 html {
   scrollbar-gutter: auto !important;
