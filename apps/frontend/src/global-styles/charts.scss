@@ -15,6 +15,8 @@
 }
 
 .chart-tabs {
+  
+    margin-top:variables.$spacing;
     button {
       background: transparent;
       border: 0;
@@ -25,5 +27,8 @@
         @include fonts.raleway-bold;
         border-bottom: calc(variables.$spacing/2) solid variables.$white;
       }
+    }
+    div[role="tabpanel"]{
+      padding-top:calc(2*variables.$spacing);
     }
 }

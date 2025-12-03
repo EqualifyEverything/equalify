@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGlobalStore } from "../utils";
+import { StyledButton } from "./StyledButton";
 
 interface Page {
   url: string;
@@ -333,9 +334,10 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
               {csvError && <p className="text-red-500 text-sm mt-1">{csvError}</p>}
             </div>
           )}
-          <button type="button" onClick={addPage}>
-            Add URLs
-          </button>
+          <StyledButton 
+            label="Add Urls"
+            onClick={addPage}
+          />
         </>
       }
       {pages.length > 0 && (

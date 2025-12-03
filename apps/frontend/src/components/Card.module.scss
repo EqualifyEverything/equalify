@@ -7,6 +7,13 @@
   h1,h2,h3 {
     margin:0;
     @include fonts.font-size-normal;
+    display: flex;
+    svg {
+      margin-right: variables.$spacing;
+    }
+  } 
+  .text-small {
+    @include fonts.font-size-small;
   }
   &.dark {
     background: variables.$black;
@@ -14,6 +21,7 @@
   }
   &.light {
     background: variables.$white;
+    border: 1px solid variables.$gray;
   }
   &.red {
     background: variables.$red;

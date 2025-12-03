@@ -1,0 +1,15 @@
+@use "./variables.module.scss";
+@use "./fonts.scss";
+
+input {
+  @include fonts.font-size-normal;
+  border: 1px solid variables.$gray;
+  color: variables.$black;
+  min-width: 120px;
+  box-sizing: border-box;
+  margin-top: calc(variables.$spacing/2);
+  padding: calc(variables.$spacing/2) calc(variables.$spacing);
+  border: 1px solid variables.$gray;
+  border-radius: calc(0.5rem - 2px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}

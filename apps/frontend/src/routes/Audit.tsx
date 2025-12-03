@@ -17,23 +17,32 @@ import {
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
+
+import { TbHistory, TbMail } from "react-icons/tb";
 import {
   FaAngleDown,
   FaAngleUp,
 } from "react-icons/fa";
+
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import * as Progress from "@radix-ui/react-progress";
+
 import { createLog } from "#src/utils/createLog.ts";
 import {
   AuditEmailSubscriptionInput,
   EmailSubscriptionList,
 } from "#src/components/AuditEmailSubscriptionInput.tsx";
-import * as Progress from "@radix-ui/react-progress";
-import { Card } from "#src/components/Card.tsx";
-import themeVariables from "../global-styles/variables.module.scss";
+
 import { CustomizedDot } from "#src/components/ChartCustomizedDot.tsx";
 import { ChartTooltipContent } from "#src/components/ChartTooltipContent.tsx";
+
 import { AuditHeader } from "#src/components/AuditHeader.tsx";
+
+import { Card } from "#src/components/Card.tsx";
+import themeVariables from "../global-styles/variables.module.scss";
+import cardStyles from "../components/Card.module.scss";
+
 interface Page {
   url: string;
   type: "html" | "pdf";
@@ -42,7 +51,7 @@ interface Page {
 export const Audit = () => {
   const { auditId } = useParams();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const location = useLocation();
   const [pages, setPages] = useState<Page[]>([]);
   const [emailNotifications, setEmailNotifications] = useState<string | null>(
@@ -109,7 +118,7 @@ export const Audit = () => {
         await API.get({
           apiName: isShared ? "public" : "auth",
           path: "/getAuditChart",
-          options: { queryParams: { id: auditId!, days: chartRange } },
+          options: { queryParams: { id: auditId!, days: chartRange.toString() } },
         }).response
       ).body.json();
       return results;
@@ -254,24 +263,8 @@ export const Audit = () => {
         audit={audit}
         auditId={auditId}
       />
-      <Card variant="red">
-        {emailNotifications && (
-          <>
-            <span>
-              {emailNotificationsCount > 0
-                ? `${emailNotificationsCount} Email Notifications`
-                : "No Email Notifications"}
-            </span>
-            <div>
-              <AuditEmailSubscriptionInput
-                initialValue={JSON.parse(emailNotifications)}
-                onValueChange={updateEmailNotifications}
-              />
-            </div>
-          </>
-        )}
-      </Card>
-      <Card variant="green">
+      
+      <Card variant="light">
         <Collapsible.Root
           className="CollapsibleRoot"
           open={showUrlInput}
@@ -309,6 +302,24 @@ export const Audit = () => {
             </form>
           </Collapsible.Content>
         </Collapsible.Root>
+      </Card>
+      <Card variant="light">
+        {emailNotifications && (
+          <div>
+            <h2><TbMail className="icon-small"/> Email Notifications</h2>
+            <span className="font-small">
+              {emailNotificationsCount > 0
+                ? `${emailNotificationsCount} Email Notifications`
+                : "No Email Notifications"}
+            </span>
+            <div>
+              <AuditEmailSubscriptionInput
+                initialValue={JSON.parse(emailNotifications)}
+                onValueChange={updateEmailNotifications}
+              />
+            </div>
+          </div>
+        )}
       </Card>
       <Card>
         {scans && scans?.length > 0 && (
@@ -351,7 +362,7 @@ export const Audit = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {scans?.map((scan, index) => (
+                      {scans?.map((scan:any, index:number) => (
                         <tr key={index}>
                           <td>#{index + 1}</td>
                           <td>{formatDate(scan.created_at)}</td>
@@ -371,9 +382,12 @@ export const Audit = () => {
         {chartData?.data && chartData.data.length > 0 && (
           <div>
             <div className="blockers-chart-heading-wrapper">
+              <div>
               <h2 id="blockers-chart-heading">
-                Blockers Over Time (Last {chartData.period_days} Days)
+                <TbHistory className="icon-small" />Blockers Over Time
               </h2>
+              <span className="font-small">Last {chartData.period_days} Days</span>
+              </div>
               <div className="chart-ranger-select">
                 <label htmlFor="chart-range-select">Date Range</label>
                 <select

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { StyledButton } from "./StyledButton";
+import { TbMailX } from "react-icons/tb";
+import auditEmailStyles from "./AuditEmailSubscriptionInput.module.scss";
 
 export interface EmailSubscriptionList {
   emails: EmailSubscriptionEmail[];
@@ -67,7 +70,7 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
   }, [emails]);
 
   return (
-    <div>
+    <div className={auditEmailStyles.AuditEmailSubscriptionInput}>
       <div>
       {emails.map((entry) => (
         <EmailInputRow
@@ -78,9 +81,11 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
         />
       ))}
       </div>
-      <button onClick={handleAddEmail} type="button">
-        {emails.length > 0 ? "Add Another Email" : "Add Email Notification" }
-      </button>
+      <StyledButton
+        onClick={handleAddEmail}
+        label={emails.length > 0 ? "Add Another Email" : "Add Email Notification"}
+      />
+      
     </div>
   );
 };
@@ -112,7 +117,7 @@ const EmailInputRow: React.FC<EmailInputRowProps> = ({
   }, [id, onRemove]);
 
   return (
-    <div className="inline-flex">
+    <div className={auditEmailStyles["row"]}>
       <label htmlFor={`email-${id}`}>Email</label>
       <input
         id={`email-${id}`}
@@ -137,13 +142,19 @@ const EmailInputRow: React.FC<EmailInputRowProps> = ({
         ))}
       </select>
 
-      <button
+      {/* <button
         onClick={handleRemoveClick}
         type="button"
         aria-label={`Remove email ${email}`}
       >
         Remove
-      </button>
+      </button> */}
+      <StyledButton 
+        onClick={handleRemoveClick}
+        label={`Remove email ${email}`}
+        icon={<TbMailX />}
+        showLabel={false}
+      />
     </div>
   );
 };
