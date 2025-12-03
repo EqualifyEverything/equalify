@@ -1,0 +1,41 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.AuditHeader {
+  .audit-name-label {
+    display: block;
+    @include fonts.font-size-small;
+  }
+  .inner {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: flex-end;
+    width:100%;
+    display: inline-flex;
+    h1 {
+      margin:0;
+    }
+    .header-l {
+      display: inline-flex;
+    }
+    .buttons-l {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: flex-end;
+      //align-items:center;
+      justify-content: flex-end;
+      margin-left: calc(variables.$spacing);
+      button {
+        padding:calc(variables.$spacing) calc(variables.$spacing) calc(variables.$spacing/2) calc(variables.$spacing);
+      }
+    }
+    .buttons-r {
+      display: inline-flex;
+      gap:calc(variables.$spacing*2)
+    }
+  }
+}
+
+

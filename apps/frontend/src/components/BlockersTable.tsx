@@ -21,11 +21,10 @@ import * as Switch from "@radix-ui/react-switch";
 import { useGlobalStore } from "../utils";
 import { MdOutlineCancel } from "react-icons/md";
 import themeVariables from "../global-styles/variables.module.scss";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-//import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
-//import prism from 'react-syntax-highlighter/dist/esm/styles/prism/prism';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
 import { a11yDark  as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
-//SyntaxHighlighter.registerLanguage('jsx', jsx);
+SyntaxHighlighter.registerLanguage('jsx', jsx);
 
 const apiClient = API.generateClient();
 
@@ -220,7 +219,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     }
   };
 
-  const TAGS_TO_SHOW_IN_TABLE = 3;
+  const TAGS_TO_SHOW_IN_TABLE = 1;
 
   const columns = useMemo<ColumnDef<Blocker>[]>(
     () => [
@@ -326,7 +325,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 {getElementTagFromContent(content)}
               </code>
 
-              <Drawer.Root direction="right" shouldScaleBackground>
+              <Drawer.Root 
+                direction="right" 
+                shouldScaleBackground
+                setBackgroundColorOnScale={false}
+                >
                 <Drawer.Trigger
                   render={(props) => (
                     <button {...props} aria-label="View Code" title="View Code">

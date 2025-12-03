@@ -143,7 +143,7 @@ export const Navigation = () => {
 
   return (
     <>
-    <div className="app-container">
+    <div className="app-container" data-vaul-drawer-wrapper>
       <GlobalErrorHandler />
       <div className="container">
         <div className={styles.navigation}>

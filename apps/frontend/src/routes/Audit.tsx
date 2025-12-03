@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDate, useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import { useEffect, useState, ChangeEvent } from "react";
 import {
@@ -13,11 +13,14 @@ import {
   Tooltip,
   //Legend,
   ResponsiveContainer,
-  Dot,
+  //Dot,
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
-import { FaAngleDown, FaAngleUp, FaClipboard } from "react-icons/fa";
+import {
+  FaAngleDown,
+  FaAngleUp,
+} from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { createLog } from "#src/utils/createLog.ts";
@@ -30,8 +33,7 @@ import { Card } from "#src/components/Card.tsx";
 import themeVariables from "../global-styles/variables.module.scss";
 import { CustomizedDot } from "#src/components/ChartCustomizedDot.tsx";
 import { ChartTooltipContent } from "#src/components/ChartTooltipContent.tsx";
-import { AxisInterval } from "recharts/types/util/types";
-
+import { AuditHeader } from "#src/components/AuditHeader.tsx";
 interface Page {
   url: string;
   type: "html" | "pdf";
@@ -114,64 +116,6 @@ export const Audit = () => {
     },
     refetchInterval: 5000,
   });
-
-  const renameAudit = async () => {
-    const newName = prompt(
-      `What would you like to rename this audit to?`,
-      audit?.name
-    );
-    if (newName) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/updateAudit",
-          options: { body: { id: auditId!, name: newName } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
-      // aria & logging
-      setAriaAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`);
-      return;
-    }
-  };
-
-  const rescanAudit = async () => {
-    if (confirm(`Are you sure you want to re-scan this audit?`)) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/rescanAudit",
-          options: { body: { id: auditId! } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audits"] });
-      // aria & logging
-      setAriaAnnounceMessage(`Scanning audit ${audit.name}...`);
-      return;
-    }
-  };
-
-  const deleteAudit = async () => {
-    if (confirm(`Are you sure you want to delete this audit?`)) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/deleteAudit",
-          options: { body: { id: auditId! } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audits"] });
-      // aria & logging
-      setAriaAnnounceMessage(`Deleted audit ${audit.name}.`);
-      await createLog(`Deleted audit ${audit.name}.`, auditId);
-
-      navigate("/audits");
-      return;
-    }
-  };
 
   const handleUrlInput = async (_changedPages: Page[]) => {
     // just here to have a void function to hand to AuditPagesInput
@@ -302,100 +246,69 @@ export const Audit = () => {
     }
   };
 
-  const copyCurrentLocationToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        window.location.origin +
-          location.pathname.replace("/audits/", "/shared/")
-      );
-      console.log(
-        `URL ${window.location.origin + location.pathname} copied to clipboard!`
-      );
-      setAriaAnnounceMessage(
-        `URL ${window.location.origin + location.pathname} copied to clipboard!`
-      );
-    } catch (err) {
-      console.error("Failed to copy URLs: ", err);
-    }
-  };
-
   return (
-    <div className="max-w-screen-md">
-      <div className="flex flex-col gap-2">
-        {!isShared && <Link to={"/audits"}>← Go Back</Link>}
-        <div className="flex flex-row items-center gap-2 justify-between">
-          <h1 className="initial-focus-element">Audit: {audit?.name}</h1>
-          <div className="flex flex-row items-center gap-2">
-            {!isShared && <button onClick={renameAudit}>Rename</button>}
-            {!isShared && <button onClick={rescanAudit}>Re-scan</button>}
-            {!isShared && <button onClick={deleteAudit}>Delete</button>}
-          </div>
-        </div>
-      </div>
-      <button
-        className="flex justify-center"
-        onClick={copyCurrentLocationToClipboard}
-      >
-        <FaClipboard />
-        <span>Copy link</span>
-      </button>
-      
-      <hr />
+    <div>
+      <AuditHeader 
+        isShared={isShared}
+        queryClient={queryClient}
+        audit={audit}
+        auditId={auditId}
+      />
       <Card variant="red">
-      {emailNotifications && (
-        <>
-          <span>
-            {emailNotificationsCount > 0
-              ? `${emailNotificationsCount} Email Notifications`
-              : "No Email Notifications"}
-          </span>
-          <div>
-            <AuditEmailSubscriptionInput
-              initialValue={JSON.parse(emailNotifications)}
-              onValueChange={updateEmailNotifications}
-            />
-          </div>
-        </>
-      )}
+        {emailNotifications && (
+          <>
+            <span>
+              {emailNotificationsCount > 0
+                ? `${emailNotificationsCount} Email Notifications`
+                : "No Email Notifications"}
+            </span>
+            <div>
+              <AuditEmailSubscriptionInput
+                initialValue={JSON.parse(emailNotifications)}
+                onValueChange={updateEmailNotifications}
+              />
+            </div>
+          </>
+        )}
       </Card>
       <Card variant="green">
-      <Collapsible.Root
-        className="CollapsibleRoot"
-        open={showUrlInput}
-        onOpenChange={setShowUrlInput}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+        <Collapsible.Root
+          className="CollapsibleRoot"
+          open={showUrlInput}
+          onOpenChange={setShowUrlInput}
         >
-          <span>
-            Audit: <b>{audit?.name}</b> <br /> Scanning {pages.length}{" "}
-            <b>URL{pages.length > 1 ? "s" : ""}</b>
-          </span>
-          <Collapsible.Trigger>
-            {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-            {isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
-          </Collapsible.Trigger>
-        </div>
-        <Collapsible.Content>
-          <form>
-            {pages.length > 0 && (
-              <AuditPagesInput
-                initialPages={pages}
-                setParentPages={handleUrlInput}
-                addParentPages={addUrls}
-                removeParentPages={removeUrls}
-                updateParentPageType={updateUrlType}
-                returnMutation
-                isShared={isShared}
-              />
-            )}
-          </form>
-        </Collapsible.Content>
-      </Collapsible.Root>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>
+              Audit: <b>{audit?.name}</b> <br /> Scanning {pages.length}{" "}
+              <b>URL{pages.length > 1 ? "s" : ""}</b>
+            </span>
+            <Collapsible.Trigger>
+              {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
+              {isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
+            </Collapsible.Trigger>
+          </div>
+          <Collapsible.Content>
+            <form>
+              {pages.length > 0 && (
+                <AuditPagesInput
+                  initialPages={pages}
+                  setParentPages={handleUrlInput}
+                  addParentPages={addUrls}
+                  removeParentPages={removeUrls}
+                  updateParentPageType={updateUrlType}
+                  returnMutation
+                  isShared={isShared}
+                />
+              )}
+            </form>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </Card>
       <Card>
         {scans && scans?.length > 0 && (
@@ -426,7 +339,7 @@ export const Audit = () => {
               </Collapsible.CollapsibleTrigger>
               <Collapsible.CollapsibleContent>
                 <p>
-                    Use this table to review every scan of this audit by date.
+                  Use this table to review every scan of this audit by date.
                 </p>
                 <div className="table-container">
                   <table>
@@ -553,9 +466,7 @@ export const Audit = () => {
               <Tabs.Content value="table">
                 <div>
                   <h3>Blockers Data Table</h3>
-                  <p>
-                    Use this table to review exact blocker counts by date.
-                  </p>
+                  <p>Use this table to review exact blocker counts by date.</p>
                   <div className={"table-container card-table"}>
                     <table aria-labelledby="blockers-chart-heading">
                       <thead>
