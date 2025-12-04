@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useGlobalStore } from "../utils";
 import { StyledButton } from "./StyledButton";
+import { AuditPagesInputTable } from "./AuditPagesInputTable";
+import { StyledLabeledInput } from "./StyledLabeledInput";
+import { Card } from "./Card";
+import style from "./AuditPagesInput.module.scss";
 
 interface Page {
   url: string;
@@ -31,7 +35,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   const [importBy, setImportBy] = useState("URLs");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [pages, setPages] = useState<Page[]>(initialPages);
-  const [pagesToDeleteCount, setPagesToDeleteCount] = useState(0);
+  //const [pagesToDeleteCount, setPagesToDeleteCount] = useState(0);
   const [csvError, setCsvError] = useState<string | null>(null);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +43,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     if (!file) return;
 
     // Validate file type
-    if (!file.name.endsWith('.csv') && !file.type.includes('csv') && !file.type.includes('text')) {
+    if (
+      !file.name.endsWith(".csv") &&
+      !file.type.includes("csv") &&
+      !file.type.includes("text")
+    ) {
       setCsvError("Please upload a CSV or text file");
       return;
     }
@@ -53,7 +61,10 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       }
 
       // Parse CSV - expecting one URL per line
-      const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+      const lines = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
 
       if (lines.length === 0) {
         setCsvError("No URLs found in the file");
@@ -66,7 +77,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
       lines.forEach((line, index) => {
         // Skip empty lines and potential header rows
-        if (!line || line.toLowerCase().includes('url') && index === 0) return;
+        if (!line || (line.toLowerCase().includes("url") && index === 0))
+          return;
 
         // Validate and format URL
         const validUrl = validateAndFormatUrl(line);
@@ -76,13 +88,13 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         }
 
         // Check for duplicates in existing pages
-        if (pages.some(page => page.url === validUrl)) {
+        if (pages.some((page) => page.url === validUrl)) {
           duplicates.push(validUrl);
           return;
         }
 
         // Check for duplicates in new pages being added
-        if (newPages.some(page => page.url === validUrl)) {
+        if (newPages.some((page) => page.url === validUrl)) {
           duplicates.push(validUrl);
           return;
         }
@@ -93,7 +105,9 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       // Add all valid URLs to the pages
       if (newPages.length > 0) {
         setPages([...pages, ...newPages]);
-        setAriaAnnounceMessage(`Successfully imported ${newPages.length} URL(s) from CSV`);
+        setAriaAnnounceMessage(
+          `Successfully imported ${newPages.length} URL(s) from CSV`
+        );
         setCsvError(null);
       }
 
@@ -109,11 +123,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         if (errors.length > 0) {
           messages.push(`${errors.length} invalid URL(s) skipped.`);
         }
-        setCsvError(messages.join(' '));
+        setCsvError(messages.join(" "));
       }
 
       // Clear the file input
-      e.target.value = '';
+      e.target.value = "";
     };
 
     reader.onerror = () => {
@@ -185,6 +199,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     }
   };
 
+  /* 
   const removePage = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const button = e.currentTarget;
@@ -201,6 +216,13 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     uncheckAllPagesToDelete();
     setPagesToDeleteCount(0);
     return;
+  }; */
+
+  const removePages = (pagesToRemove: Page[]) => {
+    //console.log("After Removal:", pages.filter((row) => !pagesToRemove.includes(row)));
+    setPages(pages.filter((row) => !pagesToRemove.includes(row)));
+    setAriaAnnounceMessage(`Removed ${pagesToRemove.length} URLs!`);
+    return;
   };
 
   const updatePageType = (url: string, type: "html" | "pdf") => {
@@ -208,7 +230,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       pages.map((page) => (page.url === url ? { ...page, type } : page))
     );
 
-    if (updateParentPageType) { //update in DB if we have a function to do so
+    if (updateParentPageType) {
+      //update in DB if we have a function to do so
       updateParentPageType({ url: url, type: type });
     }
   };
@@ -243,22 +266,22 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     }
   };
 
-  const updatePagesSelectedCount = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /* const updatePagesSelectedCount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const button = e.target;
     const form = button.closest("form");
     if (!form) return;
     const checkboxes = form.querySelectorAll(".page-checkbox:checked");
     //console.log(checkboxes);
     setPagesToDeleteCount(checkboxes.length);
-  };
+  }; */
 
-  //TODO this is a hack - we should really probably be using a controlled component
+  /* //TODO this is a hack - we should really probably be using a controlled component
   const uncheckAllPagesToDelete = () => {
     var x = document.getElementsByClassName("page-checkbox");
     for (let i = 0; i < x.length; i++) {
       x[i].setAttribute("checked", "");
     }
-  };
+  }; */
 
   // update parent value on change
   useEffect(() => {
@@ -269,132 +292,97 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     if (returnMutation) {
       let arrDelta: Page[] = [];
       if (initialPages === pages) return;
-      if (initialPages.length < pages.length) { // adding pages
+      if (initialPages.length < pages.length) {
+        // adding pages
         //console.log("Adding...")
-        arrDelta = pages.filter(page => !initialPages.includes(page));
-        if (addParentPages)
-          addParentPages(arrDelta);
+        arrDelta = pages.filter((page) => !initialPages.includes(page));
+        if (addParentPages) addParentPages(arrDelta);
       }
-      if (initialPages.length > pages.length) { // removing pages
+      if (initialPages.length > pages.length) {
+        // removing pages
         //console.log("Removing...")
-        const initialUrls = initialPages.map(page => page.url);
-        const pageUrls = pages.map(page => page.url);
-        const overlap = initialUrls.filter(page => !pageUrls.includes(page));
-        arrDelta = initialPages.filter(page => overlap.includes(page.url));
+        const initialUrls = initialPages.map((page) => page.url);
+        const pageUrls = pages.map((page) => page.url);
+        const overlap = initialUrls.filter((page) => !pageUrls.includes(page));
+        arrDelta = initialPages.filter((page) => overlap.includes(page.url));
         //console.log("To remove:",arrDelta);
-        if (removeParentPages)
-          removeParentPages(arrDelta);
+        if (removeParentPages) removeParentPages(arrDelta);
       }
       setParentPages(arrDelta);
-    }
-    else {
+    } else {
       setParentPages(pages);
     }
   }, [pages]);
+  //console.log(pages);
 
   return (
-    <>
-      {!isShared &&
-        <>
-          <div className="flex flex-col">
-            <label htmlFor="importBy">Import By:</label>
-            <select
-              id="importBy"
-              name="importBy"
-              value={importBy}
-              onChange={(e) => setImportBy(e.target.value)}
-            >
-              <option>URLs</option>
-              <option>CSV</option>
-            </select>
-          </div>
-          {["URLs"].includes(importBy) && (
-            <div className="flex flex-col">
-              <label htmlFor="pageInput">URLs:</label>
-              <input
-                id="pageInput"
-                name="pageInput"
-                onKeyDown={handleUrlInputKeyDown}
-                placeholder="example.com"
-              />
-              {urlError && <p className="text-red-500 text-sm mt-1">{urlError}</p>}
-            </div>
-          )}
-          {["CSV"].includes(importBy) && (
-            <div className="flex flex-col">
-              <label htmlFor="csvInput">CSV Upload:</label>
-              <input
-                id="csvInput"
-                name="csvInput"
-                type="file"
-                accept=".csv,.txt,text/csv,text/plain"
-                onChange={handleCsvUpload}
-              />
-              <p className="text-sm text-gray-600 mt-1">Upload a CSV or text file with one URL per line</p>
-              {csvError && <p className="text-red-500 text-sm mt-1">{csvError}</p>}
-            </div>
-          )}
-          <StyledButton 
-            label="Add Urls"
-            onClick={addPage}
-          />
-        </>
-      }
+    <div className={style.AuditPagesInput}>
       {pages.length > 0 && (
         <>
-          <h2>Review Added URLs</h2>
-          <table>
-            <thead>
-              <tr>
-                {!isShared && <th>Select</th>}
-                <th>URL</th>
-                <th>Scan Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pages.map((page) => (
-                <tr key={page.url}>
-                  {!isShared && <td>
-                    <input
-                      id={page.url}
-                      name={page.url}
-                      type="checkbox"
-                      className="page-checkbox"
-                      value={page.url}
-                      defaultChecked={false}
-                      onChange={updatePagesSelectedCount}
-                      aria-label={`Checkbox for ${page.url}`}
-                    />
-                  </td>}
-                  <td>{page.url}</td>
-                  <td>
-                    <select
-                      name={`pageType_${page.url}`}
-                      value={page.type}
-                      onChange={(e) =>
-                        updatePageType(
-                          page.url,
-                          e.target.value as "html" | "pdf"
-                        )
-                      }
-                      className="!p-0 mx-1"
-                      disabled={isShared}
-                    >
-                      <option value="html">HTML</option>
-                      <option value="pdf">PDF</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!isShared && pagesToDeleteCount > 0 ? (
-            <button type="button" onClick={removePage}>
-              Remove {pagesToDeleteCount} URL(s)
-            </button>
-          ) : null}
+          <AuditPagesInputTable
+            pages={pages}
+            removePages={removePages}
+            isShared={isShared}
+            updatePageType={updatePageType}
+          />
+          {!isShared && (
+            <Card variant="inset-light">
+              <h3>Add URLs to Scan</h3>
+              <div className={style["input-area"]}>
+                <StyledLabeledInput>
+                  <label htmlFor="importBy">Import By:</label>
+                  <select
+                    id="importBy"
+                    name="importBy"
+                    value={importBy}
+                    onChange={(e) => setImportBy(e.target.value)}
+                  >
+                    <option>URLs</option>
+                    <option>CSV</option>
+                  </select>
+                </StyledLabeledInput>
+                {["URLs"].includes(importBy) && (
+                  <div>
+                    <StyledLabeledInput>
+                      <label htmlFor="pageInput">URLs:</label>
+                      <input
+                        id="pageInput"
+                        name="pageInput"
+                        onKeyDown={handleUrlInputKeyDown}
+                        placeholder="example.com"
+                      />
+                    </StyledLabeledInput>
+                    {urlError && <p>{urlError}</p>}
+                  </div>
+                )}
+                {["CSV"].includes(importBy) && (
+                  <div>
+                    <StyledLabeledInput>
+                      <label htmlFor="csvInput">CSV Upload:</label>
+                      <input
+                        id="csvInput"
+                        name="csvInput"
+                        type="file"
+                        accept=".csv,.txt,text/csv,text/plain"
+                        onChange={handleCsvUpload}
+                      />
+                    </StyledLabeledInput>
+                    <p className="font-small">
+                      Upload a CSV or text file with one URL per line
+                    </p>
+                    {csvError && (
+                      <p className="text-red-500 text-sm mt-1">{csvError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className={style["button-area"]}>
+              <StyledButton label="Add Urls" onClick={addPage} />
+              </div>
+            </Card>
+          )}
         </>
       )}
-    </>
+    </div>
   );
 };

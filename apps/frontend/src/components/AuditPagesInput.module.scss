@@ -1,0 +1,22 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.AuditPagesInput {
+    h3 {}
+    select {
+        padding-top:0;
+        padding-bottom:0;
+    }
+    .input-area{
+        margin-top:calc(variables.$spacing);
+        display:inline-flex;
+        align-items: flex-start;
+    }
+    .button-area{
+        display:flex;
+        justify-content: flex-end;
+    }
+  
+}
+
+

@@ -23,6 +23,19 @@
     background: variables.$white;
     border: 1px solid variables.$gray;
   }
+  &.inset-light {
+    margin-top:variables.$spacing;
+    background: variables.$paper;
+    border: 1px solid variables.$gray;
+    padding: calc(variables.$spacing * 2) calc(variables.$spacing * 2);
+  
+    h3{
+      border-bottom: 2px solid variables.$black;
+    }
+    select {
+      background-color: variables.$white;
+    }
+  }
   &.red {
     background: variables.$red;
   }

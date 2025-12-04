@@ -35,6 +35,12 @@
       color:variables.$gray;
     }
   }
+  &.naked {
+    background: transparent;
+    border:0;
+    color:variables.$red;
+    flex-direction: row-reverse;
+  }
   &.red {
     background: variables.$red;
     color:variables.$white;

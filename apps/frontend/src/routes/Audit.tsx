@@ -43,6 +43,9 @@ import { Card } from "#src/components/Card.tsx";
 import { Drawer } from "vaul-base";
 import themeVariables from "../global-styles/variables.module.scss";
 import cardStyles from "../components/Card.module.scss";
+import { PiFileMagnifyingGlassBold } from "react-icons/pi";
+import { StyledButton } from "#src/components/StyledButton.tsx";
+import style from "./Audit.module.scss";
 
 interface Page {
   url: string;
@@ -278,7 +281,7 @@ export const Audit = () => {
   };
 
   return (
-    <div>
+    <div className={style.Audit}>
       <AuditHeader 
         isShared={isShared}
         queryClient={queryClient}
@@ -292,20 +295,18 @@ export const Audit = () => {
           open={showUrlInput}
           onOpenChange={setShowUrlInput}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>
-              Audit: <b>{audit?.name}</b> <br /> Scanning {pages.length}{" "}
-              <b>URL{pages.length > 1 ? "s" : ""}</b>
-            </span>
-            <Collapsible.Trigger>
-              {showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-              {isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
+          <div className={style["scan-url-card-header"]}>
+            <h2><PiFileMagnifyingGlassBold className="icon-small"/>
+              {/* Audit: <b>{audit?.name}</b> <br /> */} 
+              Scanning {pages.length}{" "} URL{pages.length > 1 ? "s" : ""}
+            </h2>
+            <Collapsible.Trigger asChild>
+               <StyledButton
+                variant="naked"
+                label={isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
+                icon={!showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
+                onClick={()=>{}}
+              />
             </Collapsible.Trigger>
           </div>
           <Collapsible.Content>
@@ -730,7 +731,7 @@ export const Audit = () => {
                       }} */
                       tickFormatter={(value, index) => {
                         if (index % 2) return "";
-                        console.log(index);
+                        //console.log(index);
                         //if(index%5 === 0) return "";
                         const date = new Date(value);
                         return date.toLocaleDateString("en-US", {
