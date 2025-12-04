@@ -1,0 +1,22 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.Audits {
+  h2 {
+    margin-bottom: calc(variables.$spacing);
+    svg {
+      color:variables.$black;
+    }
+  }
+
+  .audits-header {
+    display: inline-flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+}

@@ -157,8 +157,8 @@ export const BuildAudit = () => {
               <option>Manually</option>
               <option>Daily</option>
               <option>Weekly</option>
-              <option>Monthly</option>
-              <option>On Monitor Update</option>
+              <option>Monthly</option>{/* 
+              <option>On Monitor Update</option> */}
             </select>
           </StyledLabeledInput>
         </Card>

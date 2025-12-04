@@ -21,3 +21,12 @@
         width:62%;
     }
 }
+
+.cards-33 {
+    margin-bottom: calc(variables.$spacing*2);
+    display:flex;
+    gap: calc(variables.$spacing*2);
+    .card {
+        width:33%;
+    }
+}

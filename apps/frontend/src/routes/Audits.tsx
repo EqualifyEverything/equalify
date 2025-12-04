@@ -1,25 +1,114 @@
-import { useQuery } from '@tanstack/react-query';
-import { formatDate, formatId } from '../utils';
-import * as API from 'aws-amplify/api';
-import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from "@tanstack/react-query";
+import { formatDate, formatId } from "../utils";
+import * as API from "aws-amplify/api";
+import { Link, useNavigate } from "react-router-dom";
+import { StyledButton } from "#src/components/StyledButton.tsx";
+import { LuClipboard, LuClipboardPlus } from "react-icons/lu";
+import { Card } from "#src/components/Card.tsx";
 const apiClient = API.generateClient();
+import styles from "./Audits.module.scss";
+import { DataRow } from "#src/components/DataRow.tsx";
 
 export const Audits = () => {
-    const navigate = useNavigate();
-    const { data: audits } = useQuery({
-        queryKey: ['audits'],
-        queryFn: async () => (await apiClient.graphql({
-            query: `{audits(order_by: {created_at: desc}) {id created_at name}}`,
-        }))?.data?.audits,
-    });
-    return <div>
-        <div className='flex flex-row items-center justify-start gap-4'>
-            <h1 className="initial-focus-element">Audits</h1>
-            <button onClick={() => navigate('/audits/build')}>Add Audit</button>
+  const navigate = useNavigate();
+  const { data: audits } = useQuery({
+    queryKey: ["audits"],
+    queryFn: async () =>
+      (
+        await apiClient.graphql({
+          //query: `{audits(order_by: {created_at: desc}) {id created_at name}}`,
+          query: `
+            {
+          audits(order_by: {created_at: desc}) {
+            id
+            created_at
+            name
+            interval
+            scans(order_by: {created_at: desc}, limit: 1) {
+            blockers_aggregate(order_by: {created_at: desc}, where: {}) {
+                aggregate {
+                count
+                }
+            }
+            percentage
+            updated_at
+            }
+            urls_aggregate {
+            aggregate {
+                count
+            }
+            }
+        }
+        }
+            `,
+        })
+      )?.data?.audits,
+  });
+  console.log(audits);
+  return (
+    <div className={styles.Audits}>
+      <div>
+        <div className={styles["audits-header"]}>
+          <h1 className="initial-focus-element">Audits</h1>
+
+          <StyledButton
+            onClick={() => navigate("/audits/build")}
+            label="Add Audit"
+            variant="dark"
+            icon={<LuClipboardPlus className="icon-small" />}
+          />
         </div>
-        {audits?.map((row, index) => <div key={index} className='flex flex-row items-center gap-2 py-4'>
-            <Link className='hover:opacity-50' to={`/audits/${formatId(row.id)}`}>{row.name}</Link>
-            <div className='opacity-50'>{formatDate(row.created_at)}</div>
-        </div>)}
+      </div>
+      <div className="cards-33">
+        {audits?.map((row: any, index: number) => (
+          <Card variant="light" key={index}>
+            <Link
+              className="hover:opacity-50"
+              to={`/audits/${formatId(row.id)}`}
+            >
+              <h2>
+                <LuClipboard className="icon-small" />
+                {row.name}
+              </h2>
+            </Link>
+            <div className={styles["dataRow-list"]}>
+            <DataRow variant="highlight" the_key="Blockers" the_value={row.scans[0].blockers_aggregate.aggregate.count} />
+            <DataRow the_key="URLs" the_value={row.urls_aggregate.aggregate.count} />
+            <DataRow the_key="Runs" the_value={row.interval} />
+            <DataRow the_key="Last Scan" the_value={prettyDate(row.scans[0].updated_at) +" at "+prettyTime(row.scans[0].updated_at)} />  
+            <DataRow variant="no-border" the_key="Created" the_value={prettyDate(row.created_at)} />
+            
+            {/* {row.scans[0].percentage}% */}
+            </div>
+          </Card>
+        ))}
+      </div>
     </div>
+  );
+};
+
+function shortDate(dateTime: string) {
+  return new Date(dateTime).toLocaleDateString("en-US", {
+    //weekday: "short",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+}
+
+function prettyDate(dateTime: string) {
+  return new Date(dateTime).toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function prettyTime(dateTime: string) {
+  const time = new Date(dateTime);
+  return time.toLocaleTimeString(navigator.language, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

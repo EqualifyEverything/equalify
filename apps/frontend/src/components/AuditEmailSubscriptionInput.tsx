@@ -82,12 +82,14 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
           />
         ))}
       </div>
+      <div className={auditEmailStyles["action-buttons"]}>
       <StyledButton
         onClick={handleAddEmail}
         label={
           emails.length > 0 ? "Add Another Email" : "Add Email Notification"
         }
       />
+      </div>
     </div>
   );
 };

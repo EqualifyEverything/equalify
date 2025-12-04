@@ -1,0 +1,37 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.dataRow {
+  display: inline-flex;
+  justify-content: space-between;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: space-between;
+  align-items: center;
+  width: 100%;
+  .key {
+    font-weight: bold;
+  }
+
+  .key,
+  .value {
+    @include fonts.font-size-small;
+    padding: calc(variables.$spacing/2) calc(variables.$spacing/2);
+  }
+
+  &.highlight {
+    background: variables.$white;
+    border-bottom: 2px solid variables.$red;
+    .key {
+      font-weight:800;
+      //color:variables.$red;
+    }
+    .value{
+      font-weight: bold;
+    }
+  }
+  &.light {
+    background: variables.$white;
+    border-bottom: 1px solid variables.$gray;
+  }
+}
