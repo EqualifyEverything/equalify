@@ -9,6 +9,7 @@ interface ButtonProps extends React.PropsWithChildren {
   onClick: (e?:any) => Promise<void> | void;
   label: string;
   showLabel?: boolean;
+  disabled?: boolean;
 }
 
 export const StyledButton = ({
@@ -17,8 +18,10 @@ export const StyledButton = ({
   onClick,
   label,
   showLabel = true,
+  disabled = false
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
+  const isDisabled = disabled ? styles["disabled"]: "";
   return (
     <button
       className={
@@ -26,8 +29,10 @@ export const StyledButton = ({
         + " button "  
         + styles[variant] + " " 
         + iconOnly 
+        + isDisabled
         }
       onClick={onClick}
+      disabled={disabled}
     >
       {icon && <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>}
       {showLabel ? (

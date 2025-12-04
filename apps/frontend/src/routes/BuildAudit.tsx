@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  FormEvent
-} from "react";
+import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../queries";
 import * as API from "aws-amplify/api";
@@ -13,6 +10,14 @@ import { v4 as uuidv4 } from "uuid";
 import { useGlobalStore } from "../utils";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { createLog } from "#src/utils/createLog.ts";
+import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
+import { Card } from "#src/components/Card.tsx";
+import { CgOptions } from "react-icons/cg";
+import { TbList, TbMail } from "react-icons/tb";
+import { StyledButton } from "#src/components/StyledButton.tsx";
+import { LuClipboardCheck, LuClipboardPaste } from "react-icons/lu";
+import styles from "./BuildAudit.module.scss";
+import * as Switch from "@radix-ui/react-switch";
 
 interface Page {
   url: string;
@@ -20,7 +25,6 @@ interface Page {
 }
 
 export const BuildAudit = () => {
-
   const navigate = useNavigate();
   const { setAriaAnnounceMessage } = useGlobalStore();
   const { data: user } = useUser();
@@ -74,16 +78,16 @@ export const BuildAudit = () => {
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const auditData = buildAuditData(formData);
     console.log("Audit Data (Save & Run):", JSON.stringify(auditData));
-    const response = await (
+    const response = (await (
       await API.post({
         apiName: "auth",
         path: "/saveAudit",
         options: { body: { ...auditData, saveAndRun: true } },
       }).response
-    ).body.json() as { id:string };
+    ).body.json()) as { id: string };
     setAriaAnnounceMessage(`Audit saved and audit run started!`);
-    await createLog( `Audit created and audit run started!`, response.id);
-        
+    await createLog(`Audit created and audit run started!`, response.id);
+
     navigate(`/audits/${response?.id}`);
     return;
   };
@@ -101,88 +105,132 @@ export const BuildAudit = () => {
 
     console.log("Audit Data (Save):", JSON.stringify(auditData));
 
-    const response = await (
+    const response = (await (
       await API.post({
         apiName: "auth",
         path: "/saveAudit",
         options: { body: { ...auditData, saveAndRun: false } },
       }).response
-    ).body.json() as { id:string };
+    ).body.json()) as { id: string };
     setAriaAnnounceMessage(`Audit saved!`);
-    await createLog( `Audit created!`, response.id);
+    await createLog(`Audit created!`, response.id);
     navigate(`/audits/${response?.id}`);
     return;
   };
 
   const validateAuditName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const auditName = e.target.value.trim();
-    if(auditName) { 
-      setAuditNameValid(true)
+    if (auditName) {
+      setAuditNameValid(true);
     } else {
-      setAuditNameValid(false)
-    };
-  }
+      setAuditNameValid(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4 max-w-screen-md">
+    <div className={styles.buildAudit}>
       <Link to="..">← Go Back</Link>
       <h1 className="initial-focus-element">Audit Builder</h1>
-      <form className="flex flex-col gap-4" onSubmit={saveAndRunAudit}>
-        <h2>General Info</h2>
-        <div className="flex flex-col">
-          <label htmlFor="auditName">Audit Name <span>(required)</span>:</label>
-          <input id="auditName" name="auditName" onBlur={validateAuditName} required />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="scanFrequency">Scan Frequency:</label>
-          <select id="scanFrequency" name="scanFrequency">
-            <option>Manually</option>
-            <option>Daily</option>
-            <option>Weekly</option>
-            <option>Monthly</option>
-            <option>On Monitor Update</option>
-          </select>
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="emailNotifications">Email Notifications:</label>
-          <div>
+      <form onSubmit={saveAndRunAudit}>
+        <div className="cards-38-62">
+        <Card variant="light">
+          <h2>
+            <CgOptions className={"icon-small"} />
+            General Info
+          </h2>
+          <StyledLabeledInput>
+            <label htmlFor="auditName">
+              Audit Name <span>(required)</span>:
+            </label>
             <input
-              type="checkbox"
-              id="emailNotifications"
-              name="emailNotifications"
-              checked={emailNotifications}
-              onChange={(e) => setEmailNotifications(e.target.checked)}
+              id="auditName"
+              name="auditName"
+              onBlur={validateAuditName}
+              required
+              className={styles["input-element"]}
             />
+          </StyledLabeledInput>
+
+          <StyledLabeledInput>
+            <label htmlFor="scanFrequency">Scan Frequency:</label>
+            <select id="scanFrequency" name="scanFrequency" className={styles["input-element"]}>
+              <option>Manually</option>
+              <option>Daily</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+              <option>On Monitor Update</option>
+            </select>
+          </StyledLabeledInput>
+        </Card>
+        <Card variant="light">
+          <h2>
+            <TbMail className="icon-small" />
+            Email Notifications:
+          </h2>
+          <StyledLabeledInput>  
             <label htmlFor="emailNotifications">
               Enable email notifications?
             </label>
-          </div>
-        </div>
-        {emailNotifications && (
-          <div className="flex flex-col">
-            <AuditEmailSubscriptionInput
-              initialValue={emailList}
-              onValueChange={setEmailList}
-            />
-          </div>
-        )}
+            <Switch.Root
+              id="emailNotifications"
+              checked={!emailNotifications}
+              onCheckedChange={(checked) => setEmailNotifications(!checked)}
+              aria-label={"Enable email notifications?"}
+              className={styles["switch"]}
+            >
+              <Switch.Thumb className={styles["switch-thumb"]} />
+            </Switch.Root>
+          </StyledLabeledInput>
 
-        <h2>Add URLs</h2>
-        <AuditPagesInput initialPages={pages} setParentPages={setPages} />
-        <div className="border-[1px] border-border" />
-        <div className="flex flex-row gap-2">
-          <button
-            type="button"
-            onClick={saveAudit}
-            disabled={pages.length < 1 || !auditNameValid}
-            className="w-full"
-          >
-            Save Audit
-          </button>
-          <button type="submit" disabled={pages.length < 1 || !auditNameValid} className="w-full">
-            Save & Run Audit
-          </button>
+          {emailNotifications && (
+            <div>
+              <AuditEmailSubscriptionInput
+                initialValue={emailList}
+                onValueChange={setEmailList}
+              />
+            </div>
+          )}
+        </Card>
         </div>
+
+        <Card variant="light">
+          <h2>
+            <TbList className={"icon-small"} />
+            Add URLs
+          </h2>
+          <AuditPagesInput initialPages={pages} setParentPages={setPages} />
+        </Card>
+        <div className={styles["action-buttons"]}>
+          <StyledButton
+            icon={<LuClipboardCheck />}
+            onClick={saveAudit}
+            label="Save Audit"
+            disabled={pages.length < 1 || !auditNameValid}
+          />
+          <StyledButton
+            icon={<LuClipboardPaste />}
+            onClick={saveAndRunAudit}
+            label="Save & Run Audit"
+            variant="red"
+            disabled={pages.length < 1 || !auditNameValid}
+          />
+        </div>
+        {/* 
+            <button
+              type="button"
+              onClick={saveAudit}
+              disabled={pages.length < 1 || !auditNameValid}
+              className="w-full"
+            >
+              Save Audit
+            </button> */}
+        {/* <button
+              type="submit"
+              disabled={pages.length < 1 || !auditNameValid}
+              className="w-full"
+            >
+              Save & Run Audit
+            </button> */}
       </form>
     </div>
   );

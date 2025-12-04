@@ -1,0 +1,23 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.cards-50 {
+    display:flex;
+    margin-bottom: calc(variables.$spacing*2);
+    gap: calc(variables.$spacing*2);
+    .card {
+        width:50%;
+    }
+}
+
+.cards-38-62 {
+    margin-bottom: calc(variables.$spacing*2);
+    display:flex;
+    gap: calc(variables.$spacing*2);
+    .card:nth-of-type(1) {
+        width:38%;
+    }
+    .card:nth-of-type(2) {
+        width:62%;
+    }
+}

@@ -30,9 +30,18 @@
   }
   &.light {
     background: transparent;
+    &.disabled {
+      border-color:variables.$gray;
+      color:variables.$gray;
+    }
   }
   &.red {
     background: variables.$red;
+    color:variables.$white;
+    border-color:variables.$red;
+    &.disabled {
+      opacity:.5;
+    }
   }
   &.green {
     background: variables.$green;
@@ -54,10 +63,17 @@
     }
     &.red {
       color: variables.$red;
+
     }
     &.green {
       color: variables.$green;
     }
+  }
+
+  &.disabled, &:disabled {
+    //opacity:1;
+    //color:variables.$gray;
+    //border-color:variables.$gray;
   }
   
 }
