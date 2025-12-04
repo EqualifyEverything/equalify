@@ -3,6 +3,7 @@ export interface StreamResults {
     auditId: string;
     scanId: string;
     urlId: string;
+    url?: string;
     blockers: Blocker[];
     date: string
     message: string

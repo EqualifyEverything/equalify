@@ -91,6 +91,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
             auditId: job.auditId,
             scanId: job.scanId,
             urlId: job.urlId,
+            url: job.url,
             status: 'failed',
             error: 'Scan failed to produce results',
             blockers: []

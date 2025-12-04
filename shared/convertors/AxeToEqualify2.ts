@@ -92,6 +92,7 @@ function convertToEqualifyV2(axeResult: AxeResults, job: any):StreamResults {
         auditId: job.auditId,
         scanId: job.scanId,
         urlId: job.urlId,
+        url: job.url,
         blockers,
         date,
         message,
