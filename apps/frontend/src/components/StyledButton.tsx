@@ -10,6 +10,7 @@ interface ButtonProps extends React.PropsWithChildren {
   label: string;
   showLabel?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export const StyledButton = ({
@@ -18,18 +19,21 @@ export const StyledButton = ({
   onClick,
   label,
   showLabel = true,
-  disabled = false
+  disabled = false,
+  className = ""
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   const isDisabled = disabled ? styles["disabled"]: "";
   return (
     <button
       className={
-        styles.button 
+        styles["button"] 
         + " button "  
         + styles[variant] + " " 
-        + iconOnly 
-        + isDisabled
+        + variant + " "
+        + iconOnly + " "
+        + isDisabled + " "
+        + className
         }
       onClick={onClick}
       disabled={disabled}

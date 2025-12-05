@@ -1,0 +1,33 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.BlockersTable {
+  .blocker-code {
+    color:variables.$white;
+    background: variables.$black;
+    padding: calc(variables.$spacing/2) calc(variables.$spacing * 2);
+    border-radius: calc(variables.$spacing/2);
+    display: inline-block;
+    margin-bottom: calc(variables.$spacing/2);
+  }
+  .view-code-button {
+    border: 0;
+    display: inline-flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background: variables.$paper;
+    color: variables.$red;
+    font-weight: bold;
+    border-radius: 999px;
+    gap: calc(variables.$spacing/6);
+    padding: calc(variables.$spacing/2) calc(variables.$spacing * 2);
+    svg {
+    }
+    span {
+      display: block;
+      white-space: nowrap;
+    }
+  }
+}

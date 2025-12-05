@@ -5,14 +5,14 @@
   border: 0;
   padding: calc(variables.$spacing) calc(variables.$spacing * 2);
   cursor: pointer;
-  border-radius: calc(variables.$spacing*4);
+  border-radius: calc(variables.$spacing * 4);
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
   align-content: center;
   justify-content: center;
   align-items: center;
-  border:3px solid variables.$black;
+  border: 3px solid variables.$black;
   font-weight: bold;
 
   span {
@@ -31,22 +31,23 @@
   &.light {
     background: transparent;
     &.disabled {
-      border-color:variables.$gray;
-      color:variables.$gray;
+      border-color: variables.$gray;
+      color: variables.$gray;
     }
   }
   &.naked {
     background: transparent;
-    border:0;
-    color:variables.$red;
+    border: 0;
+    color: variables.$red;
     flex-direction: row-reverse;
+    padding:0;
   }
   &.red {
     background: variables.$red;
-    color:variables.$white;
-    border-color:variables.$red;
+    color: variables.$white;
+    border-color: variables.$red;
     &.disabled {
-      opacity:.5;
+      opacity: 0.5;
     }
   }
   &.green {
@@ -55,11 +56,11 @@
   }
 
   &.icon-only {
-    border:0;
+    border: 0;
     background: transparent !important;
     opacity: 0.6;
-    svg{
-      margin:0;
+    svg {
+      margin: 0;
     }
     &:hover {
       opacity: 1;
@@ -69,17 +70,28 @@
     }
     &.red {
       color: variables.$red;
-
     }
     &.green {
       color: variables.$green;
     }
   }
 
-  &.disabled, &:disabled {
+  &.toggle {
+    border:0;
+    background: variables.$green;
+    color: variables.$white;
+  }
+  &.toggle-ignored{
+    border:0;
+    background: variables.$paper;
+    color: variables.$black;
+    @include fonts.font-size-small;  
+  }
+/* 
+  &.disabled,
+  &:disabled {
     //opacity:1;
     //color:variables.$gray;
     //border-color:variables.$gray;
-  }
-  
+  } */
 }

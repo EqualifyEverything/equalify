@@ -21,10 +21,13 @@ import * as Switch from "@radix-ui/react-switch";
 import { useGlobalStore } from "../utils";
 import { MdOutlineCancel } from "react-icons/md";
 import themeVariables from "../global-styles/variables.module.scss";
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
-import { a11yDark  as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
-SyntaxHighlighter.registerLanguage('jsx', jsx);
+import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
+import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { StyledButton } from "./StyledButton";
+import { TbEye, TbEyeX } from "react-icons/tb";
+import style from "./BlockersTable.module.scss";
+SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const apiClient = API.generateClient();
 
@@ -303,13 +306,12 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <div className="text-sm max-w-sm">
                 {messages[0] || "No message"}
               </div>
-              <button
-                onClick={() => copyToClipboard(shortId)}
-                className="text-sm font-bold bg-gray-100 px-2 py-1 rounded border-1 cursor-pointer flex items-center"
-              >
-                {shortId || "N/A"}
-                <FaClipboard />
-              </button>
+              <StyledButton
+               onClick={() => copyToClipboard(shortId)}
+               icon={<FaClipboard className="icon-small" />}
+               label={shortId || "N/A"}
+               variant={"naked"}
+               />
             </>
           );
         },
@@ -321,22 +323,18 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           const content = getValue() as string;
           return (
             <>
-              <code className="text-xs break-all block max-w-md">
+              <code className={style["blocker-code"]}>
                 {getElementTagFromContent(content)}
               </code>
 
-              <Drawer.Root 
-                direction="right" 
+              <Drawer.Root
+                direction="right"
                 shouldScaleBackground
                 setBackgroundColorOnScale={false}
-                >
-                <Drawer.Trigger
-                  render={(props) => (
-                    <button {...props} aria-label="View Code" title="View Code">
-                      <FaCode />
-                    </button>
-                  )}
-                />
+              >
+                <Drawer.Trigger className={style["view-code-button"]}>
+                    <FaCode /> <span>View Code</span>
+                </Drawer.Trigger>
                 <Drawer.Portal>
                   <Drawer.Overlay className="drawer-overlay" />
                   <Drawer.Content className="drawer-content">
@@ -344,13 +342,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                      */}
                     <div className="drawer-content-inner">
                       <h4>Blocker Code</h4>
-                      <SyntaxHighlighter 
-                        style={prism} 
+                      <SyntaxHighlighter
+                        style={prism}
                         language={"jsx"}
                         className="drawer-code"
                         /* wrapLines={true}
                         wrapLongLines={true} */
-                        >
+                      >
                         {content}
                       </SyntaxHighlighter>
                       <Drawer.Close className={"drawer-content-close"}>
@@ -456,37 +454,23 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           const blockerId = getValue() as string;
           const isIgnored = ignoredBlockers?.has(blockerId) || false;
           return (
-            <>
-              <label
-                htmlFor={blockerId + "-ignore-switch"}
-                className={`px-2 py-1 rounded text-xs ${
-                  isIgnored
-                    ? "bg-gray-200 text-gray-800"
-                    : "bg-green-200 text-green-800"
-                }`}
-              >
-                {isIgnored ? "Ignored" : "Active"}
-              </label>
-              {authenticated && (
-                <Switch.Root
-                  id={blockerId + "-ignore-switch"}
-                  checked={isIgnored}
-                  onCheckedChange={() => {
-                    toggleIgnoreMutation.mutate({
-                      blockerId,
-                      isCurrentlyIgnored: isIgnored,
-                    });
-                    setAriaAnnounceMessage(
-                      `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
-                    );
-                  }}
-                  aria-label={`Change blocker ${blockerId} ignore status`}
-                  className="switch"
-                >
-                  <Switch.Thumb className="switch-thumb" />
-                </Switch.Root>
-              )}
-            </>
+            
+              <StyledButton
+                onClick={() => {
+                  if (!authenticated) return;
+                  toggleIgnoreMutation.mutate({
+                    blockerId,
+                    isCurrentlyIgnored: isIgnored,
+                  });
+                  setAriaAnnounceMessage(
+                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
+                  );
+                }}
+                label={isIgnored ? "Ignored" : "Active"}
+                icon={isIgnored ? <TbEyeX className="icon-small" /> : <TbEye className="icon-small" />}
+                variant={isIgnored ? "toggle-ignored" : "toggle"} 
+                />
+            
           );
         },
       },
@@ -568,7 +552,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   };
 
   return (
-    <div>
+    <div className={style.BlockersTable}>
       <div>
         <h2>
           Blockers
