@@ -5,6 +5,8 @@
     display:flex;
     margin-bottom: calc(variables.$spacing*2);
     gap: calc(variables.$spacing*2);
+    align-items: flex-start;
+    justify-content: space-between;
     .card {
         width:50%;
     }
@@ -14,11 +16,31 @@
     margin-bottom: calc(variables.$spacing*2);
     display:flex;
     gap: calc(variables.$spacing*2);
+    align-items: flex-start;
+    justify-content: space-between;
     .card:nth-of-type(1) {
         width:38%;
     }
     .card:nth-of-type(2) {
         width:62%;
+    }
+}
+.cards-62-38 {
+    margin-bottom: calc(variables.$spacing*2);
+    display:flex;
+    gap: calc(variables.$spacing*2);
+    align-items: flex-start;
+    justify-content: space-between;
+    .card:nth-of-type(1) {
+        width:62%;
+    }
+    .card:nth-of-type(2) {
+        width:38%;
+    }
+    .card {
+        .card {
+            width:auto;
+        }
     }
 }
 

@@ -19,10 +19,7 @@ import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
 import { TbHistory, TbMail, TbAlertTriangle } from "react-icons/tb";
-import {
-  FaAngleDown,
-  FaAngleUp,
-} from "react-icons/fa";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
@@ -143,7 +140,9 @@ export const Audit = () => {
         await API.get({
           apiName: isShared ? "public" : "auth",
           path: "/getAuditChart",
-          options: { queryParams: { id: auditId!, days: chartRange.toString() } },
+          options: {
+            queryParams: { id: auditId!, days: chartRange.toString() },
+          },
         }).response
       ).body.json();
       return results;
@@ -282,396 +281,24 @@ export const Audit = () => {
 
   return (
     <div className={style.Audit}>
-      <AuditHeader 
+      <AuditHeader
         isShared={isShared}
         queryClient={queryClient}
         audit={audit}
         auditId={auditId}
       />
-      
-      <Card variant="light">
-        <Collapsible.Root
-          className="CollapsibleRoot"
-          open={showUrlInput}
-          onOpenChange={setShowUrlInput}
-        >
-          <div className={style["scan-url-card-header"]}>
-            <h2><PiFileMagnifyingGlassBold className="icon-small"/>
-              {/* Audit: <b>{audit?.name}</b> <br /> */} 
-              Scanning {pages.length}{" "} URL{pages.length > 1 ? "s" : ""}
-            </h2>
-            <Collapsible.Trigger asChild>
-               <StyledButton
-                variant="naked"
-                label={isShared ? "View Audit URLs" : "View or Edit Audit URLs"}
-                icon={!showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-                onClick={()=>{}}
-              />
-            </Collapsible.Trigger>
-          </div>
-          <Collapsible.Content>
-            <form>
-              {pages.length > 0 && (
-                <AuditPagesInput
-                  initialPages={pages}
-                  setParentPages={handleUrlInput}
-                  addParentPages={addUrls}
-                  removeParentPages={removeUrls}
-                  updateParentPageType={updateUrlType}
-                  returnMutation
-                  isShared={isShared}
-                />
-              )}
-            </form>
-          </Collapsible.Content>
-        </Collapsible.Root>
-      </Card>
-      <Card variant="light">
-        {emailNotifications && (
-          <div>
-            <h2><TbMail className="icon-small"/> Email Notifications</h2>
-            <span className="font-small">
-              {emailNotificationsCount > 0
-                ? `${emailNotificationsCount} Email Notifications`
-                : "No Email Notifications"}
-            </span>
-            <div>
-              <AuditEmailSubscriptionInput
-                initialValue={JSON.parse(emailNotifications)}
-                onValueChange={updateEmailNotifications}
-              />
-            </div>
-          </div>
-        )}
-      </Card>
-      <Card>
-        {scans && scans?.length > 0 && (
-          <div>
-            <div>
-              Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
-              {scans[scans.length - 1].status && (
-                <span style={{ 
-                  textTransform: "capitalize",
-                  fontWeight: "bold",
-                  color: scans[scans.length - 1].status === "complete" 
-                    ? themeVariables.green 
-                    : scans[scans.length - 1].status === "failed" 
-                      ? themeVariables.red 
-                      : "inherit"
-                }}>
-                  ({scans[scans.length - 1].status})
-                </span>
-              )}
-            </div>
-            <div className="flex">
-              <Progress.Root
-                value={scans[scans.length - 1].percentage}
-                className="w-full bg-gray-200 h-4 rounded-full overflow-hidden"
-              >
-                <Progress.Indicator
-                  className="bg-gray-800 w-full h-6"
-                  style={{
-                    transform: `translateX(-${100 - scans[scans.length - 1].percentage}%)`,
-                  }}
-                />
-              </Progress.Root>
-              <div>{scans[scans.length - 1].percentage}%</div>
-            </div>
-            
-            {/* Display scan errors if any */}
-            {scans[scans.length - 1].errors && scans[scans.length - 1].errors.length > 0 && (
-              <div style={{ marginTop: "8px" }}>
-                <Drawer.Root 
-                  direction="right" 
-                  shouldScaleBackground
-                  setBackgroundColorOnScale={false}
-                  onOpenChange={(open) => {
-                    if (open) {
-                      setSelectedScanErrors(scans[scans.length - 1].errors);
-                    }
-                  }}
-                >
-                  <Drawer.Trigger
-                    style={{ 
-                      color: themeVariables.red,
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      padding: "4px 0",
-                      fontSize: "inherit",
-                      textDecoration: "underline"
-                    }}
-                    aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
-                  >
-                    <TbAlertTriangle aria-hidden="true" />
-                    {scans[scans.length - 1].errors.length} Error{scans[scans.length - 1].errors.length > 1 ? "s" : ""} During Scan
-                  </Drawer.Trigger>
-                  <Drawer.Portal>
-                    <Drawer.Overlay className="drawer-overlay" />
-                    <Drawer.Content className="drawer-content">
-                      <div className="drawer-content-inner">
-                        <h4 style={{ display: "flex", alignItems: "center", gap: "8px", margin: "0 0 16px 0" }}>
-                          <TbAlertTriangle style={{ color: themeVariables.red }} aria-hidden="true" />
-                          Scan Errors ({selectedScanErrors.length})
-                        </h4>
-                        <p style={{ marginBottom: "16px" }}>
-                          The following pages encountered errors during scanning:
-                        </p>
-                        <div style={{ maxHeight: "60vh", overflowY: "auto" }}>
-                          {selectedScanErrors.map((err: ScanError, idx: number) => (
-                            <div 
-                              key={idx} 
-                              style={{ 
-                                marginBottom: "16px",
-                                padding: "12px",
-                                backgroundColor: `${themeVariables.red}10`,
-                                borderRadius: "4px",
-                                border: `1px solid ${themeVariables.red}30`
-                              }}
-                            >
-                              <div style={{ marginBottom: "8px" }}>
-                                <span style={{ 
-                                  display: "inline-block",
-                                  padding: "2px 8px",
-                                  backgroundColor: `${themeVariables.red}20`,
-                                  borderRadius: "4px",
-                                  fontSize: "0.875em",
-                                  fontWeight: "bold"
-                                }}>
-                                  {formatErrorType(err.type)}
-                                </span>
-                              </div>
-                              {err.url && (
-                                <div style={{ marginBottom: "8px", wordBreak: "break-all" }}>
-                                  <strong>URL:</strong>{" "}
-                                  <a 
-                                    href={err.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                  >
-                                    {err.url}
-                                  </a>
-                                </div>
-                              )}
-                              {err.message && (
-                                <Collapsible.Root>
-                                  <Collapsible.Trigger style={{ 
-                                    background: "none", 
-                                    border: "none", 
-                                    cursor: "pointer",
-                                    textDecoration: "underline",
-                                    padding: 0,
-                                    color: "inherit",
-                                    fontSize: "0.875em"
-                                  }}>
-                                    View error details
-                                  </Collapsible.Trigger>
-                                  <Collapsible.Content>
-                                    <pre style={{ 
-                                      margin: "8px 0 0 0",
-                                      padding: "8px",
-                                      backgroundColor: themeVariables.black,
-                                      color: themeVariables.paper,
-                                      borderRadius: "4px",
-                                      fontSize: "0.75em",
-                                      whiteSpace: "pre-wrap",
-                                      wordBreak: "break-word"
-                                    }}>
-                                      {err.message}
-                                      {err.timestamp && (
-                                        <>
-                                          {"\n\n"}Time: {new Date(err.timestamp).toLocaleString()}
-                                        </>
-                                      )}
-                                    </pre>
-                                  </Collapsible.Content>
-                                </Collapsible.Root>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                        <Drawer.Close className="drawer-content-close">
-                          Close
-                        </Drawer.Close>
-                      </div>
-                    </Drawer.Content>
-                  </Drawer.Portal>
-                </Drawer.Root>
-              </div>
-            )}
-
-            <Collapsible.Root
-              open={showAllScans}
-              onOpenChange={setShowAllScans}
-            >
-              <Collapsible.CollapsibleTrigger>
-                Show Scan History ({scans.length} Scans)
-              </Collapsible.CollapsibleTrigger>
-              <Collapsible.CollapsibleContent>
-                <p>
-                  Use this table to review every scan of this audit by date.
-                </p>
-                <div className="table-container">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Scan</th>
-                        <th>Date</th>
-                        <th>Progress</th>
-                        <th>Status</th>
-                        <th>Errors</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {scans?.map((scan: any, index: number) => (
-                        <tr key={index}>
-                          <td>#{index + 1}</td>
-                          <td>{formatDate(scan.created_at)}</td>
-                          <td>{scan.percentage ?? 0}%</td>
-                          <td style={{ textTransform: "capitalize" }}>{scan.status || "processing"}</td>
-                          <td>
-                            {scan.errors?.length > 0 ? (
-                              <Drawer.Root 
-                                direction="right" 
-                                shouldScaleBackground
-                                setBackgroundColorOnScale={false}
-                                onOpenChange={(open) => {
-                                  if (open) {
-                                    setSelectedScanErrors(scan.errors);
-                                  }
-                                }}
-                              >
-                                <Drawer.Trigger
-                                  style={{ 
-                                    color: themeVariables.red,
-                                    background: "none",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    textDecoration: "underline",
-                                    padding: 0
-                                  }}
-                                  aria-label={`View ${scan.errors.length} errors for scan #${index + 1}`}
-                                >
-                                  {scan.errors.length}
-                                </Drawer.Trigger>
-                                <Drawer.Portal>
-                                  <Drawer.Overlay className="drawer-overlay" />
-                                  <Drawer.Content className="drawer-content">
-                                    <div className="drawer-content-inner">
-                                      <h4 style={{ display: "flex", alignItems: "center", gap: "8px", margin: "0 0 16px 0" }}>
-                                        <TbAlertTriangle style={{ color: themeVariables.red }} aria-hidden="true" />
-                                        Scan #{index + 1} Errors ({scan.errors.length})
-                                      </h4>
-                                      <p style={{ marginBottom: "16px" }}>
-                                        The following pages encountered errors during scanning:
-                                      </p>
-                                      <div style={{ maxHeight: "60vh", overflowY: "auto" }}>
-                                        {scan.errors.map((err: ScanError, idx: number) => (
-                                          <div 
-                                            key={idx} 
-                                            style={{ 
-                                              marginBottom: "16px",
-                                              padding: "12px",
-                                              backgroundColor: `${themeVariables.red}10`,
-                                              borderRadius: "4px",
-                                              border: `1px solid ${themeVariables.red}30`
-                                            }}
-                                          >
-                                            <div style={{ marginBottom: "8px" }}>
-                                              <span style={{ 
-                                                display: "inline-block",
-                                                padding: "2px 8px",
-                                                backgroundColor: `${themeVariables.red}20`,
-                                                borderRadius: "4px",
-                                                fontSize: "0.875em",
-                                                fontWeight: "bold"
-                                              }}>
-                                                {formatErrorType(err.type)}
-                                              </span>
-                                            </div>
-                                            {err.url && (
-                                              <div style={{ marginBottom: "8px", wordBreak: "break-all" }}>
-                                                <strong>URL:</strong>{" "}
-                                                <a 
-                                                  href={err.url} 
-                                                  target="_blank" 
-                                                  rel="noopener noreferrer"
-                                                >
-                                                  {err.url}
-                                                </a>
-                                              </div>
-                                            )}
-                                            {err.message && (
-                                              <Collapsible.Root>
-                                                <Collapsible.Trigger style={{ 
-                                                  background: "none", 
-                                                  border: "none", 
-                                                  cursor: "pointer",
-                                                  textDecoration: "underline",
-                                                  padding: 0,
-                                                  color: "inherit",
-                                                  fontSize: "0.875em"
-                                                }}>
-                                                  View error details
-                                                </Collapsible.Trigger>
-                                                <Collapsible.Content>
-                                                  <pre style={{ 
-                                                    margin: "8px 0 0 0",
-                                                    padding: "8px",
-                                                    backgroundColor: themeVariables.black,
-                                                    color: themeVariables.paper,
-                                                    borderRadius: "4px",
-                                                    fontSize: "0.75em",
-                                                    whiteSpace: "pre-wrap",
-                                                    wordBreak: "break-word"
-                                                  }}>
-                                                    {err.message}
-                                                    {err.timestamp && (
-                                                      <>
-                                                        {"\n\n"}Time: {new Date(err.timestamp).toLocaleString()}
-                                                      </>
-                                                    )}
-                                                  </pre>
-                                                </Collapsible.Content>
-                                              </Collapsible.Root>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                      <Drawer.Close className="drawer-content-close">
-                                        Close
-                                      </Drawer.Close>
-                                    </div>
-                                  </Drawer.Content>
-                                </Drawer.Portal>
-                              </Drawer.Root>
-                            ) : (
-                              "None"
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Collapsible.CollapsibleContent>
-            </Collapsible.Root>
-          </div>
-        )}
-      </Card>
-
       <Card variant="dark">
         {chartData?.data && chartData.data.length > 0 && (
           <div>
             <div className="blockers-chart-heading-wrapper">
               <div>
-              <h2 id="blockers-chart-heading">
-                <TbHistory className="icon-small" />Blockers Over Time
-              </h2>
-              <span className="font-small">Last {chartData.period_days} Days</span>
+                <h2 id="blockers-chart-heading">
+                  <TbHistory className="icon-small" />
+                  Blockers Over Time
+                </h2>
+                <span className="font-small">
+                  Last {chartData.period_days} Days
+                </span>
               </div>
               <div className="chart-ranger-select">
                 <label htmlFor="chart-range-select">Date Range</label>
@@ -807,6 +434,653 @@ export const Audit = () => {
           </div>
         )}
       </Card>
+
+      <div className={"cards-62-38 " + style["scan-cards-area"]}>
+        <Card variant="light">
+          <Collapsible.Root
+            className="CollapsibleRoot"
+            open={showUrlInput}
+            onOpenChange={setShowUrlInput}
+          >
+            <div className={style["scan-url-card-header"]}>
+              <div>
+                <h2>
+                  <PiFileMagnifyingGlassBold className="icon-small" />
+                  Scanning {pages.length} URL{pages.length > 1 ? "s" : ""}
+                </h2>
+
+                {scans && scans?.length > 0 && (
+                  <div>
+                    <div className="font-small">
+                      Last Scan:{" "}
+                      {formatDate(scans[scans.length - 1].created_at)}{" "}
+                      {scans[scans.length - 1].status && (
+                        <span
+                          style={{
+                            textTransform: "capitalize",
+                            fontWeight: "bold",
+                            color:
+                              scans[scans.length - 1].status === "complete"
+                                ? themeVariables.green
+                                : scans[scans.length - 1].status === "failed"
+                                  ? themeVariables.red
+                                  : "inherit",
+                          }}
+                        >
+                          ({scans[scans.length - 1].status})
+                        </span>
+                      )}
+                    </div>
+                    {/* Display scan errors if any */}
+                    {scans[scans.length - 1].errors &&
+                      scans[scans.length - 1].errors.length > 0 && (
+                        <div style={{ marginTop: "8px" }}>
+                          <Drawer.Root
+                            direction="right"
+                            shouldScaleBackground
+                            setBackgroundColorOnScale={false}
+                            onOpenChange={(open) => {
+                              if (open) {
+                                setSelectedScanErrors(
+                                  scans[scans.length - 1].errors
+                                );
+                              }
+                            }}
+                          >
+                            <Drawer.Trigger
+                              style={{
+                                color: themeVariables.red,
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                padding: "4px 0",
+                                fontSize: "inherit",
+                                textDecoration: "underline",
+                              }}
+                              aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
+                            >
+                              <TbAlertTriangle aria-hidden="true" />
+                              {scans[scans.length - 1].errors.length} Error
+                              {scans[scans.length - 1].errors.length > 1
+                                ? "s"
+                                : ""}{" "}
+                              During Scan
+                            </Drawer.Trigger>
+                            <Drawer.Portal>
+                              <Drawer.Overlay className="drawer-overlay" />
+                              <Drawer.Content className="drawer-content">
+                                <div className="drawer-content-inner">
+                                  <h4
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                      margin: "0 0 16px 0",
+                                    }}
+                                  >
+                                    <TbAlertTriangle
+                                      style={{ color: themeVariables.red }}
+                                      aria-hidden="true"
+                                    />
+                                    Scan Errors ({selectedScanErrors.length})
+                                  </h4>
+                                  <p style={{ marginBottom: "16px" }}>
+                                    The following pages encountered errors
+                                    during scanning:
+                                  </p>
+                                  <div
+                                    style={{
+                                      maxHeight: "60vh",
+                                      overflowY: "auto",
+                                    }}
+                                  >
+                                    {selectedScanErrors.map(
+                                      (err: ScanError, idx: number) => (
+                                        <div
+                                          key={idx}
+                                          style={{
+                                            marginBottom: "16px",
+                                            padding: "12px",
+                                            backgroundColor: `${themeVariables.red}10`,
+                                            borderRadius: "4px",
+                                            border: `1px solid ${themeVariables.red}30`,
+                                          }}
+                                        >
+                                          <div style={{ marginBottom: "8px" }}>
+                                            <span
+                                              style={{
+                                                display: "inline-block",
+                                                padding: "2px 8px",
+                                                backgroundColor: `${themeVariables.red}20`,
+                                                borderRadius: "4px",
+                                                fontSize: "0.875em",
+                                                fontWeight: "bold",
+                                              }}
+                                            >
+                                              {formatErrorType(err.type)}
+                                            </span>
+                                          </div>
+                                          {err.url && (
+                                            <div
+                                              style={{
+                                                marginBottom: "8px",
+                                                wordBreak: "break-all",
+                                              }}
+                                            >
+                                              <strong>URL:</strong>{" "}
+                                              <a
+                                                href={err.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                              >
+                                                {err.url}
+                                              </a>
+                                            </div>
+                                          )}
+                                          {err.message && (
+                                            <Collapsible.Root>
+                                              <Collapsible.Trigger
+                                                style={{
+                                                  background: "none",
+                                                  border: "none",
+                                                  cursor: "pointer",
+                                                  textDecoration: "underline",
+                                                  padding: 0,
+                                                  color: "inherit",
+                                                  fontSize: "0.875em",
+                                                }}
+                                              >
+                                                View error details
+                                              </Collapsible.Trigger>
+                                              <Collapsible.Content>
+                                                <pre
+                                                  style={{
+                                                    margin: "8px 0 0 0",
+                                                    padding: "8px",
+                                                    backgroundColor:
+                                                      themeVariables.black,
+                                                    color: themeVariables.paper,
+                                                    borderRadius: "4px",
+                                                    fontSize: "0.75em",
+                                                    whiteSpace: "pre-wrap",
+                                                    wordBreak: "break-word",
+                                                  }}
+                                                >
+                                                  {err.message}
+                                                  {err.timestamp && (
+                                                    <>
+                                                      {"\n\n"}Time:{" "}
+                                                      {new Date(
+                                                        err.timestamp
+                                                      ).toLocaleString()}
+                                                    </>
+                                                  )}
+                                                </pre>
+                                              </Collapsible.Content>
+                                            </Collapsible.Root>
+                                          )}
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                  <Drawer.Close className="drawer-content-close">
+                                    Close
+                                  </Drawer.Close>
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Portal>
+                          </Drawer.Root>
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
+              <Collapsible.Trigger asChild>
+                <StyledButton
+                  variant="naked"
+                  label={
+                    isShared ? "View Audit URLs" : "View or Edit Audit URLs"
+                  }
+                  icon={!showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
+                  onClick={() => {}}
+                />
+              </Collapsible.Trigger>
+            </div>
+            <Collapsible.Content>
+              <form>
+                {pages.length > 0 && (
+                  <AuditPagesInput
+                    initialPages={pages}
+                    setParentPages={handleUrlInput}
+                    addParentPages={addUrls}
+                    removeParentPages={removeUrls}
+                    updateParentPageType={updateUrlType}
+                    returnMutation
+                    isShared={isShared}
+                  />
+                )}
+              </form>
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </Card>
+        <Card variant="light">
+          {emailNotifications && (
+            <div>
+              <h2>
+                <TbMail className="icon-small" /> Email Notifications
+              </h2>
+              <span className="font-small">
+                {emailNotificationsCount > 0
+                  ? `${emailNotificationsCount} Email Notifications`
+                  : "No Email Notifications"}
+              </span>
+              <div>
+                <AuditEmailSubscriptionInput
+                  initialValue={JSON.parse(emailNotifications)}
+                  onValueChange={updateEmailNotifications}
+                />
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
+      {/* 
+      <Card>
+        {scans && scans?.length > 0 && (
+          <div>
+            <div>
+              Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
+              {scans[scans.length - 1].status && (
+                <span
+                  style={{
+                    textTransform: "capitalize",
+                    fontWeight: "bold",
+                    color:
+                      scans[scans.length - 1].status === "complete"
+                        ? themeVariables.green
+                        : scans[scans.length - 1].status === "failed"
+                          ? themeVariables.red
+                          : "inherit",
+                  }}
+                >
+                  ({scans[scans.length - 1].status})
+                </span>
+              )}
+              
+            </div>
+            <div className="flex">
+              <Progress.Root
+                value={scans[scans.length - 1].percentage}
+                className="w-full bg-gray-200 h-4 rounded-full overflow-hidden"
+              >
+                <Progress.Indicator
+                  className="bg-gray-800 w-full h-6"
+                  style={{
+                    transform: `translateX(-${100 - scans[scans.length - 1].percentage}%)`,
+                  }}
+                />
+              </Progress.Root>
+              <div>{scans[scans.length - 1].percentage}%</div>
+            </div>
+
+            {scans[scans.length - 1].errors &&
+              scans[scans.length - 1].errors.length > 0 && (
+                <div style={{ marginTop: "8px" }}>
+                  <Drawer.Root
+                    direction="right"
+                    shouldScaleBackground
+                    setBackgroundColorOnScale={false}
+                    onOpenChange={(open) => {
+                      if (open) {
+                        setSelectedScanErrors(scans[scans.length - 1].errors);
+                      }
+                    }}
+                  >
+                    <Drawer.Trigger
+                      style={{
+                        color: themeVariables.red,
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        padding: "4px 0",
+                        fontSize: "inherit",
+                        textDecoration: "underline",
+                      }}
+                      aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
+                    >
+                      <TbAlertTriangle aria-hidden="true" />
+                      {scans[scans.length - 1].errors.length} Error
+                      {scans[scans.length - 1].errors.length > 1 ? "s" : ""}{" "}
+                      During Scan
+                    </Drawer.Trigger>
+                    <Drawer.Portal>
+                      <Drawer.Overlay className="drawer-overlay" />
+                      <Drawer.Content className="drawer-content">
+                        <div className="drawer-content-inner">
+                          <h4
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              margin: "0 0 16px 0",
+                            }}
+                          >
+                            <TbAlertTriangle
+                              style={{ color: themeVariables.red }}
+                              aria-hidden="true"
+                            />
+                            Scan Errors ({selectedScanErrors.length})
+                          </h4>
+                          <p style={{ marginBottom: "16px" }}>
+                            The following pages encountered errors during
+                            scanning:
+                          </p>
+                          <div style={{ maxHeight: "60vh", overflowY: "auto" }}>
+                            {selectedScanErrors.map(
+                              (err: ScanError, idx: number) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    marginBottom: "16px",
+                                    padding: "12px",
+                                    backgroundColor: `${themeVariables.red}10`,
+                                    borderRadius: "4px",
+                                    border: `1px solid ${themeVariables.red}30`,
+                                  }}
+                                >
+                                  <div style={{ marginBottom: "8px" }}>
+                                    <span
+                                      style={{
+                                        display: "inline-block",
+                                        padding: "2px 8px",
+                                        backgroundColor: `${themeVariables.red}20`,
+                                        borderRadius: "4px",
+                                        fontSize: "0.875em",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      {formatErrorType(err.type)}
+                                    </span>
+                                  </div>
+                                  {err.url && (
+                                    <div
+                                      style={{
+                                        marginBottom: "8px",
+                                        wordBreak: "break-all",
+                                      }}
+                                    >
+                                      <strong>URL:</strong>{" "}
+                                      <a
+                                        href={err.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {err.url}
+                                      </a>
+                                    </div>
+                                  )}
+                                  {err.message && (
+                                    <Collapsible.Root>
+                                      <Collapsible.Trigger
+                                        style={{
+                                          background: "none",
+                                          border: "none",
+                                          cursor: "pointer",
+                                          textDecoration: "underline",
+                                          padding: 0,
+                                          color: "inherit",
+                                          fontSize: "0.875em",
+                                        }}
+                                      >
+                                        View error details
+                                      </Collapsible.Trigger>
+                                      <Collapsible.Content>
+                                        <pre
+                                          style={{
+                                            margin: "8px 0 0 0",
+                                            padding: "8px",
+                                            backgroundColor:
+                                              themeVariables.black,
+                                            color: themeVariables.paper,
+                                            borderRadius: "4px",
+                                            fontSize: "0.75em",
+                                            whiteSpace: "pre-wrap",
+                                            wordBreak: "break-word",
+                                          }}
+                                        >
+                                          {err.message}
+                                          {err.timestamp && (
+                                            <>
+                                              {"\n\n"}Time:{" "}
+                                              {new Date(
+                                                err.timestamp
+                                              ).toLocaleString()}
+                                            </>
+                                          )}
+                                        </pre>
+                                      </Collapsible.Content>
+                                    </Collapsible.Root>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                          <Drawer.Close className="drawer-content-close">
+                            Close
+                          </Drawer.Close>
+                        </div>
+                      </Drawer.Content>
+                    </Drawer.Portal>
+                  </Drawer.Root>
+                </div>
+              )}
+
+            <Collapsible.Root
+              open={showAllScans}
+              onOpenChange={setShowAllScans}
+            >
+              <Collapsible.CollapsibleTrigger>
+                Show Scan History ({scans.length} Scans)
+              </Collapsible.CollapsibleTrigger>
+              <Collapsible.CollapsibleContent>
+                <p>
+                  Use this table to review every scan of this audit by date.
+                </p>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Scan</th>
+                        <th>Date</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Errors</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scans?.map((scan: any, index: number) => (
+                        <tr key={index}>
+                          <td>#{index + 1}</td>
+                          <td>{formatDate(scan.created_at)}</td>
+                          <td>{scan.percentage ?? 0}%</td>
+                          <td style={{ textTransform: "capitalize" }}>
+                            {scan.status || "processing"}
+                          </td>
+                          <td>
+                            {scan.errors?.length > 0 ? (
+                              <Drawer.Root
+                                direction="right"
+                                shouldScaleBackground
+                                setBackgroundColorOnScale={false}
+                                onOpenChange={(open) => {
+                                  if (open) {
+                                    setSelectedScanErrors(scan.errors);
+                                  }
+                                }}
+                              >
+                                <Drawer.Trigger
+                                  style={{
+                                    color: themeVariables.red,
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    textDecoration: "underline",
+                                    padding: 0,
+                                  }}
+                                  aria-label={`View ${scan.errors.length} errors for scan #${index + 1}`}
+                                >
+                                  {scan.errors.length}
+                                </Drawer.Trigger>
+                                <Drawer.Portal>
+                                  <Drawer.Overlay className="drawer-overlay" />
+                                  <Drawer.Content className="drawer-content">
+                                    <div className="drawer-content-inner">
+                                      <h4
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "8px",
+                                          margin: "0 0 16px 0",
+                                        }}
+                                      >
+                                        <TbAlertTriangle
+                                          style={{ color: themeVariables.red }}
+                                          aria-hidden="true"
+                                        />
+                                        Scan #{index + 1} Errors (
+                                        {scan.errors.length})
+                                      </h4>
+                                      <p style={{ marginBottom: "16px" }}>
+                                        The following pages encountered errors
+                                        during scanning:
+                                      </p>
+                                      <div
+                                        style={{
+                                          maxHeight: "60vh",
+                                          overflowY: "auto",
+                                        }}
+                                      >
+                                        {scan.errors.map(
+                                          (err: ScanError, idx: number) => (
+                                            <div
+                                              key={idx}
+                                              style={{
+                                                marginBottom: "16px",
+                                                padding: "12px",
+                                                backgroundColor: `${themeVariables.red}10`,
+                                                borderRadius: "4px",
+                                                border: `1px solid ${themeVariables.red}30`,
+                                              }}
+                                            >
+                                              <div
+                                                style={{ marginBottom: "8px" }}
+                                              >
+                                                <span
+                                                  style={{
+                                                    display: "inline-block",
+                                                    padding: "2px 8px",
+                                                    backgroundColor: `${themeVariables.red}20`,
+                                                    borderRadius: "4px",
+                                                    fontSize: "0.875em",
+                                                    fontWeight: "bold",
+                                                  }}
+                                                >
+                                                  {formatErrorType(err.type)}
+                                                </span>
+                                              </div>
+                                              {err.url && (
+                                                <div
+                                                  style={{
+                                                    marginBottom: "8px",
+                                                    wordBreak: "break-all",
+                                                  }}
+                                                >
+                                                  <strong>URL:</strong>{" "}
+                                                  <a
+                                                    href={err.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                  >
+                                                    {err.url}
+                                                  </a>
+                                                </div>
+                                              )}
+                                              {err.message && (
+                                                <Collapsible.Root>
+                                                  <Collapsible.Trigger
+                                                    style={{
+                                                      background: "none",
+                                                      border: "none",
+                                                      cursor: "pointer",
+                                                      textDecoration:
+                                                        "underline",
+                                                      padding: 0,
+                                                      color: "inherit",
+                                                      fontSize: "0.875em",
+                                                    }}
+                                                  >
+                                                    View error details
+                                                  </Collapsible.Trigger>
+                                                  <Collapsible.Content>
+                                                    <pre
+                                                      style={{
+                                                        margin: "8px 0 0 0",
+                                                        padding: "8px",
+                                                        backgroundColor:
+                                                          themeVariables.black,
+                                                        color:
+                                                          themeVariables.paper,
+                                                        borderRadius: "4px",
+                                                        fontSize: "0.75em",
+                                                        whiteSpace: "pre-wrap",
+                                                        wordBreak: "break-word",
+                                                      }}
+                                                    >
+                                                      {err.message}
+                                                      {err.timestamp && (
+                                                        <>
+                                                          {"\n\n"}Time:{" "}
+                                                          {new Date(
+                                                            err.timestamp
+                                                          ).toLocaleString()}
+                                                        </>
+                                                      )}
+                                                    </pre>
+                                                  </Collapsible.Content>
+                                                </Collapsible.Root>
+                                              )}
+                                            </div>
+                                          )
+                                        )}
+                                      </div>
+                                      <Drawer.Close className="drawer-content-close">
+                                        Close
+                                      </Drawer.Close>
+                                    </div>
+                                  </Drawer.Content>
+                                </Drawer.Portal>
+                              </Drawer.Root>
+                            ) : (
+                              "None"
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Collapsible.CollapsibleContent>
+            </Collapsible.Root>
+          </div>
+        )}
+      </Card>
+ */}
 
       {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
     </div>

@@ -2,6 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .AuditHeader {
+  margin-bottom: calc(variables.$spacing)*2;
   .audit-name-label {
     display: block;
     @include fonts.font-size-small;

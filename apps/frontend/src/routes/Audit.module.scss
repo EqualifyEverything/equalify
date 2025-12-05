@@ -13,5 +13,17 @@
     width: 100%;
   }
 
+  .scan-cards-area {
+    margin-top:calc(variables.$spacing*2);
+  }
+
+  input[name="email"]{
+    padding-top:calc(variables.$spacing);
+    //padding-bottom:calc(variables.$spacing);
+    width: 180px;
+  }
+  select[name="frequency"]{
+    min-width:100px;
+  }
 
 }
