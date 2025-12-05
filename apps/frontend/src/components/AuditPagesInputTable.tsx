@@ -108,7 +108,7 @@ export const AuditPagesInputTable = ({
 
   return (
     <>
-      {pages.length > 0 ? (
+      {/* {pages.length > 0 ? ( */}
         <div className={"table-container "+styles.AuditPagesInputTable} >
           <table aria-label="Users table">
             <thead>
@@ -217,9 +217,9 @@ export const AuditPagesInputTable = ({
             </div>
           </div>
         </div>
-      ) : (
+      {/* ) : (
         <div className="text-center py-8">Loading URLs...</div>
-      )}
+      )} */}
     </>
   );
 };

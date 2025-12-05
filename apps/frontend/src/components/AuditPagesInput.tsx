@@ -317,7 +317,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
   return (
     <div className={style.AuditPagesInput}>
-      {pages.length > 0 && (
+      {/* {pages.length > 0 && ( */}
         <>
           <AuditPagesInputTable
             pages={pages}
@@ -382,7 +382,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
             </Card>
           )}
         </>
-      )}
+      {/* )} */}
     </div>
   );
 };
