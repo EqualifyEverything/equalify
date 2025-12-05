@@ -80,8 +80,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         if (!line || (line.toLowerCase().includes("url") && index === 0))
           return;
 
+        // Parse line for URL and optional type (format: url,type)
+        const { url: rawUrl, type: pageType } = parseUrlWithType(line);
+
         // Validate and format URL
-        const validUrl = validateAndFormatUrl(line);
+        const validUrl = validateAndFormatUrl(rawUrl);
         if (!validUrl) {
           errors.push(`Line ${index + 1}: Invalid URL format`);
           return;
@@ -99,7 +102,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
           return;
         }
 
-        newPages.push({ url: validUrl, type: "html" });
+        newPages.push({ url: validUrl, type: pageType });
       });
 
       // Add all valid URLs to the pages
@@ -149,8 +152,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       return;
     }
 
+    // Parse input for URL and optional type
+    const { url: rawUrl, type: pageType } = parseUrlWithType(input);
+
     // Validate and format URL
-    const validUrl = validateAndFormatUrl(input);
+    const validUrl = validateAndFormatUrl(rawUrl);
     if (!validUrl) return;
 
     // Check for duplicates
@@ -159,8 +165,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       return;
     }
 
-    // Add page with default type of 'html'
-    setPages([...pages, { url: validUrl, type: "html" }]);
+    // Add page with parsed type (defaults to 'html')
+    setPages([...pages, { url: validUrl, type: pageType }]);
     // Clear the input field
     const inputField = form.querySelector(
       '[name="pageInput"]'
@@ -197,6 +203,48 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       );
       return null;
     }
+  };
+
+  /**
+   * Parse a line that may contain a URL and optional type separated by comma
+   * Format: url,type (e.g., "https://example.com,html" or "https://example.com/doc.pdf,pdf")
+   * If no type specified, defaults to "html"
+   */
+  const parseUrlWithType = (line: string): { url: string; type: "html" | "pdf" } => {
+    const trimmedLine = line.trim();
+    
+    // Check if the line ends with ,html or ,pdf (case-insensitive)
+    const htmlMatch = trimmedLine.match(/^(.+),\s*html\s*$/i);
+    const pdfMatch = trimmedLine.match(/^(.+),\s*pdf\s*$/i);
+    
+    if (pdfMatch) {
+      return { url: pdfMatch[1].trim(), type: "pdf" };
+    }
+    if (htmlMatch) {
+      return { url: htmlMatch[1].trim(), type: "html" };
+    }
+    
+    // No type specified, default to html
+    return { url: trimmedLine, type: "html" };
+  };
+
+  const downloadCsvTemplate = () => {
+    const csvContent = `url,type
+https://example.com,html
+https://example.com/about,html
+https://example.com/document.pdf,pdf
+https://example.com/contact,html`;
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "url-import-template.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   /* 
@@ -248,8 +296,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         return;
       }
 
+      // Parse input for URL and optional type
+      const { url: rawUrl, type: pageType } = parseUrlWithType(inputValue);
+
       // Validate and format URL
-      const validUrl = validateAndFormatUrl(inputValue);
+      const validUrl = validateAndFormatUrl(rawUrl);
       if (!validUrl) return;
 
       // Check for duplicates
@@ -258,8 +309,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         return;
       }
 
-      // Add page with default type of 'html'
-      setPages([...pages, { url: validUrl, type: "html" }]);
+      // Add page with parsed type (defaults to 'html')
+      setPages([...pages, { url: validUrl, type: pageType }]);
       // Clear the input field
       input.value = "";
       setUrlError(null);
@@ -368,8 +419,13 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                       />
                     </StyledLabeledInput>
                     <p className="font-small">
-                      Upload a CSV or text file with one URL per line
+                      Upload a CSV with one URL per line. Optionally specify type as <code>url,type</code> (e.g., <code>https://example.com/doc.pdf,pdf</code>). If no type is provided, HTML is assumed.
                     </p>
+                    <StyledButton
+                      label="Download Template CSV"
+                      onClick={downloadCsvTemplate}
+                      variant="secondary"
+                    />
                     {csvError && (
                       <p className="text-red-500 text-sm mt-1">{csvError}</p>
                     )}
