@@ -174,20 +174,11 @@ export const Navigation = () => {
           </div>
           <div className={styles.nav_buttons}>
             {authenticated && user && (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <Avatar.Root>
-                    <Avatar.Fallback>
-                      {generateAbbreviation(user.name)}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item>
+              <div className={styles["logout-text"]}>
+                    Signed in as <b>{user.name}</b><br/>
                     <Link to="/logout">Logout</Link>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
+              </div>
+                  
             )}
             {/* <button onClick={() => setDarkMode(!darkMode)}>
               <AccessibleIcon.Root

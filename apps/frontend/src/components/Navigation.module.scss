@@ -41,4 +41,8 @@
         border:0;
     }
   }
+  .logout-text{
+    @include fonts.font-size-small;
+    text-align:right;
+  }
 }

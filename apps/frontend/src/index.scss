@@ -13,6 +13,7 @@
 @use "./global-styles/selects";
 @use "./global-styles/inputs";
 @use "./global-styles/flex";
+@use "./global-styles/navigation.scss";
 
 html {
   scrollbar-gutter: auto !important;

@@ -99,8 +99,7 @@ export const AuditHeader = ({
   };
   return (
     <div className={styles.AuditHeader}>
-      {!isShared && <Link to={"/audits"}>← Go Back</Link>}
-
+      
       <div className={styles["inner"]}>
         <div className={styles["header-l"]}>
         <h1 className="initial-focus-element">

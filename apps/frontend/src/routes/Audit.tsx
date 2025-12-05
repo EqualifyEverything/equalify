@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDate, useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import { useEffect, useState, ChangeEvent } from "react";
 import {
@@ -23,7 +23,7 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import * as Progress from "@radix-ui/react-progress";
+//import * as Progress from "@radix-ui/react-progress";
 
 import { createLog } from "#src/utils/createLog.ts";
 import {
@@ -39,7 +39,7 @@ import { AuditHeader } from "#src/components/AuditHeader.tsx";
 import { Card } from "#src/components/Card.tsx";
 import { Drawer } from "vaul-base";
 import themeVariables from "../global-styles/variables.module.scss";
-import cardStyles from "../components/Card.module.scss";
+//import cardStyles from "../components/Card.module.scss";
 import { PiFileMagnifyingGlassBold } from "react-icons/pi";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import style from "./Audit.module.scss";
@@ -281,6 +281,7 @@ export const Audit = () => {
 
   return (
     <div className={style.Audit}>
+      {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
       <AuditHeader
         isShared={isShared}
         queryClient={queryClient}
