@@ -107,7 +107,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 
       // Add all valid URLs to the pages
       if (newPages.length > 0) {
-        setPages([...pages, ...newPages]);
+        setPages(prev => [...prev, ...newPages]);
         setAriaAnnounceMessage(
           `Successfully imported ${newPages.length} URL(s) from CSV`
         );
@@ -166,7 +166,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     }
 
     // Add page with parsed type (defaults to 'html')
-    setPages([...pages, { url: validUrl, type: pageType }]);
+    setPages(prev => [...prev, { url: validUrl, type: pageType }]);
     // Clear the input field
     const inputField = form.querySelector(
       '[name="pageInput"]'
@@ -174,6 +174,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     if (inputField) inputField.value = "";
     setUrlError(null);
     setAriaAnnounceMessage(`Added URL ${validUrl}!`);
+    //console.log(pages);
     return;
   };
 
@@ -247,25 +248,6 @@ https://example.com/contact,html`;
     URL.revokeObjectURL(url);
   };
 
-  /* 
-  const removePage = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const button = e.currentTarget;
-    const form = button.closest("form");
-    if (!form) return;
-
-    const checkboxes = form.querySelectorAll(".page-checkbox:checked");
-    const toRemove = Array.from(checkboxes).map(
-      (cb) => (cb as HTMLInputElement).value
-    );
-    setPages(pages.filter((row) => !toRemove.includes(row.url)));
-
-    setAriaAnnounceMessage(`Removed ${toRemove.length} URLs!`);
-    uncheckAllPagesToDelete();
-    setPagesToDeleteCount(0);
-    return;
-  }; */
-
   const removePages = (pagesToRemove: Page[]) => {
     //console.log("After Removal:", pages.filter((row) => !pagesToRemove.includes(row)));
     setPages(pages.filter((row) => !pagesToRemove.includes(row)));
@@ -274,9 +256,10 @@ https://example.com/contact,html`;
   };
 
   const updatePageType = (url: string, type: "html" | "pdf") => {
+    //console.log("updatePagesType...", pages);
     setPages(
       pages.map((page) => (page.url === url ? { ...page, type } : page))
-    );
+    ); 
 
     if (updateParentPageType) {
       //update in DB if we have a function to do so
@@ -310,37 +293,19 @@ https://example.com/contact,html`;
       }
 
       // Add page with parsed type (defaults to 'html')
-      setPages([...pages, { url: validUrl, type: pageType }]);
+      setPages(prev => [...prev, { url: validUrl, type: pageType }]);
       // Clear the input field
       input.value = "";
       setUrlError(null);
     }
   };
 
-  /* const updatePagesSelectedCount = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const button = e.target;
-    const form = button.closest("form");
-    if (!form) return;
-    const checkboxes = form.querySelectorAll(".page-checkbox:checked");
-    //console.log(checkboxes);
-    setPagesToDeleteCount(checkboxes.length);
-  }; */
-
-  /* //TODO this is a hack - we should really probably be using a controlled component
-  const uncheckAllPagesToDelete = () => {
-    var x = document.getElementsByClassName("page-checkbox");
-    for (let i = 0; i < x.length; i++) {
-      x[i].setAttribute("checked", "");
-    }
-  }; */
-
   // update parent value on change
   useEffect(() => {
-    //console.log("Updating pages...");
-    //console.log("Pages:", pages);
+    //console.log("Updating pages...", pages);
     //console.log("InitialPages", initialPages);
 
-    if (returnMutation) {
+    if (returnMutation) { // return only the delta, ie modified URLs
       let arrDelta: Page[] = [];
       if (initialPages === pages) return;
       if (initialPages.length < pages.length) {

@@ -12,7 +12,7 @@ import { StyledButton } from "./StyledButton";
 import styles from "./AuditPagesInputTable.module.scss";
 
 interface ChildProps {
-  pages: any;
+  pages: Page[];
   isShared: boolean;
   removePages: (pagesToRemove: Page[]) => void
   updatePageType: (url: string, type: "html" | "pdf") => void
@@ -37,7 +37,7 @@ export const AuditPagesInputTable = ({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   useEffect(() => {
-    console.log(rowSelection);
+    //console.log(rowSelection);
   }, [rowSelection]);
 
   const columns = useMemo<ColumnDef<Page>[]>(
@@ -91,7 +91,7 @@ export const AuditPagesInputTable = ({
         },
       },
     ],
-    []
+    [pages]
   );
   const table = useReactTable({
     data: pages || [],

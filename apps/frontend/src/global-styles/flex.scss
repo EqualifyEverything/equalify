@@ -47,8 +47,9 @@
 .cards-33 {
     margin-bottom: calc(variables.$spacing*2);
     display:flex;
+    flex-wrap: wrap;
     gap: calc(variables.$spacing*2);
     .card {
-        width:33%;
+        width:calc(33.33333% - (variables.$spacing*6));
     }
 }

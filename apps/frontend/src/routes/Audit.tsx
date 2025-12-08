@@ -281,8 +281,9 @@ export const Audit = () => {
 
   return (
     <div className={style.Audit}>
-      {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
-      <AuditHeader
+      {/* {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
+       */}
+       <AuditHeader
         isShared={isShared}
         queryClient={queryClient}
         audit={audit}

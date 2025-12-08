@@ -129,8 +129,9 @@ export const BuildAudit = () => {
 
   return (
     <div className={styles.buildAudit}>
-      <Link to="..">← Go Back</Link>
-      <h1 className="initial-focus-element">Audit Builder</h1>
+      {/* <Link to="..">← Go Back</Link>
+       */}
+       <h1 className="initial-focus-element">Audit Builder</h1>
       <form onSubmit={saveAndRunAudit}>
         <div className="cards-38-62">
         <Card variant="light">
@@ -198,7 +199,11 @@ export const BuildAudit = () => {
             <TbList className={"icon-small"} />
             Add URLs
           </h2>
-          <AuditPagesInput initialPages={pages} setParentPages={setPages} />
+          <AuditPagesInput 
+            initialPages={pages} 
+            setParentPages={setPages}
+            returnMutation={false}
+            />
         </Card>
         <div className={styles["action-buttons"]}>
           <StyledButton
@@ -215,22 +220,6 @@ export const BuildAudit = () => {
             disabled={pages.length < 1 || !auditNameValid}
           />
         </div>
-        {/* 
-            <button
-              type="button"
-              onClick={saveAudit}
-              disabled={pages.length < 1 || !auditNameValid}
-              className="w-full"
-            >
-              Save Audit
-            </button> */}
-        {/* <button
-              type="submit"
-              disabled={pages.length < 1 || !auditNameValid}
-              className="w-full"
-            >
-              Save & Run Audit
-            </button> */}
       </form>
     </div>
   );
