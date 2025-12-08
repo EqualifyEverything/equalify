@@ -50,6 +50,7 @@ body {
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
   margin:0 auto;
+  min-height:calc(100dvh - 88px);
 }
 
 /* Suppress focus outline */
