@@ -13,7 +13,6 @@
 body {
   margin: 0;
   color: variables.$black;
-  background: variables.$paper;
   @include fonts.raleway-medium;
   @include fonts.font-size-normal;
 
@@ -41,6 +40,22 @@ body {
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
   margin:0 auto;
+}
+
+button{
+  color: variables.$white;
+  padding: variables.$spacing variables.$spacing*2;
+  background: variables.$green;
+  border-radius: variables.$spacing;
+  border: 1px solid variables.$green-dark;
+  box-shadow: variables.$shadow-small;
+  cursor: pointer;
+  &:hover{
+    background: variables.$green-dark
+  }
+  &:active{
+    background: variables.$green-darker
+  }
 }
 
 /* Suppress focus outline */
