@@ -141,68 +141,73 @@ export const Navigation = () => {
     focusEl?.focus();
   }, [location]);
 
+  const hideNavigation =
+    location.pathname.startsWith("/login") ||
+    location.pathname.startsWith("/signup");
+
   return (
     <>
     <div className="app-container">
       <GlobalErrorHandler />
       <div className="container">
-        <div className={styles.navigation}>
-          
-            <Logo />
-            <div className={styles.nav_menu}>
-            {(!authenticated
-              ? [
-                  { label: "Log In", value: "/login" },
-                  { label: "Sign Up", value: "/signup" },
-                ]
-              : [
-                  { label: "Audits", value: "/audits" },
-                  { label: "Logs", value: "/logs" },
-                  { label: "Account", value: "/account" },
-                ]
-            ).map((obj) => (
-              <Link
-                key={obj.value}
-                to={obj.value}
-                className={
-                  styles["link"] + " " + (location.pathname === obj.value ? styles["active"] : "")
-                }
-              >
-                {obj.label}
-              </Link>
-            ))}
+        {!hideNavigation && (
+          <div className={styles.navigation}>
+            
+              <Logo />
+              <div className={styles.nav_menu}>
+              {(!authenticated
+                ? [
+                    { label: "Log In", value: "/login" },
+                    { label: "Sign Up", value: "/signup" },
+                  ]
+                : [
+                    { label: "Audits", value: "/audits" },
+                    { label: "Logs", value: "/logs" },
+                    { label: "Account", value: "/account" },
+                  ]
+              ).map((obj) => (
+                <Link
+                  key={obj.value}
+                  to={obj.value}
+                  className={
+                    styles["link"] + " " + (location.pathname === obj.value ? styles["active"] : "")
+                  }
+                >
+                  {obj.label}
+                </Link>
+              ))}
+            </div>
+            <div className={styles.nav_buttons}>
+              {authenticated && user && (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Avatar.Root>
+                      <Avatar.Fallback>
+                        {generateAbbreviation(user.name)}
+                      </Avatar.Fallback>
+                    </Avatar.Root>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item>
+                      <Link to="/logout">Logout</Link>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              )}
+              {/* <button onClick={() => setDarkMode(!darkMode)}>
+                <AccessibleIcon.Root
+                  label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
+                >
+                  {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
+                </AccessibleIcon.Root>
+              </button> */}
+            </div>
           </div>
-          <div className={styles.nav_buttons}>
-            {authenticated && user && (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <Avatar.Root>
-                    <Avatar.Fallback>
-                      {generateAbbreviation(user.name)}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item>
-                    <Link to="/logout">Logout</Link>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            )}
-            {/* <button onClick={() => setDarkMode(!darkMode)}>
-              <AccessibleIcon.Root
-                label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
-              >
-                {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
-              </AccessibleIcon.Root>
-            </button> */}
-          </div>
-        </div>
+        )}
         {loading && <Loader />}
         <Outlet />
       </div>
-      
-    <Footer />
+      <Footer />
     </div>
     
     </>

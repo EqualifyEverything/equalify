@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import * as Auth from 'aws-amplify/auth';
 import * as API from 'aws-amplify/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { sleep, useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
+import { Logo } from '../components/Logo';
+import styles from './Signup.module.scss';
 
 export const Signup = () => {
     const queryClient = useQueryClient();
@@ -65,27 +67,58 @@ export const Signup = () => {
         }
     }
 
-    return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto initial-focus-element'>Create an account</h1>
-        {import.meta.env.VITE_SSO_ENABLED ? <div>Sorry, you may only login using your SSO provider.</div> : <>
-            <div className='flex flex-col'>
-                <label htmlFor='name'>Name</label>
-                <input id='name' name='name' required type='text' placeholder='John Doe' />
+    return (
+        <form onSubmit={signup} className={styles.login}>
+            <div className={styles.header}>
+                <div className={styles.logo}>
+                    <Logo />
+                </div>
+                <h1 className={`${styles.title} initial-focus-element`}>Sign up for Equalify</h1>
             </div>
-            <div className='flex flex-col'>
-                <label htmlFor='email'>Email address</label>
-                <input id='email' name='email' required type='email' placeholder='johndoe@example.com' />
-            </div>
-            <div className='flex flex-col'>
-                <label htmlFor='password'>Password</label>
-                <input id='password' name='password' required type='password' placeholder='Password' />
-            </div>
-            <div className='flex flex-row gap-1'>
-                <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
-                <label htmlFor='terms'>I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a></label>
-            </div>
-            <button disabled={loading} className=''>Sign Up</button>
-            {error && <div className=''>{error}</div>}
-        </>}
-    </form>)
+            {import.meta.env.VITE_SSO_ENABLED ? (
+                <div className={styles.actions}>
+                    <p>Sorry, you may only login using your SSO provider.</p>
+                    <div className={styles.authSwitch}>
+                        <span>Already have an account? </span>
+                        <Link to="/login" className={styles.authLink}>
+                            Log in
+                        </Link>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className={styles.fields}>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor='name' className={styles.label}>Name</label>
+                            <input id='name' name='name' required type='text' placeholder='John Doe' className={styles.input} />
+                        </div>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor='email' className={styles.label}>Email address</label>
+                            <input id='email' name='email' required type='email' placeholder='johndoe@example.com' className={styles.input} />
+                        </div>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor='password' className={styles.label}>Password</label>
+                            <input id='password' name='password' required type='password' placeholder='Password' className={styles.input} />
+                        </div>
+                        <div className={styles.checkboxRow}>
+                            <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
+                            <label htmlFor='terms'>
+                                I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div className={styles.actions}>
+                        <button disabled={loading} className={styles.button}>Sign Up</button>
+                        {error && <div className={styles.error}>{error}</div>}
+                        <p>
+                            <span>Already have an account? </span>
+                            <Link to="/login" className={styles.authLink}>
+                                Log in
+                            </Link>
+                        </p>
+                    </div>
+                </>
+            )}
+        </form>
+    )
 }

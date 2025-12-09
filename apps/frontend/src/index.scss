@@ -33,6 +33,8 @@ body {
   max-width:100%;
   margin:0 auto;
   min-height:100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
@@ -40,9 +42,15 @@ body {
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
   margin:0 auto;
+  width:100%;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 button{
+    @include fonts.font-size-normal;
+
   color: variables.$white;
   padding: variables.$spacing variables.$spacing*2;
   background: variables.$green;

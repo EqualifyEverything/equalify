@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import * as Auth from 'aws-amplify/auth';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
 import { useMsal } from '@azure/msal-react';
+import { Logo } from '../components/Logo';
+import styles from './Login.module.scss';
 
 export const Login = () => {
     const queryClient = useQueryClient();
@@ -151,22 +153,51 @@ export const Login = () => {
     };
 
 
-    return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto initial-focus-element'>Welcome back!</h1>
-        {import.meta.env.VITE_SSO_ENABLED ? <>
-            <button type="button" onClick={ssoLogin}>Sign In with SSO</button>
-            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
-        </> : <>
-            <div className='flex flex-col'>
-                <label htmlFor='email'>Email address</label>
-                <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} />
+    return (
+        <form onSubmit={login} className={styles.login}>
+            <div className={styles.header}>
+                <div className={styles.logo}>
+                    <Logo />
+                </div>
+                <h1 className={`${styles.title} initial-focus-element`}>Sign in to Equalify</h1>
             </div>
-            <div className='flex flex-col'>
-                <label htmlFor='password'>Password</label>
-                <input id='password' name="password" required type="password" placeholder='Password' />
-            </div>
-            <button disabled={!!loading} className=''>Log In</button>
-            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
-        </>}
-    </form>)
+            {import.meta.env.VITE_SSO_ENABLED ? (
+                <div className={styles.actions}>
+                    <button type="button" onClick={ssoLogin} className={`${styles.button} ${styles.ssoButton}`}>
+                        Sign In with SSO
+                    </button>
+                    {error && <div className={styles.error}>{error}</div>}
+                    <p>
+                        <span>New here? </span>
+                        <Link to="/signup" className={styles.authLink}>
+                            Create an account
+                        </Link>
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <div className={styles.fields}>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor='email' className={styles.label}>Email address</label>
+                            <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} className={styles.input} />
+                        </div>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor='password' className={styles.label}>Password</label>
+                            <input id='password' name="password" required type="password" placeholder='Password' className={styles.input} />
+                        </div>
+                    </div>
+                    <div className={styles.actions}>
+                        <button disabled={!!loading} className={styles.button}>Log In</button>
+                        {error && <div className={styles.error}>{error}</div>}
+                        <div className={styles.authSwitch}>
+                            <span>New here?</span>
+                            <Link to="/signup" className={styles.authLink}>
+                                Create an account
+                            </Link>
+                        </div>
+                    </div>
+                </>
+            )}
+        </form>
+    )
 }
