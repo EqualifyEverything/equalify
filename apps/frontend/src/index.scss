@@ -39,8 +39,6 @@ body {
 
 .container {
   max-width: variables.$max-width;
-  padding-right: variables.$spacing;
-  padding-left: variables.$spacing;
   margin:0 auto;
   width:100%;
   flex: 1 0 auto;
