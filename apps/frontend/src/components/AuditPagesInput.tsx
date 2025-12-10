@@ -229,12 +229,13 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     return { url: trimmedLine, type: "html" };
   };
 
-  const downloadCsvTemplate = () => {
+  const downloadCsvTemplate = (e:any) => {
+    e.preventDefault();
     const csvContent = `url,type
-https://example.com,html
-https://example.com/about,html
-https://example.com/document.pdf,pdf
-https://example.com/contact,html`;
+    https://example.com,html
+    https://example.com/about,html
+    https://example.com/document.pdf,pdf
+    https://example.com/contact,html`;
     
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
