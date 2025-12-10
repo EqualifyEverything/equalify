@@ -2,11 +2,15 @@
 @use "../global-styles/fonts.scss";
 
 .login {
-  text-align: center;
   margin: clamp(32px, 8vw, 120px) auto;
   padding: calc(variables.$spacing * 5);
   display: grid;
   gap: calc(variables.$spacing * 3);
+  width: 100%;
+  max-width: 400px ;
+}
+h1{
+    text-align: center;
 }
 .logo{
   width: 100px;
@@ -21,5 +25,12 @@
 }
 button{
   width: 100%;
-  max-width: 400px;
+}
+input[type="text"], input[type="password"], input[type="email"]{
+  width: 100%
+}
+label{
+  text-align: left;
+  margin-top: variables.$spacing;
+  padding: variables.$spacing 0;
 }

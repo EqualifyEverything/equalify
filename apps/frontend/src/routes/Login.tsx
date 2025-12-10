@@ -154,12 +154,12 @@ export const Login = () => {
 
 
     return (
-        <form onSubmit={login} className={styles.login}>
+        <form onSubmit={login} className={`${styles.login} form-control`}>
             <div className={styles.header}>
                 <div className={styles.logo}>
                     <Logo />
                 </div>
-                <h1 className={`${styles.title} initial-focus-element`}>Sign in to Equalify</h1>
+                <h1 className={`initial-focus-element`}>Sign in to Equalify</h1>
             </div>
             {import.meta.env.VITE_SSO_ENABLED ? (
                 <div className={styles.actions}>
@@ -177,11 +177,11 @@ export const Login = () => {
             ) : (
                 <>
                     <div className={styles.fields}>
-                        <div className={styles.fieldGroup}>
+                        <div className={`fieldGroup`}>
                             <label htmlFor='email' className={styles.label}>Email address</label>
                             <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} className={styles.input} />
                         </div>
-                        <div className={styles.fieldGroup}>
+                        <div className={`fieldGroup`}>
                             <label htmlFor='password' className={styles.label}>Password</label>
                             <input id='password' name="password" required type="password" placeholder='Password' className={styles.input} />
                         </div>
@@ -189,12 +189,12 @@ export const Login = () => {
                     <div className={styles.actions}>
                         <button disabled={!!loading} className={styles.button}>Log In</button>
                         {error && <div className={styles.error}>{error}</div>}
-                        <div className={styles.authSwitch}>
-                            <span>New here?</span>
+                        <p>
+                            <span>New here? </span>
                             <Link to="/signup" className={styles.authLink}>
                                 Create an account
                             </Link>
-                        </div>
+                        </p>
                     </div>
                 </>
             )}

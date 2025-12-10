@@ -1,17 +1,19 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
-.login {
+.signup {
   text-align: center;
   margin: clamp(32px, 8vw, 120px) auto;
   padding: calc(variables.$spacing * 5);
-  border-radius: calc(variables.$spacing * 2);
   display: grid;
   gap: calc(variables.$spacing * 3);
 }
 .logo{
   width: 100px;
   margin: 0 auto;
+}
+h1{
+    text-align: center;
 }
 .error {
   border-radius: calc(variables.$spacing * 1.25);
@@ -22,4 +24,12 @@
 }
 button{
   width: 100%;
+}
+input[type="text"], input[type="password"]{
+  width: 100%
+}
+label{
+  text-align: left;
+  margin-top: variables.$spacing;
+  padding: variables.$spacing 0;
 }

@@ -15,6 +15,7 @@ $spacing: 8px;
 $max-width: 1080px;
 
 $shadow-small: 0px 1px 1px 0px $black-translucent, 0px 1px 3px 0px $black-translucent;
+$shadow-inset: inset 0px 1px 0px 0px #1f23280a;
 
 :export {
   white: $white;

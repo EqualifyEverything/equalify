@@ -1,6 +1,5 @@
-/* @layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+/* 
+Variables
  */
 @use "./global-styles/variables.module";
 @use "./global-styles/fonts";
@@ -10,26 +9,42 @@
 @use "./global-styles/charts"; 
 @use "./global-styles/sr-only";
 
-body {
+// =====================================================
+// Reset / normalize-ish
+// =====================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+
+body{
   margin: 0;
+}
+
+
+// =====================================================
+// Typeography
+// =====================================================
+
+body {
   color: variables.$black;
   @include fonts.raleway-medium;
   @include fonts.font-size-normal;
-
-  a,
-  a:visited {
-    color: variables.$red;
-    text-decoration: underline;
-  }
-
-  &.dark {
-    background: variables.$black;
-    color:  variables.$paper;
-  }
 }
 
+// =====================================================
+// Containers
+// =====================================================
+
 .app-container {
-  //max-width: variables.$max-width;
   max-width:100%;
   margin:0 auto;
   min-height:100dvh;
@@ -46,21 +61,65 @@ body {
   flex-direction: column;
 }
 
-button{
-    @include fonts.font-size-normal;
+// =====================================================
+// Links
+// =====================================================
 
-  color: variables.$white;
-  padding: variables.$spacing variables.$spacing*2;
-  background: variables.$green;
-  border-radius: variables.$spacing;
-  border: 1px solid variables.$green-dark;
-  box-shadow: variables.$shadow-small;
-  cursor: pointer;
-  &:hover{
-    background: variables.$green-dark
+a{
+  &:visited {
+    color: variables.$red;
+    text-decoration: underline;
   }
-  &:active{
-    background: variables.$green-darker
+
+  &.dark {
+    background: variables.$black;
+    color:  variables.$paper;
+  }
+
+}
+
+// =====================================================
+// Form Controls
+// =====================================================
+
+.form-control{
+  text-align: left;
+  button{
+    @include fonts.font-size-normal;
+    color: variables.$white;
+    padding: variables.$spacing variables.$spacing*2;
+    background: variables.$green;
+    border-radius: variables.$spacing/2;
+    border: 1px solid variables.$green-dark;
+    box-shadow: variables.$shadow-small;
+    cursor: pointer;
+    &:hover{
+      background: variables.$green-dark
+    }
+    &:active{
+      background: variables.$green-darker
+    }
+  }
+  label{
+    @include fonts.font-size-small;
+    font-weight: 700;
+  }
+  .fieldGroup{
+    margin-bottom: variables.$spacing*2;
+  }
+  input, select, textarea {
+    @include fonts.font-size-normal;
+    padding: variables.$spacing variables.$spacing;
+    color: variables.$black;
+    background-color: variables.$white;
+    border: 1px solid variables.$gray;
+    border-radius: variables.$spacing/2;
+    box-shadow: variables.$shadow-inset;
+    transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
+    transition-property: box-shadow, border-color;
+    &:focus{
+      box-shadow: 0;
+    }
   }
 }
 

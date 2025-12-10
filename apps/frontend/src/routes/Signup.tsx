@@ -68,7 +68,7 @@ export const Signup = () => {
     }
 
     return (
-        <form onSubmit={signup} className={styles.login}>
+        <form onSubmit={signup} className={`${styles.signup} form-control`}>
             <div className={styles.header}>
                 <div className={styles.logo}>
                     <Logo />
@@ -88,19 +88,19 @@ export const Signup = () => {
             ) : (
                 <>
                     <div className={styles.fields}>
-                        <div className={styles.fieldGroup}>
+                        <div className={`fieldGroup`}>
                             <label htmlFor='name' className={styles.label}>Name</label>
                             <input id='name' name='name' required type='text' placeholder='John Doe' className={styles.input} />
                         </div>
-                        <div className={styles.fieldGroup}>
+                        <div className={`fieldGroup`}>
                             <label htmlFor='email' className={styles.label}>Email address</label>
                             <input id='email' name='email' required type='email' placeholder='johndoe@example.com' className={styles.input} />
                         </div>
-                        <div className={styles.fieldGroup}>
+                        <div className={`fieldGroup`}>
                             <label htmlFor='password' className={styles.label}>Password</label>
                             <input id='password' name='password' required type='password' placeholder='Password' className={styles.input} />
                         </div>
-                        <div className={styles.checkboxRow}>
+                        <div className={`fieldGroup`}>
                             <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
                             <label htmlFor='terms'>
                                 I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a>
