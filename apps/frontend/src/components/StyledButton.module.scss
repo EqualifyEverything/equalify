@@ -19,8 +19,8 @@
     display: block;
   }
   svg {
-    width: 14px;
-    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
     margin-right: variables.$spacing;
   }
 
