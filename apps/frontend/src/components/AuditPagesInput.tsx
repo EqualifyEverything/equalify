@@ -30,7 +30,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   returnMutation = false,
   isShared = false,
 }) => {
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
 
   const [importBy, setImportBy] = useState("URLs");
   const [urlError, setUrlError] = useState<string | null>(null);
@@ -108,8 +108,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       // Add all valid URLs to the pages
       if (newPages.length > 0) {
         setPages(prev => [...prev, ...newPages]);
-        setAriaAnnounceMessage(
-          `Successfully imported ${newPages.length} URL(s) from CSV`
+        setAnnounceMessage(
+          `Successfully imported ${newPages.length} URL(s) from CSV`, "success"
         );
         setCsvError(null);
       }
@@ -173,7 +173,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     ) as HTMLInputElement;
     if (inputField) inputField.value = "";
     setUrlError(null);
-    setAriaAnnounceMessage(`Added URL ${validUrl}!`);
+    setAnnounceMessage(`Added URL ${validUrl}!`, "success");
     //console.log(pages);
     return;
   };
@@ -252,7 +252,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   const removePages = (pagesToRemove: Page[]) => {
     //console.log("After Removal:", pages.filter((row) => !pagesToRemove.includes(row)));
     setPages(pages.filter((row) => !pagesToRemove.includes(row)));
-    setAriaAnnounceMessage(`Removed ${pagesToRemove.length} URLs!`);
+    setAnnounceMessage(`Removed ${pagesToRemove.length} URLs!`, "success");
     return;
   };
 

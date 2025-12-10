@@ -8,7 +8,7 @@ import { useMsal } from '@azure/msal-react';
 
 export const Login = () => {
     const queryClient = useQueryClient();
-    const { loading, setLoading, setAuthenticated, setSsoAuthenticated, setAriaAnnounceMessage } = useGlobalStore();
+    const { loading, setLoading, setAuthenticated, setSsoAuthenticated, setAnnounceMessage } = useGlobalStore();
     const [error, setError] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
@@ -48,7 +48,7 @@ export const Login = () => {
                 navigate(`/verify/${location.search}`);
             }
             else {
-                setAriaAnnounceMessage("Login Success!");
+                setAnnounceMessage("Login Success!", "success");
                 navigate('/audits');
             }
 
@@ -62,6 +62,9 @@ export const Login = () => {
             console.log(err);
             setLoading(false);
             setError(confirm?.error?.message ?? `There was an issue logging in. Please try again.`);
+            setAnnounceMessage(
+                confirm?.error?.message ?? `There was an issue logging in. Please try again.`, "error"
+            );
         }
     }
 
@@ -118,7 +121,7 @@ export const Login = () => {
             posthog?.identify(claims?.oid || claims?.sub, { email: claims?.email });
             
             setLoading(false);
-            setAriaAnnounceMessage("Login Success!");
+            setAnnounceMessage("Login Success!", "success");
             navigate('/audits');
             
             setTimeout(() => queryClient.refetchQueries({ queryKey: ['user'] }), 100);
@@ -147,6 +150,7 @@ export const Login = () => {
             }
             
             setError(errorMessage);
+            setAnnounceMessage(errorMessage, "error");
         }
     };
 

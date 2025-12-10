@@ -26,7 +26,7 @@ interface Page {
 
 export const BuildAudit = () => {
   const navigate = useNavigate();
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
   const { data: user } = useUser();
 
   const [emailNotifications, setEmailNotifications] = useState(false);
@@ -85,7 +85,7 @@ export const BuildAudit = () => {
         options: { body: { ...auditData, saveAndRun: true } },
       }).response
     ).body.json()) as { id: string };
-    setAriaAnnounceMessage(`Audit saved and audit run started!`);
+    setAnnounceMessage(`Audit saved and audit run started!`, "success");
     await createLog(`Audit created and audit run started!`, response.id);
 
     navigate(`/audits/${response?.id}`);
@@ -112,7 +112,7 @@ export const BuildAudit = () => {
         options: { body: { ...auditData, saveAndRun: false } },
       }).response
     ).body.json()) as { id: string };
-    setAriaAnnounceMessage(`Audit saved!`);
+    setAnnounceMessage(`Audit saved!`, "success");
     await createLog(`Audit created!`, response.id);
     navigate(`/audits/${response?.id}`);
     return;

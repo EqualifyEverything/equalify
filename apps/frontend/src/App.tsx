@@ -24,6 +24,8 @@ import { useGlobalStore } from "./utils/useGlobalStore";
 import { isJwtExpiredError, handleJwtExpiration } from "./utils/jwtErrorHandler";
 registerSW({ immediate: true });
 
+import { Toaster } from "sonner";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -168,7 +170,7 @@ const router = createBrowserRouter([
 import { MsalProvider } from '@azure/msal-react';
 
 export const App = () => {
-  const { ariaAnnounceMessage } = useGlobalStore();
+  const { announceMessage } = useGlobalStore();
   return (
   <MsalProvider instance={msalInstance}>
     <PostHogProvider
@@ -176,11 +178,12 @@ export const App = () => {
       options={{ api_host: "https://us.posthog.com" }}
     >
       <div aria-live="assertive" role="status" className="sr-only">
-        {ariaAnnounceMessage}
+        {announceMessage}
       </div>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>
+      <Toaster />
     </PostHogProvider>
   </MsalProvider>
   );
