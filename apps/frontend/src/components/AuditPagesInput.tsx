@@ -141,7 +141,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   };
 
   const addPage = (e: React.MouseEvent<HTMLButtonElement>) => {
-    //e.preventDefault();
+    e.preventDefault();
     const button = e.currentTarget;
     const form = button.closest("form");
     if (!form) return;

@@ -160,6 +160,7 @@ export const AuditPagesInputTable = ({
                   onClick={(e)=>{
                     e.preventDefault();
                     removePages(table.getSelectedRowModel().flatRows.map(row => row.original));
+                    table.toggleAllPageRowsSelected(false);
                   }}
                   />
                 ) : null}

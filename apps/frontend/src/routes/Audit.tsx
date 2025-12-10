@@ -200,6 +200,9 @@ export const Audit = () => {
         type: row.type,
       });
     }
+
+    await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
+    
     // aria
     setAriaAnnounceMessage(
       `Removed ${changedPages.length} URLs from audit ${audit.name}.`
