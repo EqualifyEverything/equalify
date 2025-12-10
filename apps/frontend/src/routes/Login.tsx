@@ -5,6 +5,10 @@ import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
 import { useMsal } from '@azure/msal-react';
+import { Logo } from "#src/components/Logo";
+import { StyledButton } from "#src/components/StyledButton";
+import styles from "./Login.module.scss";
+
 
 export const Login = () => {
     const queryClient = useQueryClient();
@@ -151,10 +155,20 @@ export const Login = () => {
     };
 
 
-    return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto initial-focus-element'>Welcome back!</h1>
+    return (
+    <form onSubmit={login} className={styles.login}>
+        <div className={styles.login}>
+            <div className={styles.logo}>
+                <Logo />
+            </div>
+            <h1 className={`${styles.title} initial-focus-element`}>Sign in to Equalify</h1>
+        </div>
+
         {import.meta.env.VITE_SSO_ENABLED ? <>
-            <button type="button" onClick={ssoLogin}>Sign In with SSO</button>
+            <StyledButton
+                onClick={ssoLogin}
+                label={`Sign in with SSO`}
+            />
             {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
         </> : <>
             <div className='flex flex-col'>
