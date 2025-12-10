@@ -72,10 +72,10 @@ export const Audits = () => {
               </h2>
             </Link>
             <div className={styles["dataRow-list"]}>
-            <DataRow variant="highlight" the_key="Blockers" the_value={row.scans[0].blockers_aggregate.aggregate.count} />
+            <DataRow variant="highlight" the_key="Blockers" the_value={row.scans[0]?.blockers_aggregate?.aggregate?.count ?? "—"} />
             <DataRow the_key="URLs" the_value={row.urls_aggregate.aggregate.count} />
             <DataRow the_key="Runs" the_value={row.interval} />
-            <DataRow the_key="Last Scan" the_value={prettyDate(row.scans[0].updated_at) +" at "+prettyTime(row.scans[0].updated_at)} />  
+            <DataRow the_key="Last Scan" the_value={row.scans[0] ? prettyDate(row.scans[0].updated_at) + " at " + prettyTime(row.scans[0].updated_at) : "Not scanned yet"} />  
             <DataRow variant="no-border" the_key="Created" the_value={prettyDate(row.created_at)} />
             
             {/* {row.scans[0].percentage}% */}
