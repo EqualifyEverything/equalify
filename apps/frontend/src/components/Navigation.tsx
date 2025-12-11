@@ -200,7 +200,7 @@ export const Navigation = () => {
         {loading && <Loader />}
         <Outlet />
       </div>
-      {!isAuthRoute && <Footer />}
+      <Footer />
     </div>
     
     </>
