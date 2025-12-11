@@ -23,7 +23,7 @@ export const UsersTable = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
 
   // Query to get users
   const { data, isLoading, error } = useQuery({
@@ -79,11 +79,11 @@ export const UsersTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      setAriaAnnounceMessage("User type updated successfully!");
+      setAnnounceMessage("User type updated successfully!", "success");
     },
     onError: (error) => {
       console.error("Failed to update type:", error);
-      setAriaAnnounceMessage("Failed to update user type");
+      setAnnounceMessage("Failed to update user type", "error");
     },
   });
 
@@ -101,7 +101,7 @@ export const UsersTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      setAriaAnnounceMessage("User removed");
+      setAnnounceMessage("User removed.", "success");
     },
   });
 

@@ -79,7 +79,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { setAriaAnnounceMessage, authenticated } = useGlobalStore();
+  const { setAnnounceMessage, authenticated } = useGlobalStore();
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -216,7 +216,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     try {
       await navigator.clipboard.writeText(val);
       console.log(`"${val}" copied to clipboard!`);
-      setAriaAnnounceMessage(`"${val}" copied to clipboard!`);
+      setAnnounceMessage(`"${val}" copied to clipboard!`, "success");
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
@@ -437,7 +437,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   blockerId,
                   isCurrentlyIgnored: isIgnored,
                 });
-                setAriaAnnounceMessage(
+                setAnnounceMessage(
                   `Blocker ID ${blockerId} set to ignored status: ${isIgnored}`
                 );
               }}
@@ -462,8 +462,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                     blockerId,
                     isCurrentlyIgnored: isIgnored,
                   });
-                  setAriaAnnounceMessage(
-                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`
+                  setAnnounceMessage(
+                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`, "success"
                   );
                 }}
                 label={isIgnored ? "Ignored" : "Active"}
@@ -535,7 +535,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     if (sortBy === "url") {
       // Toggle sort order if already sorting by URL
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-      setAriaAnnounceMessage(`Sorting by URL ${sortOrder}`);
+      setAnnounceMessage(`Sorting by URL ${sortOrder}`);
     } else {
       // Start sorting by URL in ascending order
       setSortBy("url");

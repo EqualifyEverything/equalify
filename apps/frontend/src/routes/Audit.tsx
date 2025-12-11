@@ -87,7 +87,7 @@ export const Audit = () => {
   const [chartRange, setChartRange] = useState<number>(7);
   const [selectedScanErrors, setSelectedScanErrors] = useState<ScanError[]>([]);
   const isShared = location.pathname.startsWith("/shared/");
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
   useEffect(() => {
     if (emailNotifications)
       setEmailNotificationsCount(JSON.parse(emailNotifications).emails.length);
@@ -176,8 +176,8 @@ export const Audit = () => {
     }
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     // aria
-    setAriaAnnounceMessage(
-      `Added ${changedPages.length} URLs to audit ${audit.name}.`
+    setAnnounceMessage(
+      `Added ${changedPages.length} URLs to audit ${audit.name}.`, "success"
     );
 
     console.log("DB update complete.");
@@ -204,8 +204,8 @@ export const Audit = () => {
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     
     // aria
-    setAriaAnnounceMessage(
-      `Removed ${changedPages.length} URLs from audit ${audit.name}.`
+    setAnnounceMessage(
+      `Removed ${changedPages.length} URLs from audit ${audit.name}.`, "success"
     );
 
     console.log("DB update complete.");
@@ -241,8 +241,8 @@ export const Audit = () => {
     console.log("DB Updated with new URL Type.", updatedPage);
 
     // aria & logging
-    setAriaAnnounceMessage(
-      `Changed ${changedPage.url} to type ${changedPage.type}.`
+    setAnnounceMessage(
+      `Changed ${changedPage.url} to type ${changedPage.type}.`, "success"
     );
     await createLog(
       `Changed ${changedPage.url} to type ${changedPage.type}.`,

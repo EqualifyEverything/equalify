@@ -23,7 +23,7 @@ export const AuditHeader = ({
   auditId,
 }: AuditHeaderProps) => {
   const navigate = useNavigate();
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
 
   const copyCurrentLocationToClipboard = async () => {
     try {
@@ -34,8 +34,8 @@ export const AuditHeader = ({
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
       );
-      setAriaAnnounceMessage(
-        `URL ${window.location.origin + location.pathname} copied to clipboard!`
+      setAnnounceMessage(
+        `URL ${window.location.origin + location.pathname} copied to clipboard!`, "success"
       );
     } catch (err) {
       console.error("Failed to copy URLs: ", err);
@@ -53,7 +53,7 @@ export const AuditHeader = ({
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audits"] });
       // aria & logging
-      setAriaAnnounceMessage(`Deleted audit ${audit.name}.`);
+      setAnnounceMessage(`Deleted audit ${audit.name}.`, "success");
       await createLog(`Deleted audit ${audit.name}.`, auditId);
 
       navigate("/audits");
@@ -72,7 +72,7 @@ export const AuditHeader = ({
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audits"] });
       // aria & logging
-      setAriaAnnounceMessage(`Scanning audit ${audit.name}...`);
+      setAnnounceMessage(`Scanning audit ${audit.name}...`);
       return;
     }
   };
@@ -93,7 +93,7 @@ export const AuditHeader = ({
       //console.log(response);
       await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
       // aria & logging
-      setAriaAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`);
+      setAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`, "success");
       return;
     }
   };

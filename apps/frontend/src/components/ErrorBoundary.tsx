@@ -7,7 +7,7 @@ import { isJwtExpiredError } from '../utils/jwtErrorHandler';
 export const GlobalErrorHandler = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { setAuthenticated, setSsoAuthenticated, setAriaAnnounceMessage } = useGlobalStore();
+  const { setAuthenticated, setSsoAuthenticated, setAnnounceMessage } = useGlobalStore();
   const logoutTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export const GlobalErrorHandler = () => {
           queryClient.clear();
           
           // Show message and redirect
-          setAriaAnnounceMessage('Your session has expired. Please log in again.');
+          setAnnounceMessage('Your session has expired. Please log in again.',"error");
           navigate('/login');
         }, 5000);
       }
@@ -72,7 +72,7 @@ export const GlobalErrorHandler = () => {
       mutationUnsubscribe();
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
-  }, [queryClient, navigate, setAuthenticated, setSsoAuthenticated, setAriaAnnounceMessage]);
+  }, [queryClient, navigate, setAuthenticated, setSsoAuthenticated, setAnnounceMessage]);
 
   return null;
 };

@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 export const SsoCallback = () => {
     const navigate = useNavigate();
     const { instance } = useMsal();
-    const { setAuthenticated, setSsoAuthenticated, setLoading, setAriaAnnounceMessage } = useGlobalStore();
+    const { setAuthenticated, setSsoAuthenticated, setLoading, setAnnounceMessage } = useGlobalStore();
     const posthog = usePostHog();
     const queryClient = useQueryClient();
 
@@ -35,7 +35,7 @@ export const SsoCallback = () => {
                         setSsoAuthenticated(true);
                         posthog?.identify(claims?.oid || claims?.sub, { email: claims?.email });
                         
-                        setAriaAnnounceMessage("Login Success!");
+                        setAnnounceMessage("Login Success!", "success");
                         setTimeout(() => queryClient.refetchQueries({ queryKey: ['user'] }), 100);
                         navigate('/audits');
                     } catch (backendError: any) {

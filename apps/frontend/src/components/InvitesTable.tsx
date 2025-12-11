@@ -22,7 +22,7 @@ export const InvitesTable = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
   const [newEmail, setNewEmail] = useState("");
-  const { setAriaAnnounceMessage } = useGlobalStore();
+  const { setAnnounceMessage } = useGlobalStore();
 
   // Query to get invites
   const { data, isLoading, error } = useQuery({
@@ -77,11 +77,11 @@ export const InvitesTable = () => {
       if (response?.status === "error") {
         console.error("Failed to create invite:", response?.message);
         window.alert(`Failed to send invite: ${response?.message}`);
-        setAriaAnnounceMessage(`Failed to send invite: ${response?.message}`);
+        setAnnounceMessage(`Failed to send invite: ${response?.message}`, "error");
       } else if (response?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["invites"] });
         setNewEmail("");
-        setAriaAnnounceMessage("Invite sent successfully!");
+        setAnnounceMessage("Invite sent successfully!", "success");
       }
     },
   });
@@ -100,7 +100,7 @@ export const InvitesTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites"] });
-      setAriaAnnounceMessage("Invite deleted");
+      setAnnounceMessage("Invite deleted", "success");
     },
   });
 

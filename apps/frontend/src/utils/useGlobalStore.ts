@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -10,8 +11,8 @@ interface EqualifyState {
   setAuthenticated: (val: boolean) => void
   ssoAuthenticated: boolean
   setSsoAuthenticated: (val: boolean) => void
-  ariaAnnounceMessage: string
-  setAriaAnnounceMessage: (val:string) => void
+  announceMessage: string
+  setAnnounceMessage: (val:string, style?:"normal"|"success"|"error", screenReaderOnly?: boolean) => void
 }
 
 export const useGlobalStore = create<EqualifyState>()(
@@ -25,8 +26,19 @@ export const useGlobalStore = create<EqualifyState>()(
             setAuthenticated: (val) => set(() => ({ authenticated: val })),
             ssoAuthenticated: false,
             setSsoAuthenticated: (val) => set(() => ({ ssoAuthenticated: val })),
-            ariaAnnounceMessage: "",
-            setAriaAnnounceMessage: (val) => set(() => ({ ariaAnnounceMessage: val })),
+            announceMessage: "",
+            setAnnounceMessage: (val, style = "normal", setScreenReaderOnly = false) => { 
+                set(() => ({ announceMessage: val })); 
+                if(!setScreenReaderOnly){
+                    switch(style){
+                        case 'success': toast.success(val);
+                            return;
+                        case 'error': toast.error(val);
+                            return;
+                        default: toast(val);
+                    }
+                }
+            },
         }), {
         name: 'equalify-storage',
         partialize: (state) => ({
