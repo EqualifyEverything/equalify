@@ -75,7 +75,9 @@ export const BuildAudit = () => {
       window.alert(`You need to add at least 1 URL to your audit.`);
       return;
     }
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const form = (e.currentTarget as HTMLElement).closest("form");
+    if (!form) return;
+    const formData = new FormData(form);
     const auditData = buildAuditData(formData);
     console.log("Audit Data (Save & Run):", JSON.stringify(auditData));
     const response = (await (
