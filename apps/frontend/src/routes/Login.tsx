@@ -172,7 +172,7 @@ export const Login = () => {
             />
             {error && <div className={`${styles.error}`}>{error}</div>}
         </> : <>
-            <div className={`${styles.signIn}`}>
+            <div className={`${styles.signInForm}`}>
                 <label htmlFor='email'>Email address</label>
                 <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} />
                 <label htmlFor='password'>Password</label>
