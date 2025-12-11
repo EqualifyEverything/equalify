@@ -1,0 +1,8 @@
+@use "./variables.module.scss";
+@use "./fonts.scss";
+
+label{
+    text-align: left;
+    @include fonts.font-size-small;
+    font-weight: 700;
+}

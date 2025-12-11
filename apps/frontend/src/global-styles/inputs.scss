@@ -1,15 +1,16 @@
 @use "./variables.module.scss";
 @use "./fonts.scss";
-
-input {
+input, select, textarea {
   @include fonts.font-size-normal;
-  border: 1px solid variables.$gray;
+  padding: variables.$spacing variables.$spacing;
   color: variables.$black;
-  min-width: 120px;
-  box-sizing: border-box;
-  margin-top: calc(variables.$spacing/2);
-  padding: calc(variables.$spacing/2) calc(variables.$spacing);
+  background-color: variables.$white;
   border: 1px solid variables.$gray;
-  border-radius: calc(0.5rem - 2px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: variables.$spacing/2;
+  box-shadow: variables.$shadow-inset;
+  transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
+  transition-property: box-shadow, border-color;
+  &:focus{
+    box-shadow: 0;
+  }
 }
