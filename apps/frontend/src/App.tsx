@@ -183,7 +183,9 @@ export const App = () => {
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>
-      <Toaster />
+      <Toaster 
+        theme="dark"
+      />
     </PostHogProvider>
   </MsalProvider>
   );
