@@ -2,8 +2,32 @@
 @use "../global-styles/fonts.scss";
 
 .login{
-    background: red;
-    .title{
-        color:blue;
+    margin: clamp(32px, 8vw, 120px) auto;
+    padding: calc(variables.$spacing * 5);
+    display: grid;
+    gap: calc(variables.$spacing * 3);
+    width: 100%;
+    max-width: 380px ;
+    .header{
+        .logo{
+            width: 100px;
+            margin: 0 auto;
+        }
+        .title{
+            text-align: center;
+        }
+    }
+    label{
+        display: block;
+        margin-top: variables.$spacing*2;
+        margin-bottom: variables.$spacing/4;
+
+    }
+    button{
+        width: 100%;
+        margin-top: variables.$spacing*2;
+    }
+    input[type="text"], input[type="password"], input[type="email"]{
+        width: 100%
     }
 }
