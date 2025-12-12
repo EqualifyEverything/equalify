@@ -160,44 +160,46 @@ export const Navigation = () => {
     <>
     <div className="app-container" data-vaul-drawer-wrapper>
       <GlobalErrorHandler />
-      <div className="container">
         {!isAuthRoute && (
           <div className={styles.navigation}>
-            <Logo />
-            <div className={styles.nav_menu}>
-              {navItems.map((obj) => (
-                <Link
-                  key={obj.value}
-                  to={obj.value}
-                  className={
-                    styles["link"] +
-                    " " +
-                    (location.pathname === obj.value ? styles["active"] : "")
-                  }
-                >
-                  {obj.label}
-                </Link>
-              ))}
-            </div>
-            <div className={styles.nav_buttons}>
-              {authenticated && user && (
-                <div className={styles["logout-text"]}>
-                  Signed in as <b>{user.name}</b>
-                  <br />
-                  <Link to="/logout">Logout</Link>
-                </div>
-              )}
-              {/* <button onClick={() => setDarkMode(!darkMode)}>
-                <AccessibleIcon.Root
-                  label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
-                >
-                  {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
-                </AccessibleIcon.Root>
-              </button> */}
+            <div className={styles.content}>
+              <Logo />
+              <div className={styles.nav_menu}>
+                {navItems.map((obj) => (
+                  <Link
+                    key={obj.value}
+                    to={obj.value}
+                    className={
+                      styles["link"] +
+                      " " +
+                      (location.pathname === obj.value ? styles["active"] : "")
+                    }
+                  >
+                    {obj.label}
+                  </Link>
+                ))}
+              </div>
+              <div className={styles.nav_buttons}>
+                {authenticated && user && (
+                  <div className={styles["user_info"]}>
+                    Signed in as <b>{user.name}</b>
+                    <br />
+                    <Link className={styles["logout"]} to="/logout">Logout</Link>
+                  </div>
+                )}
+                {/* <button onClick={() => setDarkMode(!darkMode)}>
+                  <AccessibleIcon.Root
+                    label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
+                  >
+                    {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
+                  </AccessibleIcon.Root>
+                </button> */}
+              </div>
             </div>
           </div>
         )}
-        {loading && <Loader />}
+        <div className="container page-content">
+          {loading && <Loader />}
         <Outlet />
       </div>
       <Footer />

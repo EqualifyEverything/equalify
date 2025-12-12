@@ -24,7 +24,7 @@
     display:flex;
     align-items: center;
     gap: variables.$spacing;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.12s ease-out;
     &:hover {
       opacity: 1;
     }

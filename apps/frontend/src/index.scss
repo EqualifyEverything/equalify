@@ -55,13 +55,14 @@ body {
 }
 
 .container {
+  width: 100%;
   max-width: variables.$max-width;
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
-  margin:0 auto;
-  min-height:calc(100dvh - 60px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  min-height:calc(100dvh - 60px);
 }
 
 /* Suppress focus outline */

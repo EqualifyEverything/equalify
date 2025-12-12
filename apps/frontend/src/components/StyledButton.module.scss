@@ -18,6 +18,8 @@
   align-content: center;
   justify-content: center;
   align-items: center;
+  transition: background 0.12s ease-out, opacity 0.12s ease-out;
+
   span {
     display: block;
   }
