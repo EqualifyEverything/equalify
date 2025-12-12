@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import styles from "./AuditHeader.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { StyledButton } from "./StyledButton";
@@ -24,6 +24,7 @@ export const AuditHeader = ({
 }: AuditHeaderProps) => {
   const navigate = useNavigate();
   const { setAnnounceMessage } = useGlobalStore();
+  const [isScanning, setIsScanning] = useState(false);
 
   const copyCurrentLocationToClipboard = async () => {
     try {
@@ -62,17 +63,22 @@ export const AuditHeader = ({
   };
   const rescanAudit = async () => {
     if (confirm(`Are you sure you want to re-scan this audit?`)) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/rescanAudit",
-          options: { body: { id: auditId! } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audits"] });
-      // aria & logging
-      setAnnounceMessage(`Scanning audit ${audit.name}...`);
+      setIsScanning(true);
+      try {
+        const response = await (
+          await API.post({
+            apiName: "auth",
+            path: "/rescanAudit",
+            options: { body: { id: auditId! } },
+          }).response
+        ).body.json();
+        //console.log(response);
+        await queryClient.refetchQueries({ queryKey: ["audits"] });
+        // aria & logging
+        setAnnounceMessage(`Scanning audit ${audit.name}...`);
+      } finally {
+        setIsScanning(false);
+      }
       return;
     }
   };
@@ -130,6 +136,7 @@ export const AuditHeader = ({
               label="Scan Now"
               icon={<GrPowerCycle />}
               variant="dark"
+              loading={isScanning}
             />
         )}
         <StyledButton

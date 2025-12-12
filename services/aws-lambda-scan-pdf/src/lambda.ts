@@ -35,6 +35,12 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payloadParsed = JSON.parse(payload) as sqsPayload;
 
   const job = payloadParsed.data;
+  
+  // Validate job has required fields
+  if (!job.scanId) {
+    logger.warn("Job is missing scanId!", { auditId: job.auditId, urlId: job.urlId });
+  }
+  
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
@@ -66,18 +72,20 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         });
 
         if(sendResultsResponse.ok){
+          const responseData = await sendResultsResponse.json();
           logger.info(
             "PDF-scan Results sent to API results webhook!",
-            JSON.stringify(sendResultsResponse.json())
+            JSON.stringify(responseData)
           );
         }else{
+          const errorData = await sendResultsResponse.text();
           logger.error(
             "Error sending results to API results webhook!",
             sendResultsResponse.statusText
           );
           logger.error(
-            "Failed to send:",
-            JSON.stringify(sendResultsResponse.json())
+            "Failed to send. Response body:",
+            errorData
           )
         }
         

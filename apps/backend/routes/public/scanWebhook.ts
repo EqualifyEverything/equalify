@@ -3,7 +3,34 @@ import { db, event, hashStringToUuid, normalizeHtmlWithVdom, generateShortId } f
 export const scanWebhook = async () => {
     console.log(JSON.stringify(event));
     const { auditId, scanId, urlId, url, blockers, status, error } = event.body;
+    
+    // Validate required fields
+    if (!auditId || !urlId) {
+        console.error("Missing required fields: auditId or urlId", { auditId, urlId });
+        return { success: false, message: 'Missing required fields: auditId and urlId are required' };
+    }
+    
+    if (!scanId) {
+        console.error("Missing scanId in webhook payload - looking up from audit", { auditId, urlId });
+    }
+    
     await db.connect();
+    
+    // If scanId is missing, look it up from the most recent scan for this audit
+    let effectiveScanId = scanId;
+    if (!effectiveScanId) {
+        const scanResult = await db.query({
+            text: `SELECT id FROM scans WHERE audit_id = $1 ORDER BY created_at DESC LIMIT 1`,
+            values: [auditId],
+        });
+        if (scanResult?.rows?.[0]?.id) {
+            effectiveScanId = scanResult.rows[0].id;
+            console.log(`Resolved scanId from audit: ${effectiveScanId}`);
+        } else {
+            console.error("Could not resolve scanId for audit", { auditId });
+            // Continue without scanId - we can still save blockers
+        }
+    }
 
     const ignoredBlockerHashes = (await db.query({
         text: `SELECT b.content_hash_id FROM ignored_blockers as ib LEFT OUTER JOIN blockers as b ON ib.blocker_id = b.id WHERE ib.audit_id=$1`,
@@ -22,16 +49,24 @@ export const scanWebhook = async () => {
         };
 
         // Atomic append using PostgreSQL's jsonb_concat (||) operator
-        await db.query({
-            text: `UPDATE "scans" SET "errors" = COALESCE("errors", '[]'::jsonb) || $1::jsonb WHERE "id"=$2`,
-            values: [JSON.stringify([errorEntry]), scanId],
-        });
+        if (effectiveScanId) {
+            await db.query({
+                text: `UPDATE "scans" SET "errors" = COALESCE("errors", '[]'::jsonb) || $1::jsonb WHERE "id"=$2`,
+                values: [JSON.stringify([errorEntry]), effectiveScanId],
+            });
+        }
 
         console.log(`Scan error logged: ${errorType} - ${errorMessage}`);
     };
 
     // Helper function to update scan progress and status (atomic operation)
     const updateScanProgress = async () => {
+        // Skip if no scanId available
+        if (!effectiveScanId) {
+            console.warn("Cannot update scan progress: no scanId available");
+            return { percentage: 0, isComplete: false, scannedCount: 0, totalPages: 0 };
+        }
+        
         // Use a single atomic UPDATE with RETURNING to avoid race conditions
         // This atomically adds urlId to processed_pages if not present, then calculates progress
         const result = (await db.query({
@@ -49,8 +84,13 @@ export const scanWebhook = async () => {
                     "processed_pages",
                     jsonb_array_length(COALESCE("processed_pages", '[]'::jsonb)) as scanned_count
             `,
-            values: [JSON.stringify([urlId]), scanId],
+            values: [JSON.stringify([urlId]), effectiveScanId],
         })).rows[0];
+
+        if (!result) {
+            console.error("Scan not found for id:", effectiveScanId);
+            return { percentage: 0, isComplete: false, scannedCount: 0, totalPages: 0 };
+        }
 
         const totalPages = result.pages?.length || 0;
         const scannedCount = result.scanned_count || 0;
@@ -60,7 +100,7 @@ export const scanWebhook = async () => {
         // Second atomic update for percentage and status
         await db.query({
             text: `UPDATE "scans" SET "percentage"=$1, "status"=$2 WHERE "id"=$3`,
-            values: [percentage, isComplete ? 'complete' : 'processing', scanId],
+            values: [percentage, isComplete ? 'complete' : 'processing', effectiveScanId],
         });
 
         return { percentage, isComplete, scannedCount, totalPages };
@@ -86,10 +126,10 @@ export const scanWebhook = async () => {
         // Only mark audit as failed if this is the only/last page, otherwise let other pages continue
         if (isComplete) {
             // Check if there were any successful pages by looking at blockers
-            const hasSuccessfulPages = (await db.query({
+            const hasSuccessfulPages = effectiveScanId ? (await db.query({
                 text: `SELECT COUNT(*) FROM "blockers" WHERE "scan_id"=$1`,
-                values: [scanId],
-            })).rows[0].count > 0;
+                values: [effectiveScanId],
+            })).rows[0].count > 0 : false;
 
             await db.query({
                 text: `UPDATE "audits" SET "status"=$1, "response"=$2 WHERE "id"=$3`,
@@ -132,7 +172,7 @@ export const scanWebhook = async () => {
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                     RETURNING "id"
                 `,
-                values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, scanId],
+                values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, effectiveScanId],
             })).rows[0].id;
 
             if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {

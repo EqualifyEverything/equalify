@@ -87,6 +87,11 @@
     color: variables.$black;
     @include fonts.font-size-small;  
   }
+
+  &.loading {
+    cursor: wait;
+    opacity: 0.8;
+  }
 /* 
   &.disabled,
   &:disabled {
@@ -94,4 +99,21 @@
     //color:variables.$gray;
     //border-color:variables.$gray;
   } */
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: variables.$spacing;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
