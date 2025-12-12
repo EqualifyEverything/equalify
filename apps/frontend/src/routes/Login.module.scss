@@ -7,7 +7,7 @@
     display: grid;
     gap: calc(variables.$spacing * 3);
     width: 100%;
-    max-width: 380px ;
+    max-width: 400px ;
     .header{
         .logo{
             width: 100px;
@@ -31,9 +31,10 @@
         width: 100%
     }
     .error{
+        color: variables.$red;
         border-radius: variables.$spacing/2;
-        background: variables.$paper;
-        border: 1px solid variables.$paper-dark;
-        padding: variables.$spacing;
+        background: variables.$red-light;
+        border: 1px solid variables.$red-dark;
+        padding: variables.$spacing*2;
     }
 }

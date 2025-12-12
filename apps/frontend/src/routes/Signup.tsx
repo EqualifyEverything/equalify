@@ -76,7 +76,7 @@ export const Signup = () => {
             <h1 className={`${styles.title} initial-focus-element`}>Sign up for Equalify</h1>
         </div>
 
-        {import.meta.env.VITE_SSO_ENABLED ? <div>Sorry, you may only login using your SSO provider.</div> : <>
+        {import.meta.env.VITE_SSO_ENABLED ? <div className={`${styles.error}`}>Sorry, you may only login using your SSO provider.</div> : <>
         <div className={`${styles.signUpForm}`}>
             <label htmlFor='name'>Name</label>
             <input id='name' name='name' required type='text' placeholder='John Doe' />

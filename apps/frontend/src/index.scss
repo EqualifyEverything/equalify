@@ -33,6 +33,7 @@ body {
   color: variables.$black;
   @include fonts.raleway-medium;
   @include fonts.font-size-normal;
+  line-height: 1.4em;
 
   a,
   a:visited {
@@ -58,7 +59,9 @@ body {
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
   margin:0 auto;
-  min-height:calc(100dvh - 88px);
+  min-height:calc(100dvh - 60px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Suppress focus outline */
