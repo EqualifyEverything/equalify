@@ -11,20 +11,29 @@
 @use "./global-styles/sr-only";
 @use "./global-styles/drawer";
 @use "./global-styles/selects";
+@use "./global-styles/labels";
 @use "./global-styles/inputs";
 @use "./global-styles/flex";
 @use "./global-styles/navigation.scss";
 
 html {
   scrollbar-gutter: auto !important;
+    -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   color: variables.$black;
-  background: variables.$paper;
   @include fonts.raleway-medium;
   @include fonts.font-size-normal;
+  line-height: 1.4em;
 
   a,
   a:visited {
@@ -46,11 +55,14 @@ body {
 }
 
 .container {
+  width: 100%;
   max-width: variables.$max-width;
   padding-right: variables.$spacing;
   padding-left: variables.$spacing;
-  margin:0 auto;
-  min-height:calc(100dvh - 88px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height:calc(100dvh - 60px);
 }
 
 /* Suppress focus outline */

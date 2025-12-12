@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import * as Auth from 'aws-amplify/auth';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import {  Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
 import { useMsal } from '@azure/msal-react';
+import { Logo } from "#src/components/Logo";
+import { StyledButton } from "#src/components/StyledButton";
+import styles from "./Login.module.scss";
+
 
 export const Login = () => {
     const queryClient = useQueryClient();
@@ -155,22 +159,41 @@ export const Login = () => {
     };
 
 
-    return (<form onSubmit={login} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto initial-focus-element'>Welcome back!</h1>
+    return (
+    <form onSubmit={login} className={styles.login}>
+        <div className={styles.header}>
+            <div className={styles.logo}>
+                <Logo />
+            </div>
+            <h1 className={`${styles.title} initial-focus-element`}>Sign in to Equalify</h1>
+        </div>
+
         {import.meta.env.VITE_SSO_ENABLED ? <>
-            <button type="button" onClick={ssoLogin}>Sign In with SSO</button>
-            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
+            {error && <div className={`${styles.error}`}>{error}</div>}
+            <StyledButton
+                variant='green'
+                onClick={ssoLogin}
+                label={`Sign in with SSO`}
+            />
         </> : <>
-            <div className='flex flex-col'>
+            <div className={`${styles.signInForm}`}>
                 <label htmlFor='email'>Email address</label>
                 <input id='email' name="email" required type="email" placeholder='johndoe@example.com' defaultValue={email ?? ''} />
-            </div>
-            <div className='flex flex-col'>
                 <label htmlFor='password'>Password</label>
                 <input id='password' name="password" required type="password" placeholder='Password' />
+                <StyledButton
+                    variant='green'
+                    onClick={``}
+                    label={`Log In`}
+                />
+                {error && <div className={`${styles.error}`}>{error}</div>}
             </div>
-            <button disabled={!!loading} className=''>Log In</button>
-            {error && <div className='text-red-600 dark:text-red-400'>{error}</div>}
         </>}
+        <p>
+            <span>New here? </span>
+            <Link to="/signup" className={styles.authLink}>
+                Create an account
+            </Link>
+        </p>
     </form>)
 }

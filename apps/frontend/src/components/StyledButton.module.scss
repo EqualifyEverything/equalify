@@ -2,18 +2,23 @@
 @use "../global-styles/fonts.scss";
 
 .button {
-  border: 0;
-  padding: calc(variables.$spacing) calc(variables.$spacing * 2);
+  @include fonts.font-size-normal;
+  font-weight: bold;
+
+  color: variables.$white;
+  padding: variables.$spacing*2;
+  background: variables.$green;
+  border-radius: variables.$spacing/2;
+  border: 1px solid variables.$green-dark;
+  box-shadow: variables.$shadow-small;
   cursor: pointer;
-  border-radius: calc(variables.$spacing * 4);
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
   align-content: center;
   justify-content: center;
   align-items: center;
-  border: 3px solid variables.$black;
-  font-weight: bold;
+  transition: background 0.12s ease-out, opacity 0.12s ease-out;
 
   span {
     display: block;
@@ -26,10 +31,30 @@
 
   &.dark {
     background: variables.$black;
-    color: variables.$paper;
+        border-color: variables.$black;
+
+    color: variables.$white;
+    &:hover{
+      background: variables.$black;
+      opacity: .85;
+    }
+    &:active{
+      background: variables.$black;
+      opacity: .7;
+    }
   }
   &.light {
     background: transparent;
+    border-color: variables.$black;
+    color: variables.$black;
+    &:hover{
+      background: transparent;
+      opacity: .85;
+    }
+    &:active{
+      background: transparent;
+      opacity: .7;
+    }
     &.disabled {
       border-color: variables.$gray;
       color: variables.$gray;
@@ -37,15 +62,32 @@
   }
   &.naked {
     background: transparent;
+    box-shadow: none;
     border: 0;
     color: variables.$red;
     flex-direction: row-reverse;
     padding:0;
+    &:hover{
+      background: transparent;
+      opacity: .85;
+    }
+    &:active{
+      background: transparent;
+      opacity: .7;
+    }
   }
   &.red {
     background: variables.$red;
     color: variables.$white;
     border-color: variables.$red;
+    &:hover{
+      background: variables.$red;
+      opacity: .85;
+    }
+    &:active{
+      background: variables.$red;
+      opacity: .7;
+    }
     &.disabled {
       opacity: 0.5;
     }
@@ -53,11 +95,18 @@
   &.green {
     background: variables.$green;
     color: variables.$paper;
+    &:hover{
+      background: variables.$green-dark
+    }
+    &:active{
+      background: variables.$green-darker
+    }
   }
 
   &.icon-only {
     border: 0;
     background: transparent !important;
+    box-shadow: none;
     opacity: 0.6;
     svg {
       margin: 0;

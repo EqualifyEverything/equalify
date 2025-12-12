@@ -1,26 +1,44 @@
 $white: #fff;
-$black: #171717;
-//$paper: #fcf9f1;
+$black: #334155;
+$black-translucent: #334155ad;
 $paper: #eff0eb;
+$paper-dark: #ddded8;
 $gray: #e0dcd0;
 $yellow: #fed95a;
-$red: #d4563a;
+$red-light: #fae7e6;
+$red: #c72d25;
+$red-dark: #651410;
 $green: #168a36;
+$green-dark: #128131;
+$green-darker: #106427;
 $green-light: #c3fed4;
 
 $spacing: 8px;
 $max-width: 1080px;
 
+$shadow-small: 0px 1px 1px 0px $black-translucent, 0px 1px 3px 0px $black-translucent;
+$shadow-inset: inset 0px 1px 0px 0px #1f23280a;
+
 :export {
   white: $white;
   black: $black;
+  black_translucent: $black-translucent;
   paper:$paper;
+  paper_dark: $paper-dark;
   gray: $gray;
   yellow:$yellow;
+  red_light: $red-light;
   red: $red;
+  red_dark: $red-dark;
   green: $green;
+  green_dark: $green-dark;
+  green_darker: $green_darker;
   green_light: $green-light;
 
   spacing: $spacing;
   max_width: $max-width;
+
+  shadow_small: $shadow-small;
+  shadow-inset: $shadow-inset;
+
 }

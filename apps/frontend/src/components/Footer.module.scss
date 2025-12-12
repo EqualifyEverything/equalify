@@ -3,14 +3,15 @@
 
 .footer {
   text-decoration: none;
-  background: variables.$black;
-  color: variables.$paper;
+  background: variables.$paper;
+  border-top: 1px solid variables.$paper-dark;
+  color: variables.$black;
   @include fonts.font-size-small;
   text-align: center;
   display: inline-flex;
   align-items: center;
   width:100%;
-  margin-top: calc(variables.$spacing*4);
+  margin-top: auto;
   justify-content: center;
   padding-top:variables.$spacing;
   padding-bottom:variables.$spacing;
@@ -18,11 +19,12 @@
     display: inline-block;
     padding:variables.$spacing;
     text-decoration: none;
-    color: variables.$paper;
+    color: variables.$black;
     opacity:0.6;
     display:flex;
     align-items: center;
     gap: variables.$spacing;
+    transition: opacity 0.12s ease-out;
     &:hover {
       opacity: 1;
     }

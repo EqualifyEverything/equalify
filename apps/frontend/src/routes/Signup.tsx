@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import * as Auth from 'aws-amplify/auth';
 import * as API from 'aws-amplify/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { sleep, useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
+import styles from "./Signup.module.scss";
+import { Logo } from "#src/components/Logo";
+import { StyledButton } from "#src/components/StyledButton";
 
 export const Signup = () => {
     const queryClient = useQueryClient();
@@ -65,27 +68,42 @@ export const Signup = () => {
         }
     }
 
-    return (<form onSubmit={signup} className='flex flex-col gap-4 max-w-screen-sm'>
-        <h1 className='mx-auto initial-focus-element'>Create an account</h1>
-        {import.meta.env.VITE_SSO_ENABLED ? <div>Sorry, you may only login using your SSO provider.</div> : <>
-            <div className='flex flex-col'>
-                <label htmlFor='name'>Name</label>
-                <input id='name' name='name' required type='text' placeholder='John Doe' />
+    return (<form onSubmit={signup} className={styles.signup}>
+        <div className={styles.header}>
+            <div className={styles.logo}>
+                <Logo />
             </div>
-            <div className='flex flex-col'>
-                <label htmlFor='email'>Email address</label>
-                <input id='email' name='email' required type='email' placeholder='johndoe@example.com' />
-            </div>
-            <div className='flex flex-col'>
-                <label htmlFor='password'>Password</label>
-                <input id='password' name='password' required type='password' placeholder='Password' />
-            </div>
-            <div className='flex flex-row gap-1'>
+            <h1 className={`${styles.title} initial-focus-element`}>Sign up for Equalify</h1>
+        </div>
+
+        {import.meta.env.VITE_SSO_ENABLED ? <div className={`${styles.error}`}>Sorry, you may only login using your SSO provider.</div> : <>
+        <div className={`${styles.signUpForm}`}>
+            <label htmlFor='name'>Name</label>
+            <input id='name' name='name' required type='text' placeholder='John Doe' />
+            <label htmlFor='email'>Email address</label>
+            <input id='email' name='email' required type='email' placeholder='johndoe@example.com' />
+            <label htmlFor='password'>Password</label>
+            <input id='password' name='password' required type='password' placeholder='Password' />
+            <div className={`${styles.terms}`}>
                 <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
-                <label htmlFor='terms'>I agree to the <a className='hover:opacity-50' target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a className='hover:opacity-50' target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a></label>
+                <label htmlFor='terms'>I agree to the <a target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a>.</label>
             </div>
-            <button disabled={loading} className=''>Sign Up</button>
-            {error && <div className=''>{error}</div>}
+            {error && <div className={`${styles.error}`}>{error}</div>}
+
+            <StyledButton
+                variant='green'
+                onClick={``}
+                label={`Sign Up`}
+            />
+            
+        </div>
         </>}
+        <p>
+            <span>Already have an account? </span>
+            <Link to="/login" className={styles.authLink}>
+                Log in
+            </Link>
+        </p>
+
     </form>)
 }

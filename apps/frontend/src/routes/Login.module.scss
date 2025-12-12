@@ -1,0 +1,40 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.login{
+    margin: clamp(32px, 8vw, 120px) auto;
+    padding: calc(variables.$spacing * 5);
+    display: grid;
+    gap: calc(variables.$spacing * 3);
+    width: 100%;
+    max-width: 400px ;
+    .header{
+        .logo{
+            width: 100px;
+            margin: 0 auto;
+        }
+        .title{
+            text-align: center;
+        }
+    }
+    label{
+        display: block;
+        margin-top: variables.$spacing*2;
+        margin-bottom: variables.$spacing/4;
+
+    }
+    button{
+        width: 100%;
+        margin-top: variables.$spacing*2;
+    }
+    input[type="text"], input[type="password"], input[type="email"]{
+        width: 100%
+    }
+    .error{
+        color: variables.$red;
+        border-radius: variables.$spacing/2;
+        background: variables.$red-light;
+        border: 1px solid variables.$red-dark;
+        padding: variables.$spacing*2;
+    }
+}
