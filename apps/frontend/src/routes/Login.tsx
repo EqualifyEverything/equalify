@@ -169,12 +169,12 @@ export const Login = () => {
         </div>
 
         {import.meta.env.VITE_SSO_ENABLED ? <>
+            {error && <div className={`${styles.error}`}>{error}</div>}
             <StyledButton
                 variant='green'
                 onClick={ssoLogin}
                 label={`Sign in with SSO`}
             />
-            {error && <div className={`${styles.error}`}>{error}</div>}
         </> : <>
             <div className={`${styles.signInForm}`}>
                 <label htmlFor='email'>Email address</label>

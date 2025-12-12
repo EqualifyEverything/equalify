@@ -35,4 +35,10 @@
     input[type="text"], input[type="password"], input[type="email"]{
         width: 100%
     }
+    .error{
+        border-radius: variables.$spacing/2;
+        background: variables.$paper;
+        border: 1px solid variables.$paper-dark;
+        padding: variables.$spacing;
+    }
 }

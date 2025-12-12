@@ -88,12 +88,13 @@ export const Signup = () => {
                 <input id='terms' name='terms' required type='checkbox' placeholder='terms' />
                 <label htmlFor='terms'>I agree to the <a target='_blank' href='https://equalify.app/terms-of-service/'>Terms of Service</a> and <a target='_blank' href='https://equalify.app/privacy-policy/'>Privacy Policy</a>.</label>
             </div>
+            {error && <div className={`${styles.error}`}>{error}</div>}
+
             <StyledButton
                 variant='green'
                 onClick={``}
                 label={`Sign Up`}
             />
-            {error && <div className={`${styles.error}`}>{error}</div>}
             
         </div>
         </>}
