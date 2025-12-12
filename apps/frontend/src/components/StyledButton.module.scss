@@ -31,6 +31,8 @@
 
   &.dark {
     background: variables.$black;
+        border-color: variables.$black;
+
     color: variables.$white;
     &:hover{
       background: variables.$black;
@@ -43,6 +45,8 @@
   }
   &.light {
     background: transparent;
+    border-color: variables.$black;
+    color: variables.$black;
     &:hover{
       background: transparent;
       opacity: .85;
@@ -58,6 +62,7 @@
   }
   &.naked {
     background: transparent;
+    box-shadow: none;
     border: 0;
     color: variables.$red;
     flex-direction: row-reverse;
@@ -101,6 +106,7 @@
   &.icon-only {
     border: 0;
     background: transparent !important;
+    box-shadow: none;
     opacity: 0.6;
     svg {
       margin: 0;
