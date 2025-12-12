@@ -35,12 +35,12 @@ export const BuildAudit = () => {
 
   const defaultEmailList = {
     emails: [
-      {
+      /* {
         id: uuidv4(),
         email: user?.email ?? "user@uic.edu",
         frequency: "Weekly",
         lastSent: "", // we'll populate this on send in buildAuditData
-      },
+      }, */
     ],
   };
   const [emailList, setEmailList] =
@@ -133,67 +133,53 @@ export const BuildAudit = () => {
     <div className={styles.buildAudit}>
       {/* <Link to="..">← Go Back</Link>
        */}
-       <h1 className="initial-focus-element">Audit Builder</h1>
+      <h1 className="initial-focus-element">Audit Builder</h1>
       <form onSubmit={saveAndRunAudit}>
         <div className="cards-38-62">
-        <Card variant="light">
-          <h2>
-            <CgOptions className={"icon-small"} />
-            General Info
-          </h2>
-          <StyledLabeledInput>
-            <label htmlFor="auditName">
-              Audit Name <span>(required)</span>:
-            </label>
-            <input
-              id="auditName"
-              name="auditName"
-              onBlur={validateAuditName}
-              required
-              className={styles["input-element"]}
-            />
-          </StyledLabeledInput>
-
-          <StyledLabeledInput>
-            <label htmlFor="scanFrequency">Scan Frequency:</label>
-            <select id="scanFrequency" name="scanFrequency" className={styles["input-element"]}>
-              <option>Manually</option>
-              <option>Daily</option>
-              <option>Weekly</option>
-              <option>Monthly</option>{/* 
-              <option>On Monitor Update</option> */}
-            </select>
-          </StyledLabeledInput>
-        </Card>
-        <Card variant="light">
-          <h2>
-            <TbMail className="icon-small" />
-            Email Notifications:
-          </h2>
-          <StyledLabeledInput>  
-            <label htmlFor="emailNotifications">
-              Enable email notifications?
-            </label>
-            <Switch.Root
-              id="emailNotifications"
-              checked={!emailNotifications}
-              onCheckedChange={(checked) => setEmailNotifications(!checked)}
-              aria-label={"Enable email notifications?"}
-              className={styles["switch"]}
-            >
-              <Switch.Thumb className={styles["switch-thumb"]} />
-            </Switch.Root>
-          </StyledLabeledInput>
-
-          {emailNotifications && (
-            <div>
-              <AuditEmailSubscriptionInput
-                initialValue={emailList}
-                onValueChange={setEmailList}
+          <Card variant="light">
+            <h2>
+              <CgOptions className={"icon-small"} />
+              General Info
+            </h2>
+            <StyledLabeledInput>
+              <label htmlFor="auditName">
+                Audit Name <span>(required)</span>:
+              </label>
+              <input
+                id="auditName"
+                name="auditName"
+                onBlur={validateAuditName}
+                required
+                className={styles["input-element"]}
               />
-            </div>
-          )}
-        </Card>
+            </StyledLabeledInput>
+
+            <StyledLabeledInput>
+              <label htmlFor="scanFrequency">Scan Frequency:</label>
+              <select
+                id="scanFrequency"
+                name="scanFrequency"
+                className={styles["input-element"]}
+              >
+                <option>Manually</option>
+                <option>Daily</option>
+                <option>Weekly</option>
+                <option>Monthly</option>
+                {/* 
+              <option>On Monitor Update</option> */}
+              </select>
+            </StyledLabeledInput>
+          </Card>
+          <Card variant="light">
+            <h2>
+              <TbMail className="icon-small" />
+              Email Notifications:
+            </h2>
+            <AuditEmailSubscriptionInput
+              initialValue={emailList}
+              onValueChange={setEmailList}
+            />
+          </Card>
         </div>
 
         <Card variant="light">
@@ -201,11 +187,11 @@ export const BuildAudit = () => {
             <TbList className={"icon-small"} />
             Add URLs
           </h2>
-          <AuditPagesInput 
-            initialPages={pages} 
+          <AuditPagesInput
+            initialPages={pages}
             setParentPages={setPages}
             returnMutation={false}
-            />
+          />
         </Card>
         <div className={styles["action-buttons"]}>
           <StyledButton

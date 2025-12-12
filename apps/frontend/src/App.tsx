@@ -177,7 +177,7 @@ export const App = () => {
       apiKey={import.meta.env.VITE_POSTHOG_KEY}
       options={{ api_host: "https://us.posthog.com" }}
     >
-      <div aria-live="assertive" role="status" className="sr-only">
+      <div aria-live="assertive" aria-atomic className="sr-only">
         {announceMessage}
       </div>
       <QueryClientProvider client={queryClient}>

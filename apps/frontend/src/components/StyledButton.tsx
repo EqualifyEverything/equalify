@@ -46,7 +46,7 @@ export const StyledButton = ({
       {loading ? (
         <span className={styles["spinner"]} aria-hidden="true"></span>
       ) : (
-        icon && <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>
+        icon //&& <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>
       )}
       {showLabel ? (
         <span>{loading ? "Loading..." : label}</span>

@@ -41,7 +41,8 @@ export const AuditEmailSubscriptionInput: React.FC<ChildProps> = ({
     []
   );
 
-  const handleAddEmail = () => {
+  const handleAddEmail = (e:any) => {
+    e.preventDefault();
     setEmails((prevEmails) => [
       ...prevEmails,
       {
