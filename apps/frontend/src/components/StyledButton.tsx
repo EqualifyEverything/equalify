@@ -12,6 +12,7 @@ interface ButtonProps extends React.PropsWithChildren {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
+  prependText?: string;
 }
 
 export const StyledButton = ({
@@ -22,7 +23,8 @@ export const StyledButton = ({
   showLabel = true,
   disabled = false,
   loading = false,
-  className = ""
+  className = "",
+  prependText = ""
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   const isDisabled = disabled || loading ? styles["disabled"]: "";
@@ -48,6 +50,7 @@ export const StyledButton = ({
       ) : (
         icon //&& <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>
       )}
+      {prependText}
       {showLabel ? (
         <span>{loading ? "Loading..." : label}</span>
       ) : (

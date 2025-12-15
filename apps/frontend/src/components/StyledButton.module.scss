@@ -76,6 +76,10 @@
       opacity: .7;
     }
   }
+  &.rondel {
+    padding:variables.$spacing;
+    border-radius: 999px;
+  }
   &.red {
     background: variables.$red;
     color: variables.$white;
