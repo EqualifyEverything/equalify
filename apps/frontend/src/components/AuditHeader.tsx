@@ -8,6 +8,7 @@ import { createLog } from "#src/utils/createLog.ts";
 import { useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { SkeletonAuditHeader } from "./Skeleton";
 
 interface AuditHeaderProps extends React.PropsWithChildren {
   isShared: boolean;
@@ -25,6 +26,8 @@ export const AuditHeader = ({
   const navigate = useNavigate();
   const { setAnnounceMessage } = useGlobalStore();
   const [isScanning, setIsScanning] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
 
   const copyCurrentLocationToClipboard = async () => {
     try {
@@ -44,20 +47,25 @@ export const AuditHeader = ({
   };
   const deleteAudit = async () => {
     if (confirm(`Are you sure you want to delete this audit?`)) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/deleteAudit",
-          options: { body: { id: auditId! } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audits"] });
-      // aria & logging
-      setAnnounceMessage(`Deleted audit ${audit.name}.`, "success");
-      await createLog(`Deleted audit ${audit.name}.`, auditId);
+      setIsDeleting(true);
+      try {
+        const response = await (
+          await API.post({
+            apiName: "auth",
+            path: "/deleteAudit",
+            options: { body: { id: auditId! } },
+          }).response
+        ).body.json();
+        //console.log(response);
+        await queryClient.refetchQueries({ queryKey: ["audits"] });
+        // aria & logging
+        setAnnounceMessage(`Deleted audit ${audit.name}.`, "success");
+        await createLog(`Deleted audit ${audit.name}.`, auditId);
 
-      navigate("/audits");
+        navigate("/audits");
+      } finally {
+        setIsDeleting(false);
+      }
       return;
     }
   };
@@ -89,20 +97,31 @@ export const AuditHeader = ({
       audit?.name
     );
     if (newName) {
-      const response = await (
-        await API.post({
-          apiName: "auth",
-          path: "/updateAudit",
-          options: { body: { id: auditId!, name: newName } },
-        }).response
-      ).body.json();
-      //console.log(response);
-      await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
-      // aria & logging
-      setAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`, "success");
+      setIsRenaming(true);
+      try {
+        const response = await (
+          await API.post({
+            apiName: "auth",
+            path: "/updateAudit",
+            options: { body: { id: auditId!, name: newName } },
+          }).response
+        ).body.json();
+        //console.log(response);
+        await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
+        // aria & logging
+        setAnnounceMessage(`Audit ${audit.name} renamed to ${newName}`, "success");
+      } finally {
+        setIsRenaming(false);
+      }
       return;
     }
   };
+
+  // Show skeleton while audit is loading
+  if (!audit) {
+    return <SkeletonAuditHeader />;
+  }
+
   return (
     <div className={styles.AuditHeader}>
       
@@ -118,12 +137,16 @@ export const AuditHeader = ({
               label="Rename Audit"
               icon={<FaPen />}
               showLabel={false}
+              loading={isRenaming}
+              disabled={isRenaming || isDeleting}
             />
             <StyledButton
               onClick={deleteAudit}
               label="Delete Audit"
               icon={<FaTrash />}
               showLabel={false}
+              loading={isDeleting}
+              disabled={isRenaming || isDeleting}
             />
           </div>
         )}

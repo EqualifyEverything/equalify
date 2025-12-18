@@ -8,7 +8,7 @@
   color: variables.$white;
   padding: variables.$spacing*2;
   background: variables.$green;
-  border-radius: variables.$spacing/2;
+  border-radius: calc(variables.$spacing / 2);
   border: 1px solid variables.$green-dark;
   box-shadow: variables.$shadow-small;
   cursor: pointer;

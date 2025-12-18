@@ -20,7 +20,7 @@
     label{
         display: block;
         margin-top: variables.$spacing*2;
-        margin-bottom: variables.$spacing/4;
+        margin-bottom: calc(variables.$spacing / 4);
 
     }
     button{
@@ -32,7 +32,7 @@
     }
     .error{
         color: variables.$red;
-        border-radius: variables.$spacing/2;
+        border-radius: calc(variables.$spacing / 2);
         background: variables.$red-light;
         border: 1px solid variables.$red-dark;
         padding: variables.$spacing*2;

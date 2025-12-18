@@ -8,6 +8,7 @@ import {
 import * as API from "aws-amplify/api";
 import { useState, useMemo } from "react";
 import { useGlobalStore } from "../utils";
+import { SkeletonTable } from "./Skeleton";
 
 const apiClient = API.generateClient();
 
@@ -134,10 +135,11 @@ export const InvitesTable = () => {
           return (
             <button
               onClick={() => deleteInviteMutation.mutate(inviteId)}
-              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm disabled:opacity-50"
               aria-label={`Delete invite`}
+              disabled={deleteInviteMutation.isPending}
             >
-              Delete
+              {deleteInviteMutation.isPending ? "Deleting..." : "Delete"}
             </button>
           );
         },
@@ -192,7 +194,7 @@ export const InvitesTable = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading invites...</div>
+        <SkeletonTable columns={3} rows={3} headers={["Email", "Created At", "Actions"]} />
       ) : (
         <>
           <div className="table-container">

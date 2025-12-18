@@ -105,3 +105,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+// Text group for multi-line skeletons
+.skeletonTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: calc(variables.$spacing / 2);
+}
+
+// Table row skeleton
+.skeletonTableRow {
+  td {
+    padding: variables.$spacing calc(variables.$spacing * 2);
+    border-bottom: 1px solid variables.$gray;
+  }
+}

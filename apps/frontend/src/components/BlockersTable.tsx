@@ -27,6 +27,7 @@ import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/pris
 import { StyledButton } from "./StyledButton";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
+import { SkeletonBlockersTable } from "./Skeleton";
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const apiClient = API.generateClient();
@@ -726,7 +727,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       </div>
 
       {isLoading ? (
-        <div>Loading blockers...</div>
+        <SkeletonBlockersTable rows={8} />
       ) : (
         <>
           <div className="table-container">

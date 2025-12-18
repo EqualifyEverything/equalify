@@ -32,6 +32,8 @@ export const BuildAudit = () => {
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [auditNameValid, setAuditNameValid] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
 
   const defaultEmailList = {
     emails: [
@@ -80,18 +82,21 @@ export const BuildAudit = () => {
     const formData = new FormData(form);
     const auditData = buildAuditData(formData);
     console.log("Audit Data (Save & Run):", JSON.stringify(auditData));
-    const response = (await (
-      await API.post({
-        apiName: "auth",
-        path: "/saveAudit",
-        options: { body: { ...auditData, saveAndRun: true } },
-      }).response
-    ).body.json()) as { id: string };
-    setAnnounceMessage(`Audit saved and audit run started!`, "success");
-    await createLog(`Audit created and audit run started!`, response.id);
-
-    navigate(`/audits/${response?.id}`);
-    return;
+    setIsSavingAndRunning(true);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/saveAudit",
+          options: { body: { ...auditData, saveAndRun: true } },
+        }).response
+      ).body.json()) as { id: string };
+      setAnnounceMessage(`Audit saved and audit run started!`, "success");
+      await createLog(`Audit created and audit run started!`, response.id);
+      navigate(`/audits/${response?.id}`);
+    } finally {
+      setIsSavingAndRunning(false);
+    }
   };
 
   const saveAudit = async (e: FormEvent) => {
@@ -106,18 +111,21 @@ export const BuildAudit = () => {
     const auditData = buildAuditData(formData);
 
     console.log("Audit Data (Save):", JSON.stringify(auditData));
-
-    const response = (await (
-      await API.post({
-        apiName: "auth",
-        path: "/saveAudit",
-        options: { body: { ...auditData, saveAndRun: false } },
-      }).response
-    ).body.json()) as { id: string };
-    setAnnounceMessage(`Audit saved!`, "success");
-    await createLog(`Audit created!`, response.id);
-    navigate(`/audits/${response?.id}`);
-    return;
+    setIsSaving(true);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/saveAudit",
+          options: { body: { ...auditData, saveAndRun: false } },
+        }).response
+      ).body.json()) as { id: string };
+      setAnnounceMessage(`Audit saved!`, "success");
+      await createLog(`Audit created!`, response.id);
+      navigate(`/audits/${response?.id}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const validateAuditName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,14 +206,16 @@ export const BuildAudit = () => {
             icon={<LuClipboardCheck />}
             onClick={saveAudit}
             label="Save Audit"
-            disabled={pages.length < 1 || !auditNameValid}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            loading={isSaving}
           />
           <StyledButton
             icon={<LuClipboardPaste />}
             onClick={saveAndRunAudit}
             label="Save & Run Audit"
             variant="red"
-            disabled={pages.length < 1 || !auditNameValid}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            loading={isSavingAndRunning}
           />
         </div>
       </form>

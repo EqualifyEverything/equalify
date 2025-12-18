@@ -6,7 +6,7 @@ input, select, textarea {
   color: variables.$black;
   background-color: variables.$white;
   border: 1px solid variables.$gray;
-  border-radius: variables.$spacing/2;
+  border-radius: calc(variables.$spacing / 2);
   box-shadow: variables.$shadow-inset;
   transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
   transition-property: box-shadow, border-color;
