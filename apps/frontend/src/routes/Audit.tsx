@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDate, useGlobalStore } from "../utils";
+import { formatDate, useGlobalStore, unformatId } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
@@ -70,7 +70,8 @@ const formatErrorType = (type: string): string => {
 };
 
 export const Audit = () => {
-  const { auditId } = useParams();
+  const { auditId: rawAuditId } = useParams();
+  const auditId = rawAuditId ? unformatId(rawAuditId) : undefined;
   const queryClient = useQueryClient();
   //const navigate = useNavigate();
   const location = useLocation();

@@ -18,7 +18,7 @@ import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 //import convertToEqualifyV2 from "../../../shared/convertors/VeraToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT = "https://api-staging.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT = process.env.RESULTS_ENDPOINT || "https://api.equalifyapp.com/public/scanWebhook";
 
 // {"data":{"auditId":"51a5077e-f8e6-4f75-939e-9c91b00a1f2e","urlId":"ea350f8f-5e56-4361-8cd5-570fcea0025d","url":"http://decubing.com/wp-content/uploads/2025/05/zombieplan.pdf","type":"pdf"}}
 interface sqsPayload {

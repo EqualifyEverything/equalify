@@ -14,7 +14,7 @@ import scan from "./scan.ts";
 import convertToEqualifyV2 from "../../../shared/convertors/AxeToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT = "https://api-staging.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT = process.env.RESULTS_ENDPOINT || "https://api.equalifyapp.com/public/scanWebhook";
 
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
