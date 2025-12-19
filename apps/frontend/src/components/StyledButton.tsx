@@ -29,6 +29,11 @@ export const StyledButton = ({
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   const isDisabled = disabled || loading ? styles["disabled"]: "";
   const isLoading = loading ? styles["loading"]: "";
+  const mappedClassNames = className
+    ?.split(" ")
+    .filter(Boolean)
+    .map((name) => styles[name] ?? name)
+    .join(" ");
   return (
     <button
       className={
@@ -39,7 +44,7 @@ export const StyledButton = ({
         + iconOnly + " "
         + isDisabled + " "
         + isLoading + " "
-        + className
+        + mappedClassNames
         }
       onClick={onClick}
       disabled={disabled || loading}

@@ -125,7 +125,7 @@ export const AuditPagesInputTable = ({
     <>
       {/* {pages.length > 0 ? ( */}
       <div className={"table-container " + styles.AuditPagesInputTable}>
-        <table aria-label="Users table">
+        <table aria-label="URLs table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-gray-100">

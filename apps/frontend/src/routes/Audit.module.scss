@@ -2,7 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .Audit {
-
+  margin-bottom: variables.$spacing*2;
   .scan-url-card-header {
     display: inline-flex;
     justify-content: space-between;

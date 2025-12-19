@@ -172,6 +172,7 @@ export const Login = () => {
             {error && <div className={`${styles.error}`}>{error}</div>}
             <StyledButton
                 variant='green'
+                className='large'
                 onClick={ssoLogin}
                 label={`Sign in with SSO`}
             />
