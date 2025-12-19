@@ -2,9 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .button {
-  @include fonts.font-size-normal;
   font-weight: bold;
-
   color: variables.$white;
   padding: variables.$spacing variables.$spacing*2;
   background: variables.$green;
@@ -31,6 +29,7 @@
 
   &.large{
     padding: variables.$spacing*2;
+      @include fonts.font-size-normal;
   }
 
   &.dark {
