@@ -65,7 +65,7 @@ interface Option {
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(10);
 
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
   const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
