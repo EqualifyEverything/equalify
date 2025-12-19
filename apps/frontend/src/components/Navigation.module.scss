@@ -30,7 +30,7 @@
         opacity:.7;
         transition: background 0.12s ease-out, opacity 0.12s ease-out;
         &:hover {
-            border-radius: variables.$spacing/2;
+            border-radius: calc(variables.$spacing / 2);
             background-color: variables.$paper-dark;
             opacity:1;
         }

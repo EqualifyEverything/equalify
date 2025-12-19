@@ -10,7 +10,9 @@ interface ButtonProps extends React.PropsWithChildren {
   label: string;
   showLabel?: boolean;
   disabled?: boolean;
+  loading?: boolean;
   className?: string;
+  prependText?: string;
 }
 
 export const StyledButton = ({
@@ -20,10 +22,13 @@ export const StyledButton = ({
   label,
   showLabel = true,
   disabled = false,
-  className = ""
+  loading = false,
+  className = "",
+  prependText = ""
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
-  const isDisabled = disabled ? styles["disabled"]: "";
+  const isDisabled = disabled || loading ? styles["disabled"]: "";
+  const isLoading = loading ? styles["loading"]: "";
   return (
     <button
       className={
@@ -33,16 +38,23 @@ export const StyledButton = ({
         + variant + " "
         + iconOnly + " "
         + isDisabled + " "
+        + isLoading + " "
         + className
         }
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading}
     >
-      {icon && <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>}
-      {showLabel ? (
-        <span>{label}</span>
+      {loading ? (
+        <span className={styles["spinner"]} aria-hidden="true"></span>
       ) : (
-        <VisuallyHidden.Root>{label}</VisuallyHidden.Root>
+        icon //&& <AccessibleIcon.Root label={label}>{icon}</AccessibleIcon.Root>
+      )}
+      {prependText}
+      {showLabel ? (
+        <span>{loading ? "Loading..." : label}</span>
+      ) : (
+        <VisuallyHidden.Root>{loading ? "Loading..." : label}</VisuallyHidden.Root>
       )}
     </button>
   );

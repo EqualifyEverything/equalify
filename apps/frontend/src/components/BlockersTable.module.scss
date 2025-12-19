@@ -30,4 +30,17 @@
       white-space: nowrap;
     }
   }
+  .view-code-details {
+    span {
+      @include fonts.font-size-small;
+    }
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .tooltip-rondel {
+    color:variables.$white;
+    background: variables.$black;
+    border-radius: 999px;
+    cursor:pointer;
+  }
 }

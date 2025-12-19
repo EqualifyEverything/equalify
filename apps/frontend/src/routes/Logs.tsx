@@ -9,6 +9,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { SkeletonTable } from "#src/components/Skeleton.tsx";
 
 export const Logs = () => {
   const [page, setPage] = useState(0);
@@ -97,7 +98,7 @@ export const Logs = () => {
         <div className="text-center py-8">Error Loading Logs Data</div>
       )}
       {isLoading ? (
-        <div className="text-center py-8">Loading Logs...</div>
+        <SkeletonTable columns={4} rows={8} headers={["Date", "Message", "User", "Audit"]} />
       ) : (
         <>
           <div className="table-container">

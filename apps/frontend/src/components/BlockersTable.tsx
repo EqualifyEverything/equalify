@@ -12,7 +12,7 @@ import { useState, useMemo, ChangeEvent } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
-import { FaClipboard, FaCode, FaRegFilePdf } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaClipboard, FaCode, FaRegFilePdf } from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
@@ -27,6 +27,7 @@ import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/pris
 import { StyledButton } from "./StyledButton";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
+import { SkeletonBlockersTable } from "./Skeleton";
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const apiClient = API.generateClient();
@@ -209,7 +210,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const getElementTagFromContent = (content: string) => {
     const parser = new DOMParser();
     const extractedElementTag = `<${parser.parseFromString(content, "text/html").body?.firstChild?.nodeName.toLowerCase()}>`;
-    return extractedElementTag ?? content;
+    return extractedElementTag !== "<undefined>"
+      ? extractedElementTag
+      : undefined;
   };
 
   const copyToClipboard = async (val: string) => {
@@ -268,18 +271,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "url",
         header: () => (
-          <button
+          <StyledButton
             onClick={handleSortByUrl}
-            className="flex items-center gap-1 hover:text-blue-600"
-            aria-label={`Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
+            className="font-small"
+            label={`Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
+            icon={sortOrder === "asc" ? <FaArrowUp /> : <FaArrowDown />}
+            variant="naked"
+            showLabel={false}
+            prependText="URL"
           >
-            URL
+            {/* URL
             {sortBy === "url" && (
               <span className="text-xs" aria-label={`Sorted ${sortOrder}`}>
                 {sortOrder === "asc" ? "▲" : "▼"}
               </span>
-            )}
-          </button>
+            )} */}
+          </StyledButton>
         ),
         cell: ({ getValue }) => {
           const url = getValue() as string;
@@ -307,11 +314,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 {messages[0] || "No message"}
               </div>
               <StyledButton
-               onClick={() => copyToClipboard(shortId)}
-               icon={<FaClipboard className="icon-small" />}
-               label={shortId || "N/A"}
-               variant={"naked"}
-               />
+                onClick={() => copyToClipboard(shortId)}
+                icon={<FaClipboard className="icon-small" />}
+                label={shortId || "N/A"}
+                variant={"naked"}
+              />
             </>
           );
         },
@@ -323,9 +330,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           const content = getValue() as string;
           return (
             <>
-              <code className={style["blocker-code"]}>
-                {getElementTagFromContent(content)}
-              </code>
+              {getElementTagFromContent(content) && (
+                <div className={style["view-code-details"]}>
+                  <span>Issue in element:</span>
+                  <code className={style["blocker-code"]}>
+                    {getElementTagFromContent(content)}
+                  </code>
+                </div>
+              )}
 
               <Drawer.Root
                 direction="right"
@@ -333,7 +345,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 setBackgroundColorOnScale={false}
               >
                 <Drawer.Trigger className={style["view-code-button"]}>
-                    <FaCode /> <span>View Code</span>
+                  <FaCode /> <span>View Code</span>
                 </Drawer.Trigger>
                 <Drawer.Portal>
                   <Drawer.Overlay className="drawer-overlay" />
@@ -377,8 +389,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
                 <Tooltip.Provider>
                   <Tooltip.Root>
-                    <Tooltip.Trigger>
-                      +{tags.slice(TAGS_TO_SHOW_IN_TABLE).length}
+                    <Tooltip.Trigger className={style["tooltip-rondel"]}>
+                      {`+${tags.slice(TAGS_TO_SHOW_IN_TABLE).length}`}
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content
@@ -402,7 +414,20 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </div>
           );
         },
-      } /* 
+      },
+      {
+        accessorKey: "categories",
+        header: "Category",
+        cell: ({ getValue }) => {
+          const category = getValue() as string;
+          return (
+            <div className="category tags">
+              <span className="tag">{category}</span>
+            </div>
+          );
+        },
+      }
+      /* 
       {
         accessorKey: "ignored",
         header: "Status",
@@ -454,23 +479,28 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           const blockerId = getValue() as string;
           const isIgnored = ignoredBlockers?.has(blockerId) || false;
           return (
-            
-              <StyledButton
-                onClick={() => {
-                  if (!authenticated) return;
-                  toggleIgnoreMutation.mutate({
-                    blockerId,
-                    isCurrentlyIgnored: isIgnored,
-                  });
-                  setAnnounceMessage(
-                    `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`, "success"
-                  );
-                }}
-                label={isIgnored ? "Ignored" : "Active"}
-                icon={isIgnored ? <TbEyeX className="icon-small" /> : <TbEye className="icon-small" />}
-                variant={isIgnored ? "toggle-ignored" : "toggle"} 
-                />
-            
+            <StyledButton
+              onClick={() => {
+                if (!authenticated) return;
+                toggleIgnoreMutation.mutate({
+                  blockerId,
+                  isCurrentlyIgnored: isIgnored,
+                });
+                setAnnounceMessage(
+                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`,
+                  "success"
+                );
+              }}
+              label={isIgnored ? "Ignored" : "Active"}
+              icon={
+                isIgnored ? (
+                  <TbEyeX className="icon-small" />
+                ) : (
+                  <TbEye className="icon-small" />
+                )
+              }
+              variant={isIgnored ? "toggle-ignored" : "toggle"}
+            />
           );
         },
       },
@@ -697,7 +727,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       </div>
 
       {isLoading ? (
-        <div>Loading blockers...</div>
+        <SkeletonBlockersTable rows={8} />
       ) : (
         <>
           <div className="table-container">

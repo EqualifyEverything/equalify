@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDate, useGlobalStore } from "../utils";
+import { formatDate, useGlobalStore, unformatId } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 const apiClient = API.generateClient();
@@ -70,7 +70,8 @@ const formatErrorType = (type: string): string => {
 };
 
 export const Audit = () => {
-  const { auditId } = useParams();
+  const { auditId: rawAuditId } = useParams();
+  const auditId = rawAuditId ? unformatId(rawAuditId) : undefined;
   const queryClient = useQueryClient();
   //const navigate = useNavigate();
   const location = useLocation();
@@ -152,7 +153,7 @@ export const Audit = () => {
 
   const handleUrlInput = async (_changedPages: Page[]) => {
     // just here to have a void function to hand to AuditPagesInput
-    console.log("Url Input...");
+    //console.log("Url Input...");
   };
 
   const addUrls = async (changedPages: Page[]) => {
@@ -656,7 +657,6 @@ export const Audit = () => {
             </div>
             <Collapsible.Content>
               <form>
-                {pages.length > 0 && (
                   <AuditPagesInput
                     initialPages={pages}
                     setParentPages={handleUrlInput}
@@ -666,7 +666,6 @@ export const Audit = () => {
                     returnMutation
                     isShared={isShared}
                   />
-                )}
               </form>
             </Collapsible.Content>
           </Collapsible.Root>

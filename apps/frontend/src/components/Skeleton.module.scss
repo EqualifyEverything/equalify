@@ -1,0 +1,122 @@
+@use "../global-styles/variables.module.scss";
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    variables.$gray 0%,
+    variables.$paper 50%,
+    variables.$gray 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: calc(variables.$spacing / 2);
+}
+
+.text {
+  height: 1em;
+  width: 100%;
+}
+
+.title {
+  height: 1.25em;
+  width: 60%;
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.rounded {
+  border-radius: variables.$spacing;
+}
+
+.skeletonCard {
+  background: variables.$white;
+  border: 1px solid variables.$gray;
+  border-radius: variables.$spacing;
+  padding: calc(variables.$spacing * 3) calc(variables.$spacing * 2);
+}
+
+.skeletonCardHeader {
+  display: flex;
+  align-items: center;
+  gap: variables.$spacing;
+  margin-bottom: calc(variables.$spacing * 2);
+}
+
+.skeletonIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.skeletonTitle {
+  height: 1.25em;
+  flex: 1;
+  max-width: 70%;
+}
+
+.skeletonDataRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(variables.$spacing / 2);
+  background: variables.$white;
+  border-bottom: 1px solid variables.$gray;
+
+  &:first-of-type {
+    border-bottom: 2px solid variables.$gray;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.skeletonKey {
+  height: 0.875em;
+  width: 30%;
+}
+
+.skeletonValue {
+  height: 0.875em;
+  width: 25%;
+}
+
+.skeletonGrid {
+  display: grid;
+  gap: calc(variables.$spacing * 2);
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Text group for multi-line skeletons
+.skeletonTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: calc(variables.$spacing / 2);
+}
+
+// Table row skeleton
+.skeletonTableRow {
+  td {
+    padding: variables.$spacing calc(variables.$spacing * 2);
+    border-bottom: 1px solid variables.$gray;
+  }
+}

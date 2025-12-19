@@ -8,10 +8,11 @@ import { Card } from "#src/components/Card.tsx";
 const apiClient = API.generateClient();
 import styles from "./Audits.module.scss";
 import { DataRow } from "#src/components/DataRow.tsx";
+import { SkeletonAuditGrid } from "#src/components/Skeleton.tsx";
 
 export const Audits = () => {
   const navigate = useNavigate();
-  const { data: audits } = useQuery({
+  const { data: audits, isLoading } = useQuery({
     queryKey: ["audits"],
     queryFn: async () =>
       (
@@ -60,7 +61,10 @@ export const Audits = () => {
         </div>
       </div>
       <div className="cards-33">
-        {audits?.map((row: any, index: number) => (
+        {isLoading ? (
+          <SkeletonAuditGrid count={6} />
+        ) : (
+          audits?.map((row: any, index: number) => (
           <Card variant="light" key={index}>
             <Link
               className="hover:opacity-50"
@@ -81,7 +85,8 @@ export const Audits = () => {
             {/* {row.scans[0].percentage}% */}
             </div>
           </Card>
-        ))}
+        ))
+        )}
       </div>
     </div>
   );

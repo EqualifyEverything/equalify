@@ -32,15 +32,17 @@ export const BuildAudit = () => {
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [auditNameValid, setAuditNameValid] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
 
   const defaultEmailList = {
     emails: [
-      {
+      /* {
         id: uuidv4(),
         email: user?.email ?? "user@uic.edu",
         frequency: "Weekly",
         lastSent: "", // we'll populate this on send in buildAuditData
-      },
+      }, */
     ],
   };
   const [emailList, setEmailList] =
@@ -75,21 +77,26 @@ export const BuildAudit = () => {
       window.alert(`You need to add at least 1 URL to your audit.`);
       return;
     }
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const form = (e.currentTarget as HTMLElement).closest("form");
+    if (!form) return;
+    const formData = new FormData(form);
     const auditData = buildAuditData(formData);
     console.log("Audit Data (Save & Run):", JSON.stringify(auditData));
-    const response = (await (
-      await API.post({
-        apiName: "auth",
-        path: "/saveAudit",
-        options: { body: { ...auditData, saveAndRun: true } },
-      }).response
-    ).body.json()) as { id: string };
-    setAnnounceMessage(`Audit saved and audit run started!`, "success");
-    await createLog(`Audit created and audit run started!`, response.id);
-
-    navigate(`/audits/${response?.id}`);
-    return;
+    setIsSavingAndRunning(true);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/saveAudit",
+          options: { body: { ...auditData, saveAndRun: true } },
+        }).response
+      ).body.json()) as { id: string };
+      setAnnounceMessage(`Audit saved and audit run started!`, "success");
+      await createLog(`Audit created and audit run started!`, response.id);
+      navigate(`/audits/${response?.id}`);
+    } finally {
+      setIsSavingAndRunning(false);
+    }
   };
 
   const saveAudit = async (e: FormEvent) => {
@@ -104,18 +111,21 @@ export const BuildAudit = () => {
     const auditData = buildAuditData(formData);
 
     console.log("Audit Data (Save):", JSON.stringify(auditData));
-
-    const response = (await (
-      await API.post({
-        apiName: "auth",
-        path: "/saveAudit",
-        options: { body: { ...auditData, saveAndRun: false } },
-      }).response
-    ).body.json()) as { id: string };
-    setAnnounceMessage(`Audit saved!`, "success");
-    await createLog(`Audit created!`, response.id);
-    navigate(`/audits/${response?.id}`);
-    return;
+    setIsSaving(true);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/saveAudit",
+          options: { body: { ...auditData, saveAndRun: false } },
+        }).response
+      ).body.json()) as { id: string };
+      setAnnounceMessage(`Audit saved!`, "success");
+      await createLog(`Audit created!`, response.id);
+      navigate(`/audits/${response?.id}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const validateAuditName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,67 +141,53 @@ export const BuildAudit = () => {
     <div className={styles.buildAudit}>
       {/* <Link to="..">← Go Back</Link>
        */}
-       <h1 className="initial-focus-element">Audit Builder</h1>
+      <h1 className="initial-focus-element">Audit Builder</h1>
       <form onSubmit={saveAndRunAudit}>
         <div className="cards-38-62">
-        <Card variant="light">
-          <h2>
-            <CgOptions className={"icon-small"} />
-            General Info
-          </h2>
-          <StyledLabeledInput>
-            <label htmlFor="auditName">
-              Audit Name <span>(required)</span>:
-            </label>
-            <input
-              id="auditName"
-              name="auditName"
-              onBlur={validateAuditName}
-              required
-              className={styles["input-element"]}
-            />
-          </StyledLabeledInput>
-
-          <StyledLabeledInput>
-            <label htmlFor="scanFrequency">Scan Frequency:</label>
-            <select id="scanFrequency" name="scanFrequency" className={styles["input-element"]}>
-              <option>Manually</option>
-              <option>Daily</option>
-              <option>Weekly</option>
-              <option>Monthly</option>{/* 
-              <option>On Monitor Update</option> */}
-            </select>
-          </StyledLabeledInput>
-        </Card>
-        <Card variant="light">
-          <h2>
-            <TbMail className="icon-small" />
-            Email Notifications:
-          </h2>
-          <StyledLabeledInput>  
-            <label htmlFor="emailNotifications">
-              Enable email notifications?
-            </label>
-            <Switch.Root
-              id="emailNotifications"
-              checked={!emailNotifications}
-              onCheckedChange={(checked) => setEmailNotifications(!checked)}
-              aria-label={"Enable email notifications?"}
-              className={styles["switch"]}
-            >
-              <Switch.Thumb className={styles["switch-thumb"]} />
-            </Switch.Root>
-          </StyledLabeledInput>
-
-          {emailNotifications && (
-            <div>
-              <AuditEmailSubscriptionInput
-                initialValue={emailList}
-                onValueChange={setEmailList}
+          <Card variant="light">
+            <h2>
+              <CgOptions className={"icon-small"} />
+              General Info
+            </h2>
+            <StyledLabeledInput>
+              <label htmlFor="auditName">
+                Audit Name <span>(required)</span>:
+              </label>
+              <input
+                id="auditName"
+                name="auditName"
+                onBlur={validateAuditName}
+                required
+                className={styles["input-element"]}
               />
-            </div>
-          )}
-        </Card>
+            </StyledLabeledInput>
+
+            <StyledLabeledInput>
+              <label htmlFor="scanFrequency">Scan Frequency:</label>
+              <select
+                id="scanFrequency"
+                name="scanFrequency"
+                className={styles["input-element"]}
+              >
+                <option>Manually</option>
+                <option>Daily</option>
+                <option>Weekly</option>
+                <option>Monthly</option>
+                {/* 
+              <option>On Monitor Update</option> */}
+              </select>
+            </StyledLabeledInput>
+          </Card>
+          <Card variant="light">
+            <h2>
+              <TbMail className="icon-small" />
+              Email Notifications:
+            </h2>
+            <AuditEmailSubscriptionInput
+              initialValue={emailList}
+              onValueChange={setEmailList}
+            />
+          </Card>
         </div>
 
         <Card variant="light">
@@ -199,25 +195,27 @@ export const BuildAudit = () => {
             <TbList className={"icon-small"} />
             Add URLs
           </h2>
-          <AuditPagesInput 
-            initialPages={pages} 
+          <AuditPagesInput
+            initialPages={pages}
             setParentPages={setPages}
             returnMutation={false}
-            />
+          />
         </Card>
         <div className={styles["action-buttons"]}>
           <StyledButton
             icon={<LuClipboardCheck />}
             onClick={saveAudit}
             label="Save Audit"
-            disabled={pages.length < 1 || !auditNameValid}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            loading={isSaving}
           />
           <StyledButton
             icon={<LuClipboardPaste />}
             onClick={saveAndRunAudit}
             label="Save & Run Audit"
             variant="red"
-            disabled={pages.length < 1 || !auditNameValid}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            loading={isSavingAndRunning}
           />
         </div>
       </form>

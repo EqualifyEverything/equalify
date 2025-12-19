@@ -18,7 +18,7 @@ import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 //import convertToEqualifyV2 from "../../../shared/convertors/VeraToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT = "https://api-staging.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT = process.env.RESULTS_ENDPOINT || "https://api.equalifyapp.com/public/scanWebhook";
 
 // {"data":{"auditId":"51a5077e-f8e6-4f75-939e-9c91b00a1f2e","urlId":"ea350f8f-5e56-4361-8cd5-570fcea0025d","url":"http://decubing.com/wp-content/uploads/2025/05/zombieplan.pdf","type":"pdf"}}
 interface sqsPayload {
@@ -35,6 +35,12 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
   const payloadParsed = JSON.parse(payload) as sqsPayload;
 
   const job = payloadParsed.data;
+  
+  // Validate job has required fields
+  if (!job.scanId) {
+    logger.warn("Job is missing scanId!", { auditId: job.auditId, urlId: job.urlId });
+  }
+  
   if (payload) {
     try {
       metrics.addMetric("scansStarted", MetricUnit.Count, 1);
@@ -66,18 +72,20 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         });
 
         if(sendResultsResponse.ok){
+          const responseData = await sendResultsResponse.json();
           logger.info(
             "PDF-scan Results sent to API results webhook!",
-            JSON.stringify(sendResultsResponse.json())
+            JSON.stringify(responseData)
           );
         }else{
+          const errorData = await sendResultsResponse.text();
           logger.error(
             "Error sending results to API results webhook!",
             sendResultsResponse.statusText
           );
           logger.error(
-            "Failed to send:",
-            JSON.stringify(sendResultsResponse.json())
+            "Failed to send. Response body:",
+            errorData
           )
         }
         
