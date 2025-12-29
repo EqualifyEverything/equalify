@@ -61,6 +61,7 @@
     &.disabled {
       border-color: variables.$gray;
       color: variables.$gray;
+      box-shadow: none;
     }
   }
   &.naked {
@@ -155,6 +156,10 @@
     //color:variables.$gray;
     //border-color:variables.$gray;
   } */
+}
+
+.inline {
+  display: inline-flex;
 }
 
 .spinner {

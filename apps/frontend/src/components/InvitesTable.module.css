@@ -1,0 +1,9 @@
+/*
+  Basic layout for invites table container.
+  Add more styling as needed to match the design system.
+*/
+.InvitesTable {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

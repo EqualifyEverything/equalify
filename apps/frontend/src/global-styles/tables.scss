@@ -75,6 +75,10 @@
         }
       }
     }
+    select{
+      @include fonts.font-size-small;
+      padding: calc(variables.$spacing/2) variables.$spacing;
+    }
   }
   .pagination {
     background: variables.$white;
@@ -103,7 +107,6 @@
       }
 
       button:disabled {
-        opacity: 0.5;
         cursor: not-allowed;
       }
     }
