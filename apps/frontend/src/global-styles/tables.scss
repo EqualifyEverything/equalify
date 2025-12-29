@@ -78,6 +78,7 @@
     select{
       @include fonts.font-size-small;
       padding: calc(variables.$spacing/2) variables.$spacing;
+      margin: 0;
     }
   }
   .pagination {
@@ -86,6 +87,11 @@
     align-items: center;
     justify-content: space-between;
     padding: variables.$spacing;
+    select{
+      @include fonts.font-size-small;
+      padding: 0 variables.$spacing;
+      margin: 0;
+    }
 
     @include fonts.font-size-small;
     .pagination-text {

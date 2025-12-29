@@ -8,7 +8,7 @@
   background: variables.$green;
   border-radius: calc(variables.$spacing / 2);
   border: 1px solid variables.$green-dark;
-  box-shadow: variables.$shadow-small;
+  box-shadow: 0;
   cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
@@ -160,6 +160,7 @@
 
 .inline {
   display: inline-flex;
+  margin-left: variables.$spacing;
 }
 
 .spinner {
