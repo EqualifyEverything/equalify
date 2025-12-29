@@ -9,7 +9,12 @@
     .chart-ranger-select{
         label{
             display: block;
-            @include fonts.font-size-small
+        }
+        label, select{
+          @include fonts.font-size-small;
+        }
+        select{
+          padding: variables.$spacing;
         }
     }
 }
