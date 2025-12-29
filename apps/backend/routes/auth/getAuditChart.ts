@@ -56,6 +56,11 @@ export const getAuditChart = async () => {
     now.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
     const chartData = [];
     let lastKnownValue = 0;
+    
+    // get the blockers value of the most recent scan
+    const mostRecentScan = Array.from(scansByDate.values()).sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0];
+    const mostRecentBlockersCount = mostRecentScan ? mostRecentScan.blockers : 0;
+    lastKnownValue = mostRecentBlockersCount;
 
     for (let i = days - 1; i >= 0; i--) {
         const date = new Date(now);
