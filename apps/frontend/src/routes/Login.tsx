@@ -72,7 +72,8 @@ export const Login = () => {
         }
     }
 
-    const ssoLogin = async () => {
+    const ssoLogin = async (e:any) => {
+        e.preventDefault();
         setLoading('Logging in with SSO...');
         setError(''); // Clear any previous errors
         

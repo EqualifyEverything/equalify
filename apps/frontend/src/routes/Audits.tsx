@@ -45,7 +45,7 @@ export const Audits = () => {
         })
       )?.data?.audits,
   });
-  console.log(audits);
+  //console.log(audits);
   return (
     <div className={styles.Audits}>
       <div>

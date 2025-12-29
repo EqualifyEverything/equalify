@@ -50,6 +50,6 @@
     flex-wrap: wrap;
     gap: calc(variables.$spacing*2);
     .card {
-        width:calc(33.33333% - (variables.$spacing*6));
+        width:calc(33.33333% - (12px));
     }
 }
