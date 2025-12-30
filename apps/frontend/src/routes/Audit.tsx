@@ -387,7 +387,7 @@ export const Audit = () => {
                     <Line
                       type="monotone"
                       dataKey="blockers"
-                      stroke={themeVariables.paper}
+                      stroke={themeVariables.white}
                       strokeWidth={4}
                       dot={CustomizedDot}
                       name="Blockers"
