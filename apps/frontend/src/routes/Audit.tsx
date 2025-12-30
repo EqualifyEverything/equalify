@@ -453,7 +453,7 @@ export const Audit = () => {
               <div>
                 <h2>
                   <PiFileMagnifyingGlassBold className="icon-small" />
-                  Scanning {pages.length} URL{pages.length > 1 ? "s" : ""}
+                  {pages.length} URL{pages.length > 1 ? "s" : ""} Included
                 </h2>
 
                 {scans && scans?.length > 0 && (
