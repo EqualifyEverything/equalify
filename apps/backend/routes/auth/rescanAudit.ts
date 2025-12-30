@@ -1,4 +1,4 @@
-import { db, event } from '#src/utils';
+import { db, event, isStaging } from '#src/utils';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 const lambda = new LambdaClient();
 
@@ -19,7 +19,7 @@ export const rescanAudit = async () => {
         FunctionName: "aws-lambda-scan-sqs-router",
         InvocationType: "Event",
         Payload: JSON.stringify({
-            urls: urls?.map(url => ({ auditId: audit_id, scanId: scanId, urlId: url.id, url: url.url, type: url.type }))
+            urls: urls?.map(url => ({ auditId: audit_id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))
         })
     }));
     await db.clean();

@@ -44,7 +44,7 @@ export const saveAudit = async () => {
                 FunctionName: "aws-lambda-scan-sqs-router",
                 InvocationType: "Event",
                 Payload: JSON.stringify({
-                    urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type }))
+                    urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))
                 })
             }));
             console.log('Scan jobs queued for audit:', id);

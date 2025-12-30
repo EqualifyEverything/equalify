@@ -14,7 +14,9 @@ import scan from "./scan.ts";
 import convertToEqualifyV2 from "../../../shared/convertors/AxeToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT = process.env.RESULTS_ENDPOINT || "https://api.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT_PROD = "https://api.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT_STAGING = "https://api-staging.equalifyapp.com/public/scanWebhook";
+const getResultsEndpoint = (isStaging?: boolean) => isStaging ? RESULTS_ENDPOINT_STAGING : RESULTS_ENDPOINT_PROD;
 
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
@@ -60,7 +62,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
           logger.info("Converted results:", JSON.stringify(convertedResults));
 
           try {
-            const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+            const sendResultsResponse = await fetch(getResultsEndpoint(job.isStaging), {
               method: 'post',
               body: JSON.stringify(convertedResults),
               headers: {'Content-Type': 'application/json'}
@@ -97,7 +99,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
             blockers: []
           };
           
-          const sendResultsResponse = await fetch(RESULTS_ENDPOINT, {
+          const sendResultsResponse = await fetch(getResultsEndpoint(job.isStaging), {
             method: 'post',
             body: JSON.stringify(failurePayload),
             headers: {'Content-Type': 'application/json'}

@@ -5,4 +5,5 @@ export type SqsScanJob = {
   urlId: string;
   url: string;
   type: string;
+  isStaging?: boolean;
 };
