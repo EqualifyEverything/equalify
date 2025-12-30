@@ -292,6 +292,7 @@ export const Audit = () => {
         queryClient={queryClient}
         audit={audit}
         auditId={auditId}
+        scans={scans}
       />
       <Card variant="dark">
         {chartData?.data && chartData.data.length > 0 && (

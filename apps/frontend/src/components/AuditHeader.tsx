@@ -15,6 +15,7 @@ interface AuditHeaderProps extends React.PropsWithChildren {
   queryClient: QueryClient;
   audit: any;
   auditId: string | undefined;
+  scans?: any[];
 }
 
 export const AuditHeader = ({
@@ -22,6 +23,7 @@ export const AuditHeader = ({
   queryClient,
   audit,
   auditId,
+  scans,
 }: AuditHeaderProps) => {
   const navigate = useNavigate();
   const { setAnnounceMessage } = useGlobalStore();
@@ -91,6 +93,11 @@ export const AuditHeader = ({
     }
   };
 
+  // Check if there's an active scan (not complete or failed)
+  const hasActiveScan = scans && scans.length > 0 && 
+    scans[scans.length - 1].status !== "complete" && 
+    scans[scans.length - 1].status !== "failed";
+
   const renameAudit = async () => {
     const newName = prompt(
       `What would you like to rename this audit to?`,
@@ -156,10 +163,12 @@ export const AuditHeader = ({
         {!isShared && (
             <StyledButton
               onClick={rescanAudit}
-              label="Scan Now"
+              label={hasActiveScan ? "Scan in Progress" : "Scan Now"}
               icon={<GrPowerCycle />}
               variant="dark"
-              loading={isScanning}
+              loading={isScanning || hasActiveScan}
+              disabled={hasActiveScan}
+              title={hasActiveScan ? "A scan is already in progress" : undefined}
             />
         )}
         <StyledButton
