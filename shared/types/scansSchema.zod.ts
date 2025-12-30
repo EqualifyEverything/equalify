@@ -9,6 +9,7 @@ export const scansSchema = z.object({
       urlId: z.string(),
       url: z.string(),
       type: z.string(),
+      isStaging: z.boolean().optional(),
     })
   ),
 });
