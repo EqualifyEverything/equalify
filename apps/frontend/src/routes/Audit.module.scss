@@ -25,5 +25,10 @@
   select[name="frequency"]{
     min-width:100px;
   }
+  text, line{
+    fill: variables.$paper-dark;
+    stroke: variables.$paper-dark;
+  }
+
 
 }
