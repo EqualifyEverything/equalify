@@ -13,6 +13,12 @@
     width: 100%;
   }
 
+  .scan-url-card-header-top{
+    display: inline-flex;
+    justify-content: space-between;
+    width:100%;
+  }
+
   .scan-cards-area {
     margin-top:calc(variables.$spacing*2);
   }
