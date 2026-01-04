@@ -5,6 +5,7 @@ import {
   flexRender,
   ColumnDef,
   RowExpanding,
+  RowData,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
 import { useState, useMemo, ChangeEvent } from "react";
@@ -12,7 +13,13 @@ import { useState, useMemo, ChangeEvent } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
-import { FaArrowDown, FaArrowUp, FaClipboard, FaCode, FaRegFilePdf } from "react-icons/fa";
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaClipboard,
+  FaCode,
+  FaRegFilePdf,
+} from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
@@ -60,6 +67,12 @@ interface BlockersTableProps {
 interface Option {
   value: string;
   label: string;
+}
+
+declare module '@tanstack/table-core' {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    className?: string; // Add your custom property
+  }
 }
 
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
@@ -270,6 +283,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
  */
       {
         accessorKey: "url",
+        meta: {
+          className: style["url"],
+        },
         header: () => (
           <StyledButton
             onClick={handleSortByUrl}
@@ -305,6 +321,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "messages",
         header: "Issue",
+        meta: {
+          className: style["issue"],
+        },
         cell: ({ getValue, row }) => {
           const messages = getValue() as string[];
           const shortId = row.original.short_id;
@@ -326,6 +345,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "content",
         header: "Code",
+        meta: {
+          className: style["content"],
+        },
         cell: ({ getValue }) => {
           const content = getValue() as string;
           return (
@@ -377,6 +399,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "tags",
         header: "Tags",
+        meta: {
+          className: style["tags"],
+        },
         cell: ({ getValue }) => {
           const tags = getValue() as BlockerTag[];
           return (
@@ -418,6 +443,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "categories",
         header: "Category",
+        meta: {
+          className: style["categories"],
+        },
         cell: ({ getValue }) => {
           const category = getValue() as string;
           return (
@@ -426,7 +454,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </div>
           );
         },
-      }
+      },
       /* 
       {
         accessorKey: "ignored",
@@ -445,8 +473,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </span>
           );
         },
-      }, */,
-      /* {
+      }, */ /* {
         accessorKey: "id",
         header: "Ignore",
 
@@ -757,7 +784,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   table.getRowModel().rows.map((row, index) => (
                     <tr key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id}>
+                        <td key={cell.id} className={cell.column.columnDef.meta?.className ?? ""}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

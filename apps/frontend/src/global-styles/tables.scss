@@ -121,6 +121,7 @@
 
 .tags {
   display: inline-flex;
+  align-items: center;
   gap: calc(variables.$spacing/2);
   @include fonts.font-size-small;
   .tag {
