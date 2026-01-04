@@ -287,24 +287,23 @@ export const Audit = () => {
     }
   };
 
-  const updateAuditInterval= async (newValue:string) => {
+  const updateAuditInterval = async (newValue: string) => {
     console.log("Updating audit interval:", newValue);
     const updatedInterval = await apiClient.graphql({
-        query: `mutation ($audit_id:uuid, $interval: String) {
+      query: `mutation ($audit_id:uuid, $interval: String) {
                 update_audits(where: {id: {_eq: $audit_id}}, _set: {interval: $interval}) {
                   returning {
                     interval
                   }
                 }
               }`,
-        variables: {
-          audit_id: auditId,
-          interval: newValue,
-        },
-      });
-      refetchAudit();
-      
-  }
+      variables: {
+        audit_id: auditId,
+        interval: newValue,
+      },
+    });
+    refetchAudit();
+  };
 
   return (
     <div className={style.Audit}>
@@ -324,10 +323,13 @@ export const Audit = () => {
               <div>
                 <h2 id="blockers-chart-heading">
                   <TbHistory className="icon-small" />
-                  Blockers Over Time
+                  {chartData.data[
+                    chartData.data.length - 1
+                  ].blockers.toLocaleString()}{" "}
+                  Blockers
                 </h2>
                 <span className="font-small">
-                  Last {chartData.period_days} Days
+                  Last {chartData.period_days} Days:
                 </span>
               </div>
               <div className="chart-ranger-select">
@@ -487,8 +489,8 @@ export const Audit = () => {
                     className={themeVariables["input-element"]}
                     value={audit.interval}
                     onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                    updateAuditInterval(event.target.value);
-                  }}
+                      updateAuditInterval(event.target.value);
+                    }}
                   >
                     <option>Manually</option>
                     <option>Daily</option>
@@ -524,7 +526,7 @@ export const Audit = () => {
                   {/* Display scan errors if any */}
                   {scans[scans.length - 1].errors &&
                     scans[scans.length - 1].errors.length > 0 && (
-                      <div style={{ marginTop: "8px" }}>
+                      <div>
                         <Drawer.Root
                           direction="right"
                           shouldScaleBackground
@@ -538,26 +540,16 @@ export const Audit = () => {
                           }}
                         >
                           <Drawer.Trigger
-                            style={{
-                              color: themeVariables.red,
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                              padding: "4px 0",
-                              fontSize: "inherit",
-                              textDecoration: "underline",
-                            }}
                             aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
+                            className={style["view-errors-button"]}
                           >
-                            <TbAlertTriangle aria-hidden="true" />
-                            {scans[scans.length - 1].errors.length} Error
-                            {scans[scans.length - 1].errors.length > 1
-                              ? "s"
-                              : ""}{" "}
-                            During Scan
+                            <TbAlertTriangle />
+                            <span>{
+                              scans[scans.length - 1].errors.length + 
+                              " Error" +
+                              (scans[scans.length - 1].errors.length > 1 ? "s" : "") +
+                              " During Scan"
+                            }</span>
                           </Drawer.Trigger>
                           <Drawer.Portal>
                             <Drawer.Overlay className="drawer-overlay" />

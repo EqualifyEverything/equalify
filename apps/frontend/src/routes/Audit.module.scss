@@ -36,5 +36,29 @@
     stroke: variables.$paper-dark;
   }
 
+  .view-errors-button {
+    border: 0;
+    display: inline-flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background: variables.$paper;
+    color: variables.$red;
+    font-weight: bold;
+    border-radius: 999px;
+    gap: calc(variables.$spacing/6);
+    padding: calc(variables.$spacing/2) calc(variables.$spacing * 2);
+    margin-top:variables.$spacing;
+    margin-bottom:variables.$spacing;
+    cursor: pointer;
+    
+    svg {
+    }
+    span {
+      display: block;
+      white-space: nowrap;
+    }
+  }
 
 }
