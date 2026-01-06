@@ -28,7 +28,8 @@ export const StyledButton = ({
   className = "",
   prependText = "",
   type = "button",
-  inline = false
+  inline = false,
+  ...props
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   const isDisabled = disabled || loading ? styles["disabled"]: "";
@@ -56,6 +57,7 @@ export const StyledButton = ({
       onClick={onClick}
       disabled={disabled || loading}
       aria-busy={loading}
+      {...props}
     >
       {loading ? (
         <span className={styles["spinner"]} aria-hidden="true"></span>
