@@ -2,15 +2,13 @@
 @use "../global-styles/fonts.scss";
 
 .button {
-  @include fonts.font-size-normal;
   font-weight: bold;
-
   color: variables.$white;
-  padding: variables.$spacing*2;
+  padding: variables.$spacing variables.$spacing*2;
   background: variables.$green;
   border-radius: calc(variables.$spacing / 2);
   border: 1px solid variables.$green-dark;
-  box-shadow: variables.$shadow-small;
+  box-shadow: 0;
   cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
@@ -27,6 +25,11 @@
     min-width: 14px;
     min-height: 14px;
     margin-right: variables.$spacing;
+  }
+
+  &.large{
+    padding: variables.$spacing*2;
+      @include fonts.font-size-normal;
   }
 
   &.dark {
@@ -58,6 +61,7 @@
     &.disabled {
       border-color: variables.$gray;
       color: variables.$gray;
+      box-shadow: none;
     }
   }
   &.naked {
@@ -152,6 +156,11 @@
     //color:variables.$gray;
     //border-color:variables.$gray;
   } */
+}
+
+.inline {
+  display: inline-flex;
+  margin-left: variables.$spacing;
 }
 
 .spinner {

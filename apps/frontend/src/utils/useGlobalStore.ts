@@ -7,6 +7,8 @@ interface EqualifyState {
   setLoading: (val: string|boolean) => void
   darkMode: boolean
   setDarkMode: (val: boolean) => void
+  auditsTableView: string
+  setAuditsTableView: (val:string) => void
   authenticated: boolean
   setAuthenticated: (val: boolean) => void
   ssoAuthenticated: boolean
@@ -22,6 +24,8 @@ export const useGlobalStore = create<EqualifyState>()(
             setLoading: (val) => set(() => ({ loading: val })),
             darkMode: false,
             setDarkMode: (val) => set(() => ({ darkMode: val })),
+            auditsTableView: "cards",
+            setAuditsTableView: (val) => set(()=>({ auditsTableView: val })),
             authenticated: false,
             setAuthenticated: (val) => set(() => ({ authenticated: val })),
             ssoAuthenticated: false,

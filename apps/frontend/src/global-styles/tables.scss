@@ -4,7 +4,8 @@
 .table-container {
   border: 1px solid variables.$gray;
   border-radius: variables.$spacing;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: scroll;
 
   table {
     width: 100%;
@@ -74,6 +75,11 @@
         }
       }
     }
+    select{
+      @include fonts.font-size-small;
+      padding: calc(variables.$spacing/2) variables.$spacing;
+      margin: 0;
+    }
   }
   .pagination {
     background: variables.$white;
@@ -81,6 +87,11 @@
     align-items: center;
     justify-content: space-between;
     padding: variables.$spacing;
+    select{
+      @include fonts.font-size-small;
+      padding: 0 variables.$spacing;
+      margin: 0;
+    }
 
     @include fonts.font-size-small;
     .pagination-text {
@@ -102,7 +113,6 @@
       }
 
       button:disabled {
-        opacity: 0.5;
         cursor: not-allowed;
       }
     }
@@ -111,6 +121,7 @@
 
 .tags {
   display: inline-flex;
+  align-items: center;
   gap: calc(variables.$spacing/2);
   @include fonts.font-size-small;
   .tag {
@@ -145,7 +156,7 @@
     margin-bottom: calc(variables.$spacing);
     .root {
       padding: calc(variables.$spacing/4) calc(variables.$spacing/2);
-      background-color: variables.$gray;
+      background-color: variables.$paper;
       border-radius: 999px;
       width: auto;
       display: inline-block;

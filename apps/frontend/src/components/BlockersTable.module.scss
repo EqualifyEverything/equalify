@@ -43,4 +43,14 @@
     border-radius: 999px;
     cursor:pointer;
   }
+  /* table cells */
+  td.issue {
+    min-width: 300px;
+  }
+  td.tags {
+    min-width: 140px;
+  }
+  td.categories {
+    min-width: 140px;
+  }
 }

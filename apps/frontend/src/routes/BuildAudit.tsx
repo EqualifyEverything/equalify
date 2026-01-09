@@ -213,7 +213,7 @@ export const BuildAudit = () => {
             icon={<LuClipboardPaste />}
             onClick={saveAndRunAudit}
             label="Save & Run Audit"
-            variant="red"
+            variant="green"
             disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
             loading={isSavingAndRunning}
           />

@@ -74,6 +74,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       const newPages: Page[] = [];
       const errors: string[] = [];
       const duplicates: string[] = [];
+      const typeUpdates: Page[] = [];
 
       lines.forEach((line, index) => {
         // Skip empty lines and potential header rows
@@ -90,9 +91,15 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
           return;
         }
 
-        // Check for duplicates in existing pages
-        if (pages.some((page) => page.url === validUrl)) {
-          duplicates.push(validUrl);
+        // Check for duplicates in existing pages - if type differs, update it
+        const existingPage = pages.find((page) => page.url === validUrl);
+        if (existingPage) {
+          if (existingPage.type !== pageType) {
+            // Type has changed, update it
+            typeUpdates.push({ url: validUrl, type: pageType });
+          } else {
+            duplicates.push(validUrl);
+          }
           return;
         }
 
@@ -105,11 +112,37 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         newPages.push({ url: validUrl, type: pageType });
       });
 
+      // Process type updates for existing URLs
+      if (typeUpdates.length > 0) {
+        setPages(prev => prev.map(page => {
+          const update = typeUpdates.find(u => u.url === page.url);
+          if (update) {
+            // Also call the parent update function if available
+            if (updateParentPageType) {
+              updateParentPageType({ url: update.url, type: update.type });
+            }
+            return { ...page, type: update.type };
+          }
+          return page;
+        }));
+      }
+
       // Add all valid URLs to the pages
       if (newPages.length > 0) {
         setPages(prev => [...prev, ...newPages]);
+      }
+
+      // Show success message
+      if (newPages.length > 0 || typeUpdates.length > 0) {
+        const successMessages: string[] = [];
+        if (newPages.length > 0) {
+          successMessages.push(`${newPages.length} URL(s) added`);
+        }
+        if (typeUpdates.length > 0) {
+          successMessages.push(`${typeUpdates.length} URL type(s) updated`);
+        }
         setAnnounceMessage(
-          `Successfully imported ${newPages.length} URL(s) from CSV`, "success"
+          `Successfully processed CSV: ${successMessages.join(", ")}`, "success"
         );
         setCsvError(null);
       }
@@ -117,11 +150,14 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
       // Show warnings if there were issues
       if (errors.length > 0 || duplicates.length > 0) {
         const messages: string[] = [];
-        if (newPages.length > 0) {
-          messages.push(`Successfully imported ${newPages.length} URL(s).`);
+        if (newPages.length > 0 || typeUpdates.length > 0) {
+          const successParts: string[] = [];
+          if (newPages.length > 0) successParts.push(`${newPages.length} URL(s) added`);
+          if (typeUpdates.length > 0) successParts.push(`${typeUpdates.length} type(s) updated`);
+          messages.push(`Successfully processed: ${successParts.join(", ")}.`);
         }
         if (duplicates.length > 0) {
-          messages.push(`${duplicates.length} duplicate(s) skipped.`);
+          messages.push(`${duplicates.length} unchanged duplicate(s) skipped.`);
         }
         if (errors.length > 0) {
           messages.push(`${errors.length} invalid URL(s) skipped.`);
@@ -178,6 +214,15 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
     return;
   };
 
+  /**
+   * Normalize a URL by removing trailing slashes from the path
+   * This ensures URLs like "https://example.com/" and "https://example.com" are treated as the same
+   */
+  const normalizeUrl = (url: string): string => {
+    // Remove trailing slash unless it's just the root path
+    return url.replace(/\/+$/, '') || url;
+  };
+
   const validateAndFormatUrl = (input: string): string | null => {
     // Trim whitespace
     let url = input.trim();
@@ -197,7 +242,8 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
         return null;
       }
       setUrlError(null);
-      return urlObj.href;
+      // Normalize the URL to remove trailing slashes
+      return normalizeUrl(urlObj.href);
     } catch {
       setUrlError(
         "Invalid URL format. Please enter a valid URL (e.g., example.com or https://example.com)"

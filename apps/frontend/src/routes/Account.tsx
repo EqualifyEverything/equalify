@@ -2,12 +2,13 @@ import { Link } from "react-router-dom"
 import { useUser } from "../queries"
 import { InvitesTable, UsersTable } from "../components"
 import { SkeletonAccount } from "#src/components/Skeleton.tsx"
+import style from "./Account.module.scss";
 
 export const Account = () => {
     const { data: user, isLoading } = useUser();
     const isAdmin = user?.type === 'admin';
 
-    return <div>
+    return <div className={style.Account}>
         <h1 className="initial-focus-element">Account</h1>
         {isLoading ? (
             <SkeletonAccount />

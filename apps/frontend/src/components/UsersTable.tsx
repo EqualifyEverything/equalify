@@ -9,6 +9,7 @@ import * as API from "aws-amplify/api";
 import { useState, useMemo } from "react";
 import { useGlobalStore } from "../utils";
 import { SkeletonTable } from "./Skeleton";
+import { StyledButton } from "./StyledButton";
 
 const apiClient = API.generateClient();
 
@@ -166,7 +167,9 @@ export const UsersTable = () => {
         cell: ({ getValue, row }) => {
           const userId = getValue() as string;
           return (
-            <button
+            <StyledButton
+              variant="red"
+              label={deleteUserMutation.isPending ? "Removing..." : "Remove"}
               onClick={() => {
                 if (
                   confirm(
@@ -176,12 +179,9 @@ export const UsersTable = () => {
                   deleteUserMutation.mutate(userId);
                 }
               }}
-              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm disabled:opacity-50"
               aria-label={`Remove user ${row.original.email}`}
               disabled={deleteUserMutation.isPending}
-            >
-              {deleteUserMutation.isPending ? "Removing..." : "Remove"}
-            </button>
+            />
           );
         },
       },
@@ -284,34 +284,30 @@ export const UsersTable = () => {
                 {data && ` (Page ${page + 1} of ${data.totalPages})`}
               </div>
               <div className="pagination-buttons">
-                <button
+                <StyledButton
+                  label="First"
                   onClick={() => setPage(0)}
                   disabled={page === 0}
                   aria-label="Go to first page"
-                >
-                  First
-                </button>
-                <button
+                />
+                <StyledButton
+                  label="Previous"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
                   aria-label="Go to previous page"
-                >
-                  Previous
-                </button>
-                <button
+                />
+                <StyledButton
+                  label="Next"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={!data || page >= data.totalPages - 1}
                   aria-label="Go to next page"
-                >
-                  Next
-                </button>
-                <button
+                />
+                <StyledButton
+                  label="Last"
                   onClick={() => data && setPage(data.totalPages - 1)}
                   disabled={!data || page >= data.totalPages - 1}
                   aria-label="Go to last page"
-                >
-                  Last
-                </button>
+                />
               </div>
             </div>
           </div>

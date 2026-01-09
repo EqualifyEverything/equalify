@@ -13,6 +13,8 @@ interface ButtonProps extends React.PropsWithChildren {
   loading?: boolean;
   className?: string;
   prependText?: string;
+  type?: "button" | "submit" | "reset";
+  inline?: boolean;
 }
 
 export const StyledButton = ({
@@ -24,11 +26,20 @@ export const StyledButton = ({
   disabled = false,
   loading = false,
   className = "",
-  prependText = ""
+  prependText = "",
+  type = "button",
+  inline = false,
+  ...props
 }: ButtonProps) => {
   const iconOnly = !showLabel ? styles["icon-only"] + " icon-only":"";
   const isDisabled = disabled || loading ? styles["disabled"]: "";
   const isLoading = loading ? styles["loading"]: "";
+  const inlineClass = inline ? styles["inline"] + " inline" : "";
+  const mappedClassNames = className
+    ?.split(" ")
+    .filter(Boolean)
+    .map((name) => styles[name] ?? name)
+    .join(" ");
   return (
     <button
       className={
@@ -39,11 +50,14 @@ export const StyledButton = ({
         + iconOnly + " "
         + isDisabled + " "
         + isLoading + " "
-        + className
+        + inlineClass + " "
+        + mappedClassNames
         }
+      type={type}
       onClick={onClick}
       disabled={disabled || loading}
       aria-busy={loading}
+      {...props}
     >
       {loading ? (
         <span className={styles["spinner"]} aria-hidden="true"></span>

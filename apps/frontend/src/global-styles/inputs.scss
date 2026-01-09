@@ -14,3 +14,6 @@ input, select, textarea {
     box-shadow: 0;
   }
 }
+select{
+    padding: calc(variables.$spacing/1.5) variables.$spacing;
+}

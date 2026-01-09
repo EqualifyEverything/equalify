@@ -43,6 +43,7 @@ import themeVariables from "../global-styles/variables.module.scss";
 import { PiFileMagnifyingGlassBold } from "react-icons/pi";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import style from "./Audit.module.scss";
+import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 
 interface Page {
   url: string;
@@ -128,7 +129,7 @@ export const Audit = () => {
     queryFn: async () =>
       (
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval}}`,
           variables: { audit_id: auditId },
         })
       )?.data?.audits_by_pk,
@@ -178,7 +179,8 @@ export const Audit = () => {
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     // aria
     setAnnounceMessage(
-      `Added ${changedPages.length} URLs to audit ${audit.name}.`, "success"
+      `Added ${changedPages.length} URLs to audit ${audit.name}.`,
+      "success"
     );
 
     console.log("DB update complete.");
@@ -203,10 +205,11 @@ export const Audit = () => {
     }
 
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
-    
+
     // aria
     setAnnounceMessage(
-      `Removed ${changedPages.length} URLs from audit ${audit.name}.`, "success"
+      `Removed ${changedPages.length} URLs from audit ${audit.name}.`,
+      "success"
     );
 
     console.log("DB update complete.");
@@ -243,7 +246,8 @@ export const Audit = () => {
 
     // aria & logging
     setAnnounceMessage(
-      `Changed ${changedPage.url} to type ${changedPage.type}.`, "success"
+      `Changed ${changedPage.url} to type ${changedPage.type}.`,
+      "success"
     );
     await createLog(
       `Changed ${changedPage.url} to type ${changedPage.type}.`,
@@ -283,15 +287,34 @@ export const Audit = () => {
     }
   };
 
+  const updateAuditInterval = async (newValue: string) => {
+    console.log("Updating audit interval:", newValue);
+    const updatedInterval = await apiClient.graphql({
+      query: `mutation ($audit_id:uuid, $interval: String) {
+                update_audits(where: {id: {_eq: $audit_id}}, _set: {interval: $interval}) {
+                  returning {
+                    interval
+                  }
+                }
+              }`,
+      variables: {
+        audit_id: auditId,
+        interval: newValue,
+      },
+    });
+    refetchAudit();
+  };
+
   return (
     <div className={style.Audit}>
       {/* {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
        */}
-       <AuditHeader
+      <AuditHeader
         isShared={isShared}
         queryClient={queryClient}
         audit={audit}
         auditId={auditId}
+        scans={scans}
       />
       <Card variant="dark">
         {chartData?.data && chartData.data.length > 0 && (
@@ -300,10 +323,13 @@ export const Audit = () => {
               <div>
                 <h2 id="blockers-chart-heading">
                   <TbHistory className="icon-small" />
-                  Blockers Over Time
+                  {chartData.data[
+                    chartData.data.length - 1
+                  ].blockers.toLocaleString()}{" "}
+                  Blockers
                 </h2>
                 <span className="font-small">
-                  Last {chartData.period_days} Days
+                  Last {chartData.period_days} Days:
                 </span>
               </div>
               <div className="chart-ranger-select">
@@ -386,7 +412,7 @@ export const Audit = () => {
                     <Line
                       type="monotone"
                       dataKey="blockers"
-                      stroke={themeVariables.paper}
+                      stroke={themeVariables.white}
                       strokeWidth={4}
                       dot={CustomizedDot}
                       name="Blockers"
@@ -449,201 +475,211 @@ export const Audit = () => {
             onOpenChange={setShowUrlInput}
           >
             <div className={style["scan-url-card-header"]}>
-              <div>
-                <h2>
-                  <PiFileMagnifyingGlassBold className="icon-small" />
-                  Scanning {pages.length} URL{pages.length > 1 ? "s" : ""}
-                </h2>
+              <h2>
+                <PiFileMagnifyingGlassBold className="icon-small" />
+                {pages.length} URL{pages.length > 1 ? "s" : ""} Included
+              </h2>
 
-                {scans && scans?.length > 0 && (
-                  <div>
-                    <div className="font-small">
-                      Last Scan:{" "}
-                      {formatDate(scans[scans.length - 1].created_at)}{" "}
-                      {scans[scans.length - 1].status && (
-                        <span
-                          style={{
-                            textTransform: "capitalize",
-                            fontWeight: "bold",
-                            color:
-                              scans[scans.length - 1].status === "complete"
-                                ? themeVariables.green
-                                : scans[scans.length - 1].status === "failed"
-                                  ? themeVariables.red
-                                  : "inherit",
+              {audit && (
+                <StyledLabeledInput>
+                  <label htmlFor="scanFrequency">Scan Frequency:</label>
+                  <select
+                    id="scanFrequency"
+                    name="scanFrequency"
+                    className={themeVariables["input-element"]}
+                    value={audit.interval}
+                    onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                      updateAuditInterval(event.target.value);
+                    }}
+                  >
+                    <option>Manually</option>
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                  </select>
+                </StyledLabeledInput>
+              )}
+            </div>
+
+            <div>
+              {scans && scans?.length > 0 && (
+                <div>
+                  <div className="font-small">
+                    Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
+                    {scans[scans.length - 1].status && (
+                      <span
+                        style={{
+                          textTransform: "capitalize",
+                          fontWeight: "bold",
+                          color:
+                            scans[scans.length - 1].status === "complete"
+                              ? themeVariables.green
+                              : scans[scans.length - 1].status === "failed"
+                                ? themeVariables.red
+                                : "inherit",
+                        }}
+                      >
+                        ({scans[scans.length - 1].status})
+                      </span>
+                    )}
+                  </div>
+                  {/* Display scan errors if any */}
+                  {scans[scans.length - 1].errors &&
+                    scans[scans.length - 1].errors.length > 0 && (
+                      <div>
+                        <Drawer.Root
+                          direction="right"
+                          shouldScaleBackground
+                          setBackgroundColorOnScale={false}
+                          onOpenChange={(open) => {
+                            if (open) {
+                              setSelectedScanErrors(
+                                scans[scans.length - 1].errors
+                              );
+                            }
                           }}
                         >
-                          ({scans[scans.length - 1].status})
-                        </span>
-                      )}
-                    </div>
-                    {/* Display scan errors if any */}
-                    {scans[scans.length - 1].errors &&
-                      scans[scans.length - 1].errors.length > 0 && (
-                        <div style={{ marginTop: "8px" }}>
-                          <Drawer.Root
-                            direction="right"
-                            shouldScaleBackground
-                            setBackgroundColorOnScale={false}
-                            onOpenChange={(open) => {
-                              if (open) {
-                                setSelectedScanErrors(
-                                  scans[scans.length - 1].errors
-                                );
-                              }
-                            }}
+                          <Drawer.Trigger
+                            aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
+                            className={style["view-errors-button"]}
                           >
-                            <Drawer.Trigger
-                              style={{
-                                color: themeVariables.red,
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "4px",
-                                padding: "4px 0",
-                                fontSize: "inherit",
-                                textDecoration: "underline",
-                              }}
-                              aria-label={`View ${scans[scans.length - 1].errors.length} scan errors`}
-                            >
-                              <TbAlertTriangle aria-hidden="true" />
-                              {scans[scans.length - 1].errors.length} Error
-                              {scans[scans.length - 1].errors.length > 1
-                                ? "s"
-                                : ""}{" "}
-                              During Scan
-                            </Drawer.Trigger>
-                            <Drawer.Portal>
-                              <Drawer.Overlay className="drawer-overlay" />
-                              <Drawer.Content className="drawer-content">
-                                <div className="drawer-content-inner">
-                                  <h4
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                      margin: "0 0 16px 0",
-                                    }}
-                                  >
-                                    <TbAlertTriangle
-                                      style={{ color: themeVariables.red }}
-                                      aria-hidden="true"
-                                    />
-                                    Scan Errors ({selectedScanErrors.length})
-                                  </h4>
-                                  <p style={{ marginBottom: "16px" }}>
-                                    The following pages encountered errors
-                                    during scanning:
-                                  </p>
-                                  <div
-                                    style={{
-                                      maxHeight: "60vh",
-                                      overflowY: "auto",
-                                    }}
-                                  >
-                                    {selectedScanErrors.map(
-                                      (err: ScanError, idx: number) => (
-                                        <div
-                                          key={idx}
-                                          style={{
-                                            marginBottom: "16px",
-                                            padding: "12px",
-                                            backgroundColor: `${themeVariables.red}10`,
-                                            borderRadius: "4px",
-                                            border: `1px solid ${themeVariables.red}30`,
-                                          }}
-                                        >
-                                          <div style={{ marginBottom: "8px" }}>
-                                            <span
-                                              style={{
-                                                display: "inline-block",
-                                                padding: "2px 8px",
-                                                backgroundColor: `${themeVariables.red}20`,
-                                                borderRadius: "4px",
-                                                fontSize: "0.875em",
-                                                fontWeight: "bold",
-                                              }}
+                            <TbAlertTriangle />
+                            <span>{
+                              scans[scans.length - 1].errors.length + 
+                              " Error" +
+                              (scans[scans.length - 1].errors.length > 1 ? "s" : "") +
+                              " During Scan"
+                            }</span>
+                          </Drawer.Trigger>
+                          <Drawer.Portal>
+                            <Drawer.Overlay className="drawer-overlay" />
+                            <Drawer.Content className="drawer-content">
+                              <div className="drawer-content-inner">
+                                <h4
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    margin: "0 0 16px 0",
+                                  }}
+                                >
+                                  <TbAlertTriangle
+                                    style={{ color: themeVariables.red }}
+                                    aria-hidden="true"
+                                  />
+                                  Scan Errors ({selectedScanErrors.length})
+                                </h4>
+                                <p style={{ marginBottom: "16px" }}>
+                                  The following pages encountered errors during
+                                  scanning:
+                                </p>
+                                <div
+                                  style={{
+                                    maxHeight: "60vh",
+                                    overflowY: "auto",
+                                  }}
+                                >
+                                  {selectedScanErrors.map(
+                                    (err: ScanError, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        style={{
+                                          marginBottom: "16px",
+                                          padding: "12px",
+                                          backgroundColor: `${themeVariables.red}10`,
+                                          borderRadius: "4px",
+                                          border: `1px solid ${themeVariables.red}30`,
+                                        }}
+                                      >
+                                        <div style={{ marginBottom: "8px" }}>
+                                          <span
+                                            style={{
+                                              display: "inline-block",
+                                              padding: "2px 8px",
+                                              backgroundColor: `${themeVariables.red}20`,
+                                              borderRadius: "4px",
+                                              fontSize: "0.875em",
+                                              fontWeight: "bold",
+                                            }}
+                                          >
+                                            {formatErrorType(err.type)}
+                                          </span>
+                                        </div>
+                                        {err.url && (
+                                          <div
+                                            style={{
+                                              marginBottom: "8px",
+                                              wordBreak: "break-all",
+                                            }}
+                                          >
+                                            <strong>URL:</strong>{" "}
+                                            <a
+                                              href={err.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
                                             >
-                                              {formatErrorType(err.type)}
-                                            </span>
+                                              {err.url}
+                                            </a>
                                           </div>
-                                          {err.url && (
-                                            <div
+                                        )}
+                                        {err.message && (
+                                          <Collapsible.Root>
+                                            <Collapsible.Trigger
                                               style={{
-                                                marginBottom: "8px",
-                                                wordBreak: "break-all",
+                                                background: "none",
+                                                border: "none",
+                                                cursor: "pointer",
+                                                textDecoration: "underline",
+                                                padding: 0,
+                                                color: "inherit",
+                                                fontSize: "0.875em",
                                               }}
                                             >
-                                              <strong>URL:</strong>{" "}
-                                              <a
-                                                href={err.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                              >
-                                                {err.url}
-                                              </a>
-                                            </div>
-                                          )}
-                                          {err.message && (
-                                            <Collapsible.Root>
-                                              <Collapsible.Trigger
+                                              View error details
+                                            </Collapsible.Trigger>
+                                            <Collapsible.Content>
+                                              <pre
                                                 style={{
-                                                  background: "none",
-                                                  border: "none",
-                                                  cursor: "pointer",
-                                                  textDecoration: "underline",
-                                                  padding: 0,
-                                                  color: "inherit",
-                                                  fontSize: "0.875em",
+                                                  margin: "8px 0 0 0",
+                                                  padding: "8px",
+                                                  backgroundColor:
+                                                    themeVariables.black,
+                                                  color: themeVariables.paper,
+                                                  borderRadius: "4px",
+                                                  fontSize: "0.75em",
+                                                  whiteSpace: "pre-wrap",
+                                                  wordBreak: "break-word",
                                                 }}
                                               >
-                                                View error details
-                                              </Collapsible.Trigger>
-                                              <Collapsible.Content>
-                                                <pre
-                                                  style={{
-                                                    margin: "8px 0 0 0",
-                                                    padding: "8px",
-                                                    backgroundColor:
-                                                      themeVariables.black,
-                                                    color: themeVariables.paper,
-                                                    borderRadius: "4px",
-                                                    fontSize: "0.75em",
-                                                    whiteSpace: "pre-wrap",
-                                                    wordBreak: "break-word",
-                                                  }}
-                                                >
-                                                  {err.message}
-                                                  {err.timestamp && (
-                                                    <>
-                                                      {"\n\n"}Time:{" "}
-                                                      {new Date(
-                                                        err.timestamp
-                                                      ).toLocaleString()}
-                                                    </>
-                                                  )}
-                                                </pre>
-                                              </Collapsible.Content>
-                                            </Collapsible.Root>
-                                          )}
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
-                                  <Drawer.Close className="drawer-content-close">
-                                    Close
-                                  </Drawer.Close>
+                                                {err.message}
+                                                {err.timestamp && (
+                                                  <>
+                                                    {"\n\n"}Time:{" "}
+                                                    {new Date(
+                                                      err.timestamp
+                                                    ).toLocaleString()}
+                                                  </>
+                                                )}
+                                              </pre>
+                                            </Collapsible.Content>
+                                          </Collapsible.Root>
+                                        )}
+                                      </div>
+                                    )
+                                  )}
                                 </div>
-                              </Drawer.Content>
-                            </Drawer.Portal>
-                          </Drawer.Root>
-                        </div>
-                      )}
-                  </div>
-                )}
-              </div>
+                                <Drawer.Close className="drawer-content-close">
+                                  Close
+                                </Drawer.Close>
+                              </div>
+                            </Drawer.Content>
+                          </Drawer.Portal>
+                        </Drawer.Root>
+                      </div>
+                    )}
+                </div>
+              )}
+
               <Collapsible.Trigger asChild>
                 <StyledButton
                   variant="naked"
@@ -657,15 +693,15 @@ export const Audit = () => {
             </div>
             <Collapsible.Content>
               <form>
-                  <AuditPagesInput
-                    initialPages={pages}
-                    setParentPages={handleUrlInput}
-                    addParentPages={addUrls}
-                    removeParentPages={removeUrls}
-                    updateParentPageType={updateUrlType}
-                    returnMutation
-                    isShared={isShared}
-                  />
+                <AuditPagesInput
+                  initialPages={pages}
+                  setParentPages={handleUrlInput}
+                  addParentPages={addUrls}
+                  removeParentPages={removeUrls}
+                  updateParentPageType={updateUrlType}
+                  returnMutation
+                  isShared={isShared}
+                />
               </form>
             </Collapsible.Content>
           </Collapsible.Root>

@@ -4,8 +4,9 @@
 .Audits {
   h2 {
     margin-bottom: calc(variables.$spacing);
+    line-height: 1.1em;
     svg {
-      color:variables.$black;
+      color: variables.$black;
     }
   }
 
@@ -19,4 +20,15 @@
     width: 100%;
   }
 
+  .audits-view-selector {
+    display: inline-flex;
+    width: 100%;
+    align-content: flex-end;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    button[data-state="active"] {
+      opacity:1;
+    }
+  }
 }

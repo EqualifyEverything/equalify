@@ -2,6 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .buildAudit {
+  margin-bottom: variables.$spacing*4;
   h2 {
     margin-bottom: calc(variables.$spacing);
   }

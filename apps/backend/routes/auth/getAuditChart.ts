@@ -56,6 +56,13 @@ export const getAuditChart = async () => {
     now.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
     const chartData = [];
     let lastKnownValue = 0;
+    
+    // get the blockers value of the most recent scan
+    const mostRecentScan = Array.from(scansByDate.values()).sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0];
+    const mostRecentBlockersCount = mostRecentScan ? mostRecentScan.blockers : 0;
+    const oldestScan = Array.from(scansByDate.values()).sort((a, b) => a.timestamp.localeCompare(b.timestamp))[0].timestamp ?? "";
+
+    lastKnownValue = mostRecentBlockersCount;
 
     for (let i = days - 1; i >= 0; i--) {
         const date = new Date(now);
@@ -73,6 +80,12 @@ export const getAuditChart = async () => {
             });
         } else {
             // Fill with the last known value
+            if(oldestScan === "" || date.toISOString() < oldestScan){
+                lastKnownValue = 0; // if the date we're showing is before the first scan, set to zero
+            }else{
+                lastKnownValue = mostRecentBlockersCount; // otherwise use the blockers value from the latest scan
+            }
+
             if(days>30){ // If the range is >30 days, only return weekly points
                 if(i % 7 === 0){
                     chartData.push({

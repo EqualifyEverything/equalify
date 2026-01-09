@@ -2,7 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .Audit {
-
+  margin-bottom: variables.$spacing*2;
   .scan-url-card-header {
     display: inline-flex;
     justify-content: space-between;
@@ -11,6 +11,12 @@
     align-content: center;
     align-items: center;
     width: 100%;
+  }
+
+  .scan-url-card-header-top{
+    display: inline-flex;
+    justify-content: space-between;
+    width:100%;
   }
 
   .scan-cards-area {
@@ -24,6 +30,35 @@
   }
   select[name="frequency"]{
     min-width:100px;
+  }
+  text, line{
+    fill: variables.$paper-dark;
+    stroke: variables.$paper-dark;
+  }
+
+  .view-errors-button {
+    border: 0;
+    display: inline-flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background: variables.$paper;
+    color: variables.$red;
+    font-weight: bold;
+    border-radius: 999px;
+    gap: calc(variables.$spacing/6);
+    padding: calc(variables.$spacing/2) calc(variables.$spacing * 2);
+    margin-top:variables.$spacing;
+    margin-bottom:variables.$spacing;
+    cursor: pointer;
+    
+    svg {
+    }
+    span {
+      display: block;
+      white-space: nowrap;
+    }
   }
 
 }
