@@ -54,6 +54,30 @@ export const runEveryMinute = async () => {
         }));
         console.log('Scan jobs queued for audit:', scheduledAuditId);
     }
+
+    // See if there are any "stuck" scans that we should error out!
+    const stuckScans = (await db.query({
+        text: `SELECT "id", "errors" FROM "scans" 
+               WHERE "status" = 'processing' 
+               AND (NOW() - "updated_at") > INTERVAL '60 minutes'`,
+    })).rows;
+    
+    for (const scan of stuckScans) {
+        const timeoutError = {
+            type: 'scan_timeout',
+            message: 'Scan timed out after 60 minutes',
+            timestamp: new Date().toISOString(),
+        };
+        const updatedErrors = [...(scan.errors || []), timeoutError];
+        await db.query({
+            text: `UPDATE "scans" 
+                   SET "status" = $1, "errors" = $2 
+                   WHERE "id" = $3`,
+            values: ['complete', updatedErrors, scan.id],
+        });
+        console.log('Marked stuck scan as complete:', scan.id);
+    }
+
     await db.clean();
     return;
 }
