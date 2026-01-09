@@ -16,10 +16,12 @@ Prioritize extensibility, and make it as straightforward as possible for users t
 - **Better Documentation**
 Simplify adoption by unifying and expanding existing documentation
 - **Always Open Source**
-Continued Open Source development under the AGPL
+Continued Open Source development under the AGPL.
+- **Best Accessible User Experience**
+Fixing accessibility bugs is mission-critical to Equalify.
 
-### Roadmap
-- **Beta (Q1 2026)**
+### Beta Roadmap (Q1 2026)
+- **Technology that Promotes our Open Source Community**
   - Deployment in 30 minutes or less
   - Handles 100 pages/minute without breaking a sweat
   - Costs less than $1000/month for typical usage
