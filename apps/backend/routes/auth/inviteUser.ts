@@ -1,4 +1,4 @@
-import { db, event, sendEmail } from "#src/utils";
+import { db, event, isStaging, sendEmail } from "#src/utils";
 
 export const inviteUser = async () => {
   if (process.env.SSO_ENABLED && process.env.SSO_EMAIL_DOMAINS) {
@@ -53,7 +53,7 @@ export const inviteUser = async () => {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" bgcolor="#186121" style="border-radius:6px;">
-                    <a href="https://app-staging.equalify.uic.edu/login" 
+                    <a href="https://app${isStaging ? '-staging' : ''}.equalify.uic.edu/login" 
                        style="display:inline-block; padding:12px 24px; font-size:16px; font-weight:600; color:#ffffff; text-decoration:none; border-radius:6px; background-color:#186121;">
                       Accept Invite
                     </a>
