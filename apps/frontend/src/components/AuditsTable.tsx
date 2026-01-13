@@ -11,6 +11,8 @@ import { StyledButton } from "./StyledButton";
 import { useMemo, useState } from "react";
 import { Audit, Scan } from "#src/routes/Audits.tsx";
 import { StyledLabeledInput } from "./StyledLabeledInput";
+import { formatId } from "../utils";
+import { Link } from "react-router-dom";
 
 interface auditsTableProps {
   audits: Audit[];
@@ -29,9 +31,8 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {
         accessorKey: "name",
         header: "Name",
-        cell: ({ getValue }) => {
-          const name = getValue() as string;
-          return name;
+        cell: ({ row }) => {
+          return <Link to={`/audits/${formatId(row.original.id)}`} className={styles["audit-name"]}>{row.original.name}</Link>;
         },
       },
       {
@@ -56,7 +57,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
         header: "Last Scan",
         cell: ({ getValue }) => {
           const scans = getValue() as Scan[];
-          if(!scans || scans.length == 0 || !scans[0].updated_at) return "N/A"
+          if (!scans || scans.length == 0 || !scans[0].updated_at) return "N/A";
           return shortDate(scans[0].updated_at);
         },
       },
@@ -215,7 +216,6 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
     </div>
   );
 };
-
 
 function shortDate(dateTime: string) {
   return new Date(dateTime).toLocaleDateString("en-US", {

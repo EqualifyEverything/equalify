@@ -4,4 +4,7 @@
 .AuditsTable {
   margin-top:variables.$spacing;
   margin-bottom:calc(variables.$spacing*2);
+  .audit-name {
+    font-weight: bold;
+  }
 }

@@ -121,7 +121,6 @@ export const Audits = () => {
                 audits?.map((row: any, index: number) => (
                   <Card variant="light" key={index}>
                     <Link
-                      className="hover:opacity-50"
                       to={`/audits/${formatId(row.id)}`}
                     >
                       <h2>
