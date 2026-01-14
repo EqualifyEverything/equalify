@@ -73,3 +73,9 @@ body {
 [tabindex="-1"]:focus-visible {
   outline: 2px solid variables.$red;
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

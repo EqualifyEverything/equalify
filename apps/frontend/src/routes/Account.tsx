@@ -16,6 +16,7 @@ export const Account = () => {
             <div style={{ marginBottom: '1rem' }}>
                 <p><strong>Name:</strong> {user.name}</p>
                 <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Role:</strong> {user.type ? user.type.charAt(0).toUpperCase() + user.type.slice(1) : 'Member'}</p>
             </div>
         ) : null}
         <Link to='/logout'>Logout</Link>

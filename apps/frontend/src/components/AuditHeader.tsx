@@ -163,10 +163,11 @@ export const AuditHeader = ({
         {!isShared && (
             <StyledButton
               onClick={rescanAudit}
-              label={hasActiveScan ? "Scan in Progress" : "Scan Now"}
+              label={hasActiveScan ? "Scanning..." : "Scan Now"}
               icon={<GrPowerCycle />}
               variant="dark"
               loading={isScanning || hasActiveScan}
+              loadingText="Scanning..."
               disabled={hasActiveScan}
               title={hasActiveScan ? "A scan is already in progress" : undefined}
             />

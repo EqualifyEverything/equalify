@@ -11,6 +11,7 @@ interface ButtonProps extends React.PropsWithChildren {
   showLabel?: boolean;
   disabled?: boolean;
   loading?: boolean;
+  loadingText?: string;
   className?: string;
   prependText?: string;
   type?: "button" | "submit" | "reset";
@@ -25,6 +26,7 @@ export const StyledButton = ({
   showLabel = true,
   disabled = false,
   loading = false,
+  loadingText = "Loading...",
   className = "",
   prependText = "",
   type = "button",
@@ -66,9 +68,9 @@ export const StyledButton = ({
       )}
       {prependText}
       {showLabel ? (
-        <span>{loading ? "Loading..." : label}</span>
+        <span>{loading ? loadingText : label}</span>
       ) : (
-        <VisuallyHidden.Root>{loading ? "Loading..." : label}</VisuallyHidden.Root>
+        <VisuallyHidden.Root>{loading ? loadingText : label}</VisuallyHidden.Root>
       )}
     </button>
   );

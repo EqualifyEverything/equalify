@@ -20,10 +20,11 @@ import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
 import { TbHistory, TbMail, TbAlertTriangle } from "react-icons/tb";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { GrPowerCycle } from "react-icons/gr";
 
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Collapsible from "@radix-ui/react-collapsible";
-//import * as Progress from "@radix-ui/react-progress";
+import * as Progress from "@radix-ui/react-progress";
 
 import { createLog } from "#src/utils/createLog.ts";
 import {
@@ -316,8 +317,51 @@ export const Audit = () => {
         auditId={auditId}
         scans={scans}
       />
-      <Card variant="dark">
-        {chartData?.data && chartData.data.length > 0 && (
+      {/* Check if there's an active scan (not complete or failed) */}
+      {(() => {
+        const hasActiveScan = scans && scans.length > 0 && 
+          scans[scans.length - 1].status !== "complete" && 
+          scans[scans.length - 1].status !== "failed";
+        const currentScan = scans?.[scans.length - 1];
+        
+        if (hasActiveScan && currentScan) {
+          return (
+            <Card variant="dark">
+              <div style={{ padding: "20px 0" }}>
+                <h2 id="scan-progress-heading" style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
+                  Scanning...
+                </h2>
+                <p style={{ marginBottom: "100px", color: themeVariables.white }}>
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <Progress.Root
+                    value={currentScan.percentage || 0}
+                    className="w-full bg-gray-200 h-6 rounded-full overflow-hidden"
+                    style={{ flex: 1, height: "24px", backgroundColor: "rgba(255,255,255,0.2)", borderRadius: "12px", overflow: "hidden" }}
+                  >
+                    <Progress.Indicator
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: themeVariables.green,
+                        transition: "transform 0.3s ease",
+                        transform: `translateX(-${100 - (currentScan.percentage || 0)}%)`,
+                      }}
+                    />
+                  </Progress.Root>
+                  <span style={{ fontWeight: "bold", fontSize: "1.25em", minWidth: "60px", textAlign: "right" }}>
+                    {currentScan.percentage || 0}%
+                  </span>
+                </div>
+              </div>
+            </Card>
+          );
+        }
+        
+        return (
+          <Card variant="dark">
+            {chartData?.data && chartData.data.length > 0 && (
           <div>
             <div className="blockers-chart-heading-wrapper">
               <div>
@@ -466,6 +510,8 @@ export const Audit = () => {
           </div>
         )}
       </Card>
+        );
+      })()}
 
       <div className={"cards-62-38 " + style["scan-cards-area"]}>
         <Card variant="light">
