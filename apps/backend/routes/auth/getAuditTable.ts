@@ -95,13 +95,15 @@ export const getAuditTable = async () => {
 
   // Add search string to where clause
   if (searchString !== "") {
-    if (validateUuid(searchString)) { // if valid UUID, use that 
+    if (validateUuid(searchString)) {
+      // if valid UUID, use that
       whereConditions.push({
         audit_id: { _eq: searchString },
       });
-    } else { // otherwise search URL
+    } else {
+      // otherwise search URL
       whereConditions.push({
-        url: { url: { _ilike: searchString } },
+        url: { url: { _ilike: `%${searchString}%` } },
       });
     }
   }
