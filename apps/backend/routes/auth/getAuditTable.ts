@@ -98,7 +98,7 @@ export const getAuditTable = async () => {
     if (validateShortId(searchString)) {
       // if valid UUID, use that
       whereConditions.push({
-        audit_id: { _eq: searchString },
+        short_id: { _eq: searchString },
       });
     } else {
       // otherwise search URL
