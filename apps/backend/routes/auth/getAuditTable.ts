@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateUuid } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId } from "#src/utils";
 
 export const getAuditTable = async () => {
   const auditId = (event.queryStringParameters as any).id;
@@ -95,7 +95,7 @@ export const getAuditTable = async () => {
 
   // Add search string to where clause
   if (searchString !== "") {
-    if (validateUuid(searchString)) {
+    if (validateShortId(searchString)) {
       // if valid UUID, use that
       whereConditions.push({
         audit_id: { _eq: searchString },
