@@ -774,7 +774,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           {/* Search Filter */}
           <div>
           <StyledLabeledInput className={style["search-input"]}>
-            <label>Search</label>
+            <label>Search by URL</label>
             <input onChange={(e) => handleSearch(e.target.value)} />
           </StyledLabeledInput>
           </div>

@@ -32,7 +32,7 @@
   }
   .search-input {
     margin-right:0;
-    margin-bottom: variables.$spacing;
+    margin-bottom: calc(variables.$spacing/1.5)
   }
   .view-code-details {
     span {
