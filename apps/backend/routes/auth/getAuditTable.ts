@@ -22,6 +22,8 @@ export const getAuditTable = async () => {
     ? categoriesParam.split(",").filter(Boolean)
     : [];
 
+  const searchString = (event.queryStringParameters as any).searchString || "";
+
   await db.connect();
   const audit = (
     await db.query({
@@ -89,6 +91,19 @@ export const getAuditTable = async () => {
         },
       });
     }
+  }
+
+  // Add search string to where clause
+  if(searchString !== "") {
+    whereConditions.push({
+      audit_id: {_eq: searchString},
+       _or: 
+        {url: 
+          {url: 
+            {_ilike: searchString}
+          }
+        }
+    });
   }
 
   // Combine all conditions with AND

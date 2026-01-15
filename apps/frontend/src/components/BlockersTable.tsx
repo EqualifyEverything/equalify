@@ -25,7 +25,7 @@ import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import * as Switch from "@radix-ui/react-switch";
-import { useGlobalStore } from "../utils";
+import { useDebounce, useGlobalStore } from "../utils";
 import { MdOutlineCancel } from "react-icons/md";
 import themeVariables from "../global-styles/variables.module.scss";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -35,6 +35,9 @@ import { StyledButton } from "./StyledButton";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
 import { SkeletonBlockersTable } from "./Skeleton";
+import { StyledLabeledInput } from "./StyledLabeledInput";
+import { useDebouncedCallback } from 'use-debounce';
+
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const apiClient = API.generateClient();
@@ -90,6 +93,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
 
+  const [searchString, setSearchString] = useState<string>("");
+  
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -170,8 +175,10 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       selectedContentType,
       sortBy,
       sortOrder,
+      searchString
     ],
     queryFn: async () => {
+      console.log(searchString);
       const params: Record<string, string> = {
         id: auditId,
         page: page.toString(),
@@ -179,6 +186,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         contentType: selectedContentType,
         sortBy: sortBy,
         sortOrder: sortOrder,
+        //searchString: searchString
       };
       if (selectedTags.length > 0) {
         //params.tags = selectedTags.join(',');
@@ -193,7 +201,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         params.status = selectedStatus;
       }
 
-      //console.log("Blockers table refresh...", params);
+      if (searchString.length >= 3 || searchString == "" ){
+        params.searchString = searchString
+      }
+
+      console.log("Blockers table refresh...", params);
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/getAuditTable",
@@ -601,6 +613,15 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
+  const handleSearch = useDebouncedCallback(
+    // function
+    (value) => {
+      //if(value.length >= 3)
+      setSearchString(value);
+    },
+    750
+  );
+
   const clearAllFilters = () => {
     setSelectedTags([]);
     setSelectedCategories([]);
@@ -750,6 +771,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               </button>
             </div>
           )} */}
+          {/* Search Filter */}
+          <div>
+          <StyledLabeledInput className={style["search-input"]}>
+            <label>Search</label>
+            <input onChange={(e) => handleSearch(e.target.value)} />
+          </StyledLabeledInput>
+          </div>
         </div>
       </div>
 

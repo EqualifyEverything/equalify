@@ -30,6 +30,10 @@
       white-space: nowrap;
     }
   }
+  .search-input {
+    margin-right:0;
+    margin-bottom: variables.$spacing;
+  }
   .view-code-details {
     span {
       @include fonts.font-size-small;
