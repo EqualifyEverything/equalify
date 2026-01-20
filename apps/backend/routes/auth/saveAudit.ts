@@ -31,23 +31,28 @@ export const saveAudit = async () => {
         }
 
         if (saveAndRun) {
-            const scanId = (await db.query({
-                text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
-                values: [id, 'processing', JSON.stringify(pages)],
-            })).rows[0].id;
-            const urls = (await db.query({
-                text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
-                values: [id],
-            })).rows;
-            console.log('Found URLs for audit:', { auditId: id, count: urls?.length, urls });
-            await lambda.send(new InvokeCommand({
-                FunctionName: "aws-lambda-scan-sqs-router",
-                InvocationType: "Event",
-                Payload: JSON.stringify({
-                    urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))
-                })
-            }));
-            console.log('Scan jobs queued for audit:', id);
+            // Check if there are pages to scan first
+            if (!pages || pages.length === 0) {
+                console.log('No pages to scan for audit, skipping scan creation');
+            } else {
+                const scanId = (await db.query({
+                    text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
+                    values: [id, 'processing', JSON.stringify(pages)],
+                })).rows[0].id;
+                const urls = (await db.query({
+                    text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
+                    values: [id],
+                })).rows;
+                console.log('Found URLs for audit:', { auditId: id, count: urls?.length, urls });
+                await lambda.send(new InvokeCommand({
+                    FunctionName: "aws-lambda-scan-sqs-router",
+                    InvocationType: "Event",
+                    Payload: JSON.stringify({
+                        urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))
+                    })
+                }));
+                console.log('Scan jobs queued for audit:', id);
+            }
         }
 
         await db.clean();

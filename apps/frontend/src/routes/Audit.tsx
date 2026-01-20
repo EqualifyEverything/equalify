@@ -54,7 +54,7 @@ interface Page {
 interface ScanError {
   type: string;
   message: string;
-  urlId: string;
+  urlId?: string;
   url?: string;
   timestamp: string;
   details?: object;
@@ -67,6 +67,8 @@ const formatErrorType = (type: string): string => {
     no_results: "No Results",
     scan_failed: "Scan Failed",
     blocker_processing_error: "Processing Error",
+    scan_timeout: "Scan Timeout",
+    no_urls: "No URLs Configured",
   };
   return errorLabels[type] || type;
 };
