@@ -48,6 +48,9 @@
     cursor:pointer;
   }
   /* table cells */
+  td.url {
+    min-width: 400px;
+  }
   td.issue {
     min-width: 300px;
   }

@@ -22,7 +22,7 @@ export interface Scan {
   percentage: number;
   updated_at: string;
 }
-
+/* 
 export interface Audit {
   created_at: string;
   id: string;
@@ -34,7 +34,7 @@ export interface Audit {
       count: number;
     };
   };
-}
+} */
 
 export const Audits = () => {
   const navigate = useNavigate();

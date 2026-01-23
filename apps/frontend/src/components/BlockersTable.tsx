@@ -24,9 +24,9 @@ import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import * as Switch from "@radix-ui/react-switch";
+//import * as Switch from "@radix-ui/react-switch";
 import { useDebounce, useGlobalStore } from "../utils";
-import { MdOutlineCancel } from "react-icons/md";
+//import { MdOutlineCancel } from "react-icons/md";
 import themeVariables from "../global-styles/variables.module.scss";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
@@ -37,6 +37,7 @@ import style from "./BlockersTable.module.scss";
 import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { useDebouncedCallback } from 'use-debounce';
+import { Link } from "react-router-dom";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
@@ -94,7 +95,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
 
   const [searchString, setSearchString] = useState<string>("");
-  
+
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -201,7 +202,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         params.status = selectedStatus;
       }
 
-      if (searchString.length >= 3 || searchString == "" ){
+      if (searchString.length >= 3 || searchString == "") {
         params.searchString = searchString
       }
 
@@ -344,12 +345,16 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <div className="text-sm max-w-sm">
                 {messages[0] || "No message"}
               </div>
-              <StyledButton
-                onClick={() => copyToClipboard(shortId)}
-                icon={<FaClipboard className="icon-small" />}
-                label={shortId || "N/A"}
-                variant={"naked"}
-              />
+              <div style={{ display: "inline-flex" }}>
+                <Link to={"/blockers/" + shortId}>{shortId}</Link>
+                <StyledButton
+                  onClick={() => copyToClipboard(shortId)}
+                  icon={<FaClipboard className="icon-small" />}
+                  label={shortId || "N/A"}
+                  variant={"naked"}
+                  showLabel={false}
+                />
+              </div>
             </>
           );
         },
@@ -392,8 +397,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                         style={prism}
                         language={"jsx"}
                         className="drawer-code"
-                        /* wrapLines={true}
-                        wrapLongLines={true} */
+                      /* wrapLines={true}
+                      wrapLongLines={true} */
                       >
                         {content}
                       </SyntaxHighlighter>
@@ -773,10 +778,10 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           )} */}
           {/* Search Filter */}
           <div>
-          <StyledLabeledInput className={style["search-input"]}>
-            <label>Search by URL</label>
-            <input onChange={(e) => handleSearch(e.target.value)} />
-          </StyledLabeledInput>
+            <StyledLabeledInput className={style["search-input"]}>
+              <label>Search by URL</label>
+              <input onChange={(e) => handleSearch(e.target.value)} />
+            </StyledLabeledInput>
           </div>
         </div>
       </div>
@@ -795,9 +800,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </th>
                     ))}
                   </tr>
