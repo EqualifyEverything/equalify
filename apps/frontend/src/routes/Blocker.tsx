@@ -97,10 +97,10 @@ export const Blocker = () => {
           <>
             <h1>Blocker: {blocker.short_id}</h1>
             <DataRow the_key={"Appears on:"} the_value={<a href={blocker?.url.url}>{blocker?.url.url}</a>} />
-            <DataRow the_key={"Audit:"} the_value={<Link to={"/audits/"+blocker?.audits.id}>{blocker?.audits.name}</Link>} />
+            <DataRow the_key={"Audit:"} the_value={<Link to={"/shared/"+blocker?.audits.id}>{blocker?.audits.name}</Link>} />
 
-            {blocker?.blocker_messages.map((messages) => {
-              return <>
+            {blocker?.blocker_messages.map((messages, index) => {
+              return <div key={index}>
                 <DataRow the_key="Error:" the_value={messages.message.content} />
 
                 <DataRow the_key="Category" the_value={
@@ -120,16 +120,16 @@ export const Blocker = () => {
                     </div>
                   } />
 
-              </>
+              </div>
             })}
 
             <DataRow className={styles["dataRow_last"]} the_key="Code" the_value={
               <SyntaxHighlighter
                 style={prism}
                 language={"jsx"}
-                className="drawer-code"
-              /* wrapLines={true}
-              wrapLongLines={true} */
+                className={styles["code"]}
+                wrapLines={true}
+                wrapLongLines={true}
               >
                 {blocker.content}
               </SyntaxHighlighter>

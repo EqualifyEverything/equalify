@@ -90,9 +90,10 @@ export const Navigation = () => {
                 }
               }
 
+              // public pages
               if (
                 !location.pathname.startsWith("/login") &&
-                !location.pathname.startsWith("/shared/")
+                !location.pathname.startsWith("/shared/") 
               ) {
                 navigate("/login?error=" + encodeURIComponent(errorMessage));
               }

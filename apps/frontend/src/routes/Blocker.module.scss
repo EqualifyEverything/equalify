@@ -5,4 +5,11 @@
     .dataRow_last {
       border-bottom: 0 !important;
     }
+    .code {
+        max-width: 800px;
+        word-break: break-word;
+        code {
+          white-space: pre-wrap !important;
+        }
+      }
 }

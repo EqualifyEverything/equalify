@@ -346,7 +346,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 {messages[0] || "No message"}
               </div>
               <div style={{ display: "inline-flex" }}>
-                <Link to={"/blockers/" + shortId}>{shortId}</Link>
+                <Link to={"/shared/blockers/" + shortId}>{shortId}</Link>
                 <StyledButton
                   onClick={() => copyToClipboard(shortId)}
                   icon={<FaClipboard className="icon-small" />}
