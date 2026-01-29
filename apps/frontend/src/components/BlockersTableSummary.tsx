@@ -31,7 +31,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData }: BlockersT
         };
         const response = await API.get({
                 apiName: isShared ? "public" : "auth",
-                path: "/getAuditTable",
+                path: "/getAuditSummary",
                 options: { queryParams: params },
         }).response;
         const resp = (await response.body.json()) as any;

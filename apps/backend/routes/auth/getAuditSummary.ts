@@ -23,7 +23,7 @@ interface AuditSummaryRespBlocker {
 }
 
 interface AuditSummaryResp {
-  data: {
+  response: {
     blockers: AuditSummaryRespBlocker[];
   };
 }
@@ -78,7 +78,7 @@ export const getAuditSummary = async () => {
   const response = (await graphqlQuery(query)) as AuditSummaryResp;
   console.log(JSON.stringify({ response }));
 
-  const flattened = response.data.blockers.map((item) => {
+  const flattened = response.response.blockers.map((item) => {
     return {
       url: item.url.url,
       message: item.blocker_messages[0].message.content,

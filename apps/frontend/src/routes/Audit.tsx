@@ -779,8 +779,13 @@ export const Audit = () => {
       { 
         chartData?.data 
         && chartData.data.length > 0 
+        && auditId
         &&
-      <BlockersTableSummary chartData={chartData} /> 
+      <BlockersTableSummary 
+        chartData={chartData} 
+        isShared={isShared}
+        auditId={auditId}
+        /> 
       }
       {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
     </div>
