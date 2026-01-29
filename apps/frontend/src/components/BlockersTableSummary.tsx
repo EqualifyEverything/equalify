@@ -62,7 +62,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages }: Bl
   });
 
   return (
-    <div className={style.BlockersTableSummary}>
+    <div className={style["BlockersTableSummary"]}>
       <h2>Audit Summary</h2>
       {data ? (
         <>
@@ -100,51 +100,63 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages }: Bl
               <h2>{chartData.data[chartData.data.length - 1].blockers.toLocaleString()}</h2> Blockers Found
             </Card>
           </div>
-          
+
           <div className="cards-50">
-          <Card variant="light">
-            <h2>URLs with Most Blockers</h2>
-            {data.urlsWithMostErrors.map((item, index) => {
-              return <DataRow
-                key={index}
-                the_value={item.key}
-                the_key={item.count.toString()} />
-            })}
-          </Card>
-          <Card variant="light">
-            <h2>Most Common Blockers</h2>
-            {data.mostCommonErrors.map((item, index) => {
-              return <DataRow
-                key={index}
-                the_value={item.key}
-                the_key={item.count.toString()} />
-            })}
-          </Card>
+            <Card variant="light">
+              <h2>URLs with Most Blockers</h2>
+              <DataRow variant="highlight" the_value="Blockers" the_key="URL" />
+              {data.urlsWithMostErrors.map((item, index) => {
+                return <DataRow
+                  key={index}
+                  the_key={<a href={item.key}>{item.key}</a>}
+                  the_value={item.count.toString()}
+                  variant="tight"
+                />
+              })}
+            </Card>
+            <Card variant="light">
+              <h2>Most Common Blockers</h2>
+              <DataRow variant="highlight" the_value="Count" the_key="Blocker" />
+              {data.mostCommonErrors.map((item, index) => {
+                return <DataRow
+                  key={index}
+                  the_key={item.key}
+                  the_value={item.count.toString()}
+                  variant="tight"
+                />
+              })}
+            </Card>
           </div>
-          
+
           <div className="cards-50">
-          <Card variant="light">
-            <h2>Most Common Blocker Category</h2>
-            {data.mostCommonCategory.map((item, index) => {
-              return <DataRow
-                key={index}
-                the_value={item.key}
-                the_key={item.count.toString()} />
-            })}
-          </Card>
-          <Card variant="light">
-            <h2>Most Common Blocker Tag</h2>
-            {data.mostCommonTags.map((item, index) => {
-              return <DataRow
-                key={index}
-                the_value={item.key}
-                the_key={item.count.toString()} />
-            })}
-          </Card>
+            <Card variant="light">
+              <h2>Most Common Blocker Category</h2>
+              <DataRow variant="highlight" the_key="Count" the_value="Category" />
+              {data.mostCommonCategory.map((item, index) => {
+                return <DataRow
+                  key={index}
+                  the_value={item.key}
+                  the_key={item.count.toString()}
+                  variant="tight"
+                />
+              })}
+            </Card>
+            <Card variant="light">
+              <h2>Most Common Blocker Tag</h2>
+              <DataRow variant="highlight" the_key="Count" the_value="Tag" />
+              {data.mostCommonTags.map((item, index) => {
+                return <DataRow
+                  key={index}
+                  the_value={item.key}
+                  the_key={item.count.toString()}
+                  variant="tight"
+                  />
+              })}
+            </Card>
           </div>
 
         </>
-      ) : (<><SkeletonAuditHeader/></>)}
+      ) : (<><SkeletonAuditHeader /></>)}
     </div >
   );
 };

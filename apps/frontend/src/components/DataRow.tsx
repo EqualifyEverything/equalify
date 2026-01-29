@@ -4,7 +4,7 @@ import React from "react";
 
 interface DataRowProps extends React.PropsWithChildren {
   variant?: string;
-  the_key: string;
+  the_key: string | ReactNode;
   the_value:string | ReactNode;
   className?: string;
 }
@@ -12,7 +12,7 @@ interface DataRowProps extends React.PropsWithChildren {
 export const DataRow = ({ variant = "light", the_key, the_value, className="" }:DataRowProps) => {
     return (
         <div className={styles.dataRow +" dataRow "+ styles[variant] + " "+className}>
-            <div className={styles["key"]}>{the_key}</div>
-            <div className={styles["value"]}>{the_value}</div>
+            <div className={styles["key"] + " key"}>{the_key}</div>
+            <div className={styles["value"]+ " value"}>{the_value}</div>
         </div>
     )}

@@ -30,6 +30,23 @@
       font-weight: bold;
     }
   }
+  &.tight {
+    .key {
+      font-weight: 500;
+      line-height: 1em;
+      
+      padding: calc(variables.$spacing) 0;
+    }
+    border-bottom: 1px solid variables.$gray;
+    .value {
+      line-height: 1em;
+      min-width: 60px;
+      text-align: right;
+    }
+    &:last-of-type {
+      border-bottom: 0;
+    }
+  }
   &.light {
     background: variables.$white;
     border-bottom: 1px solid variables.$gray;
