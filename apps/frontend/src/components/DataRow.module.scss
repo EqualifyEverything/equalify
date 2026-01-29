@@ -34,7 +34,8 @@
     .key {
       font-weight: 500;
       line-height: 1em;
-      
+      max-width: 80%;
+      word-break: break-word;
       padding: calc(variables.$spacing) 0;
     }
     border-bottom: 1px solid variables.$gray;
