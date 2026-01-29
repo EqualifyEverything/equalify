@@ -23,9 +23,7 @@ interface AuditSummaryRespBlocker {
 }
 
 interface AuditSummaryResp {
-  response: {
     blockers: AuditSummaryRespBlocker[];
-  };
 }
 
 // processing types
@@ -78,7 +76,7 @@ export const getAuditSummary = async () => {
   const response = (await graphqlQuery(query)) as AuditSummaryResp;
   console.log(JSON.stringify({ response }));
 
-  const flattened = response.response.blockers.map((item) => {
+  const flattened = response.blockers.map((item) => {
     return {
       url: item.url.url,
       message: item.blocker_messages[0].message.content,
