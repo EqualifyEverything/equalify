@@ -47,7 +47,7 @@ import style from "./Audit.module.scss";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { BlockersTableSummary } from "#src/components/BlockersTableSummary.tsx";
 
-interface Page {
+export interface Page {
   url: string;
   type: "html" | "pdf";
 }
@@ -780,11 +780,13 @@ export const Audit = () => {
         chartData?.data 
         && chartData.data.length > 0 
         && auditId
+        && pages
         &&
       <BlockersTableSummary 
         chartData={chartData} 
         isShared={isShared}
         auditId={auditId}
+        pages={pages}
         /> 
       }
       {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
