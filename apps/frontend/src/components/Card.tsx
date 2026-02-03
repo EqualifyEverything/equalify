@@ -8,7 +8,7 @@ interface CardProps extends React.PropsWithChildren {
 
 export const Card = ({ variant = "dark", className="", children }: CardProps) => {
   return (
-    <div className={styles.card + " card " + variant + " " + styles[variant]+" "+className}>
+    <div className={styles.card + " card " + variant + " " + styles[variant]+" "+className+" "+styles[className]}>
       {children}
     </div>
   );

@@ -23,12 +23,28 @@ $font-normal : 16px;
   font-size: 16px;
 }
 
+@mixin font-size-large {
+  font-size: 1.6rem;
+}
+
+@mixin font-size-extra-large {
+  font-size: 2.56rem;
+}
+
 .font-small {
   @include font-size-small;
 }
 
 .font-normal {
   @include font-size-normal;
+}
+
+.font-large {
+  @include font-size-large;
+}
+
+.font-extra-large {
+  @include font-size-extra-large;
 }
 
 h1,h2,h3,h4,h5,h5 {

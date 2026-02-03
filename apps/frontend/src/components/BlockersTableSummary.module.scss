@@ -2,5 +2,48 @@
 @use "../global-styles/fonts.scss";
 
 .BlockersTableSummary {
-  
+  .graph-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    padding-left: variables.$spacing;
+    h2 {
+      display: block;
+      min-width: 66%;
+      line-height: 1.2rem;
+    }
+  }
+  .donut-chart {
+    min-width: 100px;
+    min-height: 100px;
+  }
+  .blockers-count {
+    padding: calc(variables.$spacing * 2) 0;
+    h2 {
+      display: block;
+      line-height: 2rem;
+    }
+    span {
+      display: block;
+    }
+  }
+  .category-tag-card {
+    display: flex;
+    .column {
+        width:50%;
+        padding-right: variables.$spacing;
+    }
+    h2 {
+      font-size: 0.833rem;
+    }
+    ol {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      li {
+        font-size: 0.833rem;
+      }
+    }
+  }
 }

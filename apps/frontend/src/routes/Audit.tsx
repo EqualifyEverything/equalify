@@ -19,7 +19,7 @@ import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
 import { TbHistory, TbMail, TbAlertTriangle } from "react-icons/tb";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp, FaTable } from "react-icons/fa";
 import { GrPowerCycle } from "react-icons/gr";
 
 import * as Tabs from "@radix-ui/react-tabs";
@@ -46,6 +46,8 @@ import { StyledButton } from "#src/components/StyledButton.tsx";
 import style from "./Audit.module.scss";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { BlockersTableSummary } from "#src/components/BlockersTableSummary.tsx";
+import { FaTableList } from "react-icons/fa6";
+import { stringifyMessage } from "graphql-ws";
 
 export interface Page {
   url: string;
@@ -90,10 +92,12 @@ export const Audit = () => {
     );
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [showAllScans, setShowAllScans] = useState<boolean>(false);
-  const [chartRange, setChartRange] = useState<number>(7);
+  const [chartRange, setChartRange] = useState<number>(90);
   const [selectedScanErrors, setSelectedScanErrors] = useState<ScanError[]>([]);
   const isShared = location.pathname.startsWith("/shared/");
   const { setAnnounceMessage } = useGlobalStore();
+  const { blockersTableView, setBlockersTableView } = useGlobalStore();
+
   useEffect(() => {
     if (emailNotifications)
       setEmailNotificationsCount(JSON.parse(emailNotifications).emails.length);
@@ -309,6 +313,16 @@ export const Audit = () => {
     refetchAudit();
   };
 
+/* TODO: implement function to set table filter by URL or by value 
+  const setFilterAndOpenDetails = (type:string, value:string) => {
+    switch(type){
+      case "url":
+        set
+    }
+    setBlockersTableView("detailed")
+  }
+ */
+
   return (
     <div className={style.Audit}>
       {/* {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
@@ -322,11 +336,11 @@ export const Audit = () => {
       />
       {/* Check if there's an active scan (not complete or failed) */}
       {(() => {
-        const hasActiveScan = scans && scans.length > 0 && 
-          scans[scans.length - 1].status !== "complete" && 
+        const hasActiveScan = scans && scans.length > 0 &&
+          scans[scans.length - 1].status !== "complete" &&
           scans[scans.length - 1].status !== "failed";
         const currentScan = scans?.[scans.length - 1];
-        
+
         if (hasActiveScan && currentScan) {
           return (
             <Card variant="dark">
@@ -361,158 +375,158 @@ export const Audit = () => {
             </Card>
           );
         }
-        
+
         return (
           <Card variant="dark">
             {chartData?.data && chartData.data.length > 0 && (
-          <div>
-            <div className="blockers-chart-heading-wrapper">
               <div>
-                <h2 id="blockers-chart-heading">
-                  <TbHistory className="icon-small" />
-                  {chartData.data[
-                    chartData.data.length - 1
-                  ].blockers.toLocaleString()}{" "}
-                  Blockers
-                </h2>
-                <span className="font-small">
-                  Last {chartData.period_days} Days:
-                </span>
-              </div>
-              <div className="chart-ranger-select">
-                <label htmlFor="chart-range-select">Date Range</label>
-                <select
-                  id="chart-range-select"
-                  name="ChartRangeSelect"
-                  value={chartRange}
-                  onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                    setChartRange(parseInt(event.target.value));
-                  }}
-                  aria-label="Select Date Range"
-                >
-                  <option value={7}>Week</option>
-                  <option value={30}>Month</option>
-                  <option value={90}>Quarter</option>
-                  <option value={365}>Year</option>
-                </select>
-              </div>
-            </div>
-            <Tabs.Root
-              defaultValue="chart"
-              orientation="horizontal"
-              className="chart-tabs"
-            >
-              <Tabs.List aria-label="Select a Chart View">
-                <Tabs.Trigger value="chart" className="trigger">
-                  Chart View
-                </Tabs.Trigger>
-                <Tabs.Trigger value="table" className="trigger">
-                  Table View
-                </Tabs.Trigger>
-              </Tabs.List>
-              <Tabs.Content value="chart">
-                <ResponsiveContainer width="100%" height={150}>
-                  <LineChart
-                    data={chartData.data}
-                    //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    accessibilityLayer={true}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                    title="Blockers over time trend chart"
-                    desc="Line chart showing blocker counts over time. See the data table below for detailed values."
-                  >
-                    {/* <CartesianGrid strokeDasharray="6 6" />
-                     */}
-                    <XAxis
-                      dataKey="date"
-                      type={"category"}
-                      /* label={{
-                        value: "Date",
-                        position: "insideBottom",
-                        offset: -5,
-                      }} */
-                      tickFormatter={(value, index) => {
-                        if (index % 2) return "";
-                        //console.log(index);
-                        //if(index%5 === 0) return "";
-                        const date = new Date(value);
-                        return date.toLocaleDateString("en-US", {
-                          month: "numeric",
-                          day: "numeric",
-                        });
+                <div className="blockers-chart-heading-wrapper">
+                  <div>
+                    <h2 id="blockers-chart-heading">
+                      <TbHistory className="icon-small" />
+                      {chartData.data[
+                        chartData.data.length - 1
+                      ].blockers.toLocaleString()}{" "}
+                      Blockers
+                    </h2>
+                    <span className="font-small">
+                      Last {chartData.period_days} Days:
+                    </span>
+                  </div>
+                  <div className="chart-ranger-select">
+                    <label htmlFor="chart-range-select">Date Range</label>
+                    <select
+                      id="chart-range-select"
+                      name="ChartRangeSelect"
+                      value={chartRange}
+                      onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                        setChartRange(parseInt(event.target.value));
                       }}
-                      tickMargin={8}
-                    />
-                    {/* <YAxis
+                      aria-label="Select Date Range"
+                    >
+                      <option value={7}>Week</option>
+                      <option value={30}>Month</option>
+                      <option value={90}>Quarter</option>
+                      <option value={365}>Year</option>
+                    </select>
+                  </div>
+                </div>
+                <Tabs.Root
+                  defaultValue="chart"
+                  orientation="horizontal"
+                  className="chart-tabs"
+                >
+                  <Tabs.List aria-label="Select a Chart View">
+                    <Tabs.Trigger value="chart" className="trigger">
+                      Chart View
+                    </Tabs.Trigger>
+                    <Tabs.Trigger value="table" className="trigger">
+                      Table View
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content value="chart">
+                    <ResponsiveContainer width="100%" height={150}>
+                      <LineChart
+                        data={chartData.data}
+                        //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        accessibilityLayer={true}
+                        margin={{
+                          top: 5,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                        title="Blockers over time trend chart"
+                        desc="Line chart showing blocker counts over time. See the data table below for detailed values."
+                      >
+                        {/* <CartesianGrid strokeDasharray="6 6" />
+                     */}
+                        <XAxis
+                          dataKey="date"
+                          type={"category"}
+                          /* label={{
+                            value: "Date",
+                            position: "insideBottom",
+                            offset: -5,
+                          }} */
+                          tickFormatter={(value, index) => {
+                            if (index % 2) return "";
+                            //console.log(index);
+                            //if(index%5 === 0) return "";
+                            const date = new Date(value);
+                            return date.toLocaleDateString("en-US", {
+                              month: "numeric",
+                              day: "numeric",
+                            });
+                          }}
+                          tickMargin={8}
+                        />
+                        {/* <YAxis
                       label={{
                         value: "Blockers",
                         angle: -90,
                         position: "insideLeft",
                       }}
                     /> */}
-                    <Tooltip content={<ChartTooltipContent />} />
-                    {/* <Legend /> */}
-                    <Line
-                      type="monotone"
-                      dataKey="blockers"
-                      stroke={themeVariables.white}
-                      strokeWidth={4}
-                      dot={CustomizedDot}
-                      name="Blockers"
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Tabs.Content>
-              <Tabs.Content value="table">
-                <div>
-                  <h3>Blockers Data Table</h3>
-                  <p>Use this table to review exact blocker counts by date.</p>
-                  <div className={"table-container card-table"}>
-                    <table aria-labelledby="blockers-chart-heading">
-                      <thead>
-                        <tr>
-                          <th scope="col">Scan Date</th>
-                          <th scope="col">Blockers</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {chartData.data.map((row: any, index: number) => {
-                          if (row.timestamp) {
-                            //console.log(row);
-                            return (
-                              <tr key={row.date}>
-                                <td>
-                                  {new Date(row.date).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      weekday: "short",
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )}
-                                </td>
-                                <td>{row.blockers}</td>
-                              </tr>
-                            );
-                          } else {
-                            return false;
-                          }
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </Tabs.Content>
-            </Tabs.Root>
-          </div>
-        )}
-      </Card>
+                        <Tooltip content={<ChartTooltipContent />} />
+                        {/* <Legend /> */}
+                        <Line
+                          type="monotone"
+                          dataKey="blockers"
+                          stroke={themeVariables.white}
+                          strokeWidth={4}
+                          dot={CustomizedDot}
+                          name="Blockers"
+                          isAnimationActive={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Tabs.Content>
+                  <Tabs.Content value="table">
+                    <div className={style["blockers-data-table"]}>
+                      <h3>Blockers Data Table</h3>
+                      <p>Use this table to review exact blocker counts by date.</p>
+                      <div className={"table-container card-table"}>
+                        <table aria-labelledby="blockers-chart-heading">
+                          <thead>
+                            <tr>
+                              <th scope="col">Scan Date</th>
+                              <th scope="col">Blockers</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {chartData.data.map((row: any, index: number) => {
+                              if (row.timestamp) {
+                                //console.log(row);
+                                return (
+                                  <tr key={row.date}>
+                                    <td>
+                                      {new Date(row.date).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                          weekday: "short",
+                                          year: "numeric",
+                                          month: "short",
+                                          day: "numeric",
+                                        }
+                                      )}
+                                    </td>
+                                    <td>{row.blockers}</td>
+                                  </tr>
+                                );
+                              } else {
+                                return false;
+                              }
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </Tabs.Content>
+                </Tabs.Root>
+              </div>
+            )}
+          </Card>
         );
       })()}
 
@@ -594,7 +608,7 @@ export const Audit = () => {
                           >
                             <TbAlertTriangle />
                             <span>{
-                              scans[scans.length - 1].errors.length + 
+                              scans[scans.length - 1].errors.length +
                               " Error" +
                               (scans[scans.length - 1].errors.length > 1 ? "s" : "") +
                               " During Scan"
@@ -736,7 +750,7 @@ export const Audit = () => {
                     isShared ? "View Audit URLs" : "View or Edit Audit URLs"
                   }
                   icon={!showUrlInput ? <FaAngleDown /> : <FaAngleUp />}
-                  onClick={() => {}}
+                  onClick={() => { }}
                 />
               </Collapsible.Trigger>
             </div>
@@ -776,20 +790,52 @@ export const Audit = () => {
           )}
         </Card>
       </div>
-      { 
-        chartData?.data 
-        && chartData.data.length > 0 
-        && auditId
-        && pages
-        &&
-      <BlockersTableSummary 
-        chartData={chartData} 
-        isShared={isShared}
-        auditId={auditId}
-        pages={pages}
-        /> 
-      }
-      {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
+      <Tabs.Root
+        orientation="horizontal"
+        className="audit-tabs"
+        value={blockersTableView}
+        onValueChange={(value) => setBlockersTableView(value)}
+        activationMode="manual"
+      >
+        <div className={style["blockers-table-header"]} style={{ flexDirection : blockersTableView === "summary" ? "row" : "row-reverse"}}>
+          <h3>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h3>
+
+          <Tabs.List aria-label="Select a View" className={style["blockers-view-selector"]}>
+            {blockersTableView !== "summary" &&
+              <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
+                <StyledButton variant="naked" label="Switch to Summary View" onClick={() => { }}>Switch to Summary View</StyledButton>
+              </Tabs.Trigger>
+            }
+            {blockersTableView !== "detailed" &&
+              <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
+                <StyledButton variant="naked" label="Switch to Detailed View" onClick={() => { }}>Switch to Detailed View</StyledButton>
+              </Tabs.Trigger>
+            }
+          </Tabs.List>
+        </div>
+        <Tabs.Content value="summary">
+          {
+            chartData?.data
+            && chartData.data.length > 0
+            && auditId
+            && pages
+            &&
+            <BlockersTableSummary
+              chartData={chartData}
+              isShared={isShared}
+              auditId={auditId}
+              pages={pages}
+              scans={scans}
+              /* filterLinkHandler={setFilterAndOpenDetails} */
+            />
+          }
+        </Tabs.Content>
+        <Tabs.Content value="detailed">
+          {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
+
+        </Tabs.Content>
+      </Tabs.Root>
+
     </div>
   );
 };

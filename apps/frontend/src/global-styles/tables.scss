@@ -4,13 +4,15 @@
 .table-container {
   border: 1px solid variables.$gray;
   border-radius: variables.$spacing;
-  overflow-y: hidden;
-  overflow-x: scroll;
-
+  width:100%;
+  overflow: hidden;
   table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
+    display: block;
+    overflow-x: auto;
+    min-height: 300px;
     @include fonts.font-size-small;
     thead {
       background-color: variables.$white;
@@ -34,7 +36,7 @@
         }
         &:nth-child(odd) {
           td {
-            //background-color: variables.$gray;
+            background-color: variables.$paper;
           }
         }
       }
@@ -175,11 +177,11 @@
     }
   }
   .react-select {
-    margin-bottom: calc(variables.$spacing/1.5);
+    margin-bottom: calc(variables.$spacing);
     min-width: 180px;
   }
   .clear-button {
-    margin-bottom: calc(variables.$spacing/1.5);
+    margin-bottom: calc(variables.$spacing);
     border: 0;
     background: transparent;
     opacity: 0.2;

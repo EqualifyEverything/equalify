@@ -60,4 +60,10 @@
   td.categories {
     min-width: 140px;
   }
+
+  td.empty-table {
+    min-width: calc(100vw - 2px - variables.$spacing*4);
+    padding-bottom: 300px;
+    text-align: center;
+  }
 }

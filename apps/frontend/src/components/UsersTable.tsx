@@ -10,6 +10,8 @@ import { useState, useMemo } from "react";
 import { useGlobalStore } from "../utils";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
+import styles from "./UsersTable.module.scss";
+
 
 const apiClient = API.generateClient();
 
@@ -204,8 +206,8 @@ export const UsersTable = () => {
   }
 
   return (
-    <div className="mt-8">
-      <div className="flex flex-row items-center justify-between mb-4">
+    <div className={styles["UsersTable"]}>
+      <div>
         <h2>Users</h2>
       </div>
 

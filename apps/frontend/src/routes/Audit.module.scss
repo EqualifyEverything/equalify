@@ -2,7 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .Audit {
-  margin-bottom: variables.$spacing*2;
+  margin-bottom: variables.$spacing * 2;
   .scan-url-card-header {
     display: inline-flex;
     justify-content: space-between;
@@ -13,25 +13,26 @@
     width: 100%;
   }
 
-  .scan-url-card-header-top{
+  .scan-url-card-header-top {
     display: inline-flex;
     justify-content: space-between;
-    width:100%;
+    width: 100%;
   }
 
   .scan-cards-area {
-    margin-top:calc(variables.$spacing*2);
+    margin-top: calc(variables.$spacing * 2);
   }
 
-  input[name="email"]{
-    padding-top:calc(variables.$spacing);
+  input[name="email"] {
+    padding-top: calc(variables.$spacing);
     //padding-bottom:calc(variables.$spacing);
     width: 180px;
   }
-  select[name="frequency"]{
-    min-width:100px;
+  select[name="frequency"] {
+    min-width: 100px;
   }
-  text, line{
+  text,
+  line {
     fill: variables.$paper-dark;
     stroke: variables.$paper-dark;
   }
@@ -49,10 +50,10 @@
     border-radius: 999px;
     gap: calc(variables.$spacing/6);
     padding: calc(variables.$spacing/2) calc(variables.$spacing * 2);
-    margin-top:variables.$spacing;
-    margin-bottom:variables.$spacing;
+    margin-top: variables.$spacing;
+    margin-bottom: variables.$spacing;
     cursor: pointer;
-    
+
     svg {
     }
     span {
@@ -61,4 +62,17 @@
     }
   }
 
+  .blockers-table-header {
+    display: inline-flex;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .blockers-data-table {
+    table {
+      display: table !important;
+      min-height: auto !important;
+    }
+  }
 }

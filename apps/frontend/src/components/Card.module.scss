@@ -43,6 +43,11 @@
     background: variables.$green;
     color: variables.$paper;
   }
+  &.short {
+    height: calc(variables.$spacing*15);
+    align-items: center;
+    display: flex;
+  }
 }
 
 

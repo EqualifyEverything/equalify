@@ -6,4 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  table {
+    display:table !important;
+    min-height: auto !important;
+  }
 }

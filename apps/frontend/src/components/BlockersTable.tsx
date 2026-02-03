@@ -636,14 +636,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
   return (
     <div className={style.BlockersTable}>
-      <div>
-        <h2>
-          Blockers
-          {/* {hasFilters &&
-            ` (${filterCount} filter${filterCount !== 1 ? "s" : ""} active)`} */}
-        </h2>
-      </div>
-
       {/* Filter Controls */}
       <div>
         <div className="filter-group">
@@ -811,7 +803,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <tbody>
                 {table.getRowModel().rows.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length}>No blockers found</td>
+                    <td colSpan={columns.length} className={style["empty-table"]}>No blockers found</td>
                   </tr>
                 ) : (
                   table.getRowModel().rows.map((row, index) => (
