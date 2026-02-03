@@ -6,6 +6,7 @@ import {
   ColumnDef,
   RowExpanding,
   RowData,
+  VisibilityState,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
 import { useState, useMemo, ChangeEvent } from "react";
@@ -38,6 +39,7 @@ import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { useDebouncedCallback } from 'use-debounce';
 import { Link } from "react-router-dom";
+import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
@@ -48,7 +50,7 @@ interface BlockerTag {
   content: string;
 }
 
-interface Blocker {
+export interface Blocker {
   id: string;
   short_id: string;
   created_at: string;
@@ -99,7 +101,12 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { setAnnounceMessage, authenticated } = useGlobalStore();
+  const { 
+    setAnnounceMessage, 
+    authenticated, 
+    blockerTableColumnVisibility, 
+    setBlockerTableColumnVisibility
+  } = useGlobalStore();
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -566,7 +573,12 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: data?.pagination?.totalPages || 0,
+    state: {
+      columnVisibility: blockerTableColumnVisibility
+    },
+    onColumnVisibilityChange: setBlockerTableColumnVisibility
   });
+
 
   if (error) {
     return (
@@ -638,6 +650,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     <div className={style.BlockersTable}>
       {/* Filter Controls */}
       <div>
+        <BlockersTableColumnToggle 
+          table={table}
+        />
         <div className="filter-group">
           {/* Status Filter */}
           <div className="status-toggle-group">
@@ -776,6 +791,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </StyledLabeledInput>
           </div>
         </div>
+        
       </div>
 
       {isLoading ? (
