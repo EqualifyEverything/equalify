@@ -122,8 +122,8 @@ export const SkeletonTable = ({
   rows?: number;
   headers?: string[];
 }) => (
-  <div className="table-container" role="status" aria-label="Loading table data">
-    <table className="w-full border-collapse border border-gray-300" aria-hidden="true">
+  <div className="table-container skeleton" role="status" aria-label="Loading table data">
+    <table className="w-full border-collapse border border-gray-300" style={{width: '100%'}} aria-hidden="true">
       <thead>
         <tr className="bg-gray-100">
           {(headers.length > 0 ? headers : Array.from({ length: columns })).map((header, i) => (
@@ -156,7 +156,7 @@ export const SkeletonAccount = () => (
  * Blockers table skeleton with realistic column widths
  */
 export const SkeletonBlockersTable = ({ rows = 5 }: { rows?: number }) => (
-  <div className="table-container" role="status" aria-label="Loading blockers">
+  <div className="table-container skeleton" role="status" aria-label="Loading blockers">
     <table className="w-full border-collapse border border-gray-300" aria-hidden="true">
       <thead>
         <tr className="bg-gray-100">

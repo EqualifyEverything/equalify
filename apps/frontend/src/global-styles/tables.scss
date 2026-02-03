@@ -119,6 +119,12 @@
       }
     }
   }
+  &.skeleton {
+    table,thead,tbody {
+      display: table;
+      width:100%;
+    }
+  }
 }
 
 .tags {

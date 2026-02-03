@@ -97,7 +97,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {isLoading ? (
         <SkeletonTable
           columns={3}
-          rows={3}
+          rows={6}
           headers={["Email", "Created At", "Actions"]}
         />
       ) : (
