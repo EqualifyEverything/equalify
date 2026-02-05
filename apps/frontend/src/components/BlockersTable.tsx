@@ -19,6 +19,7 @@ import {
   FaArrowUp,
   FaClipboard,
   FaCode,
+  FaDownload,
   FaRegFilePdf,
 } from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
@@ -646,6 +647,42 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
+  const exportToCsv = () => {
+    if (!data?.blockers || data.blockers.length === 0) {
+      setAnnounceMessage("No blockers to export", "error");
+      return;
+    }
+
+    const headers = ["Type", "URL", "Issue", "Code", "Tags", "Categories", "Status", "ID"];
+    
+    const csvRows = data.blockers.map((blocker: Blocker) => {
+      const isIgnored = ignoredBlockers?.has(blocker.id) || false;
+      return [
+        blocker.type || "",
+        blocker.url || "",
+        (blocker.messages?.[0] || "").replace(/"/g, '""'),
+        (blocker.content || "").replace(/"/g, '""'),
+        blocker.tags?.map((t) => t.content).join("; ") || "",
+        Array.isArray(blocker.categories) ? blocker.categories.join("; ") : blocker.categories || "",
+        isIgnored ? "Ignored" : "Active",
+        blocker.short_id || "",
+      ].map((field) => `"${field}"`).join(",");
+    });
+
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setAnnounceMessage(`Exported ${data.blockers.length} blockers to CSV`, "success");
+  };
+
   return (
     <div className={style.BlockersTable}>
       {/* Filter Controls */}
@@ -789,6 +826,17 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <label>Search by URL</label>
               <input onChange={(e) => handleSearch(e.target.value)} />
             </StyledLabeledInput>
+          </div>
+
+          {/* CSV Export Button */}
+          <div>
+            <StyledButton
+              onClick={exportToCsv}
+              icon={<FaDownload className="icon-small" />}
+              label="CSV"
+              variant="secondary"
+              disabled={!data?.blockers || data.blockers.length === 0}
+            />
           </div>
         </div>
         
