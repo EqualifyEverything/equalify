@@ -334,13 +334,32 @@ export const Audit = () => {
         auditId={auditId}
         scans={scans}
       />
-      {/* Check if there's an active scan (not complete or failed) */}
+      {/* Check scan state: not scanned, active scan, or completed */}
       {(() => {
+        const hasNoScans = !scans || scans.length === 0;
         const hasActiveScan = scans && scans.length > 0 &&
           scans[scans.length - 1].status !== "complete" &&
           scans[scans.length - 1].status !== "failed";
         const currentScan = scans?.[scans.length - 1];
 
+        // Not scanned yet state
+        if (hasNoScans) {
+          return (
+            <Card variant="dark">
+              <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <h2 style={{ marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                  <TbHistory className="icon-small" />
+                  Not Yet Scanned
+                </h2>
+                <p style={{ color: themeVariables.white, marginBottom: "16px", maxWidth: "500px", margin: "0 auto 16px" }}>
+                  This audit hasn't been scanned yet. Add URLs below and run your first scan to discover accessibility blockers.
+                </p>
+              </div>
+            </Card>
+          );
+        }
+
+        // Active scan in progress
         if (hasActiveScan && currentScan) {
           return (
             <Card variant="dark">
@@ -376,6 +395,7 @@ export const Audit = () => {
           );
         }
 
+        // Completed scan - show chart
         return (
           <Card variant="dark">
             {chartData?.data && chartData.data.length > 0 && (
