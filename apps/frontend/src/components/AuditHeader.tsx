@@ -35,7 +35,7 @@ export const AuditHeader = ({
     try {
       await navigator.clipboard.writeText(
         window.location.origin +
-          location.pathname.replace("/audits/", "/shared/")
+        location.pathname.replace("/audits/", "/shared/")
       );
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
@@ -94,8 +94,8 @@ export const AuditHeader = ({
   };
 
   // Check if there's an active scan (not complete or failed)
-  const hasActiveScan = scans && scans.length > 0 && 
-    scans[scans.length - 1].status !== "complete" && 
+  const hasActiveScan = scans && scans.length > 0 &&
+    scans[scans.length - 1].status !== "complete" &&
     scans[scans.length - 1].status !== "failed";
 
   const renameAudit = async () => {
@@ -131,36 +131,36 @@ export const AuditHeader = ({
 
   return (
     <div className={styles.AuditHeader}>
-      
+
       <div className={styles["inner"]}>
         <div className={styles["header-l"]}>
-        <h1 className="initial-focus-element">
-          <span className={styles["audit-name-label"]}>Audit</span> {audit?.name}
-        </h1>
-        {!isShared && (
-          <div className={styles["buttons-l"]}>
-            <StyledButton
-              onClick={renameAudit}
-              label="Rename Audit"
-              icon={<FaPen />}
-              showLabel={false}
-              loading={isRenaming}
-              disabled={isRenaming || isDeleting}
-            />
-            <StyledButton
-              onClick={deleteAudit}
-              label="Delete Audit"
-              icon={<FaTrash />}
-              showLabel={false}
-              loading={isDeleting}
-              disabled={isRenaming || isDeleting}
-            />
-          </div>
-        )}
+          <h1 className="initial-focus-element">
+            <span className={styles["audit-name-label"]}>Audit</span> {audit?.name}
+          </h1>
+          {!isShared && (
+            <div className={styles["buttons-l"]}>
+              <StyledButton
+                onClick={renameAudit}
+                label="Rename Audit"
+                icon={<FaPen />}
+                showLabel={false}
+                loading={isRenaming}
+                disabled={isRenaming || isDeleting}
+              />
+              <StyledButton
+                onClick={deleteAudit}
+                label="Delete Audit"
+                icon={<FaTrash />}
+                showLabel={false}
+                loading={isDeleting}
+                disabled={isRenaming || isDeleting}
+              />
+            </div>
+          )}
         </div>
 
         <div className={styles["buttons-r"]}>
-        {!isShared && (
+          {!isShared && (
             <StyledButton
               onClick={rescanAudit}
               label={hasActiveScan ? "Scanning..." : "Scan Now"}
@@ -169,14 +169,16 @@ export const AuditHeader = ({
               loading={isScanning || hasActiveScan}
               loadingText="Scanning..."
               disabled={hasActiveScan}
-              title={hasActiveScan ? "A scan is already in progress" : undefined}
+              className="audit-main-button"
+            //title={hasActiveScan ? "A scan is already in progress" : undefined}
             />
-        )}
-        <StyledButton
-          onClick={copyCurrentLocationToClipboard}
-          label="Share"
-          icon={<FaClipboard />}
-        />
+          )}
+          <StyledButton
+            onClick={copyCurrentLocationToClipboard}
+            label="Share"
+            className="audit-main-button"
+            icon={<FaClipboard />}
+          />
         </div>
       </div>
     </div>

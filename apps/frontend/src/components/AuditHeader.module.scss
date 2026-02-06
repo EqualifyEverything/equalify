@@ -2,7 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .AuditHeader {
-  margin-bottom: calc(variables.$spacing)*2;
+  margin-bottom: calc(variables.$spacing) * 2;
   .audit-name-label {
     display: block;
     @include fonts.font-size-small;
@@ -13,10 +13,11 @@
     align-content: center;
     justify-content: space-between;
     align-items: flex-end;
-    width:100%;
+    width: 100%;
     display: inline-flex;
     h1 {
-      margin:0;
+      margin: 0;
+      line-height: 1em;
     }
     .header-l {
       display: inline-flex;
@@ -29,14 +30,14 @@
       justify-content: flex-end;
       margin-left: calc(variables.$spacing);
       button {
-        padding:calc(variables.$spacing) calc(variables.$spacing) calc(variables.$spacing/2) calc(variables.$spacing);
+        padding: calc(variables.$spacing) calc(variables.$spacing)
+          calc(variables.$spacing/2) calc(variables.$spacing);
       }
     }
     .buttons-r {
       display: inline-flex;
-      gap:calc(variables.$spacing*2)
+      gap: calc(variables.$spacing);
+      padding-left: variables.$spacing;
     }
   }
 }
-
-

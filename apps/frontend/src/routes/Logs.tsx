@@ -101,9 +101,8 @@ export const Logs = () => {
         <SkeletonTable columns={4} rows={8} headers={["Date", "Message", "User", "Audit"]} />
       ) : (
         <>
-          <div className="table-container">
+          <div className="table-container" style={{ marginBottom : "16px" }}>
             <table
-              className="w-full border-collapse border border-gray-300"
               aria-label="Logs table"
             >
               <thead>

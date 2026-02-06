@@ -27,11 +27,11 @@
         padding: calc(variables.$spacing/2) variables.$spacing;
         margin-left: calc(variables.$spacing/2);
         margin-right: calc(variables.$spacing/2);
-        opacity:.7;
+        opacity:.8;
         transition: background 0.12s ease-out, opacity 0.12s ease-out;
         &:hover {
             border-radius: calc(variables.$spacing / 2);
-            background-color: variables.$paper-dark;
+            background-color: variables.$paper;
             opacity:1;
         }
         &.active {

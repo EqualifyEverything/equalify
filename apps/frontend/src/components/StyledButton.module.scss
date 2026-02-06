@@ -27,6 +27,9 @@
     margin-right: variables.$spacing;
   }
 
+  &.audit-main-button {
+    min-width: 120px;
+  }
   &.large{
     padding: variables.$spacing*2;
       @include fonts.font-size-normal;
