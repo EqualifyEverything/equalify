@@ -15,6 +15,9 @@
   .text-small {
     @include fonts.font-size-small;
   }
+  &.blockers-chart {
+    padding:calc(variables.$spacing*3)
+  }
   &.dark {
     background: variables.$black;
     color: variables.$paper;

@@ -144,7 +144,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                 />
               })}
             </Card>
-          </div>
+          </div>{/* 
           <div className="cards-50">
             <Card variant="light">
               <div className={style["category-tag-card"]}>
@@ -177,7 +177,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               </div>
             </Card>
           </div>
-
+ */}
 
         </>
       ) : (<><SkeletonAuditHeader /></>)}

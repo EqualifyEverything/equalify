@@ -102,10 +102,10 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { 
-    setAnnounceMessage, 
-    authenticated, 
-    blockerTableColumnVisibility, 
+  const {
+    setAnnounceMessage,
+    authenticated,
+    blockerTableColumnVisibility,
     setBlockerTableColumnVisibility
   } = useGlobalStore();
 
@@ -379,7 +379,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             <>
               {getElementTagFromContent(content) && (
                 <div className={style["view-code-details"]}>
-                  <span>Issue in element:</span>
+                  <span>Issue element: </span>
                   <code className={style["blocker-code"]}>
                     {getElementTagFromContent(content)}
                   </code>
@@ -392,7 +392,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 setBackgroundColorOnScale={false}
               >
                 <Drawer.Trigger className={style["view-code-button"]}>
-                  <FaCode /> <span>View Code</span>
+                  <FaCode /> View Code
                 </Drawer.Trigger>
                 <Drawer.Portal>
                   <Drawer.Overlay className="drawer-overlay" />
@@ -654,7 +654,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     }
 
     const headers = ["Type", "URL", "Issue", "Code", "Tags", "Categories", "Status", "ID"];
-    
+
     const csvRows = data.blockers.map((blocker: Blocker) => {
       const isIgnored = ignoredBlockers?.has(blocker.id) || false;
       return [
@@ -687,9 +687,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     <div className={style.BlockersTable}>
       {/* Filter Controls */}
       <div>
-        <BlockersTableColumnToggle 
-          table={table}
-        />
+
+        <div className={style["table-top-buttons"]}>
+          {/* ColumnToggle */}
+          <BlockersTableColumnToggle
+            table={table}
+          />
+          {/* CSV Export Button */}
+          <StyledButton
+            onClick={exportToCsv}
+            icon={<FaDownload className="icon-small" />}
+            label="CSV"
+            variant="naked"
+            showLabel={false}
+            disabled={!data?.blockers || data.blockers.length === 0}
+          />
+        </div>
         <div className="filter-group">
           {/* Status Filter */}
           <div className="status-toggle-group">
@@ -828,18 +841,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </StyledLabeledInput>
           </div>
 
-          {/* CSV Export Button */}
-          <div>
-            <StyledButton
-              onClick={exportToCsv}
-              icon={<FaDownload className="icon-small" />}
-              label="CSV"
-              variant="secondary"
-              disabled={!data?.blockers || data.blockers.length === 0}
-            />
-          </div>
+
         </div>
-        
+
       </div>
 
       {isLoading ? (

@@ -13,6 +13,7 @@ import {
   Tooltip,
   //Legend,
   ResponsiveContainer,
+  YAxis,
   //Dot,
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
@@ -313,15 +314,15 @@ export const Audit = () => {
     refetchAudit();
   };
 
-/* TODO: implement function to set table filter by URL or by value 
-  const setFilterAndOpenDetails = (type:string, value:string) => {
-    switch(type){
-      case "url":
-        set
+  /* TODO: implement function to set table filter by URL or by value 
+    const setFilterAndOpenDetails = (type:string, value:string) => {
+      switch(type){
+        case "url":
+          set
+      }
+      setBlockersTableView("detailed")
     }
-    setBlockersTableView("detailed")
-  }
- */
+   */
 
   return (
     <div className={style.Audit}>
@@ -397,7 +398,7 @@ export const Audit = () => {
 
         // Completed scan - show chart
         return (
-          <Card variant="dark">
+          <Card variant="dark" className="blockers-chart">
             {chartData?.data && chartData.data.length > 0 && (
               <div>
                 <div className="blockers-chart-heading-wrapper">
@@ -445,15 +446,15 @@ export const Audit = () => {
                     </Tabs.Trigger>
                   </Tabs.List>
                   <Tabs.Content value="chart">
-                    <ResponsiveContainer width="100%" height={150}>
+                    <ResponsiveContainer width="100%" height={170}>
                       <LineChart
                         data={chartData.data}
                         //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                         accessibilityLayer={true}
                         margin={{
                           top: 5,
-                          right: 30,
-                          left: 20,
+                          right: 10,
+                          left: -20,
                           bottom: 5,
                         }}
                         title="Blockers over time trend chart"
@@ -481,13 +482,15 @@ export const Audit = () => {
                           }}
                           tickMargin={8}
                         />
-                        {/* <YAxis
-                      label={{
-                        value: "Blockers",
-                        angle: -90,
-                        position: "insideLeft",
-                      }}
-                    /> */}
+                        <YAxis
+                          //axisLine={false}
+                          orientation="left"
+                          label={{/* 
+                        value: "Blockers", */
+                            angle: -90,
+                            position: "insideLeft",
+                          }}
+                        />
                         <Tooltip content={<ChartTooltipContent />} />
                         {/* <Legend /> */}
                         <Line
@@ -817,7 +820,7 @@ export const Audit = () => {
         onValueChange={(value) => setBlockersTableView(value)}
         activationMode="manual"
       >
-        <div className={style["blockers-table-header"]} style={{ flexDirection : blockersTableView === "summary" ? "row" : "row-reverse"}}>
+        <div className={style["blockers-table-header"]} style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }}>
           <h3>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h3>
 
           <Tabs.List aria-label="Select a View" className={style["blockers-view-selector"]}>
@@ -846,7 +849,7 @@ export const Audit = () => {
               auditId={auditId}
               pages={pages}
               scans={scans}
-              /* filterLinkHandler={setFilterAndOpenDetails} */
+            /* filterLinkHandler={setFilterAndOpenDetails} */
             />
           }
         </Tabs.Content>
