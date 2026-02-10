@@ -12,6 +12,7 @@ import {
   Login,
   Logout,
   Logs,
+  QuickScans,
   Signup,
   SsoCallback,
 } from "#src/routes";
@@ -150,6 +151,7 @@ const router = createBrowserRouter([
       { path: "shared/:auditId", element: <Audit /> },
       { path: "shared/blockers/:blockerId", element: <Blocker /> },
       { path: "audits/build", element: <BuildAudit /> },
+      { path: "quick-scans", element: <QuickScans /> },
       { path: "logs", element: <Logs /> },
       { path: "log/:logId", element: <Log /> },
       { path: "account", element: <Account /> },

@@ -3,7 +3,7 @@ import { formatId, useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useNavigate } from "react-router-dom";
 import { StyledButton } from "#src/components/StyledButton.tsx";
-import { LuClipboard, LuClipboardPlus } from "react-icons/lu";
+import { LuClipboard, LuClipboardPlus, LuZap } from "react-icons/lu";
 import { Card } from "#src/components/Card.tsx";
 const apiClient = API.generateClient();
 import styles from "./Audits.module.scss";
@@ -47,7 +47,7 @@ export const Audits = () => {
           //query: `{audits(order_by: {created_at: desc}) {id created_at name}}`,
           query: `
             {
-          audits(order_by: {created_at: desc}) {
+          audits(order_by: {created_at: desc}, where: {interval: {_neq: "Quick Scan"}}) {
             id
             created_at
             name
@@ -79,12 +79,20 @@ export const Audits = () => {
         <div className={styles["audits-header"]}>
           <h1 className="initial-focus-element">Audits</h1>
 
-          <StyledButton
-            onClick={() => navigate("/audits/build")}
-            label="Add Audit"
-            variant="dark"
-            icon={<LuClipboardPlus className="icon-small" />}
-          />
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <StyledButton
+              onClick={() => navigate("/quick-scans")}
+              label="Quick Scan"
+              variant="light"
+              icon={<LuZap className="icon-small" />}
+            />
+            <StyledButton
+              onClick={() => navigate("/audits/build")}
+              label="Add Audit"
+              variant="dark"
+              icon={<LuClipboardPlus className="icon-small" />}
+            />
+          </div>
         </div>
       </div>
       <>

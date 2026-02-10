@@ -1,0 +1,88 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.QuickScans {
+  margin-bottom: variables.$spacing * 4;
+
+  .quick-scans-header {
+    display: inline-flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .quick-scan-form {
+    display: flex;
+    gap: calc(variables.$spacing * 2);
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: calc(variables.$spacing * 2);
+
+    .url-input {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .type-select {
+      min-width: 100px;
+    }
+  }
+
+  .quick-scans-list {
+    margin-top: calc(variables.$spacing * 3);
+
+    h2 {
+      margin-bottom: calc(variables.$spacing * 2);
+    }
+  }
+
+  .scan-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: variables.$spacing;
+  }
+
+  .scan-url {
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .scan-meta {
+    display: flex;
+    gap: calc(variables.$spacing * 3);
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 0.9em;
+  }
+
+  .scan-status {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+
+    &.processing {
+      background-color: variables.$yellow;
+      color: variables.$black;
+    }
+    &.complete {
+      background-color: variables.$green-light;
+      color: variables.$green-dark;
+    }
+    &.failed {
+      background-color: variables.$red-light;
+      color: variables.$red-dark;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: calc(variables.$spacing * 4);
+    opacity: 0.7;
+  }
+}
