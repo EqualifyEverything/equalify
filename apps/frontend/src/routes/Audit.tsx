@@ -396,8 +396,31 @@ export const Audit = () => {
           );
         }
 
-        // Completed scan - show chart
+        // Check if the last scan timed out
+        const lastScanTimedOut = currentScan?.errors?.some(
+          (e: ScanError) => e.type === 'scan_timeout'
+        );
+
+        // Completed scan - show timeout notice if applicable, then chart
         return (
+          <>
+          {lastScanTimedOut && (
+            <Card variant="dark">
+              <div style={{ padding: "20px 0", display: "flex", alignItems: "center", gap: "12px" }}>
+                <TbAlertTriangle style={{ fontSize: "1.5em", color: themeVariables.yellow || "#f0ad4e", flexShrink: 0 }} />
+                <div>
+                  <h3 style={{ margin: 0 }}>Scan Timed Out</h3>
+                  <p style={{ margin: "4px 0 0", color: themeVariables.white, fontSize: "0.9em" }}>
+                    The last scan did not complete within the expected time. Some results may be missing.
+                    {currentScan.percentage != null && currentScan.percentage > 0 && currentScan.percentage < 100
+                      ? ` Only ${currentScan.percentage}% of pages were scanned.`
+                      : ''}
+                    {' '}Try rescanning — if the issue persists, some pages may be unreachable.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
           <Card variant="dark" className="blockers-chart">
             {chartData?.data && chartData.data.length > 0 && (
               <div>
@@ -550,6 +573,7 @@ export const Audit = () => {
               </div>
             )}
           </Card>
+          </>
         );
       })()}
 

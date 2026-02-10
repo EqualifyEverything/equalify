@@ -64,15 +64,15 @@ export const runEveryMinute = async () => {
 
     // See if there are any "stuck" scans that we should error out!
     const stuckScans = (await db.query({
-        text: `SELECT "id", "errors" FROM "scans" 
-               WHERE "status" = 'processing' 
-               AND (NOW() - "updated_at") > INTERVAL '60 minutes'`,
+        text: `SELECT s."id", s."errors", s."audit_id" FROM "scans" s
+               WHERE s."status" = 'processing' 
+               AND (NOW() - s."updated_at") > INTERVAL '15 minutes'`,
     })).rows;
     
     for (const scan of stuckScans) {
         const timeoutError = {
             type: 'scan_timeout',
-            message: 'Scan timed out after 60 minutes',
+            message: 'Scan timed out after 15 minutes of inactivity',
             timestamp: new Date().toISOString(),
         };
         const updatedErrors = [...(scan.errors || []), timeoutError];
@@ -82,7 +82,21 @@ export const runEveryMinute = async () => {
                    WHERE "id" = $3`,
             values: ['complete', updatedErrors, scan.id],
         });
-        console.log('Marked stuck scan as complete:', scan.id);
+
+        // Also update the parent audit so the frontend stops showing the spinner
+        if (scan.audit_id) {
+            const hasSuccessfulPages = (await db.query({
+                text: `SELECT COUNT(*) FROM "blockers" WHERE "scan_id"=$1`,
+                values: [scan.id],
+            })).rows[0].count > 0;
+
+            await db.query({
+                text: `UPDATE "audits" SET "status" = $1 WHERE "id" = $2 AND "status" NOT IN ('complete', 'failed')`,
+                values: [hasSuccessfulPages ? 'complete' : 'failed', scan.audit_id],
+            });
+        }
+
+        console.log('Marked stuck scan as complete:', scan.id, 'audit:', scan.audit_id);
     }
 
     await db.clean();
