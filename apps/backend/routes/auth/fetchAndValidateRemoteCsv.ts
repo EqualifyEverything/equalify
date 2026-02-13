@@ -53,7 +53,7 @@ export const fetchAndValidateRemoteCsv = async () => {
       success: false,
       url: csvUrl,
       error:
-        error instanceof Error ? error : new Error("An unknown error occurred"),
+        error instanceof Error ? error.toString() : new Error("An unknown error occurred").toString(),
     };
   }
 };
