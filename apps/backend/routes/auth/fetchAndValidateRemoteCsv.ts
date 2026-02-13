@@ -8,9 +8,11 @@ interface urlCsv {
   url: string;
   type: string;
 }
+
 export const fetchAndValidateRemoteCsv = async () => {
-    const csvUrl = (event.queryStringParameters as any).url;
-    try {
+  const csvUrl = (event.queryStringParameters as any).url;
+  try {
+    if(!csvUrl) throw new Error(`Invalid CSV URL: ${csvUrl}`)
     const response = await fetch(csvUrl);
 
     if (!response.ok) {
@@ -18,21 +20,26 @@ export const fetchAndValidateRemoteCsv = async () => {
     }
 
     const text = await response.text();
-    const rows = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    
+    const rows = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
     const parsedData: urlCsv[] = [];
 
     for (const [index, row] of rows.entries()) {
-      const columns = row.split(',').map(col => col.trim());
+      const columns = row.split(",").map((col) => col.trim());
 
       if (columns.length !== 2) {
-        throw new Error(`Invalid format at line ${index + 1}: Expected "url, type" but found ${columns.length} columns.`);
+        throw new Error(
+          `Invalid format at line ${index + 1}: Expected "url, type" but found ${columns.length} columns.`,
+        );
       }
 
       const [url, type] = columns;
 
       try {
-        new URL(url); 
+        new URL(url);
       } catch {
         throw new Error(`Invalid URL at line ${index + 1}: "${url}"`);
       }
@@ -40,12 +47,13 @@ export const fetchAndValidateRemoteCsv = async () => {
       parsedData.push({ url, type });
     }
 
-    return { success: true, data: parsedData };
-
+    return { success: true, url: csvUrl, data: parsedData };
   } catch (error) {
-    return { 
-      success: false, 
-      error: error instanceof Error ? error : new Error('An unknown error occurred') 
+    return {
+      success: false,
+      url: csvUrl,
+      error:
+        error instanceof Error ? error : new Error("An unknown error occurred"),
     };
   }
-}
+};

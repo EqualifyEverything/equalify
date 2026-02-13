@@ -85,25 +85,20 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
     return { url: trimmedLine, type: "html" };
   };
 
-  const handleInput = useDebouncedCallback(
-    // function
-    (value) => {
-      if (value.length >= 3) {
-        setCsvUrl(value);
-      };
-      fetchAndValidateCsv();
-    },
-    750
-  );
+
+  useEffect(() => {
+    console.log("Fetching and validating CSV...", csvUrl);
+    fetchAndValidateCsv()
+  }, [csvUrl])
 
   const fetchAndValidateCsv = async () => {
-    const params: Record<string, string> = {
-        url: csvUrl,
-    };
+
     const response = await API.get({
       apiName: "auth",
       path: "/fetchAndValidateRemoteCsv",
-      options: { queryParams: params },
+      options: {
+        queryParams: { url: csvUrl.trim() },
+      },
     }).response;
     const resp = (await response.body.json()) as any;
     console.log(resp);
@@ -118,9 +113,9 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
         </p>
         <StyledLabeledInput>
           <label htmlFor="remote-csv-url">URL of Remote CSV</label>
-          <input id="remote-csv-url" type="url" value={csvUrl} onChange={(e) => { handleInput(e.target.value) }} />
+          <input id="remote-csv-url" type="url" value={csvUrl} onChange={(e) => { setCsvUrl(e.target.value) }} />
         </StyledLabeledInput>
-        { error ? error : null }
+        {error ? error : null}
       </Card>
     </div>
   );
