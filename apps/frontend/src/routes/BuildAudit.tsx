@@ -6,7 +6,7 @@ import {
   AuditEmailSubscriptionInput,
   EmailSubscriptionList,
 } from "#src/components/AuditEmailSubscriptionInput.tsx";
-import { v4 as uuidv4 } from "uuid";
+//import { v4 as uuidv4 } from "uuid";
 import { useGlobalStore } from "../utils";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 import { createLog } from "#src/utils/createLog.ts";
@@ -15,9 +15,12 @@ import { Card } from "#src/components/Card.tsx";
 import { CgOptions } from "react-icons/cg";
 import { TbList, TbMail } from "react-icons/tb";
 import { StyledButton } from "#src/components/StyledButton.tsx";
-import { LuClipboardCheck, LuClipboardPaste } from "react-icons/lu";
+import { LuClipboardCheck, LuClipboardPaste, LuImport } from "react-icons/lu";
 import styles from "./BuildAudit.module.scss";
-import * as Switch from "@radix-ui/react-switch";
+//import * as Switch from "@radix-ui/react-switch";
+import * as Tabs from "@radix-ui/react-tabs";
+import { FaCloudArrowDown, FaFileCirclePlus, FaListUl } from "react-icons/fa6";
+import { AuditRemoteCsvInput } from "#src/components/AuditRemoteCsvInput.tsx";
 
 interface Page {
   url: string;
@@ -31,6 +34,7 @@ export const BuildAudit = () => {
 
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
+  const [remoteCsvUrl, setRemoteCsvUrl] = useState("");
   const [auditNameValid, setAuditNameValid] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
@@ -60,10 +64,14 @@ export const BuildAudit = () => {
         };
       });
     }
+    if(remoteCsvUrl){ // if we're using a remote csv, discard any manual input
+      setPages([]);
+    }
     return {
       auditName: formData.get("auditName") as string,
       scanFrequency: formData.get("scanFrequency") as string,
       emailNotifications: JSON.stringify(notifications),
+      remoteCsvUrl: remoteCsvUrl,
       pages: pages.map((page) => ({
         url: page.url,
         type: page.type,
@@ -190,31 +198,59 @@ export const BuildAudit = () => {
           </Card>
         </div>
 
-        <Card variant="light">
-          <h2>
-            <TbList className={"icon-small"} />
-            Add URLs
-          </h2>
-          <AuditPagesInput
-            initialPages={pages}
-            setParentPages={setPages}
-            returnMutation={false}
-          />
+        <Card variant="light" className={styles["pages-input-card"]}>
+          <h2><FaListUl className="icon-small" /> Add URLs to Your Audit</h2>
+          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={()=>{ setRemoteCsvUrl("") }}>
+            <Tabs.List className={styles["pages-input-list"]} aria-label="Add URLs to Scan">
+              <Tabs.Trigger value="url" asChild>
+                <StyledButton
+                  variant="tab-card-button"
+                  label="Add Manually"
+                  icon={<FaFileCirclePlus />}
+                  onClick={() => { }}
+                />
+              </Tabs.Trigger>
+              <Tabs.Trigger value="remote-csv" asChild>
+                <StyledButton
+                  variant="tab-card-button"
+                  label="Use Remote CSV"
+                  icon={<FaCloudArrowDown />}
+                  onClick={() => { }}
+                />
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="url">
+              <AuditPagesInput
+              initialPages={pages}
+              setParentPages={setPages}
+              returnMutation={false}
+              reverseLayout
+            /></Tabs.Content>
+
+            <Tabs.Content value="remote-csv">
+              <AuditRemoteCsvInput 
+                csvUrl={remoteCsvUrl}
+                setCsvUrl={setRemoteCsvUrl}
+              />
+            </Tabs.Content>
+          </Tabs.Root>
+
+
         </Card>
         <div className={styles["action-buttons"]}>
           <StyledButton
             icon={<LuClipboardCheck />}
             onClick={saveAudit}
             label="Save Audit"
-            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            disabled={(pages.length < 1 && remoteCsvUrl == "") || !auditNameValid || isSaving || isSavingAndRunning}
             loading={isSaving}
           />
           <StyledButton
             icon={<LuClipboardPaste />}
             onClick={saveAndRunAudit}
+            variant="dark"
             label="Save & Run Audit"
-            variant="green"
-            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
+            disabled={(pages.length < 1 && remoteCsvUrl == "") || !auditNameValid || isSaving || isSavingAndRunning}
             loading={isSavingAndRunning}
           />
         </div>

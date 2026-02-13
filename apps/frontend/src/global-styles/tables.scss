@@ -34,7 +34,7 @@
           padding: variables.$spacing;
           border-bottom: 1px solid variables.$gray;
         }
-        &:nth-child(odd) {
+        &:nth-child(even) {
           td {
             background-color: variables.$paper;
           }

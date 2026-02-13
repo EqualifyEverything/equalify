@@ -4,7 +4,7 @@
 .button {
   font-weight: bold;
   color: variables.$white;
-  padding: variables.$spacing variables.$spacing*2;
+  padding: variables.$spacing variables.$spacing * 2;
   background: variables.$green;
   border-radius: calc(variables.$spacing / 2);
   border: 1px solid variables.$green-dark;
@@ -16,7 +16,9 @@
   align-content: center;
   justify-content: center;
   align-items: center;
-  transition: background 0.12s ease-out, opacity 0.12s ease-out;
+  transition:
+    background 0.12s ease-out,
+    opacity 0.12s ease-out;
 
   span {
     display: block;
@@ -30,41 +32,62 @@
   &.audit-main-button {
     min-width: 120px;
   }
-  &.large{
-    padding: variables.$spacing*2;
-      @include fonts.font-size-normal;
+  &.large {
+    padding: variables.$spacing * 2;
+    @include fonts.font-size-normal;
   }
 
   &.dark {
     background: variables.$black;
-        border-color: variables.$black;
-
+    border-color: variables.$black;
     color: variables.$white;
-    &:hover{
+
+    &:hover {
       background: variables.$black;
-      opacity: .85;
+      opacity: 0.85;
     }
-    &:active{
+    &:active {
       background: variables.$black;
-      opacity: .7;
+      opacity: 0.7;
+    }
+
+    &.disabled {
+      border-color: variables.$gray;
+      background: variables.$gray;
+      opacity: 0.85;
+      box-shadow: none;
+      cursor: default;
     }
   }
   &.light {
     background: transparent;
     border-color: variables.$black;
     color: variables.$black;
-    &:hover{
+    &:hover {
       background: transparent;
-      opacity: .85;
+      opacity: 0.85;
     }
-    &:active{
+    &:active {
       background: transparent;
-      opacity: .7;
+      opacity: 0.7;
     }
     &.disabled {
       border-color: variables.$gray;
       color: variables.$gray;
       box-shadow: none;
+      cursor: default;
+    }
+  }
+  &.tab-card-button {
+    color: variables.$black;
+    background: transparent;
+    border: 1px solid variables.$gray;
+    padding: calc(variables.$spacing * 2);
+    &[aria-selected="true"] {
+      border: 1px solid variables.$red;
+    }
+    &:hover {
+      background-color: variables.$paper;
     }
   }
   &.naked {
@@ -73,31 +96,31 @@
     border: 0;
     color: variables.$red;
     flex-direction: row-reverse;
-    padding:0;
-    &:hover{
+    padding: 0;
+    &:hover {
       background: transparent;
-      opacity: .85;
+      opacity: 0.85;
     }
-    &:active{
+    &:active {
       background: transparent;
-      opacity: .7;
+      opacity: 0.7;
     }
   }
   &.rondel {
-    padding:variables.$spacing;
+    padding: variables.$spacing;
     border-radius: 999px;
   }
   &.red {
     background: variables.$red;
     color: variables.$white;
     border-color: variables.$red;
-    &:hover{
+    &:hover {
       background: variables.$red;
-      opacity: .85;
+      opacity: 0.85;
     }
-    &:active{
+    &:active {
       background: variables.$red;
-      opacity: .7;
+      opacity: 0.7;
     }
     &.disabled {
       opacity: 0.5;
@@ -106,11 +129,11 @@
   &.green {
     background: variables.$green;
     color: variables.$paper;
-    &:hover{
-      background: variables.$green-dark
+    &:hover {
+      background: variables.$green-dark;
     }
-    &:active{
-      background: variables.$green-darker
+    &:active {
+      background: variables.$green-darker;
     }
   }
 
@@ -137,22 +160,22 @@
   }
 
   &.toggle {
-    border:0;
+    border: 0;
     background: variables.$green;
     color: variables.$white;
   }
-  &.toggle-ignored{
-    border:0;
+  &.toggle-ignored {
+    border: 0;
     background: variables.$paper;
     color: variables.$black;
-    @include fonts.font-size-small;  
+    @include fonts.font-size-small;
   }
 
   &.loading {
     cursor: wait;
     opacity: 0.8;
   }
-/* 
+  /* 
   &.disabled,
   &:disabled {
     //opacity:1;

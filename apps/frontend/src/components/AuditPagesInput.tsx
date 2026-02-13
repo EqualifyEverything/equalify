@@ -19,6 +19,7 @@ interface ChildProps {
   updateParentPageType?: (newValue: Page) => void; // Callback function prop
   returnMutation?: boolean; // if true, only return changed rows
   isShared?: boolean;
+  reverseLayout?: boolean;
 }
 
 export const AuditPagesInput: React.FC<ChildProps> = ({
@@ -29,6 +30,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   updateParentPageType,
   returnMutation = false,
   isShared = false,
+  reverseLayout = false
 }) => {
   const { setAnnounceMessage } = useGlobalStore();
 
@@ -379,7 +381,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
   //console.log(pages);
 
   return (
-    <div className={style.AuditPagesInput}>
+    <div className={style.AuditPagesInput + " "+ reverseLayout ? style["reverse-layout"] : ""}>
       {/* {pages.length > 0 && ( */}
         <>
           <AuditPagesInputTable
@@ -391,7 +393,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
           {!isShared && (
             <Card variant="inset-light">
               <h3>Add URLs to Scan</h3>
+              <p className="font-small">
+                      Enter individual URLs one-by-one below, or upload a CSV file to add multiple URLs to your audit simultaneously.
+                    </p>
               <div className={style["input-area"]}>
+                
                 <StyledLabeledInput>
                   <label htmlFor="importBy">Import By:</label>
                   <select
@@ -400,14 +406,14 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                     value={importBy}
                     onChange={(e) => setImportBy(e.target.value)}
                   >
-                    <option>URLs</option>
+                    <option>URL</option>
                     <option>CSV</option>
                   </select>
                 </StyledLabeledInput>
                 {["URLs"].includes(importBy) && (
                   <div>
                     <StyledLabeledInput>
-                      <label htmlFor="pageInput">URLs:</label>
+                      <label htmlFor="pageInput">URL:</label>
                       <input
                         id="pageInput"
                         name="pageInput"
@@ -436,7 +442,6 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                     <StyledButton
                       label="Download Template CSV"
                       onClick={downloadCsvTemplate}
-                      variant="secondary"
                     />
                     {csvError && (
                       <p className="text-red-500 text-sm mt-1">{csvError}</p>
@@ -445,7 +450,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                 )}
               </div>
               <div className={style["button-area"]}>
-              <StyledButton label="Add Urls" onClick={addPage} />
+              <StyledButton label="Add URL" onClick={addPage} />
               </div>
             </Card>
           )}

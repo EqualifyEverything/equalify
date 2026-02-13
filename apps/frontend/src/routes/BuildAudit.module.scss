@@ -60,3 +60,15 @@
     }
   }
 }
+.pages-input-card {
+  table {
+    display:table !important;
+    min-height: auto !important;
+  }
+}
+.pages-input-list {
+  display: inline-flex;
+  gap: variables.$spacing;
+  margin-bottom: calc(variables.$spacing);
+  margin-top: calc(variables.$spacing);
+}

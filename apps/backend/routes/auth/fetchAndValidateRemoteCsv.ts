@@ -1,0 +1,51 @@
+import { db, event, graphqlQuery, validateShortId } from "#src/utils";
+
+//
+// Fetches a remote CSV, checks for basic validity, and returns the parsed data or an error
+//
+
+interface urlCsv {
+  url: string;
+  type: string;
+}
+export const fetchAndValidateRemoteCsv = async () => {
+    const csvUrl = (event.queryStringParameters as any).url;
+    try {
+    const response = await fetch(csvUrl);
+
+    if (!response.ok) {
+      throw new Error(`Error fetching CSV: ${response.statusText}`);
+    }
+
+    const text = await response.text();
+    const rows = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    const parsedData: urlCsv[] = [];
+
+    for (const [index, row] of rows.entries()) {
+      const columns = row.split(',').map(col => col.trim());
+
+      if (columns.length !== 2) {
+        throw new Error(`Invalid format at line ${index + 1}: Expected "url, type" but found ${columns.length} columns.`);
+      }
+
+      const [url, type] = columns;
+
+      try {
+        new URL(url); 
+      } catch {
+        throw new Error(`Invalid URL at line ${index + 1}: "${url}"`);
+      }
+
+      parsedData.push({ url, type });
+    }
+
+    return { success: true, data: parsedData };
+
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error : new Error('An unknown error occurred') 
+    };
+  }
+}
