@@ -23,7 +23,8 @@ export const fetchAndValidateRemoteCsv = async () => {
     const rows = text
       .split("\n")
       .map((line) => line.trim())
-      .filter((line) => line.length > 0);
+      .filter((line) => line.length > 0)
+      .splice(0,1); // remove header row
 
     const parsedData: urlCsv[] = [];
 
