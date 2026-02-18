@@ -231,6 +231,8 @@ export const BuildAudit = () => {
 
             <Tabs.Content value="remote-csv">
               <AuditRemoteCsvInput 
+                pages={pages}
+                setParentPages={setPages}
                 csvUrl={remoteCsvUrl}
                 setCsvUrl={setRemoteCsvUrl}
                 validCsv={validRemoteCsv}

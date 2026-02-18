@@ -7,6 +7,7 @@ import { useDebouncedCallback } from "use-debounce";
 
 import * as API from "aws-amplify/api";
 import { MdCheckCircle, MdError } from "react-icons/md";
+import { AuditPagesInputTable } from "./AuditPagesInputTable";
 
 interface Page {
   url: string;
@@ -18,11 +19,14 @@ interface ChildProps {
   setCsvUrl: (value: React.SetStateAction<string>) => void
   validCsv: boolean
   setValidCsv: (value: React.SetStateAction<boolean>) => void
+  pages: Page[]
+  setParentPages: (newValue: Page[]) => void; // Callback function prop
+
 }
 
 // test file: https://equalify.app/wp-content/uploads/2026/02/url-import-template.csv
 
-export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, validCsv, setValidCsv
+export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, validCsv, setValidCsv, setParentPages, pages
 }) => {
   const { setAnnounceMessage } = useGlobalStore();
   const [error, setError] = useState<string | null>("");
@@ -88,18 +92,41 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, v
     return { url: trimmedLine, type: "html" };
   };
 
+  const updatePages = (lines: Page[]) => {
+    const newPages: Page[] = [];
+    const errors = [];
+
+    lines.forEach((line, index) => {
+
+      // Parse line for URL and optional type (format: url,type)
+      const { url: rawUrl, type: pageType } = line;
+
+      // Validate and format URL
+      const validUrl = validateAndFormatUrl(rawUrl);
+      if (!validUrl) {
+        errors.push(`Line ${index + 1}: Invalid URL format`);
+        return;
+      }
+
+      newPages.push({ url: validUrl, type: pageType });
+    });
+    //console.log(newPages);
+    setParentPages(newPages)
+  }
+
 
   useEffect(() => {
-    (async () => {   
-      if(csvUrl.length<=5) {
+    (async () => {
+      if (csvUrl.length <= 5) {
         setError("");
         return;
       }
       console.log("Fetching and validating CSV...", csvUrl);
       const fetchedCsv = await fetchAndValidateCsv();
       setError(fetchedCsv.error);
-      if(fetchedCsv.success){
+      if (fetchedCsv.success) {
         setValidCsv(true);
+        const updatedPages = updatePages(fetchedCsv.data);
       }
     })()
   }, [csvUrl])
@@ -129,11 +156,19 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, v
           <label htmlFor="remote-csv-url">URL of Remote CSV</label>
           <input id="remote-csv-url" type="url" value={csvUrl} onChange={(e) => { setCsvUrl(e.target.value) }} />
         </StyledLabeledInput>
-        {error && 
-          <Card variant="short-error"><MdError className="icon-small"/><div className="font-small"><b>There was a problem with your CSV.</b>{error}</div></Card>
+        {error &&
+          <Card variant="short-error"><MdError className="icon-small" /><div className="font-small"><b>There was a problem with your CSV.</b>{error}</div></Card>
         }
         {validCsv &&
-          <Card variant="short-success"><MdCheckCircle className="icon-small"/><div className="font-small"><b>CSV Found!</b></div></Card>
+          <Card variant="short-success"><MdCheckCircle className="icon-small" /><div className="font-small"><b>CSV Found!</b></div></Card>
+        }
+        {pages.length > 0 &&
+          <AuditPagesInputTable
+            pages={pages}
+            removePages={() => { }}
+            isShared={true}
+            updatePageType={() => { }}
+          />
         }
       </Card>
     </div>

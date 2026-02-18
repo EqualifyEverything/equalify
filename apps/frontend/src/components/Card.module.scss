@@ -55,8 +55,10 @@
     }
   }
   &.short-success {
-    background: variables.$red;
-    color:variables.$white;
+    background: transparent;
+    
+    border: 1px solid variables.$green;
+    color:variables.$black;
     display: inline-flex;
     align-items: center;
     padding: calc(variables.$spacing*2) calc(variables.$spacing*2);

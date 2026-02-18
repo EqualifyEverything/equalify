@@ -37,6 +37,8 @@ export const AuditPagesInputTable = ({
   });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+
+
   useEffect(() => {
     //console.log(rowSelection);
   }, [rowSelection]);
@@ -90,6 +92,7 @@ export const AuditPagesInputTable = ({
         cell: ({ cell, getValue }) => {
           const url = cell.row.original.url;
           const type = getValue() as string;
+          if(isShared) return type;
           return (
             <select
               name={`pageType_${url}`}
@@ -113,6 +116,13 @@ export const AuditPagesInputTable = ({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      columnVisibility: {
+        "select-col"  : !isShared, // hide the select column when in shared view
+        "url"         : true, 
+        "type"        : true,
+      },
+    },
     state: {
       pagination,
       rowSelection,
