@@ -39,6 +39,8 @@ export const BuildAudit = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
 
+  const [validRemoteCsv, setValidRemoteCsv] = useState(false);
+
   const defaultEmailList = {
     emails: [
       /* {
@@ -231,6 +233,8 @@ export const BuildAudit = () => {
               <AuditRemoteCsvInput 
                 csvUrl={remoteCsvUrl}
                 setCsvUrl={setRemoteCsvUrl}
+                validCsv={validRemoteCsv}
+                setValidCsv={setValidRemoteCsv}
               />
             </Tabs.Content>
           </Tabs.Root>
@@ -242,7 +246,7 @@ export const BuildAudit = () => {
             icon={<LuClipboardCheck />}
             onClick={saveAudit}
             label="Save Audit"
-            disabled={(pages.length < 1 && remoteCsvUrl == "") || !auditNameValid || isSaving || isSavingAndRunning}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
             loading={isSaving}
           />
           <StyledButton
@@ -250,7 +254,7 @@ export const BuildAudit = () => {
             onClick={saveAndRunAudit}
             variant="dark"
             label="Save & Run Audit"
-            disabled={(pages.length < 1 && remoteCsvUrl == "") || !auditNameValid || isSaving || isSavingAndRunning}
+            disabled={pages.length < 1 || !auditNameValid || isSaving || isSavingAndRunning}
             loading={isSavingAndRunning}
           />
         </div>

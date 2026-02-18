@@ -6,6 +6,7 @@ import { StyledLabeledInput } from "./StyledLabeledInput";
 import { useDebouncedCallback } from "use-debounce";
 
 import * as API from "aws-amplify/api";
+import { MdCheckCircle, MdError } from "react-icons/md";
 
 interface Page {
   url: string;
@@ -15,11 +16,13 @@ interface Page {
 interface ChildProps {
   csvUrl: string
   setCsvUrl: (value: React.SetStateAction<string>) => void
+  validCsv: boolean
+  setValidCsv: (value: React.SetStateAction<boolean>) => void
 }
 
 // test file: https://equalify.app/wp-content/uploads/2026/02/url-import-template.csv
 
-export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
+export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, validCsv, setValidCsv
 }) => {
   const { setAnnounceMessage } = useGlobalStore();
   const [error, setError] = useState<string | null>("");
@@ -87,8 +90,18 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
 
 
   useEffect(() => {
-    console.log("Fetching and validating CSV...", csvUrl);
-    fetchAndValidateCsv()
+    (async () => {   
+      if(csvUrl.length<=5) {
+        setError("");
+        return;
+      }
+      console.log("Fetching and validating CSV...", csvUrl);
+      const fetchedCsv = await fetchAndValidateCsv();
+      setError(fetchedCsv.error);
+      if(fetchedCsv.success){
+        setValidCsv(true);
+      }
+    })()
   }, [csvUrl])
 
   const fetchAndValidateCsv = async () => {
@@ -102,6 +115,7 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
     }).response;
     const resp = (await response.body.json()) as any;
     console.log(resp);
+    return resp;
   }
 
   return (
@@ -109,13 +123,18 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl
       <Card variant="inset-light">
         <h3>Use a Remote CSV Integration</h3>
         <p className="font-small">
-          Or, provide a link to a hosted CSV to automatically sync your URL list before every scan.
+          Provide a link to a hosted CSV to automatically sync your URL list before every scan.
         </p>
         <StyledLabeledInput>
           <label htmlFor="remote-csv-url">URL of Remote CSV</label>
           <input id="remote-csv-url" type="url" value={csvUrl} onChange={(e) => { setCsvUrl(e.target.value) }} />
         </StyledLabeledInput>
-        {error ? error : null}
+        {error && 
+          <Card variant="short-error"><MdError className="icon-small"/><div className="font-small"><b>There was a problem with your CSV.</b>{error}</div></Card>
+        }
+        {validCsv &&
+          <Card variant="short-success"><MdCheckCircle className="icon-small"/><div className="font-small"><b>CSV Found!</b></div></Card>
+        }
       </Card>
     </div>
   );

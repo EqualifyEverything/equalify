@@ -39,6 +39,36 @@
       background-color: variables.$white;
     }
   }
+  &.short-error {
+    background: variables.$red;
+    color:variables.$white;
+    display: inline-flex;
+    align-items: center;
+    padding: calc(variables.$spacing*2) calc(variables.$spacing*2);
+    margin-top: calc(variables.$spacing*2);
+    line-height: 1em;
+    b {
+      display: block;
+    }
+    svg {
+      margin-right:variables.$spacing;
+    }
+  }
+  &.short-success {
+    background: variables.$red;
+    color:variables.$white;
+    display: inline-flex;
+    align-items: center;
+    padding: calc(variables.$spacing*2) calc(variables.$spacing*2);
+    margin-top: calc(variables.$spacing*2);
+    line-height: 1em;
+    b {
+      display: block;
+    }
+    svg {
+      margin-right:variables.$spacing;
+    }
+  }
   &.red {
     background: variables.$red;
   }
