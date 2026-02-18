@@ -211,7 +211,10 @@ export const BuildAudit = () => {
                   icon={<FaFileCirclePlus />}
                   onClick={() => { }}
                 />
-              </Tabs.Trigger>
+              </Tabs.Trigger>{/* 
+              **** 
+              **** Temporarily disabled while in dev
+              ****
               <Tabs.Trigger value="remote-csv" asChild>
                 <StyledButton
                   variant="tab-card-button"
@@ -219,7 +222,7 @@ export const BuildAudit = () => {
                   icon={<FaCloudArrowDown />}
                   onClick={() => { }}
                 />
-              </Tabs.Trigger>
+              </Tabs.Trigger> */}
             </Tabs.List>
             <Tabs.Content value="url">
               <AuditPagesInput
