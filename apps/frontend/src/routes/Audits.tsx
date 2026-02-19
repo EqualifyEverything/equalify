@@ -46,33 +46,37 @@ export const Audits = () => {
         await apiClient.graphql({
           //query: `{audits(order_by: {created_at: desc}) {id created_at name}}`,
           query: `
-            {
-          audits(order_by: {created_at: desc}, where: {interval: {_neq: "Quick Scan"}}) {
-            id
-            created_at
-            name
-            interval
-            scans(order_by: {created_at: desc}, limit: 1) {
-            blockers_aggregate(order_by: {created_at: desc}, where: {}) {
-                aggregate {
-                count
+              {
+                audits(order_by: {created_at: desc}, where: {interval: {_neq: "Quick Scan"}}) {
+                  id
+                  created_at
+                  name
+                  interval
+                  user {
+                    name
+                    email
+                  }
+                  scans(order_by: {created_at: desc}, limit: 1) {
+                    blockers_aggregate(order_by: {created_at: desc}, where: {}) {
+                        aggregate {
+                          count
+                        }
+                    }
+                    percentage
+                    updated_at
+                  }
+                  urls_aggregate {
+                    aggregate {
+                        count
+                    }
+                  }
                 }
-            }
-            percentage
-            updated_at
-            }
-            urls_aggregate {
-            aggregate {
-                count
-            }
-            }
-        }
-        }
+              }
             `,
         })
       )?.data?.audits,
   });
-  //console.log(audits);
+  console.log(audits);
   return (
     <div className={styles.Audits}>
       <div>
@@ -144,6 +148,10 @@ export const Audits = () => {
                           row.scans[0]?.blockers_aggregate?.aggregate?.count ??
                           "—"
                         }
+                      />
+                      <DataRow
+                        the_key="Created By"
+                        the_value={<Link to={`mailto:${row.user.email}`}>{row.user.name}</Link>}
                       />
                       <DataRow
                         the_key="URLs"

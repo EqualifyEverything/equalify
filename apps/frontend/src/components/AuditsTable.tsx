@@ -35,6 +35,15 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
           return <Link to={`/audits/${formatId(row.original.id)}`} className={styles["audit-name"]}>{row.original.name}</Link>;
         },
       },
+      
+      {
+        accessorKey: "user",
+        header: "Created By",
+        cell: ({ getValue }) => {
+          const user = getValue() as any;;
+          return <Link to={`mailto:${user.email}`}>{user.name}</Link>;
+        },
+      },
       {
         accessorKey: "interval",
         header: "Runs",
