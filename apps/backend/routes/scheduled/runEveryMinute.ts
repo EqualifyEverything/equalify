@@ -1,5 +1,6 @@
 import { db, graphqlQuery } from '#src/utils';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { processScheduledAuditEmails } from '../internal/processScheduledAuditEmails';
 const lambda = new LambdaClient();
 
 export const runEveryMinute = async () => {
@@ -108,5 +109,13 @@ export const runEveryMinute = async () => {
     }
 
     await db.clean();
+
+    // Process scheduled audit email notifications
+    try {
+        await processScheduledAuditEmails();
+    } catch (emailError) {
+        console.error('Scheduled audit email processing failed:', emailError);
+    }
+
     return;
 }

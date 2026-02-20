@@ -1,3 +1,5 @@
+import { isStaging } from './isStaging';
+
 export const formatEmail = ({ body }) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -25,7 +27,7 @@ export const formatEmail = ({ body }) => {
           <tr>
             <td style="padding:0 24px 24px 24px; font-size:13px; line-height:1.4; color:#334155;">
               Don't want these emails?
-              <a href="https://app-staging.equalify.uic.edu/unsubscribe" style="color:#334155; text-decoration:underline;">
+              <a href="https://app${isStaging ? '-staging' : ''}.equalify.uic.edu/unsubscribe" style="color:#334155; text-decoration:underline;">
                 Unsubscribe
               </a>
             </td>
