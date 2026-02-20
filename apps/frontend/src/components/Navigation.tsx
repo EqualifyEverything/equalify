@@ -28,7 +28,7 @@ export const Navigation = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [location]);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (darkMode) {
