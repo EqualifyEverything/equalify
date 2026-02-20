@@ -92,7 +92,7 @@ export const Audits = () => {
         filtered = audits.filter((audit: any) => audit.user.email === user.email);
       }
       if (searchString.length >= 3) {
-        filtered = filtered.filter((audit: any) => audit.name.includes(searchString))
+        filtered = filtered.filter((audit: any) => audit.name.toLowerCase().includes(searchString.toLowerCase()))
       }
       return filtered;
     }
