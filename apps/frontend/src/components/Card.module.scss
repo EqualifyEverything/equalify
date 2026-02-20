@@ -4,19 +4,21 @@
 .card {
   border-radius: variables.$spacing;
   padding: calc(variables.$spacing * 3) calc(variables.$spacing * 2);
-  h1,h2,h3 {
-    margin:0;
+  h1,
+  h2,
+  h3 {
+    margin: 0;
     @include fonts.font-size-normal;
     display: flex;
     svg {
       margin-right: variables.$spacing;
     }
-  } 
+  }
   .text-small {
     @include fonts.font-size-small;
   }
   &.blockers-chart {
-    padding:calc(variables.$spacing*3)
+    padding: calc(variables.$spacing * 3);
   }
   &.dark {
     background: variables.$black;
@@ -26,13 +28,37 @@
     background: variables.$white;
     border: 1px solid variables.$gray;
   }
+  &.empty-state-card {
+    background: variables.$white;
+    border: 1px solid variables.$gray;
+    width: 100% !important;
+    margin-top: calc(variables.$spacing * 2);
+    display: flex;
+    padding: calc(variables.$spacing * 8) calc(variables.$spacing * 4);
+    gap: calc(variables.$spacing);
+    justify-content: space-evenly;
+    align-items: flex-start;
+    h2 {
+      padding: 0;
+      max-width: calc(variables.$spacing * 64);
+    }
+    p {
+      margin: 0;
+      max-width: calc(variables.$spacing * 64);
+    }
+    svg {
+      min-width: calc(variables.$spacing * 8);
+      min-height: calc(variables.$spacing * 8);
+      fill: variables.$black-translucent;
+    }
+  }
   &.inset-light {
-    margin-top:variables.$spacing;
+    margin-top: variables.$spacing;
     background: variables.$paper;
     border: 1px solid variables.$gray;
     padding: calc(variables.$spacing * 2) calc(variables.$spacing * 2);
-  
-    h3{
+
+    h3 {
       border-bottom: 2px solid variables.$black;
     }
     select {
@@ -41,34 +67,34 @@
   }
   &.short-error {
     background: variables.$red;
-    color:variables.$white;
+    color: variables.$white;
     display: inline-flex;
     align-items: center;
-    padding: calc(variables.$spacing*2) calc(variables.$spacing*2);
-    margin-top: calc(variables.$spacing*2);
+    padding: calc(variables.$spacing * 2) calc(variables.$spacing * 2);
+    margin-top: calc(variables.$spacing * 2);
     line-height: 1em;
     b {
       display: block;
     }
     svg {
-      margin-right:variables.$spacing;
+      margin-right: variables.$spacing;
     }
   }
   &.short-success {
     background: transparent;
-    
+
     border: 1px solid variables.$green;
-    color:variables.$black;
+    color: variables.$black;
     display: inline-flex;
     align-items: center;
-    padding: calc(variables.$spacing*2) calc(variables.$spacing*2);
-    margin-top: calc(variables.$spacing*2);
+    padding: calc(variables.$spacing * 2) calc(variables.$spacing * 2);
+    margin-top: calc(variables.$spacing * 2);
     line-height: 1em;
     b {
       display: block;
     }
     svg {
-      margin-right:variables.$spacing;
+      margin-right: variables.$spacing;
     }
   }
   &.red {
@@ -79,10 +105,8 @@
     color: variables.$paper;
   }
   &.short {
-    height: calc(variables.$spacing*15);
+    height: calc(variables.$spacing * 15);
     align-items: center;
     display: flex;
   }
 }
-
-

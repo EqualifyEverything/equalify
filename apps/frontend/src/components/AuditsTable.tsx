@@ -9,10 +9,23 @@ import {
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
 import { useMemo, useState } from "react";
-import { Audit, Scan } from "#src/routes/Audits.tsx";
+import { Scan } from "#src/routes/Audits.tsx";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { formatId } from "../utils";
 import { Link } from "react-router-dom";
+
+interface Audit {
+  created_at: string;
+  id: string;
+  interval: string;
+  name: string;
+  scans: Scan[];
+  urls_aggregate: {
+    aggregate: {
+      count: number;
+    };
+  };
+}
 
 interface auditsTableProps {
   audits: Audit[];

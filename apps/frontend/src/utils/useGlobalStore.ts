@@ -10,22 +10,27 @@ interface EqualifyState {
   setLoading: (val: string | boolean) => void;
   darkMode: boolean;
   setDarkMode: (val: boolean) => void;
-  auditsTableView: string;
-  setAuditsTableView: (val: string) => void;
-  blockersTableView: string;
-  setBlockersTableView: (val: string) => void;
   authenticated: boolean;
   setAuthenticated: (val: boolean) => void;
   ssoAuthenticated: boolean;
   setSsoAuthenticated: (val: boolean) => void;
+  // audits listing screen
+  auditsTableView: string;
+  setAuditsTableView: (val: string) => void;
+  auditsTableCreatedByView: string;
+  setAuditsTableCreatedByView: (val:string) => void;
+  // blockers table
+  blockersTableView: string;
+  setBlockersTableView: (val: string) => void;
+  blockerTableColumnVisibility: VisibilityState;
+  setBlockerTableColumnVisibility: OnChangeFn<VisibilityState>;
+  // screen reader announcer
   announceMessage: string;
   setAnnounceMessage: (
     val: string,
     style?: "normal" | "success" | "error",
     screenReaderOnly?: boolean,
   ) => void;
-  blockerTableColumnVisibility: VisibilityState;
-  setBlockerTableColumnVisibility: OnChangeFn<VisibilityState>;
 }
 
 export const useGlobalStore = create<EqualifyState>()(
@@ -37,6 +42,8 @@ export const useGlobalStore = create<EqualifyState>()(
       setDarkMode: (val) => set(() => ({ darkMode: val })),
       auditsTableView: "cards",
       setAuditsTableView: (val) => set(() => ({ auditsTableView: val })),
+      auditsTableCreatedByView: "user",
+      setAuditsTableCreatedByView: (val) => set(() => ({auditsTableCreatedByView : val})),
       blockersTableView: "summary",
       setBlockersTableView: (val) => set(() => ({ blockersTableView: val })),
       authenticated: false,

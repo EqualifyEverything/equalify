@@ -20,9 +20,16 @@
     width: 100%;
   }
 
+  .filter-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: calc(variables.$spacing*2);
+  }
+  .filter-controls-left {
+    display: flex;
+  }
   .audits-view-selector {
     display: inline-flex;
-    width: 100%;
     align-content: flex-end;
     align-items: flex-end;
     justify-content: flex-end;
