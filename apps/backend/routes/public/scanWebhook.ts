@@ -141,10 +141,10 @@ export const scanWebhook = async () => {
         return { success: true, message: 'Scan failure recorded' };
     }
 
-    // Store the response in audits
+    // Store the latest response payload and mark audit as processing (will be set to 'complete' or 'failed' when scan finishes)
     await db.query({
-        text: `UPDATE "audits" SET "status"=$1, "response"=$2 WHERE "id"=$3`,
-        values: ['complete', JSON.stringify(event.body), auditId],
+        text: `UPDATE "audits" SET "status"='processing', "response"=$1 WHERE "id"=$2`,
+        values: [JSON.stringify(event.body), auditId],
     });
 
     // Premature exit
@@ -159,21 +159,35 @@ export const scanWebhook = async () => {
         try {
             const contentNormalized = normalizeHtmlWithVdom(blocker.node);
             const contentHashId = hashStringToUuid(contentNormalized);
-            const shortId = generateShortId();
 
             // if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
             //     continue;
             // }
 
-            // Insert blocker
-            const blockerId = (await db.query({
-                text: `
-                    INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id") 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                    RETURNING "id"
-                `,
-                values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, effectiveScanId],
-            })).rows[0].id;
+            // Insert blocker with short_id collision retry
+            let blockerId: string;
+            let insertAttempts = 0;
+            const MAX_SHORT_ID_ATTEMPTS = 3;
+            while (true) {
+                try {
+                    const shortId = generateShortId();
+                    blockerId = (await db.query({
+                        text: `
+                            INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id")
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                            RETURNING "id"
+                        `,
+                        values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, effectiveScanId],
+                    })).rows[0].id;
+                    break;
+                } catch (insertError) {
+                    insertAttempts++;
+                    if (insertError?.message?.includes('blockers_short_id') && insertAttempts < MAX_SHORT_ID_ATTEMPTS) {
+                        continue; // Retry with a new short_id
+                    }
+                    throw insertError; // Re-throw non-collision errors or if retries exhausted
+                }
+            }
 
             if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
                 await db.query({

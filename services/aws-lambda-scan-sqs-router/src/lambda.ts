@@ -38,7 +38,7 @@ export const handler = middy()
         return {
           MessageGroupId: item.auditId,
           Id: item.urlId,
-          MessageDeduplicationId: item.urlId,
+          MessageDeduplicationId: `${item.scanId}-${item.urlId}`,
           MessageBody: JSON.stringify({
             data: item,
           }),
@@ -74,7 +74,7 @@ export const handler = middy()
         return {
           MessageGroupId: item.auditId,
           Id: item.urlId,
-          MessageDeduplicationId: item.urlId,
+          MessageDeduplicationId: `${item.scanId}-${item.urlId}`,
           MessageBody: JSON.stringify({
             data: item,
           }),

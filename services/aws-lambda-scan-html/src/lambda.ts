@@ -18,6 +18,32 @@ const RESULTS_ENDPOINT_PROD = "https://api.equalifyapp.com/public/scanWebhook";
 const RESULTS_ENDPOINT_STAGING = "https://api-staging.equalifyapp.com/public/scanWebhook";
 const getResultsEndpoint = (isStaging?: boolean) => isStaging ? RESULTS_ENDPOINT_STAGING : RESULTS_ENDPOINT_PROD;
 
+const sendFailedStatusToResultsEndpoint = async (job: any, errorMessage?: string) => {
+  const failurePayload = {
+    auditId: job.auditId,
+    scanId: job.scanId,
+    urlId: job.urlId,
+    url: job.url,
+    status: 'failed',
+    error: errorMessage || 'Scan failed to produce results',
+    blockers: []
+  };
+
+  try {
+    const sendResultsResponse = await fetch(getResultsEndpoint(job.isStaging), {
+      method: 'post',
+      body: JSON.stringify(failurePayload),
+      headers: {'Content-Type': 'application/json'}
+    });
+
+    if (!sendResultsResponse.ok) {
+      logger.error(`Failed to send failure notification to webhook`);
+    }
+  } catch (webhookError) {
+    logger.error("Failed to send failure notification", webhookError as Error);
+  }
+};
+
 // Process a single SQS Record
 const recordHandler = async (record: SQSRecord): Promise<void> => {
   metrics.captureColdStartMetric();
@@ -83,39 +109,21 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
             // Decide: throw here if you want to retry, or continue to mark as processed
           }
         } else {
-          logger.error("Error converting to EqualifyV2 format:", JSON.stringify(results));
+          // Axe analysis failed but scan returned - send failure webhook so URL is counted as processed
+          logger.error("Scan returned no axe results:", JSON.stringify(results));
+          await sendFailedStatusToResultsEndpoint(job, results?.message || 'Scan completed but produced no accessibility results');
         }
       } else {
         // Scan failed or returned no results - notify webhook of failure
         logger.error(`Job [auditId: ${job.auditId}, scanId: ${job.scanId}, urlId: ${job.urlId}] Scan failed - no results returned`);
-        try {
-          const failurePayload = {
-            auditId: job.auditId,
-            scanId: job.scanId,
-            urlId: job.urlId,
-            url: job.url,
-            status: 'failed',
-            error: 'Scan failed to produce results',
-            blockers: []
-          };
-          
-          const sendResultsResponse = await fetch(getResultsEndpoint(job.isStaging), {
-            method: 'post',
-            body: JSON.stringify(failurePayload),
-            headers: {'Content-Type': 'application/json'}
-          });
-          
-          if (!sendResultsResponse.ok) {
-            logger.error(`Failed to send failure notification to webhook`);
-          }
-        } catch (webhookError) {
-          logger.error("Failed to send failure notification", webhookError as Error);
-        }
+        await sendFailedStatusToResultsEndpoint(job);
       }
       
     } catch (error) {
       logger.error("Scan Error!", error as string);
-      throw error; // Only throw for actual scan failures
+      // Send failure webhook so the URL is counted as processed and doesn't block the FIFO queue
+      await sendFailedStatusToResultsEndpoint(job, `Scan error: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
   }
   metrics.publishStoredMetrics();
