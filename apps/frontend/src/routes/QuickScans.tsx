@@ -34,9 +34,25 @@ export const QuickScans = () => {
     refetchInterval: 15000, // Poll every 15s for scan status updates
   });
 
+  const formatUrl = (input: string): string | null => {
+    let u = input.trim();
+    if (!u) return null;
+    if (!u.match(/^https?:\/\//i)) {
+      u = "https://" + u;
+    }
+    try {
+      const urlObj = new URL(u);
+      if (!["http:", "https:"].includes(urlObj.protocol)) return null;
+      return urlObj.href.replace(/\/+$/, "") || urlObj.href;
+    } catch {
+      return null;
+    }
+  };
+
   const runQuickScan = async () => {
-    if (!url.trim()) {
-      setAnnounceMessage("Please enter a URL", "error");
+    const formattedUrl = formatUrl(url);
+    if (!formattedUrl) {
+      setAnnounceMessage("Please enter a valid URL", "error");
       return;
     }
 
@@ -46,7 +62,7 @@ export const QuickScans = () => {
         await API.post({
           apiName: "auth",
           path: "/saveQuickScan",
-          options: { body: { url: url.trim(), type } },
+          options: { body: { url: formattedUrl, type } },
         }).response
       ).body.json()) as { id: string };
 
@@ -73,13 +89,16 @@ export const QuickScans = () => {
           <LuZap className="icon-small" />
           Scan a URL
         </h2>
+        <p className="font-small" style={{ marginBottom: "12px" }}>
+          Run a single-page accessibility scan. Enter a URL to check one page for blockers.
+        </p>
         <div className={styles["quick-scan-form"]}>
           <StyledLabeledInput className={styles["url-input"]}>
             <label htmlFor="quickScanUrl">URL:</label>
             <input
               id="quickScanUrl"
               type="text"
-              placeholder="https://example.com"
+              placeholder="example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               onKeyDown={(e) => {
@@ -123,7 +142,7 @@ export const QuickScans = () => {
           <div className="cards-33">
             {quickScans.map((scan: any, index: number) => (
               <Card variant="light" key={index}>
-                <Link to={`/audits/${formatId(scan.id)}`}>
+                <Link to={`/quick-scans/${formatId(scan.id)}`}>
                   <div className={styles["scan-card"]}>
                     <div>
                       <div className={styles["scan-url"]}>{scan.url}</div>

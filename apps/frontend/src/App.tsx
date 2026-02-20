@@ -152,6 +152,7 @@ const router = createBrowserRouter([
       { path: "shared/blockers/:blockerId", element: <Blocker /> },
       { path: "audits/build", element: <BuildAudit /> },
       { path: "quick-scans", element: <QuickScans /> },
+      { path: "quick-scans/:auditId", element: <Audit /> },
       { path: "logs", element: <Logs /> },
       { path: "log/:logId", element: <Log /> },
       { path: "account", element: <Account /> },

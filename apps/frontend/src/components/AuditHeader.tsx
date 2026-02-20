@@ -12,6 +12,7 @@ import { SkeletonAuditHeader } from "./Skeleton";
 
 interface AuditHeaderProps extends React.PropsWithChildren {
   isShared: boolean;
+  isQuickScan?: boolean;
   queryClient: QueryClient;
   audit: any;
   auditId: string | undefined;
@@ -20,6 +21,7 @@ interface AuditHeaderProps extends React.PropsWithChildren {
 
 export const AuditHeader = ({
   isShared,
+  isQuickScan,
   queryClient,
   audit,
   auditId,
@@ -33,9 +35,11 @@ export const AuditHeader = ({
 
   const copyCurrentLocationToClipboard = async () => {
     try {
+      const sharedPath = location.pathname
+        .replace("/audits/", "/shared/")
+        .replace("/quick-scans/", "/shared/");
       await navigator.clipboard.writeText(
-        window.location.origin +
-        location.pathname.replace("/audits/", "/shared/")
+        window.location.origin + sharedPath
       );
       console.log(
         `URL ${window.location.origin + location.pathname} copied to clipboard!`
@@ -64,7 +68,7 @@ export const AuditHeader = ({
         setAnnounceMessage(`Deleted audit ${audit.name}.`, "success");
         await createLog(`Deleted audit ${audit.name}.`, auditId);
 
-        navigate("/audits");
+        navigate(isQuickScan ? "/quick-scans" : "/audits");
       } finally {
         setIsDeleting(false);
       }
@@ -160,7 +164,7 @@ export const AuditHeader = ({
         </div>
 
         <div className={styles["buttons-r"]}>
-          {!isShared && (
+          {!isShared && !isQuickScan && (
             <StyledButton
               onClick={rescanAudit}
               label={hasActiveScan ? "Scanning..." : "Scan Now"}

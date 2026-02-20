@@ -96,6 +96,7 @@ export const Audit = () => {
   const [chartRange, setChartRange] = useState<number>(90);
   const [selectedScanErrors, setSelectedScanErrors] = useState<ScanError[]>([]);
   const isShared = location.pathname.startsWith("/shared/");
+  const isQuickScan = location.pathname.startsWith("/quick-scans/");
   const { setAnnounceMessage } = useGlobalStore();
   const { blockersTableView, setBlockersTableView } = useGlobalStore();
 
@@ -330,13 +331,14 @@ export const Audit = () => {
        */}
       <AuditHeader
         isShared={isShared}
+        isQuickScan={isQuickScan}
         queryClient={queryClient}
         audit={audit}
         auditId={auditId}
         scans={scans}
       />
-      {/* Check scan state: not scanned, active scan, or completed */}
-      {(() => {
+      {/* For quick scans, skip everything above Audit Report */}
+      {!isQuickScan && (() => {
         const hasNoScans = !scans || scans.length === 0;
         const hasActiveScan = scans && scans.length > 0 &&
           scans[scans.length - 1].status !== "complete" &&
@@ -577,7 +579,7 @@ export const Audit = () => {
         );
       })()}
 
-      <div className={"cards-62-38 " + style["scan-cards-area"]}>
+      {!isQuickScan && <div className={"cards-62-38 " + style["scan-cards-area"]}>
         <Card variant="light">
           <Collapsible.Root
             className="CollapsibleRoot"
@@ -836,7 +838,7 @@ export const Audit = () => {
             </div>
           )}
         </Card>
-      </div>
+      </div>}
       <Tabs.Root
         orientation="horizontal"
         className="audit-tabs"
