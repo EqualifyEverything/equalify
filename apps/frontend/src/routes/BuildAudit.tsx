@@ -66,9 +66,9 @@ export const BuildAudit = () => {
         };
       });
     }
-    if(remoteCsvUrl){ // if we're using a remote csv, discard any manual input
+    /* if (remoteCsvUrl) { // if we're using a remote csv, discard any manual input
       setPages([]);
-    }
+    } */
     return {
       auditName: formData.get("auditName") as string,
       scanFrequency: formData.get("scanFrequency") as string,
@@ -202,7 +202,7 @@ export const BuildAudit = () => {
 
         <Card variant="light" className={styles["pages-input-card"]}>
           <h2><FaListUl className="icon-small" /> Add URLs to Your Audit</h2>
-          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={()=>{ setRemoteCsvUrl("") }}>
+          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={() => { setRemoteCsvUrl("") }}>
             <Tabs.List className={styles["pages-input-list"]} aria-label="Add URLs to Scan">
               <Tabs.Trigger value="url" asChild>
                 <StyledButton
@@ -211,10 +211,7 @@ export const BuildAudit = () => {
                   icon={<FaFileCirclePlus />}
                   onClick={() => { }}
                 />
-              </Tabs.Trigger>{/* 
-              **** 
-              **** Temporarily disabled while in dev
-              ****
+              </Tabs.Trigger>
               <Tabs.Trigger value="remote-csv" asChild>
                 <StyledButton
                   variant="tab-card-button"
@@ -222,18 +219,18 @@ export const BuildAudit = () => {
                   icon={<FaCloudArrowDown />}
                   onClick={() => { }}
                 />
-              </Tabs.Trigger> */}
+              </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="url">
               <AuditPagesInput
-              initialPages={pages}
-              setParentPages={setPages}
-              returnMutation={false}
-              reverseLayout
-            /></Tabs.Content>
+                initialPages={pages}
+                setParentPages={setPages}
+                returnMutation={false}
+                reverseLayout
+              /></Tabs.Content>
 
             <Tabs.Content value="remote-csv">
-              <AuditRemoteCsvInput 
+              <AuditRemoteCsvInput
                 pages={pages}
                 setParentPages={setPages}
                 csvUrl={remoteCsvUrl}

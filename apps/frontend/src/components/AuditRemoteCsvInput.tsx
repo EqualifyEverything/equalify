@@ -135,7 +135,7 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, v
 
     const response = await API.get({
       apiName: "auth",
-      path: "/fetchAndValidateRemoteCsv",
+      path: "/fetchRemoteCsv",
       options: {
         queryParams: { url: csvUrl.trim() },
       },

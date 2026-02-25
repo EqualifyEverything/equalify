@@ -1,5 +1,3 @@
-import { db, event, graphqlQuery, validateShortId } from "#src/utils";
-
 //
 // Fetches a remote CSV, checks for basic validity, and returns the parsed data or an error
 //
@@ -9,8 +7,7 @@ interface urlCsv {
   type: string;
 }
 
-export const fetchAndValidateRemoteCsv = async () => {
-  const csvUrl = (event.queryStringParameters as any).url;
+export const fetchAndValidateRemoteCsv = async (csvUrl:string) => {
   try {
     if(!csvUrl) throw new Error(`Invalid CSV URL: ${csvUrl}`)
     const response = await fetch(csvUrl);
