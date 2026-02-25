@@ -9,7 +9,7 @@ export const saveAudit = async () => {
         await db.connect();
         const id = (await db.query({
             text: `INSERT INTO "audits" ("user_id", "name", "interval", "scheduled_at", "status", "payload", "email_notifications", "remote_csv_url")
-                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"`,
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"`,
             values: [event.claims.sub, auditName, scanFrequency, scheduledAt, saveAndRun ? 'new' : 'draft', JSON.stringify(event.body), emailNotifications, remoteCsvUrl],
         })).rows[0].id;
 
