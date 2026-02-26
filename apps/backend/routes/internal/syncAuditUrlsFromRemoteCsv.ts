@@ -44,7 +44,7 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
 
     // cache the url objects for efficiency and also why not
     const existingKeys = new Set(
-        currentUrls.map((item:DBUrl) => `${item.url}|${item.type}`)
+        currentUrls.map((item:DBUrl) => `${item.url}`)
     );
     const csvKeys = new Set(
         remoteCsvUrls.map((item:newUrl)=> `${item.url}|${item.type}`)
@@ -53,16 +53,16 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
         remoteCsvUrls.map((item:newUrl)=> `${item.url}`)
     );
 
-    // get URLs to add
+    // get _new_ URLs to add
     const urlsToAdd = remoteCsvUrls.filter((item:newUrl)=>{
-        const key = `${item.url}|${item.type}`;
+        const key = `${item.url}`;
         return !existingKeys.has(key); 
     });
 
     // get URLs to remove
     const urlsToRemove = currentUrls.filter((item:DBUrl)=>{
-        const key = `${item.url}|${item.type}`;
-        return !csvKeys.has(key); 
+        const key = `${item.url}`;
+        return !csvKeysUrl.has(key); 
     });
 
     // get URLs to updated

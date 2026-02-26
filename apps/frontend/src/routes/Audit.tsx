@@ -319,14 +319,32 @@ export const Audit = () => {
   const refreshUrlsFromCsv = async () => {
     console.log("Refreshing URL list from remote...")
     const resp = (await API.get({
-          apiName: isShared ? "public" : "auth",
-          path: "/syncFromRemoteCsv",
-          options: {
-            queryParams: { id: auditId! },
-          },
-        }).response).body.json();
+      apiName: isShared ? "public" : "auth",
+      path: "/syncFromRemoteCsv",
+      options: {
+        queryParams: { id: auditId! },
+      },
+    }).response).body.json();
     console.log(resp);
   }
+
+  const updateAuditRemoteCsv = async (newValue: string) => {
+    console.log("Updating remote CSV value:", newValue);
+    const updatedRemoteCsvUrl = await apiClient.graphql({
+      query: `mutation ($audit_id:uuid, $remote_csv_url: String) {
+                update_audits(where: {id: {_eq: $audit_id}}, _set: {remote_csv_url: $remote_csv_url}) {
+                  returning {
+                    remote_csv_url
+                  }
+                }
+              }`,
+      variables: {
+        audit_id: auditId,
+        remote_csv_url: newValue,
+      },
+    });
+    refetchAudit();
+  };
 
   /* TODO: implement function to set table filter by URL or by value 
     const setFilterAndOpenDetails = (type:string, value:string) => {
@@ -627,14 +645,23 @@ export const Audit = () => {
             </div>
 
             <div>
-              
+
               <>{audit?.remote_csv_url}</>
-              <StyledButton 
+              <StyledButton
                 icon={<TbReload />}
                 label="Refresh URL list from CSV"
                 onClick={refreshUrlsFromCsv}
               />
-              
+              <StyledLabeledInput>
+                <label htmlFor="remote-csv-input">Remote CSV URL</label>
+                <input 
+                  value={audit?.remote_csv_url} 
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    updateAuditRemoteCsv(event.target.value);
+                  }} 
+                  />
+              </StyledLabeledInput>
+
             </div>
             <div>
               {scans && scans?.length > 0 && (
