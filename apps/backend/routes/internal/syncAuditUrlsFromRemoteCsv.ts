@@ -7,8 +7,7 @@ import { fetchAndValidateRemoteCsv } from '#src/routes/internal/fetchAndValidate
 // and updates the audit's URLs from remote
 //
 
-export const syncAuditUrlsFromRemoteCsv = async () => {
-    const auditId = (event.queryStringParameters as any).id;
+export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
     if(!auditId) throw new Error("Invalid Audit ID!");
     
     // fetch audit
