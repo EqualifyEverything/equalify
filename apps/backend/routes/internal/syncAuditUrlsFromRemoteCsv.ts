@@ -7,6 +7,17 @@ import { fetchAndValidateRemoteCsv } from '#src/routes/internal/fetchAndValidate
 // and updates the audit's URLs from remote
 //
 
+type newUrl = {
+    url:string;
+    type: string;
+}
+
+type DBUrl = {
+    id: string;
+    type: string;
+    url: string
+}
+
 export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
     if(!auditId) throw new Error("Invalid Audit ID!");
     
@@ -25,15 +36,47 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
     }
     const remoteCsvUrls = remoteCsv.data;
 
-    const urls = (await db.query({
+    const currentUrls = (await db.query({
         text: `SELECT "id", "url", "type" FROM "urls" WHERE "audit_id" = $1`,
         values: [auditId],
     })).rows;
     await db.clean();
 
+    // cache the url objects for efficiency and also why not
+    const existingKeys = new Set(
+        currentUrls.map((item:DBUrl) => `${item.url}|${item.type}`)
+    );
+    const csvKeys = new Set(
+        remoteCsvUrls.map((item:newUrl)=> `${item.url}|${item.type}`)
+    );
+    const csvKeysUrl = new Set(
+        remoteCsvUrls.map((item:newUrl)=> `${item.url}`)
+    );
+
+    // get URLs to add
+    const urlsToAdd = remoteCsvUrls.filter((item:newUrl)=>{
+        const key = `${item.url}|${item.type}`;
+        return !existingKeys.has(key); 
+    });
+
+    // get URLs to remove
+    const urlsToRemove = currentUrls.filter((item:DBUrl)=>{
+        const key = `${item.url}|${item.type}`;
+        return !csvKeys.has(key); 
+    });
+
+    // get URLs to updated
+    const urlsToUpdate = currentUrls.filter((item:DBUrl)=>{
+        const key = `${item.url}|${item.type}`;
+        return csvKeysUrl.has(item.url) && !csvKeys.has(key);
+    });
+
     // union with existing URLs
     return {
-        urls,
-        remoteCsvUrls
+        currentUrls,
+        remoteCsvUrls,
+        urlsToAdd,
+        urlsToRemove,
+        urlsToUpdate
     }
 }
