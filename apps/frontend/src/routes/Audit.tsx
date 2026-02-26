@@ -138,12 +138,12 @@ export const Audit = () => {
     queryFn: async () =>
       (
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url}}`,
           variables: { audit_id: auditId },
         })
       )?.data?.audits_by_pk,
   });
-
+  
   const { data: chartData } = useQuery({
     queryKey: ["auditChart", auditId],
     queryFn: async () => {
@@ -158,7 +158,7 @@ export const Audit = () => {
       ).body.json();
       return results;
     },
-    refetchInterval: 5000,
+    //refetchInterval: 5000,
   });
 
   const handleUrlInput = async (_changedPages: Page[]) => {
@@ -589,6 +589,8 @@ export const Audit = () => {
                 <PiFileMagnifyingGlassBold className="icon-small" />
                 {pages.length} URL{pages.length > 1 ? "s" : ""} Included
               </h2>
+
+              <>{audit?.remote_csv_url}</>
 
               {audit && (
                 <StyledLabeledInput>
