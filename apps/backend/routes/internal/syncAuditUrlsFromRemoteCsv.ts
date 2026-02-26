@@ -39,7 +39,7 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
     const currentUrls = (await db.query({
         text: `SELECT "id", "url", "type" FROM "urls" WHERE "audit_id" = $1`,
         values: [auditId],
-    })).rows;
+    })).rows as DBUrl[];
     await db.clean();
 
     // cache the url objects for efficiency and also why not
@@ -65,10 +65,15 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId:string) => {
         return !csvKeysUrl.has(key); 
     });
 
-    // get URLs to updated
+    // get URLs to updated and generate an array with the updated values
     const urlsToUpdate = currentUrls.filter((item:DBUrl)=>{
         const key = `${item.url}|${item.type}`;
         return csvKeysUrl.has(item.url) && !csvKeys.has(key);
+    });
+    urlsToUpdate.forEach((el:DBUrl, index:number, arr:DBUrl[]) => {
+        const updatedValue = remoteCsvUrls.find(instance => instance.url === el.url);
+        if(updatedValue)
+        arr[index].type = updatedValue.type; 
     });
 
     // union with existing URLs
