@@ -30,6 +30,11 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId: string) => {
   ).rows?.[0];
   const remoteCsvUrl = audit.remote_csv_url;
 
+  if(!audit.remote_csv_url.trim()){ // doesn't use remote csv, skip
+    console.log(`Audit ${auditId} doesn't use remote CSV, skipping sync`)
+    return;
+  }
+
   // fetch CSV URLs
   const remoteCsv = await fetchAndValidateRemoteCsv(remoteCsvUrl);
   if (!remoteCsv.data) {

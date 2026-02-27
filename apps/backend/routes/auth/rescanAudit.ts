@@ -1,5 +1,6 @@
 import { db, event, isStaging } from '#src/utils';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { syncAuditUrlsFromRemoteCsv } from '../internal';
 const lambda = new LambdaClient();
 
 export const rescanAudit = async () => {
@@ -11,6 +12,9 @@ export const rescanAudit = async () => {
         values: [audit_id],
     })).rows;
     console.log('Found URLs for audit:', { auditId: audit_id, count: urls?.length, urls });
+
+    // hook to check for remote CSV
+    await syncAuditUrlsFromRemoteCsv(audit_id);
 
     // Handle empty URLs case - create a complete scan immediately
     if (!urls || urls.length === 0) {

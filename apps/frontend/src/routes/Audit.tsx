@@ -620,7 +620,7 @@ export const Audit = () => {
       })()}
 
       <div className={"cards-62-38 " + style["scan-cards-area"]}>
-        <Card variant="light">
+        <Card variant="light" className={style["urls-card"]}>
           <Collapsible.Root
             className="CollapsibleRoot"
             open={showUrlInput}
@@ -881,7 +881,7 @@ export const Audit = () => {
                   removeParentPages={removeUrls}
                   updateParentPageType={updateUrlType}
                   returnMutation
-                  isShared={isShared}
+                  isShared={isShared || audit?.remote_csv_url}
                 />
               </form>
             </Collapsible.Content>

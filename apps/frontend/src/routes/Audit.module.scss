@@ -95,4 +95,11 @@
       min-height: 24px;
     }
   }
+  .urls-card {
+    
+    thead,tbody {
+      display: table !important;
+      min-width: 100% !important;
+    }
+  }
 }
