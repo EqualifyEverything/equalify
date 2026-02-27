@@ -75,4 +75,24 @@
       min-height: auto !important;
     }
   }
+  .remote-csv-area {
+    width:100% !important;
+    margin-bottom: calc(variables.$spacing);
+  }
+  .remote-csv-area-inputs {
+    display: inline-flex;
+    width:100%;
+    justify-content: space-between;
+    align-items: center;
+    .remote-csv-area-inputs-labeled-input {
+      width:80%;
+    }
+    input {
+      width:100%;
+    }
+    svg {
+      min-width: 24px;
+      min-height: 24px;
+    }
+  }
 }

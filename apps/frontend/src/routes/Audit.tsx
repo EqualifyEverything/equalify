@@ -324,8 +324,14 @@ export const Audit = () => {
       options: {
         queryParams: { id: auditId! },
       },
-    }).response).body.json();
-    console.log(resp);
+    }).response);
+    await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
+    const out = await resp.body.json() as any;
+
+    setAnnounceMessage(
+      out.message,
+      "success"
+    );
   }
 
   const updateAuditRemoteCsv = async (newValue: string) => {
@@ -343,6 +349,10 @@ export const Audit = () => {
         remote_csv_url: newValue,
       },
     });
+    setAnnounceMessage(
+      `Changed remote CSV URL to ${newValue}.`,
+      "success"
+    );
     refetchAudit();
   };
 
@@ -646,21 +656,30 @@ export const Audit = () => {
 
             <div>
 
-              <>{audit?.remote_csv_url}</>
-              <StyledButton
-                icon={<TbReload />}
-                label="Refresh URL list from CSV"
-                onClick={refreshUrlsFromCsv}
-              />
-              <StyledLabeledInput>
-                <label htmlFor="remote-csv-input">Remote CSV URL</label>
-                <input 
-                  value={audit?.remote_csv_url} 
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    updateAuditRemoteCsv(event.target.value);
-                  }} 
-                  />
-              </StyledLabeledInput>
+              {audit?.remote_csv_url ? (
+                <Card variant="inset-light" className={style["remote-csv-area"]}>
+                  <div className={style["remote-csv-area-inputs"]}>
+                    <StyledLabeledInput className={style["remote-csv-area-inputs-labeled-input"]}>
+                      <label htmlFor="remote-csv-input">Remote CSV URL</label>
+                      <input
+                        value={audit?.remote_csv_url}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          updateAuditRemoteCsv(event.target.value);
+                        }}
+                      />
+                    </StyledLabeledInput>
+                    <StyledButton
+                      icon={<TbReload />}
+                      label="Refresh URL list from CSV"
+                      onClick={refreshUrlsFromCsv}
+                      showLabel={false}
+                      variant="naked"
+                    />
+                  </div>
+                  
+                  <p className="font-small" style={{ marginBottom: 0}}>This audit will automatically update the list of URLs scanned from the CSV above.</p>
+                </Card>
+              ) : (null)}
 
             </div>
             <div>

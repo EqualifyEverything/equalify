@@ -8,7 +8,7 @@ interface StyledLabledInputProps extends React.PropsWithChildren {
 
 export const StyledLabeledInput = ({ variant = "stacked", className = "", children }: StyledLabledInputProps) => {
   return (
-    <div className={styles.styledLabeledInput +" " + className +" " + styles[variant]}>
+    <div className={styles.styledLabeledInput +" labeled-input " + className + " " + styles[variant]}>
       {children}
     </div>
   );
