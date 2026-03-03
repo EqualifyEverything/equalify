@@ -326,7 +326,8 @@ export const Audit = () => {
         queryParams: { id: auditId! },
       },
     }).response);
-    await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
+    refetchAudit();
+    await queryClient.refetchQueries({ queryKey: ["urls"] });
     const out = await resp.body.json() as any;
     if (out.message) {
       setAnnounceMessage(
@@ -361,7 +362,11 @@ export const Audit = () => {
       `Changed remote CSV URL to ${newValue}.`,
       "success"
     );
-    refetchAudit();
+    if(updatedRemoteCsvUrl){
+      refreshUrlsFromCsv();
+    }
+    //refetchAudit();
+    //await queryClient.refetchQueries({ queryKey: ["urls"] });
   };
 
   /* TODO: implement function to set table filter by URL or by value 
