@@ -49,6 +49,7 @@ import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { BlockersTableSummary } from "#src/components/BlockersTableSummary.tsx";
 import { FaTableList } from "react-icons/fa6";
 import { stringifyMessage } from "graphql-ws";
+import { MdError } from "react-icons/md";
 
 export interface Page {
   url: string;
@@ -139,7 +140,7 @@ export const Audit = () => {
     queryFn: async () =>
       (
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error}}`,
           variables: { audit_id: auditId },
         })
       )?.data?.audits_by_pk,
@@ -327,11 +328,18 @@ export const Audit = () => {
     }).response);
     await queryClient.refetchQueries({ queryKey: ["urls", auditId] });
     const out = await resp.body.json() as any;
+    if (out.message) {
+      setAnnounceMessage(
+        out.message,
+        "success"
+      )
+    } else {
+      setAnnounceMessage(
+        "There was a problem updating the CSV URL!",
+        "error"
+      )
+    }
 
-    setAnnounceMessage(
-      out.message,
-      "success"
-    );
   }
 
   const updateAuditRemoteCsv = async (newValue: string) => {
@@ -676,8 +684,11 @@ export const Audit = () => {
                       variant="naked"
                     />
                   </div>
-                  
-                  <p className="font-small" style={{ marginBottom: 0}}>This audit will automatically update the list of URLs scanned from the CSV above.</p>
+                  {audit.remote_csv_error &&
+                    <Card variant="short-error">
+                      <MdError className="icon-small" /><div className="font-small"><b>There was a problem with your CSV.</b>{audit.remote_csv_error}</div></Card>
+                  }
+                  <p className="font-small" style={{ marginBottom: 0 }}>This audit will automatically update the list of URLs scanned from the CSV above.</p>
                 </Card>
               ) : (null)}
 
