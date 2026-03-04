@@ -202,7 +202,7 @@ export const BuildAudit = () => {
 
         <Card variant="light" className={styles["pages-input-card"]}>
           <h2><FaListUl className="icon-small" /> Add URLs to Your Audit</h2>
-          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={() => { setRemoteCsvUrl("") }}>
+          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={() => { setRemoteCsvUrl(""); setPages([]); }}>
             <Tabs.List className={styles["pages-input-list"]} aria-label="Add URLs to Scan">
               <Tabs.Trigger value="url" asChild>
                 <StyledButton
