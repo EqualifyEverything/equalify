@@ -299,7 +299,15 @@ export const Audit = () => {
     }
   };
 
+  const URL_SOFT_LIMIT = 10_000;
+
   const updateAuditInterval = async (newValue: string) => {
+    if (newValue === "Daily" && pages.length >= URL_SOFT_LIMIT) {
+      const proceed = window.confirm(
+        `Setting daily scans for an audit with ${pages.length.toLocaleString()} URLs will use significant resources. Continue?`
+      );
+      if (!proceed) return;
+    }
     console.log("Updating audit interval:", newValue);
     const updatedInterval = await apiClient.graphql({
       query: `mutation ($audit_id:uuid, $interval: String) {

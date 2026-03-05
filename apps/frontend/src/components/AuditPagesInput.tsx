@@ -4,7 +4,10 @@ import { StyledButton } from "./StyledButton";
 import { AuditPagesInputTable } from "./AuditPagesInputTable";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { Card } from "./Card";
+import { TbAlertTriangle } from "react-icons/tb";
 import style from "./AuditPagesInput.module.scss";
+
+const URL_SOFT_LIMIT = 10_000;
 
 interface Page {
   url: string;
@@ -127,6 +130,18 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
           }
           return page;
         }));
+      }
+
+      // Soft limit warning for large URL counts
+      const totalAfterAdd = pages.length + newPages.length;
+      if (newPages.length > 0 && totalAfterAdd >= URL_SOFT_LIMIT) {
+        const proceed = window.confirm(
+          `Adding these URLs will bring your total to ${totalAfterAdd.toLocaleString()} URLs. Large audits take significantly longer to scan. Continue?`
+        );
+        if (!proceed) {
+          e.target.value = "";
+          return;
+        }
       }
 
       // Add all valid URLs to the pages
@@ -390,6 +405,14 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
             isShared={isShared}
             updatePageType={updatePageType}
           />
+          {pages.length >= URL_SOFT_LIMIT && (
+            <Card variant="short-error">
+              <TbAlertTriangle className="icon-small" />
+              <div className="font-small">
+                <b>Large audit:</b> This audit has {pages.length.toLocaleString()} URLs. Large audits take significantly longer to scan.
+              </div>
+            </Card>
+          )}
           {!isShared && (
             <Card variant="inset-light">
               <h3>Add URLs to Scan</h3>

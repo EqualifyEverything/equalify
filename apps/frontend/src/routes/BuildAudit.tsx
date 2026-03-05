@@ -1,5 +1,6 @@
 import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../queries";
 import * as API from "aws-amplify/api";
 import {
@@ -13,7 +14,7 @@ import { createLog } from "#src/utils/createLog.ts";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { Card } from "#src/components/Card.tsx";
 import { CgOptions } from "react-icons/cg";
-import { TbList, TbMail } from "react-icons/tb";
+import { TbAlertTriangle, TbMail } from "react-icons/tb";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import { LuClipboardCheck, LuClipboardPaste, LuImport } from "react-icons/lu";
 import styles from "./BuildAudit.module.scss";
@@ -27,6 +28,10 @@ interface Page {
   type: "html" | "pdf";
 }
 
+const apiClient = API.generateClient();
+const URL_SOFT_LIMIT = 10_000;
+const AUDIT_SOFT_LIMIT = 10_000;
+
 export const BuildAudit = () => {
   const navigate = useNavigate();
   const { setAnnounceMessage } = useGlobalStore();
@@ -38,8 +43,19 @@ export const BuildAudit = () => {
   const [auditNameValid, setAuditNameValid] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
+  const [scanFrequency, setScanFrequency] = useState("Manually");
 
   const [validRemoteCsv, setValidRemoteCsv] = useState(false);
+
+  const { data: auditCount } = useQuery({
+    queryKey: ["auditCount"],
+    queryFn: async () => {
+      const result = (await apiClient.graphql({
+        query: `{ audits_aggregate(where: {interval: {_neq: "Quick Scan"}}) { aggregate { count } } }`,
+      })) as any;
+      return result?.data?.audits_aggregate?.aggregate?.count ?? 0;
+    },
+  });
 
   const defaultEmailList = {
     emails: [
@@ -152,6 +168,14 @@ export const BuildAudit = () => {
       {/* <Link to="..">← Go Back</Link>
        */}
       <h1 className="initial-focus-element">Audit Builder</h1>
+      {auditCount >= AUDIT_SOFT_LIMIT && (
+        <Card variant="short-error">
+          <TbAlertTriangle className="icon-small" />
+          <div className="font-small">
+            <b>Large number of audits:</b> Your account has {auditCount.toLocaleString()} audits. Having a large number of audits may affect system performance.
+          </div>
+        </Card>
+      )}
       <form onSubmit={saveAndRunAudit}>
         <div className="cards-38-62">
           <Card variant="light">
@@ -178,15 +202,20 @@ export const BuildAudit = () => {
                 id="scanFrequency"
                 name="scanFrequency"
                 className={styles["input-element"]}
+                value={scanFrequency}
+                onChange={(e) => setScanFrequency(e.target.value)}
               >
                 <option>Manually</option>
                 <option>Daily</option>
                 <option>Weekly</option>
                 <option>Monthly</option>
-                {/* 
-              <option>On Monitor Update</option> */}
               </select>
             </StyledLabeledInput>
+            {scanFrequency === "Daily" && pages.length >= URL_SOFT_LIMIT && (
+              <p className="font-small" style={{ color: "#b45309", display: "flex", alignItems: "center", gap: "4px" }}>
+                <TbAlertTriangle /> Daily scans for audits with {pages.length.toLocaleString()} URLs will use significant resources.
+              </p>
+            )}
           </Card>
           <Card variant="light">
             <h2>
