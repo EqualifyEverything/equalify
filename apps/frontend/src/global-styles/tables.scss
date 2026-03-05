@@ -182,7 +182,7 @@
       }
     }
   }
-  .react-select {
+  .react-select, select {
     margin-bottom: calc(variables.$spacing);
     min-width: 180px;
   }
