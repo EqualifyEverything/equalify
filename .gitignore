@@ -2,3 +2,5 @@ node_modules
 dist
 .ds_store
 .vscode
+.env
+.env.*

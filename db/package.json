@@ -1,0 +1,8 @@
+{
+  "name": "equalify-db",
+  "private": true,
+  "scripts": {
+    "dump:staging": "./dump.sh staging",
+    "dump:production": "./dump.sh production"
+  }
+}
