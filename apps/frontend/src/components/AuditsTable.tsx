@@ -5,6 +5,9 @@ import {
   flexRender,
   ColumnDef,
   getPaginationRowModel,
+  SortingState,
+  getSortedRowModel,
+  SortDirection
 } from "@tanstack/react-table";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
@@ -13,6 +16,8 @@ import { Scan } from "#src/routes/Audits.tsx";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { formatId } from "../utils";
 import { Link } from "react-router-dom";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import React from "react";
 
 interface Audit {
   created_at: string;
@@ -20,6 +25,10 @@ interface Audit {
   interval: string;
   name: string;
   scans: Scan[];
+  user: {
+    name: string;
+    email: string;
+  }
   urls_aggregate: {
     aggregate: {
       count: number;
@@ -39,6 +48,13 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
     pageSize: 10,
   });
 
+  function renderSortingIcon(val: false | SortDirection) {
+    switch (val) {
+      case "asc": return <FaArrowUp />;
+      case "desc": return <FaArrowDown />;
+      default: return false;
+    }
+  }
   const columns = useMemo<ColumnDef<Audit>[]>(
     () => [
       {
@@ -48,7 +64,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
           return <Link to={`/audits/${formatId(row.original.id)}`} className={styles["audit-name"]}>{row.original.name}</Link>;
         },
       },
-      
+
       {
         accessorKey: "user",
         header: "Created By",
@@ -56,6 +72,11 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
           const user = getValue() as any;;
           return <Link to={`mailto:${user.email}`}>{user.name}</Link>;
         },
+        sortingFn: (rowA, rowB, columnId) => {
+          const valA = rowA.original.user.name;
+          const valB = rowB.original.user.name;
+          return valA.localeCompare(valB);
+        }
       },
       {
         accessorKey: "interval",
@@ -84,25 +105,32 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
         },
       },
       {
+        accessorFn: (row) => row.urls_aggregate.aggregate.count,
+        sortUndefined: 'last',
         accessorKey: "urls_aggregate",
         header: "URLs",
         cell: ({ getValue }) => {
-          const urls = getValue() as any;
-          return urls.aggregate.count;
+          const urls = getValue() as number;
+          if (!urls) return <>N/A</>;
+          return urls;
         },
       },
       {
+        accessorFn: (row) => row.scans[0]?.blockers_aggregate?.aggregate?.count,
+        sortUndefined: 'last',
         accessorKey: "scans",
         header: "Blockers",
         cell: ({ getValue }) => {
-          const scans = getValue() as Scan[];
-          return <b>{scans[0]?.blockers_aggregate?.aggregate?.count}</b>;
+          const scans = getValue() as number;
+          if (!scans) return <>N/A</>;
+          return <b>{scans}</b>;
         },
       },
     ],
     []
   );
 
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
     data: audits || [],
     columns,
@@ -110,8 +138,10 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       pagination,
+      sorting
     },
-    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -130,13 +160,33 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id} className="bg-gray-100">
                     {headerGroup.headers.map((header) => (
-                      <th key={header.id} scope="col">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                      <th key={header.id} scope="col" aria-sort={
+                        header.column.getIsSorted() === 'asc'
+                          ? 'ascending'
+                          : header.column.getIsSorted() === 'desc'
+                            ? 'descending'
+                            : 'none'
+                      }>
+                        <div
+                          {...{
+                            onClick: header.column.getToggleSortingHandler()
+                          }}
+                        >
+                          <button className={styles["header-sort"]} aria-label={`Sort by "${header.column.columnDef.header}" ${header.column.getIsSorted() === 'asc' ? 'descending' : 'ascending'
+                            }`}>
+                            <div className={styles["header-label"]}>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </div>
+                            {{
+                              asc: renderSortingIcon("asc"),
+                              desc: renderSortingIcon("desc"),
+                            }[header.column.getIsSorted() as string] ?? <div className={styles["arrow-placeholder"]} />}
+
+                          </button>
+                        </div>
                       </th>
                     ))}
                   </tr>
