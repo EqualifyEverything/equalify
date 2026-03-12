@@ -147,7 +147,7 @@ export const Audit = () => {
   });
 
   const { data: chartData } = useQuery({
-    queryKey: ["auditChart", auditId],
+    queryKey: ["auditChart", auditId, chartRange],
     queryFn: async () => {
       const results = await (
         await API.get({
@@ -710,6 +710,7 @@ export const Audit = () => {
               {scans && scans?.length > 0 && (
                 <div>
                   <div className="font-small">
+                    {console.log(scans[scans.length - 1])}
                     Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
                     {scans[scans.length - 1].status && (
                       <span
