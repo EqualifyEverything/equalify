@@ -45,10 +45,10 @@ export const getAuditChart = async () => {
 
   scans.forEach((scan:any) => {
     const scanDate = new Date(scan.created_at);
-    console.log("scan.created_at", scan.created_at);
-    console.log("scanDate", scanDate);
+    //console.log("scan.created_at", scan.created_at);
+    //console.log("scanDate", scanDate);
     const dateKey = scanDate.toISOString().split("T")[0]; // YYYY-MM-DD format
-    console.log("dateKey", dateKey)
+    //console.log("dateKey", dateKey)
     const blockerCount = scan.blockers_aggregate?.aggregate?.count || 0;
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
@@ -88,6 +88,7 @@ export const getAuditChart = async () => {
 
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(now);
+  
     date.setUTCDate(date.getUTCDate() - i);
     const dateKey = date.toISOString().split("T")[0];
 

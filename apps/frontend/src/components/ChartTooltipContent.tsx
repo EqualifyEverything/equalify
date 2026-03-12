@@ -12,13 +12,18 @@ export const ChartTooltipContent = ({
   label,
 }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
+    //console.log(label);
+    const parsed = (label as string).split("-").map(Number) ?? null;
+    const theDate = new Date(parsed[0], parsed[1]-1, parsed[2]);
+    //console.log(theDate);
+    
     const date = label
-      ? new Date(label).toLocaleDateString("en-US", {
+      ? (new Date(theDate).toLocaleDateString("en-US", {
           weekday: "short",
           year: "numeric",
           month: "short",
           day: "numeric",
-        })
+        }))
       : null;
     let scannedTime = "";
     if (payload.length > 0 && payload[0].payload?.timestamp) {

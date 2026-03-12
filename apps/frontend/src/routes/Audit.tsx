@@ -134,7 +134,7 @@ export const Audit = () => {
     setPages(urls);
   }, [urls]);
 
-  console.log(auditId);
+  //console.log(auditId);
   const { data: audit, refetch: refetchAudit } = useQuery({
     queryKey: ["audit", auditId],
     queryFn: async () =>
@@ -158,6 +158,7 @@ export const Audit = () => {
           },
         }).response
       ).body.json();
+      //console.log(results);
       return results;
     },
     //refetchInterval: 5000,
@@ -267,7 +268,7 @@ export const Audit = () => {
   };
 
   useEffect(() => {
-    console.log(audit);
+    //console.log(audit);
     if (audit?.email_notifications) {
       console.log("setting email notifications");
       setEmailNotifications(audit.email_notifications);
@@ -278,8 +279,8 @@ export const Audit = () => {
     //throw new Error("Function not implemented.");
     if (emailNotifications !== JSON.stringify(newValue)) {
       const newEmails = JSON.stringify(newValue);
-      console.log("Updating email notifications:", newEmails);
-      console.log("Email count", JSON.parse(newEmails).emails.length);
+      //console.log("Updating email notifications:", newEmails);
+      //console.log("Email count", JSON.parse(newEmails).emails.length);
       setEmailNotificationsCount(JSON.parse(newEmails).emails.length);
 
       const updatedEmailNotifications = await apiClient.graphql({
@@ -558,9 +559,10 @@ export const Audit = () => {
                             }} */
                             tickFormatter={(value, index) => {
                               if (index % 2) return "";
-                              //console.log(index);
+                              //console.log(value);
                               //if(index%5 === 0) return "";
-                              const date = new Date(value);
+                              const parsed = value.split("-").map(Number);
+                              const date = new Date(parsed[0], parsed[1]-1, parsed[2]);
                               return date.toLocaleDateString("en-US", {
                                 month: "numeric",
                                 day: "numeric",
@@ -610,7 +612,7 @@ export const Audit = () => {
                                   return (
                                     <tr key={row.date}>
                                       <td>
-                                        {new Date(row.date).toLocaleDateString(
+                                        {new Date(row.timestamp).toLocaleDateString(
                                           "en-US",
                                           {
                                             weekday: "short",
