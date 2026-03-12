@@ -939,6 +939,7 @@ export const Audit = () => {
         && pages
         && scans
         && scans.length > 0
+        && ( scans[scans.length - 1].status == "complete" || scans[scans.length - 1].status == "failed" )
         &&
         <Tabs.Root
           orientation="horizontal"
