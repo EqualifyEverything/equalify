@@ -31,9 +31,9 @@ export const getAuditChart = async () => {
     variables: { audit_id: auditId },
   };
 
-  console.log(JSON.stringify({ query }));
+  //console.log(JSON.stringify({ query }));
   const response = await graphqlQuery(query);
-  console.log(JSON.stringify({ response }));
+  //console.log(JSON.stringify({ response }));
 
   const scans = response.audits_by_pk?.scans || [];
 
@@ -45,7 +45,10 @@ export const getAuditChart = async () => {
 
   scans.forEach((scan:any) => {
     const scanDate = new Date(scan.created_at);
+    console.log("scan.created_at", scan.created_at);
+    console.log("scanDate", scanDate);
     const dateKey = scanDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+    console.log("dateKey", dateKey)
     const blockerCount = scan.blockers_aggregate?.aggregate?.count || 0;
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
