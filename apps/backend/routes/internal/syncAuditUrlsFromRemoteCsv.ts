@@ -106,15 +106,37 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId: string) => {
       });
     }
 
-    // removed URLs
-    for (const url of urlsToRemove) {
-      await graphqlQuery({
-        query: `mutation($audit_id:uuid,$url:String) {delete_urls(where: {audit_id: {_eq: $audit_id}, url: {_eq: $url}}) {affected_rows}}`,
-        variables: {
-          audit_id: auditId,
-          url: url.url,
-        },
+    // removed URLs, also clean up orphaned blockers and related rows
+    if (urlsToRemove.length > 0) {
+      const removedUrlIds = urlsToRemove.map((u: DBUrl) => u.id);
+
+      await db.connect();
+      // delete blocker_messages and ignored_blockers for blockers referencing removed URLs
+      await db.query({
+        text: `DELETE FROM "blocker_messages" WHERE "blocker_id" IN (SELECT "id" FROM "blockers" WHERE "url_id" = ANY($1::uuid[]))`,
+        values: [removedUrlIds],
       });
+      await db.query({
+        text: `DELETE FROM "ignored_blockers" WHERE "blocker_id" IN (SELECT "id" FROM "blockers" WHERE "url_id" = ANY($1::uuid[]))`,
+        values: [removedUrlIds],
+      });
+      // delete the orphaned blockers themselves
+      await db.query({
+        text: `DELETE FROM "blockers" WHERE "url_id" = ANY($1::uuid[])`,
+        values: [removedUrlIds],
+      });
+      await db.clean();
+
+      // then delete the URLs
+      for (const url of urlsToRemove) {
+        await graphqlQuery({
+          query: `mutation($audit_id:uuid,$url:String) {delete_urls(where: {audit_id: {_eq: $audit_id}, url: {_eq: $url}}) {affected_rows}}`,
+          variables: {
+            audit_id: auditId,
+            url: url.url,
+          },
+        });
+      }
     }
 
     // updated URLs
