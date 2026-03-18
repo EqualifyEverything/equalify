@@ -7,7 +7,10 @@ import { useDebouncedCallback } from "use-debounce";
 
 import * as API from "aws-amplify/api";
 import { MdCheckCircle, MdError } from "react-icons/md";
+import { TbAlertTriangle } from "react-icons/tb";
 import { AuditPagesInputTable } from "./AuditPagesInputTable";
+
+const URL_SOFT_LIMIT = 10_000;
 
 interface Page {
   url: string;
@@ -135,7 +138,7 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, v
 
     const response = await API.get({
       apiName: "auth",
-      path: "/fetchAndValidateRemoteCsv",
+      path: "/fetchRemoteCsv",
       options: {
         queryParams: { url: csvUrl.trim() },
       },
@@ -162,6 +165,14 @@ export const AuditRemoteCsvInput: React.FC<ChildProps> = ({ csvUrl, setCsvUrl, v
         {validCsv &&
           <Card variant="short-success"><MdCheckCircle className="icon-small" /><div className="font-small"><b>CSV Found!</b></div></Card>
         }
+        {validCsv && pages.length >= URL_SOFT_LIMIT && (
+          <Card variant="short-error">
+            <TbAlertTriangle className="icon-small" />
+            <div className="font-small">
+              <b>Large audit:</b> This CSV contains {pages.length.toLocaleString()} URLs. Large audits take significantly longer to scan.
+            </div>
+          </Card>
+        )}
         {pages.length > 0 &&
           <AuditPagesInputTable
             pages={pages}

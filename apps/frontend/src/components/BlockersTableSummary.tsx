@@ -71,7 +71,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
   return (
     <div className={style["BlockersTableSummary"]}>
-      {data ? (
+      {!error && !isLoading && data ? (
         <>
           <div className="cards-50">
 

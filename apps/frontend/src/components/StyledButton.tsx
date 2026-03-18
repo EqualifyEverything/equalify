@@ -6,7 +6,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 interface ButtonProps extends React.PropsWithChildren {
   variant?: string;
   icon?: ReactNode;
-  onClick: (e?:any) => Promise<void> | void;
+  onClick: undefined | ((e?:any) => Promise<void> | void) ;
   label: string;
   showLabel?: boolean;
   disabled?: boolean;

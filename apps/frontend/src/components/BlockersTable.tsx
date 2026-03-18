@@ -9,7 +9,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
-import { useState, useMemo, ChangeEvent } from "react";
+import { useState, useMemo, ChangeEvent, ChangeEventHandler } from "react";
 //import { formatDate } from "../utils";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
@@ -704,66 +704,50 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           />
         </div>
         <div className="filter-group">
+          
+          {/* Search Filter */}
+          <StyledLabeledInput className={style["search-input"]}>
+            <label>Search by URL</label>
+            <input onChange={(e) => handleSearch(e.target.value)} />
+          </StyledLabeledInput>
+          
           {/* Status Filter */}
-          <div className="status-toggle-group">
-            <label htmlFor="statusToggleGroup" className="sr-only">
-              Status:
-            </label>
-            <div>
-              <ToggleGroup.Root
-                id="statusToggleGroup"
-                type="single"
-                defaultValue="all"
-                aria-label="View by status:"
-                value={selectedStatus}
-                onValueChange={handleStatusChange}
-              >
-                <ToggleGroup.Item value="active" aria-label="Active">
-                  Active{" "}
-                  {data?.statusCounts?.active !== undefined &&
-                    `(${data.statusCounts.active})`}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item value="ignored" aria-label="Ignored">
-                  Ignored{" "}
-                  {data?.statusCounts?.ignored !== undefined &&
-                    `(${data.statusCounts.ignored})`}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item value="all" aria-label="All">
-                  All{" "}
-                  {data?.statusCounts?.all !== undefined &&
-                    `(${data.statusCounts.all})`}
-                </ToggleGroup.Item>
-              </ToggleGroup.Root>
-            </div>
-          </div>
+          <StyledLabeledInput>
+            <label>Filter by Status</label>
+            <select
+              id="statusToggleGroup"
+              defaultValue="all"
+              aria-label="Filter by status:"
+              value={selectedStatus}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleStatusChange(e.target.value)}
+            >
+              <option value="active">Active{" "}
+                {data?.statusCounts?.active !== undefined &&
+                  `(${data.statusCounts.active})`}</option>
+              <option value="ignored">Ignored{" "}
+                {data?.statusCounts?.ignored !== undefined &&
+                  `(${data.statusCounts.ignored})`}</option>
+              <option value="all">All{" "}
+                {data?.statusCounts?.all !== undefined &&
+                  `(${data.statusCounts.all})`}</option>
+            </select>
+          </StyledLabeledInput>
 
           {/* Content Type Filter */}
-          <div className="content-toggle-group">
-            <label htmlFor="contentToggleGroup" className="sr-only">
-              Content Type:
-            </label>
-            <div>
-              <ToggleGroup.Root
-                className="root"
-                id="contentToggleGroup"
-                type="single"
-                defaultValue="all"
-                aria-label="View by status:"
-                value={selectedContentType}
-                onValueChange={handleContentTypeChange}
-              >
-                <ToggleGroup.Item value="all" aria-label="All">
-                  All
-                </ToggleGroup.Item>
-                <ToggleGroup.Item value="html" aria-label="HTML">
-                  HTML
-                </ToggleGroup.Item>
-                <ToggleGroup.Item value="pdf" aria-label="PDF">
-                  PDF
-                </ToggleGroup.Item>
-              </ToggleGroup.Root>
-            </div>
-          </div>
+          <StyledLabeledInput>
+            <label>Filter by Content Type</label>
+            <select
+              id="contentToggleGroup"
+              defaultValue="all"
+              aria-label="Filter by content type:"
+              value={selectedContentType}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleContentTypeChange(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="html">HTML</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </StyledLabeledInput>
 
           {/* Tag Filter */}
           {availableTags && availableTags.length > 0 && (
@@ -833,13 +817,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               </button>
             </div>
           )} */}
-          {/* Search Filter */}
-          <div>
-            <StyledLabeledInput className={style["search-input"]}>
-              <label>Search by URL</label>
-              <input onChange={(e) => handleSearch(e.target.value)} />
-            </StyledLabeledInput>
-          </div>
 
 
         </div>

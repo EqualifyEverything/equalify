@@ -19,7 +19,7 @@ import {
 import { BlockersTable } from "../components/BlockersTable";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
-import { TbHistory, TbMail, TbAlertTriangle } from "react-icons/tb";
+import { TbHistory, TbMail, TbAlertTriangle, TbReload } from "react-icons/tb";
 import { FaAngleDown, FaAngleUp, FaTable } from "react-icons/fa";
 import { GrPowerCycle } from "react-icons/gr";
 
@@ -49,6 +49,7 @@ import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { BlockersTableSummary } from "#src/components/BlockersTableSummary.tsx";
 import { FaTableList } from "react-icons/fa6";
 import { stringifyMessage } from "graphql-ws";
+import { MdError } from "react-icons/md";
 
 export interface Page {
   url: string;
@@ -134,19 +135,20 @@ export const Audit = () => {
     setPages(urls);
   }, [urls]);
 
+  //console.log(auditId);
   const { data: audit, refetch: refetchAudit } = useQuery({
     queryKey: ["audit", auditId],
     queryFn: async () =>
       (
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error}}`,
           variables: { audit_id: auditId },
         })
       )?.data?.audits_by_pk,
   });
 
   const { data: chartData } = useQuery({
-    queryKey: ["auditChart", auditId],
+    queryKey: ["auditChart", auditId, chartRange],
     queryFn: async () => {
       const results = await (
         await API.get({
@@ -157,9 +159,10 @@ export const Audit = () => {
           },
         }).response
       ).body.json();
+      //console.log(results);
       return results;
     },
-    refetchInterval: 5000,
+    //refetchInterval: 5000,
   });
 
   const handleUrlInput = async (_changedPages: Page[]) => {
@@ -266,6 +269,7 @@ export const Audit = () => {
   };
 
   useEffect(() => {
+    //console.log(audit);
     if (audit?.email_notifications) {
       console.log("setting email notifications");
       setEmailNotifications(audit.email_notifications);
@@ -276,8 +280,8 @@ export const Audit = () => {
     //throw new Error("Function not implemented.");
     if (emailNotifications !== JSON.stringify(newValue)) {
       const newEmails = JSON.stringify(newValue);
-      console.log("Updating email notifications:", newEmails);
-      console.log("Email count", JSON.parse(newEmails).emails.length);
+      //console.log("Updating email notifications:", newEmails);
+      //console.log("Email count", JSON.parse(newEmails).emails.length);
       setEmailNotificationsCount(JSON.parse(newEmails).emails.length);
 
       const updatedEmailNotifications = await apiClient.graphql({
@@ -297,7 +301,15 @@ export const Audit = () => {
     }
   };
 
+  const URL_SOFT_LIMIT = 10_000;
+
   const updateAuditInterval = async (newValue: string) => {
+    if (newValue === "Daily" && pages.length >= URL_SOFT_LIMIT) {
+      const proceed = window.confirm(
+        `Setting daily scans for an audit with ${pages.length.toLocaleString()} URLs will use significant resources. Continue?`
+      );
+      if (!proceed) return;
+    }
     console.log("Updating audit interval:", newValue);
     const updatedInterval = await apiClient.graphql({
       query: `mutation ($audit_id:uuid, $interval: String) {
@@ -313,6 +325,58 @@ export const Audit = () => {
       },
     });
     refetchAudit();
+  };
+
+  const refreshUrlsFromCsv = async () => {
+    console.log("Refreshing URL list from remote...")
+    const resp = (await API.get({
+      apiName: isShared ? "public" : "auth",
+      path: "/syncFromRemoteCsv",
+      options: {
+        queryParams: { id: auditId! },
+      },
+    }).response);
+    refetchAudit();
+    await queryClient.refetchQueries({ queryKey: ["urls"] });
+    const out = await resp.body.json() as any;
+    if (out.message) {
+      setAnnounceMessage(
+        out.message,
+        "success"
+      )
+    } else {
+      setAnnounceMessage(
+        "There was a problem updating the CSV URL!",
+        "error"
+      )
+    }
+
+  }
+
+  const updateAuditRemoteCsv = async (newValue: string) => {
+    console.log("Updating remote CSV value:", newValue);
+    const updatedRemoteCsvUrl = await apiClient.graphql({
+      query: `mutation ($audit_id:uuid, $remote_csv_url: String) {
+                update_audits(where: {id: {_eq: $audit_id}}, _set: {remote_csv_url: $remote_csv_url}) {
+                  returning {
+                    remote_csv_url
+                  }
+                }
+              }`,
+      variables: {
+        audit_id: auditId,
+        remote_csv_url: newValue,
+      },
+    });
+    setAnnounceMessage(
+      `Changed remote CSV URL to ${newValue}.`,
+      "success"
+    );
+    if(updatedRemoteCsvUrl){
+      refreshUrlsFromCsv();
+    }
+    //refetchAudit();
+    //await queryClient.refetchQueries({ queryKey: ["urls"] });
   };
 
   /* TODO: implement function to set table filter by URL or by value 
@@ -406,181 +470,182 @@ export const Audit = () => {
         // Completed scan - show timeout notice if applicable, then chart
         return (
           <>
-          {lastScanTimedOut && (
-            <Card variant="dark">
-              <div style={{ padding: "20px 0", display: "flex", alignItems: "center", gap: "12px" }}>
-                <TbAlertTriangle style={{ fontSize: "1.5em", color: themeVariables.yellow || "#f0ad4e", flexShrink: 0 }} />
-                <div>
-                  <h3 style={{ margin: 0 }}>Scan Timed Out</h3>
-                  <p style={{ margin: "4px 0 0", color: themeVariables.white, fontSize: "0.9em" }}>
-                    The last scan did not complete within the expected time. Some results may be missing.
-                    {currentScan.percentage != null && currentScan.percentage > 0 && currentScan.percentage < 100
-                      ? ` Only ${currentScan.percentage}% of pages were scanned.`
-                      : ''}
-                    {' '}Try rescanning — if the issue persists, some pages may be unreachable.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
-          <Card variant="dark" className="blockers-chart">
-            {chartData?.data && chartData.data.length > 0 && (
-              <div>
-                <div className="blockers-chart-heading-wrapper">
+            {lastScanTimedOut && (
+              <Card variant="dark">
+                <div style={{ padding: "20px 0", display: "flex", alignItems: "center", gap: "12px" }}>
+                  <TbAlertTriangle style={{ fontSize: "1.5em", color: themeVariables.yellow || "#f0ad4e", flexShrink: 0 }} />
                   <div>
-                    <h2 id="blockers-chart-heading">
-                      <TbHistory className="icon-small" />
-                      {chartData.data[
-                        chartData.data.length - 1
-                      ].blockers.toLocaleString()}{" "}
-                      Blockers
-                    </h2>
-                    <span className="font-small">
-                      Last {chartData.period_days} Days:
-                    </span>
-                  </div>
-                  <div className="chart-ranger-select">
-                    <label htmlFor="chart-range-select">Date Range</label>
-                    <select
-                      id="chart-range-select"
-                      name="ChartRangeSelect"
-                      value={chartRange}
-                      onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                        setChartRange(parseInt(event.target.value));
-                      }}
-                      aria-label="Select Date Range"
-                    >
-                      <option value={7}>Week</option>
-                      <option value={30}>Month</option>
-                      <option value={90}>Quarter</option>
-                      <option value={365}>Year</option>
-                    </select>
+                    <h3 style={{ margin: 0 }}>Scan Timed Out</h3>
+                    <p style={{ margin: "4px 0 0", color: themeVariables.white, fontSize: "0.9em" }}>
+                      The last scan did not complete within the expected time. Some results may be missing.
+                      {currentScan.percentage != null && currentScan.percentage > 0 && currentScan.percentage < 100
+                        ? ` Only ${currentScan.percentage}% of pages were scanned.`
+                        : ''}
+                      {' '}Try rescanning — if the issue persists, some pages may be unreachable.
+                    </p>
                   </div>
                 </div>
-                <Tabs.Root
-                  defaultValue="chart"
-                  orientation="horizontal"
-                  className="chart-tabs"
-                >
-                  <Tabs.List aria-label="Select a Chart View">
-                    <Tabs.Trigger value="chart" className="trigger">
-                      Chart View
-                    </Tabs.Trigger>
-                    <Tabs.Trigger value="table" className="trigger">
-                      Table View
-                    </Tabs.Trigger>
-                  </Tabs.List>
-                  <Tabs.Content value="chart">
-                    <ResponsiveContainer width="100%" height={170}>
-                      <LineChart
-                        data={chartData.data}
-                        //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                        accessibilityLayer={true}
-                        margin={{
-                          top: 5,
-                          right: 10,
-                          left: -20,
-                          bottom: 5,
-                        }}
-                        title="Blockers over time trend chart"
-                        desc="Line chart showing blocker counts over time. See the data table below for detailed values."
-                      >
-                        {/* <CartesianGrid strokeDasharray="6 6" />
-                     */}
-                        <XAxis
-                          dataKey="date"
-                          type={"category"}
-                          /* label={{
-                            value: "Date",
-                            position: "insideBottom",
-                            offset: -5,
-                          }} */
-                          tickFormatter={(value, index) => {
-                            if (index % 2) return "";
-                            //console.log(index);
-                            //if(index%5 === 0) return "";
-                            const date = new Date(value);
-                            return date.toLocaleDateString("en-US", {
-                              month: "numeric",
-                              day: "numeric",
-                            });
-                          }}
-                          tickMargin={8}
-                        />
-                        <YAxis
-                          //axisLine={false}
-                          orientation="left"
-                          label={{/* 
-                        value: "Blockers", */
-                            angle: -90,
-                            position: "insideLeft",
-                          }}
-                        />
-                        <Tooltip content={<ChartTooltipContent />} />
-                        {/* <Legend /> */}
-                        <Line
-                          type="monotone"
-                          dataKey="blockers"
-                          stroke={themeVariables.white}
-                          strokeWidth={4}
-                          dot={CustomizedDot}
-                          name="Blockers"
-                          isAnimationActive={false}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </Tabs.Content>
-                  <Tabs.Content value="table">
-                    <div className={style["blockers-data-table"]}>
-                      <h3>Blockers Data Table</h3>
-                      <p>Use this table to review exact blocker counts by date.</p>
-                      <div className={"table-container card-table"}>
-                        <table aria-labelledby="blockers-chart-heading">
-                          <thead>
-                            <tr>
-                              <th scope="col">Scan Date</th>
-                              <th scope="col">Blockers</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {chartData.data.map((row: any, index: number) => {
-                              if (row.timestamp) {
-                                //console.log(row);
-                                return (
-                                  <tr key={row.date}>
-                                    <td>
-                                      {new Date(row.date).toLocaleDateString(
-                                        "en-US",
-                                        {
-                                          weekday: "short",
-                                          year: "numeric",
-                                          month: "short",
-                                          day: "numeric",
-                                        }
-                                      )}
-                                    </td>
-                                    <td>{row.blockers}</td>
-                                  </tr>
-                                );
-                              } else {
-                                return false;
-                              }
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </Tabs.Content>
-                </Tabs.Root>
-              </div>
+              </Card>
             )}
-          </Card>
+            <Card variant="dark" className="blockers-chart">
+              {chartData?.data && chartData.data.length > 0 && (
+                <div>
+                  <div className="blockers-chart-heading-wrapper">
+                    <div>
+                      <h2 id="blockers-chart-heading">
+                        <TbHistory className="icon-small" />
+                        {chartData.data[
+                          chartData.data.length - 1
+                        ].blockers.toLocaleString()}{" "}
+                        Blockers
+                      </h2>
+                      <span className="font-small">
+                        Last {chartData.period_days} Days:
+                      </span>
+                    </div>
+                    <div className="chart-ranger-select">
+                      <label htmlFor="chart-range-select">Date Range</label>
+                      <select
+                        id="chart-range-select"
+                        name="ChartRangeSelect"
+                        value={chartRange}
+                        onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                          setChartRange(parseInt(event.target.value));
+                        }}
+                        aria-label="Select Date Range"
+                      >
+                        <option value={7}>Week</option>
+                        <option value={30}>Month</option>
+                        <option value={90}>Quarter</option>
+                        <option value={365}>Year</option>
+                      </select>
+                    </div>
+                  </div>
+                  <Tabs.Root
+                    defaultValue="chart"
+                    orientation="horizontal"
+                    className="chart-tabs"
+                  >
+                    <Tabs.List aria-label="Select a Chart View">
+                      <Tabs.Trigger value="chart" className="trigger">
+                        Chart View
+                      </Tabs.Trigger>
+                      <Tabs.Trigger value="table" className="trigger">
+                        Table View
+                      </Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="chart">
+                      <ResponsiveContainer width="100%" height={170}>
+                        <LineChart
+                          data={chartData.data}
+                          //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                          accessibilityLayer={true}
+                          margin={{
+                            top: 5,
+                            right: 10,
+                            left: -20,
+                            bottom: 5,
+                          }}
+                          title="Blockers over time trend chart"
+                          desc="Line chart showing blocker counts over time. See the data table below for detailed values."
+                        >
+                          {/* <CartesianGrid strokeDasharray="6 6" />
+                     */}
+                          <XAxis
+                            dataKey="date"
+                            type={"category"}
+                            /* label={{
+                              value: "Date",
+                              position: "insideBottom",
+                              offset: -5,
+                            }} */
+                            tickFormatter={(value, index) => {
+                              if (index % 2) return "";
+                              //console.log(value);
+                              //if(index%5 === 0) return "";
+                              const parsed = value.split("-").map(Number);
+                              const date = new Date(parsed[0], parsed[1]-1, parsed[2]);
+                              return date.toLocaleDateString("en-US", {
+                                month: "numeric",
+                                day: "numeric",
+                              });
+                            }}
+                            tickMargin={8}
+                          />
+                          <YAxis
+                            //axisLine={false}
+                            orientation="left"
+                            label={{/* 
+                        value: "Blockers", */
+                              angle: -90,
+                              position: "insideLeft",
+                            }}
+                          />
+                          <Tooltip content={<ChartTooltipContent />} />
+                          {/* <Legend /> */}
+                          <Line
+                            type="monotone"
+                            dataKey="blockers"
+                            stroke={themeVariables.white}
+                            strokeWidth={4}
+                            dot={CustomizedDot}
+                            name="Blockers"
+                            isAnimationActive={false}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </Tabs.Content>
+                    <Tabs.Content value="table">
+                      <div className={style["blockers-data-table"]}>
+                        <h3>Blockers Data Table</h3>
+                        <p>Use this table to review exact blocker counts by date.</p>
+                        <div className={"table-container card-table"}>
+                          <table aria-labelledby="blockers-chart-heading">
+                            <thead>
+                              <tr>
+                                <th scope="col">Scan Date</th>
+                                <th scope="col">Blockers</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {chartData.data.map((row: any, index: number) => {
+                                if (row.timestamp) {
+                                  //console.log(row);
+                                  return (
+                                    <tr key={row.date}>
+                                      <td>
+                                        {new Date(row.timestamp).toLocaleDateString(
+                                          "en-US",
+                                          {
+                                            weekday: "short",
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric",
+                                          }
+                                        )}
+                                      </td>
+                                      <td>{row.blockers}</td>
+                                    </tr>
+                                  );
+                                } else {
+                                  return false;
+                                }
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </Tabs.Content>
+                  </Tabs.Root>
+                </div>
+              )}
+            </Card>
           </>
         );
       })()}
 
-      {!isQuickScan && <div className={"cards-62-38 " + style["scan-cards-area"]}>
-        <Card variant="light">
+      <div className={"cards-62-38 " + style["scan-cards-area"]}>
+        <Card variant="light" className={style["urls-card"]}>
           <Collapsible.Root
             className="CollapsibleRoot"
             open={showUrlInput}
@@ -591,6 +656,7 @@ export const Audit = () => {
                 <PiFileMagnifyingGlassBold className="icon-small" />
                 {pages.length} URL{pages.length > 1 ? "s" : ""} Included
               </h2>
+
 
               {audit && (
                 <StyledLabeledInput>
@@ -614,9 +680,41 @@ export const Audit = () => {
             </div>
 
             <div>
+
+              {audit?.remote_csv_url ? (
+                <Card variant="inset-light" className={style["remote-csv-area"]}>
+                  <div className={style["remote-csv-area-inputs"]}>
+                    <StyledLabeledInput className={style["remote-csv-area-inputs-labeled-input"]}>
+                      <label htmlFor="remote-csv-input">Remote CSV URL</label>
+                      <input
+                        value={audit?.remote_csv_url}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          updateAuditRemoteCsv(event.target.value);
+                        }}
+                      />
+                    </StyledLabeledInput>
+                    <StyledButton
+                      icon={<TbReload />}
+                      label="Refresh URL list from CSV"
+                      onClick={refreshUrlsFromCsv}
+                      showLabel={false}
+                      variant="naked"
+                    />
+                  </div>
+                  {audit.remote_csv_error &&
+                    <Card variant="short-error">
+                      <MdError className="icon-small" /><div className="font-small"><b>There was a problem with your CSV.</b>{audit.remote_csv_error}</div></Card>
+                  }
+                  <p className="font-small" style={{ marginBottom: 0 }}>This audit will automatically update the list of URLs scanned from the CSV above.</p>
+                </Card>
+              ) : (null)}
+
+            </div>
+            <div>
               {scans && scans?.length > 0 && (
                 <div>
                   <div className="font-small">
+                    {console.log(scans[scans.length - 1])}
                     Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
                     {scans[scans.length - 1].status && (
                       <span
@@ -812,7 +910,7 @@ export const Audit = () => {
                   removeParentPages={removeUrls}
                   updateParentPageType={updateUrlType}
                   returnMutation
-                  isShared={isShared}
+                  isShared={isShared || audit?.remote_csv_url}
                 />
               </form>
             </Collapsible.Content>
@@ -838,37 +936,40 @@ export const Audit = () => {
             </div>
           )}
         </Card>
-      </div>}
-      <Tabs.Root
-        orientation="horizontal"
-        className="audit-tabs"
-        value={blockersTableView}
-        onValueChange={(value) => setBlockersTableView(value)}
-        activationMode="manual"
-      >
-        <div className={style["blockers-table-header"]} style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }}>
-          <h3>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h3>
+      </div>
+      {
+        chartData?.data
+        && chartData.data.length > 0
+        && auditId
+        && pages
+        && scans
+        && scans.length > 0
+        && ( scans[scans.length - 1].status == "complete" || scans[scans.length - 1].status == "failed" )
+        &&
+        <Tabs.Root
+          orientation="horizontal"
+          className="audit-tabs"
+          value={blockersTableView}
+          onValueChange={(value) => setBlockersTableView(value)}
+          activationMode="manual"
+        >
+          <div className={style["blockers-table-header"]} style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }}>
+            <h3>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h3>
 
-          <Tabs.List aria-label="Select a View" className={style["blockers-view-selector"]}>
-            {blockersTableView !== "summary" &&
-              <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
-                <StyledButton variant="naked" label="Switch to Summary View" onClick={() => { }}>Switch to Summary View</StyledButton>
-              </Tabs.Trigger>
-            }
-            {blockersTableView !== "detailed" &&
-              <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
-                <StyledButton variant="naked" label="Switch to Detailed View" onClick={() => { }}>Switch to Detailed View</StyledButton>
-              </Tabs.Trigger>
-            }
-          </Tabs.List>
-        </div>
-        <Tabs.Content value="summary">
-          {
-            chartData?.data
-            && chartData.data.length > 0
-            && auditId
-            && pages
-            &&
+            <Tabs.List aria-label="Select a View" className={style["blockers-view-selector"]}>
+              {blockersTableView !== "summary" &&
+                <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
+                  <StyledButton variant="naked" label="Switch to Summary View" onClick={() => { }}>Switch to Summary View</StyledButton>
+                </Tabs.Trigger>
+              }
+              {blockersTableView !== "detailed" &&
+                <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
+                  <StyledButton variant="naked" label="Switch to Detailed View" onClick={() => { }}>Switch to Detailed View</StyledButton>
+                </Tabs.Trigger>
+              }
+            </Tabs.List>
+          </div>
+          <Tabs.Content value="summary">
             <BlockersTableSummary
               chartData={chartData}
               isShared={isShared}
@@ -877,13 +978,13 @@ export const Audit = () => {
               scans={scans}
             /* filterLinkHandler={setFilterAndOpenDetails} */
             />
-          }
-        </Tabs.Content>
-        <Tabs.Content value="detailed">
-          {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
+          </Tabs.Content>
+          <Tabs.Content value="detailed">
+            {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
 
-        </Tabs.Content>
-      </Tabs.Root>
+          </Tabs.Content>
+        </Tabs.Root>
+      }
 
     </div>
   );
