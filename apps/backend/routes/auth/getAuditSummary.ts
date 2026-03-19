@@ -40,6 +40,7 @@ interface ItemCount {
 }
 
 export const getAuditSummary = async () => {
+  const start = performance.now(); 
   const auditId = (event.queryStringParameters as any).id;
   const mostCommonUrlsLimit =
     (event.queryStringParameters as any).mostCommonUrlsLimit ?? 5;
@@ -74,7 +75,7 @@ export const getAuditSummary = async () => {
     },
   };
   const response = (await graphqlQuery(query)) as AuditSummaryResp;
-  console.log(JSON.stringify({ response }));
+  //console.log(JSON.stringify({ response }));
 
   const flattened = response.blockers.map((item) => {
     return {
@@ -117,6 +118,8 @@ export const getAuditSummary = async () => {
     mostCommonTagsLimit
   )
 
+  const end = performance.now();
+
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
@@ -125,7 +128,8 @@ export const getAuditSummary = async () => {
       urlsWithMostErrors,
       mostCommonErrors,
       mostCommonCategory,
-      mostCommonTags
+      mostCommonTags,
+      executionTime: end - start
     },
   };
 };
