@@ -1,12 +1,15 @@
 import { db, graphqlQuery } from "#src/utils";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
-import { syncAuditUrlsFromRemoteCsv } from "../internal";
+import {
+  processScheduledAuditEmails,
+  syncAuditUrlsFromRemoteCsv,
+} from "../internal";
 const lambda = new LambdaClient();
 
 export const runEveryMinute = async () => {
   // Perform health check
   const response = await graphqlQuery({ query: `{users(limit:1){id}}` });
-  if (!response?.users?.[0]?.id) {
+  if (!response?.users?.[0]?.id && process.env.SLACK_WEBHOOK) {
     await fetch(process.env.SLACK_WEBHOOK, {
       method: "POST",
       body: JSON.stringify({
@@ -45,9 +48,8 @@ export const runEveryMinute = async () => {
                    )
                  )`,
     })
-  ).rows.map((obj) => obj.id);
+  ).rows.map((obj: { id: string; }) => obj.id);
   for (const scheduledAuditId of scheduledAuditIds) {
-    
     // hook to check for remote CSV
     await syncAuditUrlsFromRemoteCsv(scheduledAuditId);
 
@@ -70,7 +72,7 @@ export const runEveryMinute = async () => {
         values: [
           scheduledAuditId,
           "processing",
-          JSON.stringify(urls.map((obj) => ({ url: obj.url, type: obj.type }))),
+          JSON.stringify(urls.map((obj: { url: string; type: string; }) => ({ url: obj.url, type: obj.type }))),
         ],
       })
     ).rows[0].id;
@@ -79,7 +81,7 @@ export const runEveryMinute = async () => {
         FunctionName: "aws-lambda-scan-sqs-router",
         InvocationType: "Event",
         Payload: JSON.stringify({
-          urls: urls?.map((url) => ({
+          urls: urls?.map((url: { id: string; url: string; type: string; }) => ({
             auditId: scheduledAuditId,
             scanId: scanId,
             urlId: url.id,
@@ -140,5 +142,13 @@ export const runEveryMinute = async () => {
   }
 
   await db.clean();
+
+  // Process scheduled audit email notifications
+  try {
+    await processScheduledAuditEmails();
+  } catch (emailError) {
+    console.error("Scheduled audit email processing failed:", emailError);
+  }
+
   return;
 };
