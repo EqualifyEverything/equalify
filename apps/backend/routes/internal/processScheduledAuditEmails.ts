@@ -66,8 +66,10 @@ export const processScheduledAuditEmails = async () => {
       subscriptionsCount++;
       // Ignore stale lastSent dates from before emails were enabled in prod
       const emailEnabledDate = DateTime.fromISO("2026-02-19T00:00:00.000Z");
+      console.log("Last sent from DB", email.lastSent);
       const rawLastSent = DateTime.fromISO(email.lastSent);
       const lastSent = rawLastSent < emailEnabledDate ? emailEnabledDate : rawLastSent;
+      console.log("Last Sent:", lastSent);
       let intervalDays = null;
       switch (email.frequency.toLowerCase()) {
         case "daily":
