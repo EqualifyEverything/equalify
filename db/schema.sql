@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict PqScNlLi0Sk4Or7N5O0KcunHAUaRB8F2sEOUBgd7rq2ZTol7DuIhCfUScvsLQqJ
+\restrict w0UCtZUAkqllrkWsq8VVIBLlGNK3f5ezOdm6EvNhX5O5xGQEfYRD5Am35egQpHu
 
 -- Dumped from database version 17.5
 -- Dumped by pg_dump version 18.3 (Homebrew)
@@ -49,6 +49,102 @@ CREATE FUNCTION hdb_catalog.gen_hasura_uuid() RETURNS uuid
     AS $$select gen_random_uuid()$$;
 
 
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: item_count_template; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.item_count_template (
+    key text,
+    count integer
+);
+
+
+--
+-- Name: get_most_common_messages(uuid, integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_most_common_messages(search_audit_id uuid, row_limit integer) RETURNS SETOF public.item_count_template
+    LANGUAGE plpgsql STABLE
+    AS $$
+BEGIN RETURN QUERY
+SELECT
+  m.content :: text AS key,
+  COUNT(*) :: int AS count
+FROM
+  blockers b
+  JOIN blocker_messages bm ON b.id = bm.blocker_id
+  JOIN messages m ON bm.message_id = m.id
+WHERE
+  b.audit_id = search_audit_id
+GROUP BY
+  m.content
+ORDER BY
+  count DESC
+LIMIT
+  row_limit;
+END;
+$$;
+
+
+--
+-- Name: get_most_common_tags(uuid, integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_most_common_tags(search_audit_id uuid, row_limit integer) RETURNS SETOF public.item_count_template
+    LANGUAGE plpgsql STABLE
+    AS $$
+BEGIN RETURN QUERY
+SELECT
+  t.content :: text AS key,
+  COUNT(*) :: int AS count
+FROM
+  blockers b
+  JOIN blocker_messages bm ON b.id = bm.blocker_id
+  JOIN messages m ON bm.message_id = m.id
+  JOIN message_tags mt ON m.id = mt.message_id
+  JOIN tags t ON mt.tag_id = t.id
+WHERE
+  b.audit_id = search_audit_id
+GROUP BY
+  t.content
+ORDER BY
+  count DESC
+LIMIT
+  row_limit;
+END;
+$$;
+
+
+--
+-- Name: get_most_common_urls(uuid, integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_most_common_urls(search_audit_id uuid, row_limit integer) RETURNS SETOF public.item_count_template
+    LANGUAGE plpgsql STABLE
+    AS $$
+BEGIN RETURN QUERY
+SELECT
+  u.url :: text AS key,
+  COUNT(*) :: int AS count
+FROM
+  blockers b
+  JOIN urls u ON b.url_id = u.id
+WHERE
+  b.audit_id = search_audit_id
+GROUP BY
+  u.url
+ORDER BY
+  count DESC
+LIMIT
+  row_limit;
+END;
+$$;
+
+
 --
 -- Name: set_current_timestamp_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
@@ -65,10 +161,6 @@ BEGIN
 END;
 $$;
 
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
 
 --
 -- Name: hdb_action_log; Type: TABLE; Schema: hdb_catalog; Owner: -
@@ -242,10 +334,78 @@ CREATE TABLE public.blockers (
     content_hash_id uuid NOT NULL,
     targets jsonb DEFAULT jsonb_build_array() NOT NULL,
     equalified boolean DEFAULT false NOT NULL,
-    url_id uuid NOT NULL,
+    url_id uuid,
     scan_id uuid,
     short_id text
 );
+
+
+--
+-- Name: message_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.message_tags (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    message_id uuid NOT NULL,
+    tag_id uuid NOT NULL
+);
+
+
+--
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.messages (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    content text NOT NULL,
+    category text NOT NULL
+);
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tags (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    content text NOT NULL
+);
+
+
+--
+-- Name: urls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.urls (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    user_id uuid NOT NULL,
+    audit_id uuid NOT NULL,
+    url text NOT NULL,
+    type text NOT NULL,
+    audit_ids jsonb DEFAULT jsonb_build_array() NOT NULL
+);
+
+
+--
+-- Name: blocker_summary_view; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.blocker_summary_view AS
+ SELECT b.audit_id,
+    u.url,
+    m.content AS message_content,
+    m.category,
+    t.content AS tag_content
+   FROM (((((public.blockers b
+     LEFT JOIN public.urls u ON ((b.url_id = u.id)))
+     LEFT JOIN public.blocker_messages bm ON ((b.id = bm.blocker_id)))
+     LEFT JOIN public.messages m ON ((bm.message_id = m.id)))
+     LEFT JOIN public.message_tags mt ON ((m.id = mt.message_id)))
+     LEFT JOIN public.tags t ON ((mt.tag_id = t.id)));
 
 
 --
@@ -293,37 +453,6 @@ CREATE TABLE public.logs (
 
 
 --
--- Name: message_tags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.message_tags (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    message_id uuid NOT NULL,
-    tag_id uuid NOT NULL
-);
-
-
---
--- Name: messages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.messages (
-    id uuid NOT NULL,
-    content text NOT NULL,
-    category text NOT NULL
-);
-
-
---
--- Name: TABLE messages; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE public.messages IS 'Formerly known as "messages"';
-
-
---
 -- Name: scans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -341,32 +470,6 @@ CREATE TABLE public.scans (
 
 
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tags (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    content text NOT NULL
-);
-
-
---
--- Name: urls; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.urls (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    user_id uuid NOT NULL,
-    audit_id uuid NOT NULL,
-    url text NOT NULL,
-    type text NOT NULL,
-    audit_ids jsonb DEFAULT jsonb_build_array() NOT NULL
-);
-
-
---
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -374,8 +477,8 @@ CREATE TABLE public.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    email text NOT NULL,
     name text NOT NULL,
+    email text NOT NULL,
     type text DEFAULT 'member'::text,
     analytics jsonb,
     apikey uuid DEFAULT gen_random_uuid() NOT NULL
@@ -463,6 +566,14 @@ ALTER TABLE ONLY public.audits
 
 
 --
+-- Name: blocker_messages blocker_messages_message_id_blocker_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.blocker_messages
+    ADD CONSTRAINT blocker_messages_message_id_blocker_id_key UNIQUE (message_id, blocker_id);
+
+
+--
 -- Name: tags blocker_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -471,27 +582,11 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: blocker_messages blocker_type_blockers_blocker_type_id_blocker_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.blocker_messages
-    ADD CONSTRAINT blocker_type_blockers_blocker_type_id_blocker_id_key UNIQUE (message_id, blocker_id);
-
-
---
 -- Name: blocker_messages blocker_type_blockers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blocker_messages
     ADD CONSTRAINT blocker_type_blockers_pkey PRIMARY KEY (id);
-
-
---
--- Name: message_tags blocker_type_tags_blocker_type_id_blocker_tag_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.message_tags
-    ADD CONSTRAINT blocker_type_tags_blocker_type_id_blocker_tag_id_key UNIQUE (message_id, tag_id);
 
 
 --
@@ -511,14 +606,6 @@ ALTER TABLE ONLY public.messages
 
 
 --
--- Name: ignored_blockers ignored_blockers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ignored_blockers
-    ADD CONSTRAINT ignored_blockers_pkey PRIMARY KEY (id);
-
-
---
 -- Name: invites invites_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -535,6 +622,14 @@ ALTER TABLE ONLY public.invites
 
 
 --
+-- Name: ignored_blockers issue_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ignored_blockers
+    ADD CONSTRAINT issue_updates_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: blockers issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -548,6 +643,14 @@ ALTER TABLE ONLY public.blockers
 
 ALTER TABLE ONLY public.logs
     ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: message_tags message_tags_message_id_tag_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.message_tags
+    ADD CONSTRAINT message_tags_message_id_tag_id_key UNIQUE (message_id, tag_id);
 
 
 --
@@ -617,6 +720,69 @@ CREATE UNIQUE INDEX blockers_short_id ON public.blockers USING btree (audit_id, 
 
 
 --
+-- Name: idx_blocker_messages_blocker_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_blocker_messages_blocker_id ON public.blocker_messages USING btree (blocker_id);
+
+
+--
+-- Name: idx_blocker_messages_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_blocker_messages_message_id ON public.blocker_messages USING btree (message_id);
+
+
+--
+-- Name: idx_blockers_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_blockers_audit_id ON public.blockers USING btree (audit_id);
+
+
+--
+-- Name: idx_blockers_scan_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_blockers_scan_id ON public.blockers USING btree (scan_id);
+
+
+--
+-- Name: idx_blockers_url_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_blockers_url_id ON public.blockers USING btree (url_id);
+
+
+--
+-- Name: idx_message_tags_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_message_tags_message_id ON public.message_tags USING btree (message_id);
+
+
+--
+-- Name: idx_message_tags_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_message_tags_tag_id ON public.message_tags USING btree (tag_id);
+
+
+--
+-- Name: idx_scans_status_updated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_scans_status_updated ON public.scans USING btree (status, updated_at);
+
+
+--
+-- Name: idx_urls_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_urls_audit_id ON public.urls USING btree (audit_id);
+
+
+--
 -- Name: audits set_public_audits_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -659,20 +825,6 @@ COMMENT ON TRIGGER set_public_blocker_type_tags_updated_at ON public.message_tag
 
 
 --
--- Name: ignored_blockers set_public_ignored_blockers_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER set_public_ignored_blockers_updated_at BEFORE UPDATE ON public.ignored_blockers FOR EACH ROW EXECUTE FUNCTION public.set_current_timestamp_updated_at();
-
-
---
--- Name: TRIGGER set_public_ignored_blockers_updated_at ON ignored_blockers; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TRIGGER set_public_ignored_blockers_updated_at ON public.ignored_blockers IS 'trigger to set value of column "updated_at" to current timestamp on row update';
-
-
---
 -- Name: invites set_public_invites_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -684,6 +836,20 @@ CREATE TRIGGER set_public_invites_updated_at BEFORE UPDATE ON public.invites FOR
 --
 
 COMMENT ON TRIGGER set_public_invites_updated_at ON public.invites IS 'trigger to set value of column "updated_at" to current timestamp on row update';
+
+
+--
+-- Name: ignored_blockers set_public_issue_updates_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_public_issue_updates_updated_at BEFORE UPDATE ON public.ignored_blockers FOR EACH ROW EXECUTE FUNCTION public.set_current_timestamp_updated_at();
+
+
+--
+-- Name: TRIGGER set_public_issue_updates_updated_at ON ignored_blockers; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TRIGGER set_public_issue_updates_updated_at ON public.ignored_blockers IS 'trigger to set value of column "updated_at" to current timestamp on row update';
 
 
 --
@@ -776,5 +942,5 @@ ALTER TABLE ONLY hdb_catalog.hdb_scheduled_event_invocation_logs
 -- PostgreSQL database dump complete
 --
 
-\unrestrict PqScNlLi0Sk4Or7N5O0KcunHAUaRB8F2sEOUBgd7rq2ZTol7DuIhCfUScvsLQqJ
+\unrestrict w0UCtZUAkqllrkWsq8VVIBLlGNK3f5ezOdm6EvNhX5O5xGQEfYRD5Am35egQpHu
 

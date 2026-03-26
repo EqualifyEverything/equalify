@@ -45,9 +45,6 @@ if ! command -v pg_dump &> /dev/null; then
     fi
 fi
 
-OUT_DIR="$SCRIPT_DIR/$ENV"
-mkdir -p "$OUT_DIR"
-
 echo "Dumping $ENV..."
 
 # Export DB schema (no data)
@@ -58,15 +55,15 @@ PGPASSWORD="$DB_PASSWORD" pg_dump \
     --no-privileges \
     -h "$DB_HOST" \
     -U "$DB_USER" \
-    "$DB_NAME" > "$OUT_DIR/schema.sql"
-echo "  -> db/$ENV/schema.sql"
+    "$DB_NAME" > "$SCRIPT_DIR/schema.sql"
+echo "  -> db/schema.sql"
 
 # Export Hasura metadata
 echo "Exporting Hasura metadata..."
 curl -s -X POST "$HASURA_ENDPOINT/v1/metadata" \
     -H "X-Hasura-Admin-Secret: $DB_PASSWORD" \
     -H "Content-Type: application/json" \
-    -d '{"type":"export_metadata","version":2,"args":{}}' > "$OUT_DIR/hasura-metadata.json"
-echo "  -> db/$ENV/hasura-metadata.json"
+    -d '{"type":"export_metadata","version":2,"args":{}}' > "$SCRIPT_DIR/hasura-metadata.json"
+echo "  -> db/hasura-metadata.json"
 
 echo "Done!"
