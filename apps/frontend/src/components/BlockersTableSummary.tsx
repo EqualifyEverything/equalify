@@ -53,11 +53,11 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
       };
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
-        path: "/getAuditSummary",
+        path: "/getAuditSummaryFast",
         options: { queryParams: params },
       }).response;
       const resp = (await response.body.json()) as any as SummaryResp;
-      //console.log(resp);
+      console.log(resp);
       return resp;
     }
   });
