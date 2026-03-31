@@ -20,8 +20,9 @@ import { LuClipboardCheck, LuClipboardPaste, LuImport } from "react-icons/lu";
 import styles from "./BuildAudit.module.scss";
 //import * as Switch from "@radix-ui/react-switch";
 import * as Tabs from "@radix-ui/react-tabs";
-import { FaCloudArrowDown, FaFileCirclePlus, FaListUl } from "react-icons/fa6";
+import { FaCloudArrowDown, FaFileCirclePlus, FaListUl, FaSpider } from "react-icons/fa6";
 import { AuditRemoteCsvInput } from "#src/components/AuditRemoteCsvInput.tsx";
+import { AuditCrawlInput } from "#src/components/AuditCrawlInput.tsx";
 
 interface Page {
   url: string;
@@ -249,6 +250,14 @@ export const BuildAudit = () => {
                   onClick={() => { }}
                 />
               </Tabs.Trigger>
+              <Tabs.Trigger value="crawl" asChild>
+                <StyledButton
+                  variant="tab-card-button"
+                  label="Crawl Site"
+                  icon={<FaSpider />}
+                  onClick={() => { }}
+                />
+              </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="url">
               <AuditPagesInput
@@ -266,6 +275,13 @@ export const BuildAudit = () => {
                 setCsvUrl={setRemoteCsvUrl}
                 validCsv={validRemoteCsv}
                 setValidCsv={setValidRemoteCsv}
+              />
+            </Tabs.Content>
+
+            <Tabs.Content value="crawl">
+              <AuditCrawlInput
+                pages={pages}
+                setParentPages={setPages}
               />
             </Tabs.Content>
           </Tabs.Root>
