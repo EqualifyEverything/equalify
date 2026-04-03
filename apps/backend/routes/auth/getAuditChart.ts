@@ -20,6 +20,8 @@ export const getAuditChart = async () => {
     scans(order_by: {created_at: asc}) {
       id
       created_at
+      processed_pages
+      pages
       blockers_aggregate(where: {_not: {ignored_blocker: {id: {_is_null: false}}}}) {
         aggregate {
           count
@@ -40,7 +42,7 @@ export const getAuditChart = async () => {
   // Process scans to get the last scan per day
   const scansByDate = new Map<
     string,
-    { date: string; blockers: number; timestamp: string }
+    { date: string; blockers: number; timestamp: string; pagesCount: number, processedPagesCount: number }
   >();
 
   scans.forEach((scan:any) => {
@@ -51,11 +53,16 @@ export const getAuditChart = async () => {
     //console.log("dateKey", dateKey)
     const blockerCount = scan.blockers_aggregate?.aggregate?.count || 0;
 
+    const pagesCount = scan.pages.length;
+    const processedPagesCount = scan.processed_pages.length;
+
     // Only keep the last scan for each day (scans are ordered by created_at asc)
     scansByDate.set(dateKey, {
       date: dateKey,
       blockers: blockerCount,
       timestamp: scan.created_at,
+      pagesCount: Number(pagesCount),
+      processedPagesCount: Number(processedPagesCount)
     });
   });
 
@@ -100,6 +107,8 @@ export const getAuditChart = async () => {
         date: dateKey,
         blockers: scanData.blockers,
         timestamp: scanData.timestamp,
+        pagesCount: scanData.pagesCount,
+        processedPagesCount: scanData.processedPagesCount
       });
     } else {
       // Fill with the last known value
@@ -116,6 +125,7 @@ export const getAuditChart = async () => {
             date: dateKey,
             blockers: lastKnownValue,
             timestamp: null,
+            
           });
         }
       } else {
