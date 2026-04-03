@@ -605,7 +605,7 @@ export const Audit = () => {
                               <tr>
                                 <th scope="col">Scan Date</th>
                                 <th scope="col">URLS</th>
-                                <th scope="col">URLs Scanned</th>
+                                {/* <th scope="col">Successful Scans</th> */}
                                 <th scope="col">Blockers</th>
                               </tr>
                             </thead>
@@ -626,8 +626,8 @@ export const Audit = () => {
                                           }
                                         )}
                                       </td>
-                                      <td>{row.pagesCount}</td>
-                                      <td>{row.processedPagesCount}</td>
+                                      <td>{row.pagesCount}</td>{/* 
+                                      <td>{row.processedPagesCount}</td> */}
                                       <td>{row.blockers}</td>
                                     </tr>
                                   );

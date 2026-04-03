@@ -20,7 +20,7 @@ export const getAuditChart = async () => {
     scans(order_by: {created_at: asc}) {
       id
       created_at
-      processed_pages
+      /* processed_pages */
       pages
       errors
       blockers_aggregate(where: {_not: {ignored_blocker: {id: {_is_null: false}}}}) {

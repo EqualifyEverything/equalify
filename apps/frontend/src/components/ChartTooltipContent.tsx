@@ -44,7 +44,7 @@ export const ChartTooltipContent = ({
             Blockers: <b>{payload[0].payload.blockers}</b>
             { ( payload[0].payload.processedPagesCount && payload[0].payload.pagesCount ) ?
             <div className="block">
-            URLs Scanned: <b>{payload[0].payload.processedPagesCount}</b>/<b>{payload[0].payload.pagesCount}</b>
+            URLs Scanned: {/* <b>{payload[0].payload.processedPagesCount}</b>/ */}<b>{payload[0].payload.pagesCount}</b>
             </div> : null
             }
           </div>
