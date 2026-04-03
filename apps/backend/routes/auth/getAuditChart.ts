@@ -56,7 +56,7 @@ export const getAuditChart = async () => {
 
     const pagesCount = scan.pages.length;
     //const processedPagesCount = scan.processed_pages.length;
-    const errorsCount = scan.erros.length;
+    const errorsCount = scan.errors.length;
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
     scansByDate.set(dateKey, {
