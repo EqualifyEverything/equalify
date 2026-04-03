@@ -22,6 +22,7 @@ export const getAuditChart = async () => {
       created_at
       processed_pages
       pages
+      errors
       blockers_aggregate(where: {_not: {ignored_blocker: {id: {_is_null: false}}}}) {
         aggregate {
           count
@@ -54,7 +55,8 @@ export const getAuditChart = async () => {
     const blockerCount = scan.blockers_aggregate?.aggregate?.count || 0;
 
     const pagesCount = scan.pages.length;
-    const processedPagesCount = scan.processed_pages.length;
+    //const processedPagesCount = scan.processed_pages.length;
+    const errorsCount = scan.erros.length;
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
     scansByDate.set(dateKey, {
@@ -62,7 +64,7 @@ export const getAuditChart = async () => {
       blockers: blockerCount,
       timestamp: scan.created_at,
       pagesCount: Number(pagesCount),
-      processedPagesCount: Number(processedPagesCount)
+      processedPagesCount: Number(pagesCount-errorsCount)
     });
   });
 

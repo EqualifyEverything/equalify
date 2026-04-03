@@ -42,10 +42,10 @@ export const ChartTooltipContent = ({
           <div className="block">{date}</div>
           <div className="block">
             Blockers: <b>{payload[0].payload.blockers}</b>
-            { ( payload[0].payload.processedPagesCount && payload[0].payload.pagesCount ) ??
-            <>
-            URLs Scanned: <b>{payload[0].payload.processedPagesCount}/{payload[0].payload.pagesCount}</b>
-            </>
+            { ( payload[0].payload.processedPagesCount && payload[0].payload.pagesCount ) ?
+            <div className="block">
+            URLs Scanned: <b>{payload[0].payload.processedPagesCount}</b>/<b>{payload[0].payload.pagesCount}</b>
+            </div> : null
             }
           </div>
           {scannedTime && (
