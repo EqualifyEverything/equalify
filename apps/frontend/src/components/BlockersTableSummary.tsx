@@ -126,7 +126,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               {data.urlsWithMostErrors.map((item, index) => {
                 return <DataRow
                   key={index}
-                  the_key={<a href={item.key}>{item.key}</a>}
+                  the_key={<a href={item.key} target="_blank">{item.key}</a>}
                   the_value={item.count.toString()}
                   variant="tight"
                 />
