@@ -136,8 +136,10 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination
+    },
     state: {
-      pagination,
       sorting
     },
     onSortingChange: setSorting,
