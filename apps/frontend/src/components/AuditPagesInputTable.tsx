@@ -17,6 +17,7 @@ interface ChildProps {
   isShared: boolean;
   removePages: (pagesToRemove: Page[]) => void;
   updatePageType: (url: string, type: "html" | "pdf") => void;
+  onSelectionChange?: (selectedPages: Page[]) => void;
 }
 
 interface Page {
@@ -30,6 +31,7 @@ export const AuditPagesInputTable = ({
   removePages,
   isShared,
   updatePageType,
+  onSelectionChange,
 }: ChildProps) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -37,10 +39,24 @@ export const AuditPagesInputTable = ({
   });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-
+  useEffect(() => {
+    if (pages.length > 0) {
+      const allSelected: RowSelectionState = {};
+      pages.forEach((_, index) => {
+        allSelected[index] = true;
+      });
+      setRowSelection(allSelected);
+    }
+  }, [pages]);
 
   useEffect(() => {
-    //console.log(rowSelection);
+    if (onSelectionChange) {
+      const selectedPages = Object.keys(rowSelection)
+        .filter((key) => rowSelection[key])
+        .map((key) => pages[Number(key)])
+        .filter(Boolean);
+      onSelectionChange(selectedPages);
+    }
   }, [rowSelection]);
 
   const columns = useMemo<ColumnDef<Page>[]>(

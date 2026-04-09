@@ -32,6 +32,7 @@ export const AuditCrawlInput: React.FC<ChildProps> = ({
   const [isCrawling, setIsCrawling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [crawlMethod, setCrawlMethod] = useState<string | null>(null);
+  const [discoveredPages, setDiscoveredPages] = useState<Page[]>([]);
 
   const handleCrawl = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -40,6 +41,7 @@ export const AuditCrawlInput: React.FC<ChildProps> = ({
     setIsCrawling(true);
     setError(null);
     setCrawlMethod(null);
+    setDiscoveredPages([]);
     setParentPages([]);
 
     try {
@@ -62,6 +64,7 @@ export const AuditCrawlInput: React.FC<ChildProps> = ({
         type: url.toLowerCase().endsWith(".pdf") ? "pdf" as const : "html" as const,
       }));
 
+      setDiscoveredPages(discoveredPages);
       setParentPages(discoveredPages);
       setAnnounceMessage(
         `Found ${discoveredPages.length} URL(s) via ${result.method}!`,
@@ -106,33 +109,44 @@ export const AuditCrawlInput: React.FC<ChildProps> = ({
             </div>
           </Card>
         )}
-        {crawlMethod && pages.length > 0 && (
+        {crawlMethod && discoveredPages.length > 0 && (
           <Card variant="short-success">
             <MdCheckCircle className="icon-small" />
             <div className="font-small">
               <b>
-                Found {pages.length} URL(s)
+                Found {discoveredPages.length} URL(s)
               </b>{" "}
               via {crawlMethod}.
+              {pages.length < discoveredPages.length && (
+                <> ({pages.length} selected)</>
+              )}
             </div>
           </Card>
         )}
-        {pages.length >= URL_SOFT_LIMIT && (
+        {discoveredPages.length >= URL_SOFT_LIMIT && (
           <Card variant="short-error">
             <TbAlertTriangle className="icon-small" />
             <div className="font-small">
               <b>Large audit:</b> This site has{" "}
-              {pages.length.toLocaleString()} URLs. Large audits take
+              {discoveredPages.length.toLocaleString()} URLs. Large audits take
               significantly longer to scan.
             </div>
           </Card>
         )}
-        {pages.length > 0 && (
+        {discoveredPages.length > 0 && (
           <AuditPagesInputTable
-            pages={pages}
+            pages={discoveredPages}
             removePages={() => {}}
-            isShared={true}
-            updatePageType={() => {}}
+            isShared={false}
+            updatePageType={(url, type) => {
+              const updated = discoveredPages.map((p) =>
+                p.url === url ? { ...p, type } : p
+              );
+              setDiscoveredPages(updated);
+            }}
+            onSelectionChange={(selectedPages) => {
+              setParentPages(selectedPages);
+            }}
           />
         )}
       </Card>
