@@ -151,101 +151,175 @@ export const scanWebhook = async () => {
     // await db.clean();
     // return;
 
-    // Process blockers with error handling
+    // Pre-compute all blocker data (CPU-only, no DB calls)
     let processedBlockers = 0;
     let blockerErrors = 0;
+
+    const prepared = [];
+    const allTags = new Map();       // tagId -> tag content (deduped)
+    const allMessages = new Map();   // messageId -> { content, category } (deduped)
 
     for (const blocker of blockers) {
         try {
             const contentNormalized = normalizeHtmlWithVdom(blocker.node);
             const contentHashId = hashStringToUuid(contentNormalized);
 
-            // if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
-            //     continue;
-            // }
+            const tagIds = blocker.tags.map((tag: string) => {
+                const tagId = hashStringToUuid(tag);
+                allTags.set(tagId, tag);
+                return tagId;
+            });
 
-            // Insert blocker with short_id collision retry
-            let blockerId: string;
+            const messageId = hashStringToUuid(blocker.description + blocker.test);
+            allMessages.set(messageId, { content: blocker.description, category: blocker.test || 'unknown' });
+
+            prepared.push({
+                node: blocker.node,
+                contentNormalized,
+                contentHashId,
+                shortId: generateShortId(),
+                tagIds,
+                messageId,
+                isIgnored: ignoredBlockerHashes.includes(contentHashId.replaceAll('-', '')),
+            });
+        } catch (prepError: any) {
+            blockerErrors++;
+            console.error(`Error pre-processing blocker:`, prepError);
+            await logScanError('blocker_processing_error', prepError?.message || 'Failed to pre-process blocker', {
+                blockerTest: blocker.test,
+                blockerDescription: blocker.description?.substring(0, 100)
+            });
+        }
+    }
+
+    // Bulk insert all blocker data (~6 queries instead of ~1300)
+    if (prepared.length > 0) {
+        try {
+            // 1. Bulk insert blockers with short_id collision retry
+            let blockerIds: string[];
             let insertAttempts = 0;
-            const MAX_SHORT_ID_ATTEMPTS = 3;
             while (true) {
                 try {
-                    const shortId = generateShortId();
-                    blockerId = (await db.query({
-                        text: `
-                            INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id")
-                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                            RETURNING "id"
-                        `,
-                        values: [auditId, JSON.stringify([]), blocker.node, contentNormalized, contentHashId, shortId, urlId, effectiveScanId],
-                    })).rows[0].id;
-                    break;
-                } catch (insertError) {
-                    insertAttempts++;
-                    if (insertError?.message?.includes('blockers_short_id') && insertAttempts < MAX_SHORT_ID_ATTEMPTS) {
-                        continue; // Retry with a new short_id
+                    const vals = [];
+                    const params = [];
+                    let p = 1;
+                    for (const bd of prepared) {
+                        vals.push(`($${p}, $${p+1}, $${p+2}, $${p+3}, $${p+4}, $${p+5}, $${p+6}, $${p+7})`);
+                        params.push(auditId, JSON.stringify([]), bd.node, bd.contentNormalized, bd.contentHashId, bd.shortId, urlId, effectiveScanId);
+                        p += 8;
                     }
-                    throw insertError; // Re-throw non-collision errors or if retries exhausted
+                    const result = await db.query({
+                        text: `INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id") VALUES ${vals.join(', ')} RETURNING "id"`,
+                        values: params,
+                    });
+                    blockerIds = result.rows.map((r: any) => r.id);
+                    break;
+                } catch (err) {
+                    insertAttempts++;
+                    if ((err as any)?.message?.includes('blockers_short_id') && insertAttempts < 3) {
+                        for (const bd of prepared) bd.shortId = generateShortId();
+                        continue;
+                    }
+                    throw err;
                 }
             }
 
-            if (ignoredBlockerHashes.includes(contentHashId.replaceAll('-', ''))) {
+            // 2. Bulk insert ignored_blockers
+            const ignoredEntries = prepared
+                .map((bd, i) => ({ blockerId: blockerIds[i], isIgnored: bd.isIgnored }))
+                .filter(e => e.isIgnored);
+            if (ignoredEntries.length > 0) {
+                const vals = [];
+                const params = [];
+                let p = 1;
+                for (const entry of ignoredEntries) {
+                    vals.push(`($${p}, $${p+1})`);
+                    params.push(auditId, entry.blockerId);
+                    p += 2;
+                }
                 await db.query({
-                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id") VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-                    values: [auditId, blockerId],
-                })
-            }
-
-            const tagIds = [];
-            for (const tag of blocker.tags) {
-                const tagId = hashStringToUuid(tag);
-                tagIds.push(tagId);
-                await db.query({
-                    text: `INSERT INTO "tags" ("id", "content") VALUES ($1, $2) ON CONFLICT ("id") DO NOTHING`,
-                    values: [tagId, tag],
+                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id") VALUES ${vals.join(', ')} ON CONFLICT DO NOTHING`,
+                    values: params,
                 });
             }
 
-            // Insert or get blocker type based on description
-            const blockerTypeId = hashStringToUuid(blocker.description + blocker.test);
-            await db.query({
-                text: `
-                        INSERT INTO "messages" ("id", "content", "category") 
-                        VALUES ($1, $2, $3) 
-                        ON CONFLICT ("id") DO NOTHING
-                    `,
-                values: [blockerTypeId, blocker.description, blocker.test || 'unknown'],
-            });
-
-            // Link blocker type tags
-            for (const tagId of tagIds) {
+            // 3. Bulk insert tags (deduped across all blockers)
+            if (allTags.size > 0) {
+                const vals = [];
+                const params = [];
+                let p = 1;
+                for (const [id, content] of allTags) {
+                    vals.push(`($${p}, $${p+1})`);
+                    params.push(id, content);
+                    p += 2;
+                }
                 await db.query({
-                    text: `
-                        INSERT INTO "message_tags" ("message_id", "tag_id") 
-                        VALUES ($1, $2)
-                        ON CONFLICT ("message_id", "tag_id") DO NOTHING
-                    `,
-                    values: [blockerTypeId, tagId],
+                    text: `INSERT INTO "tags" ("id", "content") VALUES ${vals.join(', ')} ON CONFLICT ("id") DO NOTHING`,
+                    values: params,
                 });
             }
 
-            // Link blocker type to blocker
-            await db.query({
-                text: `
-                    INSERT INTO "blocker_messages" ("message_id", "blocker_id") 
-                    VALUES ($1, $2)
-                    ON CONFLICT ("message_id", "blocker_id") DO NOTHING
-                `,
-                values: [blockerTypeId, blockerId],
-            });
+            // 4. Bulk insert messages (deduped across all blockers)
+            if (allMessages.size > 0) {
+                const vals = [];
+                const params = [];
+                let p = 1;
+                for (const [id, msg] of allMessages) {
+                    vals.push(`($${p}, $${p+1}, $${p+2})`);
+                    params.push(id, msg.content, msg.category);
+                    p += 3;
+                }
+                await db.query({
+                    text: `INSERT INTO "messages" ("id", "content", "category") VALUES ${vals.join(', ')} ON CONFLICT ("id") DO NOTHING`,
+                    values: params,
+                });
+            }
 
-            processedBlockers++;
-        } catch (blockerError) {
-            blockerErrors++;
-            console.error(`Error processing blocker:`, blockerError);
-            await logScanError('blocker_processing_error', blockerError?.message || 'Failed to process blocker', {
-                blockerTest: blocker.test,
-                blockerDescription: blocker.description?.substring(0, 100)
+            // 5. Bulk insert message_tags (deduped)
+            const mtPairs = new Set();
+            const mtVals = [];
+            const mtParams = [];
+            let mtp = 1;
+            for (const bd of prepared) {
+                for (const tagId of bd.tagIds) {
+                    const key = `${bd.messageId}:${tagId}`;
+                    if (!mtPairs.has(key)) {
+                        mtPairs.add(key);
+                        mtVals.push(`($${mtp}, $${mtp+1})`);
+                        mtParams.push(bd.messageId, tagId);
+                        mtp += 2;
+                    }
+                }
+            }
+            if (mtVals.length > 0) {
+                await db.query({
+                    text: `INSERT INTO "message_tags" ("message_id", "tag_id") VALUES ${mtVals.join(', ')} ON CONFLICT ("message_id", "tag_id") DO NOTHING`,
+                    values: mtParams,
+                });
+            }
+
+            // 6. Bulk insert blocker_messages
+            {
+                const vals = [];
+                const params = [];
+                let p = 1;
+                for (let i = 0; i < prepared.length; i++) {
+                    vals.push(`($${p}, $${p+1})`);
+                    params.push(prepared[i].messageId, blockerIds[i]);
+                    p += 2;
+                }
+                await db.query({
+                    text: `INSERT INTO "blocker_messages" ("message_id", "blocker_id") VALUES ${vals.join(', ')} ON CONFLICT ("message_id", "blocker_id") DO NOTHING`,
+                    values: params,
+                });
+            }
+
+            processedBlockers = blockerIds.length;
+        } catch (bulkError: any) {
+            blockerErrors = prepared.length;
+            console.error(`Error in bulk blocker insert:`, bulkError);
+            await logScanError('blocker_processing_error', bulkError?.message || 'Failed to bulk insert blockers', {
+                blockerCount: prepared.length,
             });
         }
     }
