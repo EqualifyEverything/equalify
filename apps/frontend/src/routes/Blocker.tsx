@@ -48,8 +48,8 @@ export const Blocker = () => {
   //const navigate = useNavigate();
   //const location = useLocation();
 
-  const { data: blocker, isLoading } = useQuery({
-    queryKey: ["blocker"],
+  const { data: blocker, isLoading, isPending, isFetching } = useQuery({
+    queryKey: ["blocker-"+auditId+"-"+blockerId],
     queryFn: async () => {
       if (!blockerId || !auditId) throw new Error("Blocker or Audit ID not found!");
       console.log(blockerId);
@@ -98,7 +98,7 @@ export const Blocker = () => {
   return (
     <div className={styles["Blocker"]}>
       <Card variant="light" className={styles["Card"]}>
-        {isLoading ??
+        {((isLoading || isPending || isFetching) || !blocker ) ?
           <>
             <Skeleton width={"100%"} height={30} />
             <SkeletonDataRow />
@@ -107,7 +107,7 @@ export const Blocker = () => {
             <SkeletonDataRow />
             <SkeletonDataRow />
           </>
-        }
+        :null}
         {blocker ? (
           <>
             <h1>Blocker: {blocker.short_id}</h1>
@@ -151,9 +151,10 @@ export const Blocker = () => {
 
             } />
           </>
-        ) : (
+        ):(null)}
+        { (!blocker && !isLoading && !isPending) ? (
           <>Error: Blocker {blockerId} not found.</>
-        )}
+        ):(null)}
       </Card >
     </div>
   );
