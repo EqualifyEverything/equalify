@@ -232,29 +232,30 @@ export const BuildAudit = () => {
 
         <Card variant="light" className={styles["pages-input-card"]}>
           <h2><FaListUl className="icon-small" /> Add URLs to Your Audit</h2>
-          <Tabs.Root className="TabsRoot" defaultValue="url" onValueChange={() => { setRemoteCsvUrl(""); setPages([]); }}>
+          <Tabs.Root className="TabsRoot" defaultValue="remote-csv" onValueChange={() => { setRemoteCsvUrl(""); setPages([]); }}>
             <Tabs.List className={styles["pages-input-list"]} aria-label="Add URLs to Scan">
-              <Tabs.Trigger value="url" asChild>
-                <StyledButton
-                  variant="tab-card-button"
-                  label="Add Manually"
-                  icon={<FaFileCirclePlus />}
-                  onClick={() => { }}
-                />
-              </Tabs.Trigger>
               <Tabs.Trigger value="remote-csv" asChild>
                 <StyledButton
                   variant="tab-card-button"
-                  label="Use Remote CSV"
+                  label="Wordpress Integration"
                   icon={<FaCloudArrowDown />}
                   onClick={() => { }}
                 />
               </Tabs.Trigger>
+              
               <Tabs.Trigger value="crawl" asChild>
                 <StyledButton
                   variant="tab-card-button"
                   label="Crawl Site"
                   icon={<FaSpider />}
+                  onClick={() => { }}
+                />
+              </Tabs.Trigger>
+              <Tabs.Trigger value="url" asChild>
+                <StyledButton
+                  variant="tab-card-button"
+                  label="Add Manually"
+                  icon={<FaFileCirclePlus />}
                   onClick={() => { }}
                 />
               </Tabs.Trigger>
