@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../queries";
 import * as API from "aws-amplify/api";
 import {
@@ -16,7 +16,7 @@ import { Card } from "#src/components/Card.tsx";
 import { CgOptions } from "react-icons/cg";
 import { TbAlertTriangle, TbMail } from "react-icons/tb";
 import { StyledButton } from "#src/components/StyledButton.tsx";
-import { LuClipboardCheck, LuClipboardPaste, LuImport } from "react-icons/lu";
+import { LuClipboardCheck, LuClipboardPaste } from "react-icons/lu";
 import styles from "./BuildAudit.module.scss";
 //import * as Switch from "@radix-ui/react-switch";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -36,6 +36,7 @@ const AUDIT_SOFT_LIMIT = 10_000;
 export const BuildAudit = () => {
   const navigate = useNavigate();
   const { setAnnounceMessage } = useGlobalStore();
+  const queryClient = useQueryClient();
   const { data: user } = useUser();
 
   const [emailNotifications, setEmailNotifications] = useState(false);
@@ -122,6 +123,7 @@ export const BuildAudit = () => {
       await createLog(`Audit created and audit run started!`, response.id);
       navigate(`/audits/${response?.id}`);
     } finally {
+      queryClient.invalidateQueries({ queryKey: ["audits"]});
       setIsSavingAndRunning(false);
     }
   };
@@ -151,6 +153,7 @@ export const BuildAudit = () => {
       await createLog(`Audit created!`, response.id);
       navigate(`/audits/${response?.id}`);
     } finally {
+      queryClient.invalidateQueries({ queryKey: ["audits"]});
       setIsSaving(false);
     }
   };
