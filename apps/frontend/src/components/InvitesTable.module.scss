@@ -10,4 +10,11 @@
     display:table !important;
     min-height: auto !important;
   }
+  th:last-child,
+  td:last-child {
+    text-align: right;
+    button {
+      float:right;
+    }
+  }
 }

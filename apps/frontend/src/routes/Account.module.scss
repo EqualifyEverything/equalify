@@ -4,3 +4,29 @@
 .Account{
     margin-bottom: variables.$spacing*4;
 }
+
+.adminTabs {
+    margin-top: variables.$spacing * 2;
+}
+
+.tabList {
+    display: flex;
+    gap: variables.$spacing;
+    border-bottom: 1px solid variables.$paper-dark;
+    margin-bottom: variables.$spacing * 2;
+}
+
+.tabTrigger {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: variables.$spacing calc(variables.$spacing * 1.5);
+    cursor: pointer;
+    color: variables.$black;
+    margin-bottom: -1px;
+
+    &[aria-selected="true"] {
+        @include fonts.raleway-bold;
+        border-bottom-color: variables.$black;
+    }
+}
