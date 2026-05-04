@@ -8,6 +8,7 @@ import { DataRow } from "#src/components/DataRow.tsx";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 //import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Skeleton, SkeletonDataRow } from "../components";
 
 const apiClient = API.generateClient();
 
@@ -35,25 +36,29 @@ interface theBlocker {
   audit_id: string;
   ignored_blocker: null | Object;
   content: string;
-  audits : {
-      name: string;
-      id: string;
+  audits: {
+    name: string;
+    id: string;
   }
 }
 
 export const Blocker = () => {
-  const { blockerId } = useParams();
+  const { blockerId, auditId } = useParams();
   //const queryClient = useQueryClient();
   //const navigate = useNavigate();
-  const location = useLocation();
+  //const location = useLocation();
 
-  const { data: blocker } = useQuery({
-    queryKey: ["blocker"],
+  const { data: blocker, isLoading, isPending, isFetching } = useQuery({
+    queryKey: ["blocker-"+auditId+"-"+blockerId],
     queryFn: async () => {
+      if (!blockerId || !auditId) throw new Error("Blocker or Audit ID not found!");
+      console.log(blockerId);
+      console.log(auditId);
+
       const response = await apiClient.graphql({
-        query: `query($blocker_id: String) 
+        query: `query($blocker_id: String!, $audit_id: uuid!) 
         {
-        blockers(where: {short_id: {_eq: $blocker_id}}) {
+        blockers(where: {short_id: {_eq: $blocker_id}, _and: {audit_id: {_eq: $audit_id}}}) {
             id
             url {
                 url
@@ -82,22 +87,32 @@ export const Blocker = () => {
         }
       }
       `,
-        variables: { blocker_id: blockerId },
+        variables: { blocker_id: blockerId, audit_id: auditId },
       });
       const data = response as any;
+      console.log(response);
       return data.data.blockers[0] as theBlocker;
     },
   });
-  //console.log(blocker);
 
   return (
     <div className={styles["Blocker"]}>
       <Card variant="light" className={styles["Card"]}>
+        {((isLoading || isPending || isFetching) || !blocker ) ?
+          <>
+            <Skeleton width={"100%"} height={30} />
+            <SkeletonDataRow />
+            <SkeletonDataRow />
+            <SkeletonDataRow />
+            <SkeletonDataRow />
+            <SkeletonDataRow />
+          </>
+        :null}
         {blocker ? (
           <>
             <h1>Blocker: {blocker.short_id}</h1>
             <DataRow the_key={"Appears on:"} the_value={<a href={blocker?.url.url}>{blocker?.url.url}</a>} />
-            <DataRow the_key={"Audit:"} the_value={<Link to={"/shared/"+blocker?.audits.id}>{blocker?.audits.name}</Link>} />
+            <DataRow the_key={"Audit:"} the_value={<Link to={"/shared/" + blocker?.audits.id}>{blocker?.audits.name}</Link>} />
 
             {blocker?.blocker_messages.map((messages, index) => {
               return <div key={index}>
@@ -136,9 +151,10 @@ export const Blocker = () => {
 
             } />
           </>
-        ) : (
+        ):(null)}
+        { (!blocker && !isLoading && !isPending) ? (
           <>Error: Blocker {blockerId} not found.</>
-        )}
+        ):(null)}
       </Card >
     </div>
   );

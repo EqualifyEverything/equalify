@@ -41,7 +41,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
-      "auditSummary"
+      "auditSummary", auditId
     ],
     queryFn: async () => {
       const params: Record<string, string> = {

@@ -348,13 +348,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         cell: ({ getValue, row }) => {
           const messages = getValue() as string[];
           const shortId = row.original.short_id;
+          const auditIdNoDash = auditId.replace(/-/g,"");
           return (
             <>
               <div className="text-sm max-w-sm">
                 {messages[0] || "No message"}
               </div>
               <div style={{ display: "inline-flex" }}>
-                <Link to={"/shared/blockers/" + shortId}>{shortId}</Link>
+                <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
                 <StyledButton
                   onClick={() => copyToClipboard(shortId)}
                   icon={<FaClipboard className="icon-small" />}

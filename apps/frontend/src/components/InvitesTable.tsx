@@ -1,4 +1,4 @@
-import styles from "./InvitesTable.module.css";
+import styles from "./InvitesTable.module.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,

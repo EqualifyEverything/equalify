@@ -1,0 +1,81 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.CoBrandingInput {
+  input:not(.sizeInput) {
+    width: 100%;
+  }
+  label {
+    margin-top:calc(variables.$spacing);
+  }
+}
+
+.urlInputRow {
+  display: flex;
+  align-items: center;
+  gap: variables.$spacing;
+  width: 100%;
+}
+
+hr {
+    height: 0px;
+    border: 0;
+    border-bottom: 1px solid variables.$gray;
+}
+
+.urlError {
+    font-size: 0.8rem;
+    color: variables.$red;
+}
+
+.sliderRow {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing;
+    width: 100%;
+}
+
+.sizeInput {
+    width: 64px;
+    flex-shrink: 0;
+}
+
+.sliderRoot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    height: 20px;
+    cursor: pointer;
+}
+
+.sliderTrack {
+    position: relative;
+    flex-grow: 1;
+    height: 4px;
+    background-color: variables.$gray;
+    border-radius: 9999px;
+}
+
+.sliderRange {
+    position: absolute;
+    height: 100%;
+    background-color: variables.$green;
+    border-radius: 9999px;
+}
+
+.sliderThumb {
+    display: block;
+    width: 18px;
+    height: 18px;
+    background-color: variables.$black;
+    border-radius: 9999px;
+    border: 2px solid variables.$white;
+    box-shadow: variables.$shadow-small;
+
+    &:focus-visible {
+        outline: 2px solid variables.$yellow;
+        outline-offset: 2px;
+    }
+}

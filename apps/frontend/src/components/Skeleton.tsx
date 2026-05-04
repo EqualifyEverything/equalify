@@ -147,8 +147,8 @@ export const SkeletonTable = ({
  */
 export const SkeletonAccount = () => (
   <div style={{ marginBottom: '1rem' }} aria-hidden="true">
-    <p><strong>Name:</strong> <Skeleton width={150} height="1em" style={{ display: "inline-block", verticalAlign: "middle" }} /></p>
-    <p><strong>Email:</strong> <Skeleton width={200} height="1em" style={{ display: "inline-block", verticalAlign: "middle" }} /></p>
+    <div><strong>Name:</strong> <Skeleton width={150} height="1em" style={{ display: "inline-block", verticalAlign: "middle" }} /></div>
+    <div><strong>Email:</strong> <Skeleton width={200} height="1em" style={{ display: "inline-block", verticalAlign: "middle" }} /></div>
   </div>
 );
 

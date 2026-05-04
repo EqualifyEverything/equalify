@@ -470,6 +470,24 @@ CREATE TABLE public.scans (
 
 
 --
+-- Name: options; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.options (
+    key text NOT NULL,
+    value text
+);
+
+
+--
+-- Name: options options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.options
+    ADD CONSTRAINT options_pkey PRIMARY KEY (key);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
