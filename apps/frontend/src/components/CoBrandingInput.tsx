@@ -5,8 +5,10 @@ import * as Slider from "@radix-ui/react-slider";
 import * as API from "aws-amplify/api";
 import { useGlobalStore } from "../utils";
 import { StyledLabeledInput } from "./StyledLabeledInput";
+import { StyledButton } from "./StyledButton";
 import style from "./CoBrandingInput.module.scss";
 import * as  Label from "@radix-ui/react-label";
+import { MdClose } from "react-icons/md";
 
 const apiClient = API.generateClient();
 
@@ -126,16 +128,30 @@ export const CoBrandingInput = () => {
             <hr/>
             <StyledLabeledInput>
                 <label htmlFor="cobranding-logo-url">Logo URL</label>
-                <input
-                    id="cobranding-logo-url"
-                    type="url"
-                    placeholder="https://example.com/logo.png"
-                    value={logoUrl}
-                    onChange={(e) => handleUrlChange(e.target.value)}
-                    onBlur={handleUrlBlur}
-                    aria-describedby={urlError ? "cobranding-logo-url-error" : undefined}
-                    aria-invalid={!!urlError}
-                />
+                <div className={style.urlInputRow}>
+                    <input
+                        id="cobranding-logo-url"
+                        type="url"
+                        placeholder="https://example.com/logo.png"
+                        value={logoUrl}
+                        onChange={(e) => handleUrlChange(e.target.value)}
+                        onBlur={handleUrlBlur}
+                        aria-describedby={urlError ? "cobranding-logo-url-error" : undefined}
+                        aria-invalid={!!urlError}
+                    />
+                    {logoUrl && (
+                        <StyledButton
+                            variant="naked"
+                            icon={<MdClose />}
+                            label="Clear URL"
+                            showLabel={false}
+                            onClick={() => {
+                                setLogoUrl("");
+                                debouncedSave("", logoSize, logoAltText);
+                            }}
+                        />
+                    )}
+                </div>
                 {urlError && (
                     <span id="cobranding-logo-url-error" className={style.urlError}>
                         {urlError}

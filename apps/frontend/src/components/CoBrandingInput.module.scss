@@ -10,6 +10,13 @@
   }
 }
 
+.urlInputRow {
+  display: flex;
+  align-items: center;
+  gap: variables.$spacing;
+  width: 100%;
+}
+
 hr {
     height: 0px;
     border: 0;

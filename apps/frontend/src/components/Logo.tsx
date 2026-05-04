@@ -1,25 +1,32 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import * as API from "aws-amplify/api";
 import styles from "./Logo.module.scss";
 
-const apiClient = API.generateClient();
+const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL + "/v1/graphql";
+
+const fetchCobranding = async () => {
+  const res = await fetch(GRAPHQL_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `query {
+        options(where: { key: { _in: ["cobranding_logo_url", "cobranding_logo_alt_text", "cobranding_logo_size"] } }) {
+          key
+          value
+        }
+      }`,
+    }),
+  });
+  const json = await res.json();
+  const rows: { key: string; value: string }[] = json?.data?.options ?? [];
+  return Object.fromEntries(rows.map(({ key, value }) => [key, value]));
+};
 
 export const Logo = () => {
   const { data } = useQuery({
     queryKey: ["cobranding"],
-    queryFn: async () => {
-      const response = await apiClient.graphql({
-        query: `query {
-          options(where: { key: { _in: ["cobranding_logo_url", "cobranding_logo_alt_text", "cobranding_logo_size"] } }) {
-            key
-            value
-          }
-        }`,
-      });
-      const rows: { key: string; value: string }[] = (response as any)?.data?.options ?? [];
-      return Object.fromEntries(rows.map(({ key, value }) => [key, value]));
-    },
+    queryFn: fetchCobranding,
+    staleTime: 5 * 60 * 1000,
   });
 
   const cobrandUrl = data?.cobranding_logo_url;
