@@ -17,6 +17,7 @@ import { StyledLabeledInput } from "./StyledLabeledInput";
 import { formatId } from "../utils";
 import { Link } from "react-router-dom";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
 
 interface Audit {
@@ -57,6 +58,22 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
   }
   const columns = useMemo<ColumnDef<Audit>[]>(
     () => [
+      {
+        accessorFn: (row) => row.scans[0]?.status,
+        id: "status",
+        header: "Status",
+        cell: ({ getValue }) => {
+          const status = getValue() as string | undefined;
+          if (status === "processing") {
+            return (
+              <span role="img" aria-label="Processing">
+                <GrPowerCycle className={styles.spinning} />
+              </span>
+            );
+          }
+          return null;
+        },
+      },
       {
         accessorKey: "name",
         header: "Name",

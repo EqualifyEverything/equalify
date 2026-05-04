@@ -4,6 +4,7 @@ import * as API from "aws-amplify/api";
 import { Link, useNavigate } from "react-router-dom";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import { LuClipboard, LuClipboardPlus, LuZap } from "react-icons/lu";
+import { GrPowerCycle } from "react-icons/gr";
 import { Card } from "#src/components/Card.tsx";
 const apiClient = API.generateClient();
 import styles from "./Audits.module.scss";
@@ -25,6 +26,7 @@ export interface Scan {
   };
   percentage: number;
   updated_at: string;
+  status: string;
 }
 /* 
 export interface Audit {
@@ -73,6 +75,7 @@ export const Audits = () => {
                           count
                         }
                     }
+                    status
                     percentage
                     updated_at
                   }
@@ -182,6 +185,11 @@ export const Audits = () => {
                       <h2>
                         <LuClipboard className="icon-small" />
                         {row.name}
+                        {row.scans[0]?.status === "processing" && (
+                          <span role="img" aria-label="Processing" className={styles["processing-icon"]}>
+                            <GrPowerCycle className={`icon-small ${styles.spinning}`} />
+                          </span>
+                        )}
                       </h2>
                     </Link>
                     <div className={styles["dataRow-list"]}>
