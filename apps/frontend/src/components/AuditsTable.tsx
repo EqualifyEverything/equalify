@@ -59,12 +59,12 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
   const columns = useMemo<ColumnDef<Audit>[]>(
     () => [
       {
-        accessorFn: (row) => row.scans[0]?.status,
+        accessorFn: (row) => (row.scans[0]?.status === "processing" ? 1 : 0),
         id: "status",
         header: "Status",
-        cell: ({ getValue }) => {
-          const status = getValue() as string | undefined;
-          if (status === "processing") {
+        sortingFn: "basic",
+        cell: ({ row }) => {
+          if (row.original.scans[0]?.status === "processing") {
             return (
               <span role="img" aria-label="Processing">
                 <GrPowerCycle className={styles.spinning} />
