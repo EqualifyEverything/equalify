@@ -5,7 +5,20 @@
   .table-top-buttons {
     display: flex;
     gap: 8px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .total-blockers {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  .total-blockers-count {
+    font-size: 1.25rem;
+  }
+  .table-top-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
   .blocker-code {
     //color: variables.$white;
