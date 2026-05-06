@@ -11,22 +11,69 @@ import {
 
 // Inferred Interfaces from results
 interface CheckDetail {
+  // Whether this individual check instance passed or failed — lowercase in actual output
+  // e.g. "failed", "passed", "warning"
   status: string;
+  
+  // XPath-like path to the PDF object that triggered this check
+  // e.g. "root/document[0]/pages[0]/page[0]/annots[0]/annot[0]"
   context: string;
+  
+  // Human-readable error message, with errorArguments substituted in
   errorMessage: string;
-  errorArguments: string[];
+  
+  // Arguments substituted into the error message template; entries may be null
+  errorArguments: (string | null)[];
+  
+  // Present in some veraPDF versions — secondary location info
+  location?: {
+    level: string;
+    context: string;
+  };
 }
 
 interface RuleSummary {
-  ruleStatus: "FAILED" | "PASSED" | "WARNING";
-  specification: string; // Maps to Blocker.source
-  tags?: string[] | null; // Maps to Blocker.tags
-  description: string; // Maps to Blocker.description
+  // Lowercase status matching CheckDetail — e.g. "failed", "passed"
+  status: string;
+
+  // Uppercase aggregate status for the rule as a whole - "FAILED" | "PASSED" | "WARNING";
+  ruleStatus: string;
+  
+  // The standards body document — e.g. "ISO 14289-2:2024", "WCAG 2.1"
+  specification: string;
+  
+  // Section/clause within the specification — e.g. "7.1", "Table 1", "Annex A"
+  clause: string;
+  
+  // Test number within the clause — e.g. 1, 2
+  testNumber: number;
+  
+  // Human-readable description of what the rule checks
+  description: string;
+  
+  // The PDF object type this rule operates on
+  // e.g. "PDDocument", "PDPage", "PDAnnot", "CosStream", "PDStructElem"
+  object: string;
+  
+  // The actual validation test expression evaluated against the object
+  // e.g. "hasTag" or a boolean XPath expression — often highly technical
+  test: string;
+  
+  // Classification tags — e.g. ["PDF/UA-2"], ["WCAG21", "PDF/UA-2"]
+  tags?: string[] | null;
+  
+  // Absent (not 0) when recordPasses=false and no passes were recorded
+  passedChecks?: number;
+  failedChecks: number;
+  
+  // Individual check instances — only present for FAILED rules when recordPasses=false
   checks?: CheckDetail[];
 }
 
 interface ValidationResult {
   details: {
+    // Aggregate of all tags across all rule summaries in this validation result
+    tags: string[];
     ruleSummaries: RuleSummary[];
   };
 }
@@ -48,9 +95,9 @@ function convertVeraToEqualifyV2(reportData: ReportData, job: any): StreamResult
     try {
       // Ensure the path to jobs exists before proceeding
       if (!reportData?.report?.jobs) {
-        console.warn(
+        /* console.warn(
           "Input JSON structure error!"
-        );
+        ); */
         throw new Error;
       }
 
@@ -77,7 +124,7 @@ function convertVeraToEqualifyV2(reportData: ReportData, job: any): StreamResult
                 description: ruleSummary.description,
 
                 // Fields specific to the individual CheckDetail instance
-                test: ruleSummary.specification,
+                test: ruleSummary.specification + " - " + ruleSummary.clause, // This ultimately maps to category
                 summary: check.errorMessage,
                 node: check.context,
               };
