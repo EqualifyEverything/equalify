@@ -62,6 +62,13 @@ export const getAuditTable = async () => {
     });
   }
 
+  // Content type filtering (html/pdf)
+  if (contentType.toLowerCase() === "html" || contentType.toLowerCase() === "pdf") {
+    whereConditions.push({
+      url: { type: { _eq: contentType.toLowerCase() } },
+    });
+  }
+
   // Status filtering ('ignore' field true/false)
   if (statusParam) {
     if (statusParam === "active") {
@@ -302,16 +309,6 @@ export const getAuditTable = async () => {
       categories: uniqueCategories,
     };
   });
-
-  // filter for content type. We need to do it last because the type field is set by URL, not blocker
-  if (
-    contentType.toLowerCase() === "html" ||
-    contentType.toLowerCase() === "pdf"
-  ) {
-    formattedBlockers = formattedBlockers.filter((blocker) => {
-      return blocker.type.toLowerCase() === contentType.toLowerCase();
-    });
-  }
 
   return {
     statusCode: 200,
