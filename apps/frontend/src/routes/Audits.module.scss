@@ -1,12 +1,37 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.processing-icon {
+  display: flex;
+  margin-left: auto;
+
+  svg {
+    color: variables.$green;
+  }
+}
+
 .Audits {
   h2 {
     margin-bottom: calc(variables.$spacing);
     line-height: 1.1em;
     svg {
       color: variables.$black;
+    }
+    .processing-icon svg {
+      color: variables.$green;
+      min-width: 17px;
+      min-height: 17px;
+      width: 17px;
+      height: 17px;
     }
   }
 

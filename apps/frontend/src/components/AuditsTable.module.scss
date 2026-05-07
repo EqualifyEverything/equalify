@@ -1,6 +1,16 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+  color: variables.$green;
+}
+
 .AuditsTable {
   margin-top:variables.$spacing;
   margin-bottom:calc(variables.$spacing*2);

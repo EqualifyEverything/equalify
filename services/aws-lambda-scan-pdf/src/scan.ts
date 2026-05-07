@@ -30,7 +30,7 @@ export default async function (job: SqsScanJob) {
     const response: InvokeCommandOutput = await lambdaClient.send(command);
 
     const resultPayload = response.Payload ? JSON.parse(new TextDecoder().decode(response.Payload)) : null;
-    logger.info("Results from veraPDF-interface:", resultPayload);
+    //logger.info("Results from veraPDF-interface:", resultPayload);
     veraPdfReport = resultPayload;
     
   } catch (error) {

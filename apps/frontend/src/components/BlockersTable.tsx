@@ -648,40 +648,64 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
+  const exportMutation = useMutation({
+    mutationFn: async () => {
+      const params: Record<string, string> = {
+        id: auditId,
+        contentType: selectedContentType,
+        sortBy,
+        sortOrder,
+      };
+      if (selectedTags.length > 0) {
+        params.tags = selectedTags.map((tag) => tag.value).join(",");
+      }
+      if (selectedCategories.length > 0) {
+        params.categories = selectedCategories.map((tag) => tag.value).join(",");
+      }
+      if (selectedStatus) {
+        params.status = selectedStatus;
+      }
+      if (searchString.length >= 3 || searchString === "") {
+        params.searchString = searchString;
+      }
+
+      const response = await API.get({
+        apiName: isShared ? "public" : "auth",
+        path: "/exportAuditTable",
+        options: { queryParams: params },
+      }).response;
+      const csv = await response.body.text();
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
+    onSuccess: () => {
+      setAnnounceMessage("Exported all blockers to CSV", "success");
+    },
+    onError: (err) => {
+      console.error(err);
+      setAnnounceMessage("Failed to export blockers", "error");
+    },
+  });
+
   const exportToCsv = () => {
-    if (!data?.blockers || data.blockers.length === 0) {
+    if (exportMutation.isPending) return;
+    if (!data?.pagination?.totalCount) {
       setAnnounceMessage("No blockers to export", "error");
       return;
     }
-
-    const headers = ["Type", "URL", "Issue", "Code", "Tags", "Categories", "Status", "ID"];
-
-    const csvRows = data.blockers.map((blocker: Blocker) => {
-      const isIgnored = ignoredBlockers?.has(blocker.id) || false;
-      return [
-        blocker.type || "",
-        blocker.url || "",
-        (blocker.messages?.[0] || "").replace(/"/g, '""'),
-        (blocker.content || "").replace(/"/g, '""'),
-        blocker.tags?.map((t) => t.content).join("; ") || "",
-        Array.isArray(blocker.categories) ? blocker.categories.join("; ") : blocker.categories || "",
-        isIgnored ? "Ignored" : "Active",
-        blocker.short_id || "",
-      ].map((field) => `"${field}"`).join(",");
-    });
-
-    const csvContent = [headers.join(","), ...csvRows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    setAnnounceMessage(`Exported ${data.blockers.length} blockers to CSV`, "success");
+    exportMutation.mutate();
   };
 
   return (
@@ -690,19 +714,33 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       <div>
 
         <div className={style["table-top-buttons"]}>
-          {/* ColumnToggle */}
-          <BlockersTableColumnToggle
-            table={table}
-          />
-          {/* CSV Export Button */}
-          <StyledButton
-            onClick={exportToCsv}
-            icon={<FaDownload className="icon-small" />}
-            label="CSV"
-            variant="naked"
-            showLabel={false}
-            disabled={!data?.blockers || data.blockers.length === 0}
-          />
+          <div className={style["total-blockers"]} aria-live="polite">
+            <span className={style["total-blockers-count"]}>
+              {data?.pagination?.totalCount?.toLocaleString() ?? "—"}
+            </span>{" "}
+            {data?.pagination?.totalCount === 1 ? "Blocker" : "Blockers"}
+          </div>
+          <div className={style["table-top-actions"]}>
+            {/* ColumnToggle */}
+            <BlockersTableColumnToggle
+              table={table}
+            />
+            {/* CSV Export Button */}
+            <StyledButton
+              onClick={exportToCsv}
+              icon={<FaDownload className="icon-small" />}
+              label={
+                exportMutation.isPending
+                  ? `Exporting${data?.pagination?.totalCount ? ` ${data.pagination.totalCount} blockers` : ""}...`
+                  : `Export ${data?.pagination?.totalCount || 0} blockers as CSV`
+              }
+              loading={exportMutation.isPending}
+              loadingText="Exporting..."
+              variant="naked"
+              showLabel={false}
+              disabled={!data?.pagination?.totalCount}
+            />
+          </div>
         </div>
         <div className="filter-group">
           
