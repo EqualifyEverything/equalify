@@ -24,6 +24,7 @@ import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
 import { registerSW } from "virtual:pwa-register";
 import { useGlobalStore } from "./utils/useGlobalStore";
 import { isJwtExpiredError, handleJwtExpiration } from "./utils/jwtErrorHandler";
+import { setupQueryTelemetry, CloudWatchReporter, ConsoleReporter } from "./telemetry";
 registerSW({ immediate: true });
 
 import { Toaster } from "sonner";
@@ -51,6 +52,22 @@ const queryClient = new QueryClient({
       },
     },
   },
+});
+
+const _telemetryEnv =
+  import.meta.env.VITE_BRANCH === 'main'
+    ? 'production'
+    : import.meta.env.VITE_BRANCH === 'staging'
+    ? 'staging'
+    : 'development';
+
+setupQueryTelemetry(queryClient, {
+  enabled: import.meta.env.VITE_TELEMETRY_ENABLED === 'true',
+  environment: _telemetryEnv,
+  reporters: import.meta.env.VITE_TELEMETRY_ENDPOINT
+    ? [new CloudWatchReporter({ endpoint: import.meta.env.VITE_TELEMETRY_ENDPOINT })]
+    : [new ConsoleReporter()],
+  // filter: (key) => key[0] !== 'user',   // example: exclude a query by name
 });
 
 import { PublicClientApplication } from '@azure/msal-browser';
