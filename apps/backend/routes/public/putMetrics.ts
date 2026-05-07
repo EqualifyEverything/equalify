@@ -36,10 +36,15 @@ export const putMetrics = async () => {
         return { success: false, message: 'No valid metric datums' };
     }
 
-    await cloudwatch.send(new PutMetricDataCommand({
-        Namespace: NAMESPACE,
-        MetricData: metricData,
-    }));
+    try {
+        await cloudwatch.send(new PutMetricDataCommand({
+            Namespace: NAMESPACE,
+            MetricData: metricData,
+        }));
+    } catch (err) {
+        console.error('putMetrics: CloudWatch error', err);
+        return { success: false, message: 'Failed to write metrics' };
+    }
 
     return { success: true };
 };
