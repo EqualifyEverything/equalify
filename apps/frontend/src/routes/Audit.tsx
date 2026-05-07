@@ -47,8 +47,8 @@ import { StyledButton } from "#src/components/StyledButton.tsx";
 import style from "./Audit.module.scss";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { BlockersTableSummary } from "#src/components/BlockersTableSummary.tsx";
-import { FaTableList } from "react-icons/fa6";
-import { stringifyMessage } from "graphql-ws";
+//import { FaTableList } from "react-icons/fa6";
+//import { stringifyMessage } from "graphql-ws";
 import { MdError } from "react-icons/md";
 
 export interface Page {
@@ -93,7 +93,7 @@ export const Audit = () => {
       emailNotifications ? JSON.parse(emailNotifications).emails.length : 0
     );
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
-  const [showAllScans, setShowAllScans] = useState<boolean>(false);
+  //const [showAllScans, setShowAllScans] = useState<boolean>(false);
   const [chartRange, setChartRange] = useState<number>(90);
   const [selectedScanErrors, setSelectedScanErrors] = useState<ScanError[]>([]);
   const isShared = location.pathname.startsWith("/shared/");
@@ -271,7 +271,7 @@ export const Audit = () => {
   useEffect(() => {
     //console.log(audit);
     if (audit?.email_notifications) {
-      console.log("setting email notifications");
+      //console.log("setting email notifications");
       setEmailNotifications(audit.email_notifications);
     }
   }, [audit]);
@@ -310,7 +310,7 @@ export const Audit = () => {
       );
       if (!proceed) return;
     }
-    console.log("Updating audit interval:", newValue);
+    //console.log("Updating audit interval:", newValue);
     const updatedInterval = await apiClient.graphql({
       query: `mutation ($audit_id:uuid, $interval: String) {
                 update_audits(where: {id: {_eq: $audit_id}}, _set: {interval: $interval}) {
@@ -328,7 +328,7 @@ export const Audit = () => {
   };
 
   const refreshUrlsFromCsv = async () => {
-    console.log("Refreshing URL list from remote...")
+    //console.log("Refreshing URL list from remote...")
     const resp = (await API.get({
       apiName: isShared ? "public" : "auth",
       path: "/syncFromRemoteCsv",
@@ -354,7 +354,7 @@ export const Audit = () => {
   }
 
   const updateAuditRemoteCsv = async (newValue: string) => {
-    console.log("Updating remote CSV value:", newValue);
+    //console.log("Updating remote CSV value:", newValue);
     const updatedRemoteCsvUrl = await apiClient.graphql({
       query: `mutation ($audit_id:uuid, $remote_csv_url: String) {
                 update_audits(where: {id: {_eq: $audit_id}}, _set: {remote_csv_url: $remote_csv_url}) {
@@ -718,7 +718,7 @@ export const Audit = () => {
               {scans && scans?.length > 0 && (
                 <div>
                   <div className="font-small">
-                    {console.log(scans[scans.length - 1])}
+                    {/*console.log(scans[scans.length - 1])*/}
                     Last Scan: {formatDate(scans[scans.length - 1].created_at)}{" "}
                     {scans[scans.length - 1].status && (
                       <span

@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Loader, GlobalErrorHandler } from ".";
 import * as Auth from "aws-amplify/auth";
-import { usePostHog } from "posthog-js/react";
 import { useUser } from "../queries";
 import * as Avatar from "@radix-ui/react-avatar";
 import generateAbbreviation from "#src/utils/generateAbbreviation.ts";
@@ -20,7 +19,6 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const { loading, authenticated, setAuthenticated, darkMode, setDarkMode } =
     useGlobalStore();
-  const posthog = usePostHog();
   const { data: user } = useUser();
 
   // Handle MSAL token refresh
@@ -59,7 +57,6 @@ export const Navigation = () => {
 
               // Only set authenticated if backend validation succeeds
               setAuthenticated(userId);
-              posthog?.identify(userId, { email: payload?.email });
             } catch (backendError: any) {
               // Backend rejected - token is invalid or user not authorized
               console.error(
@@ -122,7 +119,6 @@ export const Navigation = () => {
         }
       } else {
         setAuthenticated(attributes?.sub as unknown as boolean);
-        posthog?.identify(attributes?.sub, { email: attributes?.email });
         if (location.pathname === "/") {
           navigate("/audits");
         }

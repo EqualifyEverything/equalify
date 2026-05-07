@@ -18,7 +18,6 @@ import {
 } from "#src/routes";
 import { Navigation } from "#src/components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { PostHogProvider } from "posthog-js/react";
 import { CookieStorage } from "aws-amplify/utils";
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
 import { registerSW } from "virtual:pwa-register";
@@ -195,20 +194,15 @@ export const App = () => {
   const { announceMessage } = useGlobalStore();
   return (
   <MsalProvider instance={msalInstance}>
-    <PostHogProvider
-      apiKey={import.meta.env.VITE_POSTHOG_KEY}
-      options={{ api_host: "https://us.posthog.com" }}
-    >
       <div aria-live="assertive" aria-atomic className="sr-only">
         {announceMessage}
       </div>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>
-      <Toaster 
+      <Toaster
         theme="dark"
       />
-    </PostHogProvider>
   </MsalProvider>
   );
 };

@@ -3,7 +3,6 @@ import * as Auth from 'aws-amplify/auth';
 import {  Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { usePostHog } from 'posthog-js/react';
 import { useMsal } from '@azure/msal-react';
 import { Logo } from "#src/components/Logo";
 import { StyledButton } from "#src/components/StyledButton";
@@ -16,7 +15,6 @@ export const Login = () => {
     const [error, setError] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
-    const posthog = usePostHog();
     const [searchParams, setSearchParams] = useSearchParams();
     const email = searchParams.get('email');
     const code = searchParams.get('code');
@@ -46,7 +44,6 @@ export const Login = () => {
             const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload;
             setAuthenticated(attributes?.sub);
             setLoading(false);
-            posthog?.identify(attributes?.sub, { email: attributes?.email });
 
             if (code) {
                 navigate(`/verify/${location.search}`);
@@ -123,8 +120,7 @@ export const Login = () => {
             // Only set authenticated if backend validation succeeds
             setAuthenticated(claims?.oid || claims?.sub);
             setSsoAuthenticated(true);
-            posthog?.identify(claims?.oid || claims?.sub, { email: claims?.email });
-            
+
             setLoading(false);
             setAnnounceMessage("Login Success!", "success");
             navigate('/audits');

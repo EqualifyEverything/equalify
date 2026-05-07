@@ -2,14 +2,12 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { useGlobalStore } from '#src/utils';
-import { usePostHog } from 'posthog-js/react';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const SsoCallback = () => {
     const navigate = useNavigate();
     const { instance } = useMsal();
     const { setAuthenticated, setSsoAuthenticated, setLoading, setAnnounceMessage } = useGlobalStore();
-    const posthog = usePostHog();
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -33,8 +31,7 @@ export const SsoCallback = () => {
                         // Only set authenticated if backend validation succeeds
                         setAuthenticated(claims?.oid || claims?.sub);
                         setSsoAuthenticated(true);
-                        posthog?.identify(claims?.oid || claims?.sub, { email: claims?.email });
-                        
+
                         setAnnounceMessage("Login Success!", "success");
                         setTimeout(() => queryClient.refetchQueries({ queryKey: ['user'] }), 100);
                         navigate('/audits');

@@ -57,7 +57,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
         options: { queryParams: params },
       }).response;
       const resp = (await response.body.json()) as any as SummaryResp;
-      console.log(resp);
+      //console.log(resp);
       return resp;
     }
   });

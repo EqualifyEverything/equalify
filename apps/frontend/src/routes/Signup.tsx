@@ -4,7 +4,6 @@ import * as API from 'aws-amplify/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { sleep, useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { usePostHog } from 'posthog-js/react';
 import styles from "./Signup.module.scss";
 import { Logo } from "#src/components/Logo";
 import { StyledButton } from "#src/components/StyledButton";
@@ -14,8 +13,6 @@ export const Signup = () => {
     const { loading, setLoading, setAuthenticated } = useGlobalStore();
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const posthog = usePostHog();
-
     const signup = async (e) => {
         e.preventDefault();
         const { name, email, password } = Object.fromEntries(new FormData(e.currentTarget));
@@ -53,7 +50,6 @@ export const Signup = () => {
             await Auth.autoSignIn();
             const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload
             setAuthenticated(attributes?.sub);
-            posthog?.identify(attributes?.sub, { email: attributes?.email });
             setLoading(false);
             setTimeout(() => {
                 API.post({ apiName: 'auth', path: '/trackUser' }).response
