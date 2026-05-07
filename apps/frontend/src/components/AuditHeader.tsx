@@ -88,6 +88,7 @@ export const AuditHeader = ({
         ).body.json();
         //console.log(response);
         await queryClient.refetchQueries({ queryKey: ["audits"] });
+        await queryClient.refetchQueries({ queryKey: ["scans", auditId] });
         // aria & logging
         setAnnounceMessage(`Scanning audit ${audit.name}...`);
       } finally {

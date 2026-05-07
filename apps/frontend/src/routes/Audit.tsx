@@ -128,7 +128,12 @@ export const Audit = () => {
         })
       )?.data?.scans,
     initialData: [],
-    refetchInterval: 1000,
+    refetchInterval: (query) => {
+      const hasActiveScan = (query.state.data as any[])?.some(
+        (s) => s.status !== "complete" && s.status !== "failed"
+      );
+      return hasActiveScan ? 2000 : false;
+    },
   });
 
   useEffect(() => {

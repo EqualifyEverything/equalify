@@ -31,7 +31,12 @@ export const QuickScans = () => {
       ).body.json();
       return (response as any)?.body ?? response;
     },
-    refetchInterval: 15000, // Poll every 15s for scan status updates
+    refetchInterval: (query) => {
+      const hasActiveScan = (query.state.data as any[])?.some(
+        (s) => s.scan_status !== "complete" && s.scan_status !== "failed"
+      );
+      return hasActiveScan ? 15000 : false;
+    },
   });
 
   const formatUrl = (input: string): string | null => {
