@@ -6,12 +6,17 @@ export const getBlockerSummary = async () => {
     await db.connect();
 
     try {
-        const options = (await db.query({
-            text: `SELECT "key", "value" FROM "options" WHERE "key" IN ('llm_enabled', 'llm_model_id')`,
-            values: [],
-        })).rows as { key: string; value: string }[];
-
-        const optMap = Object.fromEntries(options.map(o => [o.key, o.value]));
+        const optionsData = await graphqlQuery({
+            query: `query {
+                options(where: { key: { _in: ["llm_enabled", "llm_model_id"] } }) {
+                    key
+                    value
+                }
+            }`,
+        });
+        const optMap = Object.fromEntries(
+            (optionsData?.options ?? []).map((o: any) => [o.key, o.value])
+        );
         if (optMap.llm_enabled === 'false') {
             return { disabled: true };
         }
