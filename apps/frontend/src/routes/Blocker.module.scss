@@ -12,4 +12,43 @@
           white-space: pre-wrap !important;
         }
       }
+
+    .SummaryCard {
+      margin-top: 1.5rem;
+    }
+
+    .summaryHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      h2 {
+        margin: 0;
+      }
+    }
+
+    .summaryActions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .summaryContent {
+      p {
+        margin: 0 0 0.5rem;
+        line-height: 1.6;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .summaryUnavailable {
+      margin: 0;
+      opacity: 0.6;
+    }
 }

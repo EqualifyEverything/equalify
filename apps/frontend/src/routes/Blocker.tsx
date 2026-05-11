@@ -1,14 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import styles from "./Blocker.module.scss";
 import * as API from "aws-amplify/api";
 import { Card } from "#src/components/Card.tsx";
 import { DataRow } from "#src/components/DataRow.tsx";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-//import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Skeleton, SkeletonDataRow } from "../components";
+import { StyledButton } from "#src/components/StyledButton.tsx";
 
 const apiClient = API.generateClient();
 
@@ -42,11 +42,19 @@ interface theBlocker {
   }
 }
 
+interface BlockerSummary {
+  id?: string;
+  summary?: string;
+  cached?: boolean;
+  flagged?: boolean;
+  disabled?: boolean;
+}
+
 export const Blocker = () => {
   const { blockerId, auditId } = useParams();
-  //const queryClient = useQueryClient();
-  //const navigate = useNavigate();
-  //const location = useLocation();
+  const queryClient = useQueryClient();
+  const [isFlagging, setIsFlagging] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: blocker, isLoading, isPending, isFetching } = useQuery({
     queryKey: ["blocker-"+auditId+"-"+blockerId],
@@ -56,7 +64,7 @@ export const Blocker = () => {
       console.log(auditId);
 
       const response = await apiClient.graphql({
-        query: `query($blocker_id: String!, $audit_id: uuid!) 
+        query: `query($blocker_id: String!, $audit_id: uuid!)
         {
         blockers(where: {short_id: {_eq: $blocker_id}, _and: {audit_id: {_eq: $audit_id}}}) {
             id
@@ -94,6 +102,54 @@ export const Blocker = () => {
       return data.data.blockers[0] as theBlocker;
     },
   });
+
+  const summaryQueryKey = ["blocker-summary", blocker?.id];
+
+  const { data: summary, isLoading: isSummaryLoading } = useQuery<BlockerSummary>({
+    queryKey: summaryQueryKey,
+    enabled: !!blocker?.id,
+    queryFn: async () => {
+      const response = await (
+        await API.get({
+          apiName: "public",
+          path: "/getBlockerSummary",
+          options: { queryParams: { blocker_id: blocker!.id } },
+        }).response
+      ).body.json();
+      return response as unknown as BlockerSummary;
+    },
+  });
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const fresh = await (
+        await API.get({
+          apiName: "public",
+          path: "/getBlockerSummary",
+          options: { queryParams: { blocker_id: blocker!.id, refresh: "true" } },
+        }).response
+      ).body.json() as unknown as BlockerSummary;
+      queryClient.setQueryData(summaryQueryKey, fresh);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleFlag = async () => {
+    if (!summary?.id) return;
+    setIsFlagging(true);
+    try {
+      await API.post({
+        apiName: "public",
+        path: "/flagBlockerSummary",
+        options: { body: { summary_id: summary.id } },
+      }).response;
+      queryClient.setQueryData<BlockerSummary>(summaryQueryKey, { flagged: true });
+    } finally {
+      setIsFlagging(false);
+    }
+  };
 
   return (
     <div className={styles["Blocker"]}>
@@ -155,7 +211,52 @@ export const Blocker = () => {
         { (!blocker && !isLoading && !isPending) ? (
           <>Error: Blocker {blockerId} not found.</>
         ):(null)}
-      </Card >
+      </Card>
+
+      {blocker && !summary?.disabled && (
+        <Card variant="light" className={styles["SummaryCard"]}>
+          <div className={styles["summaryHeader"]}>
+            <h2>AI Explanation</h2>
+            <div className={styles["summaryActions"]}>
+              <StyledButton
+                label="Reload summary"
+                onClick={handleRefresh}
+                loading={isRefreshing}
+                loadingText="Regenerating..."
+                variant="light"
+              />
+              {summary && (
+                <StyledButton
+                  label="Flag a problem with this summary"
+                  onClick={handleFlag}
+                  loading={isFlagging}
+                  loadingText="Flagging..."
+                  variant="light"
+                />
+              )}
+            </div>
+          </div>
+
+          {isSummaryLoading ? (
+            <>
+              <Skeleton width={"100%"} height={16} />
+              <Skeleton width={"80%"} height={16} />
+              <Skeleton width={"90%"} height={16} />
+              <Skeleton width={"70%"} height={16} />
+            </>
+          ) : summary?.summary ? (
+            <div className={styles["summaryContent"]}>
+              {summary.summary.split('\n').map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          ) : (
+            <p className={styles["summaryUnavailable"]}>
+              No summary available. Click "Reload summary" to generate one.
+            </p>
+          )}
+        </Card>
+      )}
     </div>
   );
 };

@@ -1,0 +1,46 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.LlmSettingsInput {
+  select {
+    width: 100%;
+  }
+}
+
+hr {
+  height: 0px;
+  border: 0;
+  border-bottom: 1px solid variables.$gray;
+}
+
+.toggleRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: variables.$spacing;
+  margin-top: calc(variables.$spacing);
+
+  label {
+    margin-top: 0;
+    flex: 1;
+  }
+}
+
+.toggle {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: variables.$green;
+}
+
+.modelSelect {
+  margin-top: calc(variables.$spacing / 2);
+}
+
+.description {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin: calc(variables.$spacing / 2) 0 calc(variables.$spacing);
+  line-height: 1.5;
+}
