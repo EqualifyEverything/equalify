@@ -63,8 +63,8 @@ export const Blocker = () => {
     queryKey: ["blocker-"+auditId+"-"+blockerId],
     queryFn: async () => {
       if (!blockerId || !auditId) throw new Error("Blocker or Audit ID not found!");
-      console.log(blockerId);
-      console.log(auditId);
+      //console.log(blockerId);
+      //console.log(auditId);
 
       const response = await apiClient.graphql({
         query: `query($blocker_id: String!, $audit_id: uuid!)
@@ -101,7 +101,7 @@ export const Blocker = () => {
         variables: { blocker_id: blockerId, audit_id: auditId },
       });
       const data = response as any;
-      console.log(response);
+      //console.log(response);
       return data.data.blockers[0] as theBlocker;
     },
   });
