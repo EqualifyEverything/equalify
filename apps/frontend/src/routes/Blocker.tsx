@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import styles from "./Blocker.module.scss";
 import * as API from "aws-amplify/api";
@@ -9,6 +9,9 @@ import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Skeleton, SkeletonDataRow } from "../components";
 import { StyledButton } from "#src/components/StyledButton.tsx";
+import { marked } from "marked";
+import { GrPowerCycle } from "react-icons/gr";
+import { MdOutlineFlag, MdSmartToy } from "react-icons/md";
 
 const apiClient = API.generateClient();
 
@@ -120,6 +123,11 @@ export const Blocker = () => {
     },
   });
 
+  const summaryHtml = useMemo(
+    () => (summary?.summary ? (marked.parse(summary.summary) as string) : ""),
+    [summary?.summary]
+  );
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -216,18 +224,20 @@ export const Blocker = () => {
       {blocker && !summary?.disabled && (
         <Card variant="light" className={styles["SummaryCard"]}>
           <div className={styles["summaryHeader"]}>
-            <h2>AI Explanation</h2>
+            <h2><MdSmartToy aria-hidden="true" /> Blocker Summary</h2>
             <div className={styles["summaryActions"]}>
               <StyledButton
                 label="Reload summary"
+                icon={<GrPowerCycle />}
                 onClick={handleRefresh}
                 loading={isRefreshing}
                 loadingText="Regenerating..."
                 variant="light"
               />
-              {summary && (
+              {summary?.summary && (
                 <StyledButton
                   label="Flag a problem with this summary"
+                  icon={<MdOutlineFlag />}
                   onClick={handleFlag}
                   loading={isFlagging}
                   loadingText="Flagging..."
@@ -244,12 +254,11 @@ export const Blocker = () => {
               <Skeleton width={"90%"} height={16} />
               <Skeleton width={"70%"} height={16} />
             </>
-          ) : summary?.summary ? (
-            <div className={styles["summaryContent"]}>
-              {summary.summary.split('\n').map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
-            </div>
+          ) : summaryHtml ? (
+            <div
+              className={styles["summaryContent"]}
+              dangerouslySetInnerHTML={{ __html: summaryHtml }}
+            />
           ) : (
             <p className={styles["summaryUnavailable"]}>
               No summary available. Click "Reload summary" to generate one.

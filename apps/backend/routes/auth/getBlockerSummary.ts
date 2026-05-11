@@ -1,44 +1,49 @@
-import { db, event, graphqlQuery, bedrock } from '#src/utils';
+import { db, event, graphqlQuery, bedrock } from "#src/utils";
 
 export const getBlockerSummary = async () => {
-    const { blocker_id, refresh } = event.queryStringParameters as { blocker_id: string; refresh?: string };
+  const { blocker_id, refresh } = event.queryStringParameters as {
+    blocker_id: string;
+    refresh?: string;
+  };
 
-    await db.connect();
+  await db.connect();
 
-    try {
-        const optionsData = await graphqlQuery({
-            query: `query {
+  try {
+    const optionsData = await graphqlQuery({
+      query: `query {
                 options(where: { key: { _in: ["llm_enabled", "llm_model_id"] } }) {
                     key
                     value
                 }
             }`,
-        });
-        const optMap = Object.fromEntries(
-            (optionsData?.options ?? []).map((o: any) => [o.key, o.value])
-        );
-        if (optMap.llm_enabled === 'false') {
-            return { disabled: true };
-        }
-        const modelId = optMap.llm_model_id || undefined;
+    });
+    const optMap = Object.fromEntries(
+      (optionsData?.options ?? []).map((o: any) => [o.key, o.value]),
+    );
+    if (optMap.llm_enabled === "false") {
+      return { disabled: true };
+    }
+    const modelId = optMap.llm_model_id || undefined;
 
-        if (refresh !== 'true') {
-            const existing = (await db.query({
-                text: `SELECT "id", "summary", "flagged" FROM "blocker_llm_summaries" WHERE "blocker_id" = $1 ORDER BY "created_at" DESC LIMIT 1`,
-                values: [blocker_id],
-            })).rows[0];
+    if (refresh !== "true") {
+      const existing = (
+        await db.query({
+          text: `SELECT "id", "summary", "flagged" FROM "blocker_llm_summaries" WHERE "blocker_id" = $1 ORDER BY "created_at" DESC LIMIT 1`,
+          values: [blocker_id],
+        })
+      ).rows[0];
 
-            if (existing?.flagged) {
-                return { flagged: true };
-            }
+      if (existing?.flagged) {
+        return { flagged: true };
+      }
 
-            if (existing) {
-                return { id: existing.id, summary: existing.summary, cached: true };
-            }
-        }
+      if (existing) {
+        return { id: existing.id, summary: existing.summary, cached: true };
+      }
+    }
 
-        const data = await graphqlQuery({
-            query: `query($id: uuid!) {
+    const data = await graphqlQuery({
+      query: `query($id: uuid!) {
                 blockers_by_pk(id: $id) {
                     content
                     url { url }
@@ -51,19 +56,25 @@ export const getBlockerSummary = async () => {
                     }
                 }
             }`,
-            variables: { id: blocker_id },
-        });
+      variables: { id: blocker_id },
+    });
 
-        const blocker = data?.blockers_by_pk;
-        if (!blocker) {
-            return { statusCode: 404, body: JSON.stringify({ error: 'Blocker not found' }) };
-        }
+    const blocker = data?.blockers_by_pk;
+    if (!blocker) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "Blocker not found" }),
+      };
+    }
 
-        const messages = blocker.blocker_messages.map((bm: any) =>
-            `Error: ${bm.message.content} (Category: ${bm.message.category}, Tags: ${bm.message.message_tags.map((t: any) => t.tag.content).join(', ')})`
-        ).join('\n');
+    const messages = blocker.blocker_messages
+      .map(
+        (bm: any) =>
+          `Error: ${bm.message.content} (Category: ${bm.message.category}, Tags: ${bm.message.message_tags.map((t: any) => t.tag.content).join(", ")})`,
+      )
+      .join("\n");
 
-        const prompt = `You are an accessibility expert helping a web developer fix an issue detected by an automated accessibility scanner.
+    const prompt = `You are an accessibility expert helping a website owner fix an issue detected by an automated accessibility scanner.
 
 The issue was found on this URL: ${blocker.url.url}
 
@@ -79,26 +90,28 @@ Please provide:
 1. A plain-language explanation of what this accessibility issue is and why it matters to users.
 2. Clear step-by-step instructions to fix it.
 
-Be concise and practical. Target a web developer audience.`;
+Be concise and practical. Target a general audience. This is for use in a UI context, so do not be conversational and begin or end with a question.`;
 
-        const summary = await bedrock.invoke(prompt, modelId);
+    const summary = await bedrock.invoke(prompt, modelId);
 
-        const result = (await db.query({
-            text: `INSERT INTO "blocker_llm_summaries" ("blocker_id", "summary")
+    const result = (
+      await db.query({
+        text: `INSERT INTO "blocker_llm_summaries" ("blocker_id", "summary")
                    VALUES ($1, $2)
                    ON CONFLICT ("blocker_id") DO UPDATE SET "summary" = $2, "flagged" = false, "updated_at" = now()
                    RETURNING "id"`,
-            values: [blocker_id, summary],
-        })).rows[0];
+        values: [blocker_id, summary],
+      })
+    ).rows[0];
 
-        return { id: result.id, summary, cached: false };
-    } catch (err) {
-        console.error('getBlockerSummary error:', err);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: String(err) }),
-        };
-    } finally {
-        await db.clean();
-    }
+    return { id: result.id, summary, cached: false };
+  } catch (err) {
+    console.error("getBlockerSummary error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: String(err) }),
+    };
+  } finally {
+    await db.clean();
+  }
 };

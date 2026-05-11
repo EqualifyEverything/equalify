@@ -15,6 +15,7 @@
 
     .SummaryCard {
       margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .summaryHeader {
@@ -27,6 +28,9 @@
 
       h2 {
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
       }
     }
 
@@ -37,14 +41,36 @@
     }
 
     .summaryContent {
-      p {
-        margin: 0 0 0.5rem;
-        line-height: 1.6;
+      line-height: 1.6;
 
-        &:last-child {
-          margin-bottom: 0;
-        }
+      p, ul, ol, pre { margin: 0 0 0.75rem; }
+      :last-child { margin-bottom: 0; }
+
+      ul, ol { padding-left: 1.5rem; }
+      li { margin-bottom: 0.25rem; }
+
+      h1, h2, h3 { margin: 1rem 0 0.4rem; font-weight: 600; }
+      h1 { font-size: 1.1rem; }
+      h2 { font-size: 1rem; }
+      h3 { font-size: 0.95rem; }
+
+      code {
+        font-family: monospace;
+        font-size: 0.85em;
+        background: rgba(0,0,0,0.15);
+        padding: 0.1em 0.35em;
+        border-radius: 3px;
       }
+
+      pre {
+        background: rgba(0,0,0,0.15);
+        padding: 0.75rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        code { background: none; padding: 0; }
+      }
+
+      strong { font-weight: 600; }
     }
 
     .summaryUnavailable {
