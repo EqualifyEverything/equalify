@@ -396,6 +396,12 @@ export const Audit = () => {
 
   return (
     <div className={style.Audit}>
+      {isShared && (
+        <div className={style["shared-banner"]} role="banner">
+          <span>You are viewing a shared accessibility report.</span>
+          <Link to="/login">Log in</Link>
+        </div>
+      )}
       {/* {!isShared && <Link to={"/audits"} className="back-link">← Go Back</Link>}
        */}
       <AuditHeader

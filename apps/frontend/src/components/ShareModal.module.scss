@@ -1,0 +1,112 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 40;
+  animation: overlayShow 150ms ease-out;
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: 90vw;
+  max-width: 520px;
+  background: variables.$paper;
+  border-radius: variables.$spacing;
+  padding: calc(variables.$spacing * 3);
+  box-shadow: 0 10px 38px rgba(0, 0, 0, 0.35), 0 10px 20px rgba(0, 0, 0, 0.2);
+  animation: contentShow 150ms ease-out;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.title {
+  margin: 0 0 calc(variables.$spacing * 1.5) 0;
+  @include fonts.font-size-large;
+  font-weight: bold;
+  line-height: 1.2;
+  padding-right: calc(variables.$spacing * 4);
+}
+
+.description {
+  margin: 0 0 calc(variables.$spacing * 2.5) 0;
+  color: variables.$black;
+  @include fonts.font-size-normal;
+  line-height: 1.5;
+}
+
+.url-row {
+  display: flex;
+  gap: variables.$spacing;
+  align-items: center;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    font-family: monospace;
+    background: variables.$white;
+    cursor: text;
+    user-select: all;
+  }
+
+  button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: calc(variables.$spacing * 1.5);
+  right: calc(variables.$spacing * 1.5);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid variables.$gray;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: variables.$black;
+  transition: background 0.12s ease-out;
+
+  &:hover {
+    background: variables.$paper-dark;
+  }
+
+  &:focus-visible {
+    outline: 2px solid variables.$red;
+    outline-offset: 2px;
+  }
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

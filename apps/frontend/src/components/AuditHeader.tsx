@@ -9,6 +9,7 @@ import { useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { SkeletonAuditHeader } from "./Skeleton";
+import { ShareModal } from "./ShareModal";
 
 interface AuditHeaderProps extends React.PropsWithChildren {
   isShared: boolean;
@@ -32,25 +33,12 @@ export const AuditHeader = ({
   const [isScanning, setIsScanning] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  const copyCurrentLocationToClipboard = async () => {
-    try {
-      const sharedPath = location.pathname
-        .replace("/audits/", "/shared/")
-        .replace("/quick-scans/", "/shared/");
-      await navigator.clipboard.writeText(
-        window.location.origin + sharedPath
-      );
-      console.log(
-        `URL ${window.location.origin + location.pathname} copied to clipboard!`
-      );
-      setAnnounceMessage(
-        `URL ${window.location.origin + location.pathname} copied to clipboard!`, "success"
-      );
-    } catch (err) {
-      console.error("Failed to copy URLs: ", err);
-    }
-  };
+  const sharedPath = location.pathname
+    .replace("/audits/", "/shared/")
+    .replace("/quick-scans/", "/shared/");
+  const shareUrl = window.location.origin + sharedPath;
   const deleteAudit = async () => {
     if (confirm(`Are you sure you want to delete this audit?`)) {
       setIsDeleting(true);
@@ -135,6 +123,12 @@ export const AuditHeader = ({
   }
 
   return (
+    <>
+    <ShareModal
+      open={shareModalOpen}
+      onOpenChange={setShareModalOpen}
+      shareUrl={shareUrl}
+    />
     <div className={styles.AuditHeader}>
 
       <div className={styles["inner"]}>
@@ -179,7 +173,7 @@ export const AuditHeader = ({
             />
           )}
           <StyledButton
-            onClick={copyCurrentLocationToClipboard}
+            onClick={() => setShareModalOpen(true)}
             label="Share"
             className="audit-main-button"
             icon={<FaClipboard />}
@@ -187,5 +181,6 @@ export const AuditHeader = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
