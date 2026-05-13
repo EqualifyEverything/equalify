@@ -94,16 +94,13 @@ export const SystemStats = () => {
                 <h3 className={style.sectionHeading}>Scans (Last 30 Days)</h3>
                 <div className={style.grid}>
                     <StatCard label="HTML Scans Completed" value={data.htmlScans30d} />
-                    <StatCard label="PDF Scans Completed"  value={data.pdfScans30d} />
-                    <StatCard label="Failed Scans"         value={data.failedScans30d} />
+                    <StatCard label="PDF Scans Completed"  value={data.pdfScans30d} />{/* 
+                    <StatCard label="Failed Scans"         value={data.failedScans30d} /> */}
                     <StatCard label="Avg HTML Scan Time"   value={formatDuration(data.avgHtmlScanDurationMs30d)} />
                     <StatCard label="Avg PDF Scan Time"    value={formatDuration(data.avgPdfScanDurationMs30d)} />
                 </div>
             </section>
 
-            <p className={style.note}>
-                CloudWatch scan metrics reflect the last 30 days. Scan durations are measured from job receipt to completion.
-            </p>
         </div>
     );
 };
