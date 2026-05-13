@@ -109,24 +109,24 @@ export const Audit = () => {
   const { data: urls, isSuccess } = useQuery({
     queryKey: ["urls", auditId],
     queryFn: async () =>
-      (
+      ((
         await apiClient.graphql({
           query: `query($audit_id: uuid){urls(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: desc}) {id url type}}`,
           variables: { audit_id: auditId },
         })
-      )?.data?.urls,
+      ) as any).data?.urls,
     initialData: [],
   });
 
   const { data: scans } = useQuery({
     queryKey: ["scans", auditId],
     queryFn: async () =>
-      (
+      ((
         await apiClient.graphql({
           query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage status errors}}`,
           variables: { audit_id: auditId },
         })
-      )?.data?.scans,
+      ) as any)?.data?.scans,
     initialData: [],
     refetchInterval: (query) => {
       const hasActiveScan = (query.state.data as any[])?.some(
@@ -144,12 +144,12 @@ export const Audit = () => {
   const { data: audit, refetch: refetchAudit } = useQuery({
     queryKey: ["audit", auditId],
     queryFn: async () =>
-      (
+      ((
         await apiClient.graphql({
           query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error}}`,
           variables: { audit_id: auditId },
         })
-      )?.data?.audits_by_pk,
+      ) as any)?.data?.audits_by_pk,
   });
 
   const { data: chartData } = useQuery({
@@ -499,7 +499,7 @@ export const Audit = () => {
               </Card>
             )}
             <Card variant="dark" className="blockers-chart">
-              {chartData?.data && chartData.data.length > 0 && (
+              {chartData && (chartData as any)?.data && (chartData as any).data.length > 0 && (
                 <div>
                   <div className="blockers-chart-heading-wrapper">
                     <div>

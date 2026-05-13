@@ -1,0 +1,55 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.SystemStats {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing * 4;
+}
+
+.sectionHeading {
+    margin: 0 0 variables.$spacing * 2 0;
+    font-size: 1rem;
+    color: variables.$black-translucent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: variables.$spacing * 2;
+}
+
+.statCard {
+    background: variables.$paper;
+    border-radius: 6px;
+    padding: variables.$spacing * 2 variables.$spacing * 3;
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing * 0.5;
+}
+
+.statValue {
+    @include fonts.raleway-bold;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: variables.$black;
+}
+
+.statLabel {
+    font-size: 0.875rem;
+    color: variables.$black;
+}
+
+.statSub {
+    font-size: 0.8rem;
+    color: variables.$black-translucent;
+    margin-top: variables.$spacing * 0.5;
+}
+
+.note {
+    font-size: 0.8rem;
+    color: variables.$black-translucent;
+    margin: 0;
+}
