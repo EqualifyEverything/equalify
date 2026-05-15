@@ -1,41 +1,118 @@
-<img src="logo.svg" alt="Equalify Logo" width="300">
+# Equalify
 
-## Big Changes are Coming!
-Equalify has officially transitioned to a project of the [University of Illinois Chicago (UIC) Technology Solutions](https://it.uic.edu/about/technology-solutions/ "University of Illinois Chicago (UIC) Technology Solutions") department! This marks a new chapter for Equalify, but we remain focused on our goal: bringing top-in-class acessibility scanning and reporting tools to the widest possible audience. 
+**Equalify** is an open-source accessibility scanning and monitoring platform. It started as a multi-tenant SaaS product and is now being reshaped into a simpler, self-hostable codebase focused on practical deployment, extensibility, and accessible user experience.
 
-We built Equalify as a multi-tenant, SaaS platform, but after 3 years and tens of thousands of scans, we believe users want something different - something simple, robust, and easy-to-use, and that can be deployed by users themselves, *without* a dedicated DevOps team. That means we'll be moving in a new direction for Equalify, with the goal of a streamlined application, with straightforward deployment. We aim to make Equalify as easy to install as any popular open source project. Here's what this means:
+## Table of Contents
+- [What Equalify does](#what-equalify-does)
+- [Why the project is changing](#why-the-project-is-changing)
+- [Monorepo layout](#monorepo-layout)
+- [Technology stack](#technology-stack)
+- [Getting started](#getting-started)
+- [Development workflow](#development-workflow)
+- [Accessibility commitment](#accessibility-commitment)
+- [Contributing](#contributing)
+- [Stay in touch](#stay-in-touch)
 
-### What to Expect:
+## What Equalify does
+Equalify helps teams scan, review, and monitor accessibility issues across digital properties.
 
-- **Ease of Deployment** 
-Our priority will be to make it as simple and painless as possible for users to spin up their own instances of Equalify
-- **Unified Codebase**
-A consolidated codebase, to make it simpler for developers to contribute and act as a single entry point for end users and developers
-- **Customization**
-Prioritize extensibility, and make it as straightforward as possible for users to add their own scans, modify the user interface, etc
-- **Better Documentation**
-Simplify adoption by unifying and expanding existing documentation
-- **Always Open Source**
-Continued Open Source development under the AGPL.
-- **Best Accessible User Experience**
-Fixing accessibility bugs is mission-critical to Equalify.
+Current repository signals show a platform-oriented architecture with:
+- a frontend app in `apps/frontend`
+- a backend app in `apps/backend`
+- AWS Lambda services for HTML, PDF, and routing tasks
+- shared type packages and supporting infrastructure folders
 
-### Beta Roadmap (Q1 2026)
-- **Technology that Promotes our Open Source Community**
-  - Deployment in 30 minutes or less
-  - Handles 100 pages/minute without breaking a sweat
-  - Costs less than $1000/month for typical usage
-  - No critical bugs
-  - Documentation that doesn't suck
+## Why the project is changing
+The maintainers have shared that Equalify is moving toward a more deployable, user-hosted model. The stated priorities are:
+- easier deployment
+- a more unified codebase
+- stronger customization paths
+- better documentation
+- continued AGPL open-source development
+- accessibility as a product requirement, not an afterthought
 
-### Stay in Touch! 
-Subscribe to our newsletter: [it.uic.edu/accessibility/engineering](http://it.uic.edu/accessibility/engineering "it.uic.edu/accessibility/engineering")
-Star or contribute on GitHub: [github.com/equalifyEverything/equalify](http://github.com/equalifyEverything/equalify "github.com/equalifyEverything/equalify")
+That direction is especially helpful for new contributors and self-hosters, because it clarifies where the project is headed.
 
-We welcome your questions, feedback, and continued participation.
+## Monorepo layout
+```text
+.
+├── apps/
+│   ├── frontend/
+│   └── backend/
+├── services/
+│   ├── aws-lambda-scan-html/
+│   ├── aws-lambda-scan-pdf/
+│   ├── aws-lambda-verapdf-interface/
+│   └── aws-lambda-scan-sqs-router/
+├── shared/
+│   └── types/
+├── aws-layers/
+├── db/
+├── test-data/
+├── ACCESSIBILITY.md
+├── CONTRIBUTE.md
+└── package.json
+```
 
-**Together, we can equalify the internet.**
+## Technology stack
+Based on the repository structure, Equalify currently uses:
+- **JavaScript/TypeScript workspaces** for the main monorepo
+- **AWS-focused services** for scan execution and routing
+- a **frontend + backend split** for application delivery
+- dedicated documentation for accessibility and contributor setup
 
-All the best, 
-**Digital Accessibility Engineering 
-UIC Technology Solutions**
+## Getting started
+### Prerequisites
+- Node.js and npm
+- AWS CLI v2 if you need the current SSO-based contributor workflow
+
+### Install dependencies
+From the repository root:
+
+```bash
+npm install
+```
+
+### Explore the workspace packages
+The root `package.json` declares these workspaces:
+- `apps/frontend`
+- `apps/backend`
+- `services/aws-lambda-scan-html`
+- `services/aws-lambda-scan-pdf`
+- `services/aws-lambda-verapdf-interface`
+- `services/aws-lambda-scan-sqs-router`
+- `shared/types`
+
+## Development workflow
+The repository already includes deeper setup details in [`CONTRIBUTE.md`](./CONTRIBUTE.md), especially for AWS CLI SSO access.
+
+A practical first-pass workflow for contributors is:
+1. clone the repository
+2. run `npm install`
+3. review `CONTRIBUTE.md`
+4. inspect the app and service folders relevant to your change
+5. start with small documentation, accessibility, or isolated service improvements
+
+## Accessibility commitment
+Equalify's accessibility posture is documented in [`ACCESSIBILITY.md`](./ACCESSIBILITY.md).
+
+Highlights include:
+- WCAG 2.2 Level AA as a guiding standard
+- testing with automated tools and assistive technologies
+- issue-based reporting for accessibility barriers
+- accessibility as a core product expectation
+
+## Contributing
+Contributions are welcome, especially in areas like:
+- deployment simplification
+- onboarding documentation
+- scanner customization
+- accessibility fixes
+- clearer local development commands
+
+If you open a pull request, linking the affected workspace or service makes review easier.
+
+## Stay in touch
+- UIC Technology Solutions: https://it.uic.edu/about/technology-solutions/
+- Accessibility engineering updates: http://it.uic.edu/accessibility/engineering
+- Issues and feature discussion: https://github.com/EqualifyEverything/equalify/issues
