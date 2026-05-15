@@ -9,11 +9,18 @@ export const graphqlQuery = async ({ query, variables = {} }) => {
         ...role && ({ 'x-hasura-role': role }),
     };
     // console.log(JSON.stringify({ query, variables, headers }))
-    const response = (await (await fetch(`https://graphql${isStaging ? '-staging' : ''}.equalifyapp.com/v1/graphql`, {
+    const res = await fetch(`https://graphql${isStaging ? '-staging' : ''}.equalifyapp.com/v1/graphql`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ query, variables }),
-    })).json());
+    });
+    const contentType = res.headers.get('content-type') || '';
+    if (!res.ok || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.log(JSON.stringify({ graphqlError: { status: res.status, body: text.slice(0, 500) } }));
+        throw new Error(`GraphQL endpoint returned HTTP ${res.status}`);
+    }
+    const response = await res.json();
     if (!response?.data) {
         console.log(JSON.stringify({ graphqlError: response }));
     }
