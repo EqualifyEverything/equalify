@@ -20,15 +20,18 @@ export const getAuditSummaryFast = async () => {
   
   const start = performance.now();
   const auditId = (event.queryStringParameters as any).id;
-  const mostCommonUrlsLimit =
-    (event.queryStringParameters as any).mostCommonUrlsLimit ?? 5;
-  const mostCommonBlockersLimit =
-    (event.queryStringParameters as any).mostCommonBlockersLimit ?? 5;
-  /* const mostCommonCategoriesLimit =
-    (event.queryStringParameters as any).mostCommonCategoriesLimit ?? 3;
-   */
-  const mostCommonTagsLimit =
-    (event.queryStringParameters as any).mostCommonTagsLimit ?? 3;
+  const mostCommonUrlsLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonUrlsLimit ?? "5"
+  );
+  const mostCommonBlockersLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonBlockersLimit ?? "5"
+  );
+  /* const mostCommonCategoriesLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonCategoriesLimit ?? "3"
+  ); */
+  const mostCommonTagsLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonTagsLimit ?? "3"
+  );
 
   const query = {
     query: `query GetFullAuditSummary(

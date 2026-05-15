@@ -73,13 +73,14 @@ CREATE FUNCTION public.get_most_common_messages(search_audit_id uuid, row_limit 
 BEGIN RETURN QUERY
 SELECT
   m.content :: text AS key,
-  COUNT(*) :: int AS count
+  COUNT(DISTINCT b.id) :: int AS count
 FROM
   blockers b
   JOIN blocker_messages bm ON b.id = bm.blocker_id
   JOIN messages m ON bm.message_id = m.id
 WHERE
   b.audit_id = search_audit_id
+  AND b.scan_id = (SELECT id FROM scans WHERE audit_id = search_audit_id ORDER BY created_at DESC LIMIT 1)
 GROUP BY
   m.content
 ORDER BY
@@ -100,7 +101,7 @@ CREATE FUNCTION public.get_most_common_tags(search_audit_id uuid, row_limit inte
 BEGIN RETURN QUERY
 SELECT
   t.content :: text AS key,
-  COUNT(*) :: int AS count
+  COUNT(DISTINCT b.id) :: int AS count
 FROM
   blockers b
   JOIN blocker_messages bm ON b.id = bm.blocker_id
@@ -109,6 +110,7 @@ FROM
   JOIN tags t ON mt.tag_id = t.id
 WHERE
   b.audit_id = search_audit_id
+  AND b.scan_id = (SELECT id FROM scans WHERE audit_id = search_audit_id ORDER BY created_at DESC LIMIT 1)
 GROUP BY
   t.content
 ORDER BY
@@ -135,6 +137,7 @@ FROM
   JOIN urls u ON b.url_id = u.id
 WHERE
   b.audit_id = search_audit_id
+  AND b.scan_id = (SELECT id FROM scans WHERE audit_id = search_audit_id ORDER BY created_at DESC LIMIT 1)
 GROUP BY
   u.url
 ORDER BY
@@ -405,7 +408,12 @@ CREATE VIEW public.blocker_summary_view AS
      LEFT JOIN public.blocker_messages bm ON ((b.id = bm.blocker_id)))
      LEFT JOIN public.messages m ON ((bm.message_id = m.id)))
      LEFT JOIN public.message_tags mt ON ((m.id = mt.message_id)))
-     LEFT JOIN public.tags t ON ((mt.tag_id = t.id)));
+     LEFT JOIN public.tags t ON ((mt.tag_id = t.id)))
+  WHERE (b.scan_id = ( SELECT scans.id
+           FROM public.scans
+          WHERE (scans.audit_id = b.audit_id)
+          ORDER BY scans.created_at DESC
+         LIMIT 1));
 
 
 --
