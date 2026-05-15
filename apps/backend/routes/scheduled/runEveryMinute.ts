@@ -114,7 +114,7 @@ export const runEveryMinute = async () => {
       text: `UPDATE "scans" 
                    SET "status" = $1, "errors" = $2 
                    WHERE "id" = $3`,
-      values: ["complete", updatedErrors, scan.id],
+      values: ["complete", JSON.stringify(updatedErrors), scan.id],
     });
 
     // Also update the parent audit so the frontend stops showing the spinner
