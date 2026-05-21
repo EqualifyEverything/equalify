@@ -2,54 +2,87 @@
 @use "../global-styles/fonts.scss";
 
 .cards-50 {
-    display:flex;
-    margin-bottom: calc(variables.$spacing*2);
-    gap: calc(variables.$spacing*2);
-    align-items: flex-start;
-    justify-content: space-between;
-    .card {
-        width:50%;
+  display: flex;
+  margin-bottom: calc(variables.$spacing * 2);
+  gap: calc(variables.$spacing * 2);
+  align-items: flex-start;
+  justify-content: space-between;
+  @media screen and (max-width: variables.$breakpoint-small) {
+      display: block;
     }
+  .card {
+    width: 50%;
+    
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+      margin-bottom: calc(variables.$spacing*2);
+    }
+  }
 }
 
 .cards-38-62 {
-    margin-bottom: calc(variables.$spacing*2);
-    display:flex;
-    gap: calc(variables.$spacing*2);
-    align-items: flex-start;
-    justify-content: space-between;
-    .card:nth-of-type(1) {
-        width:38%;
+  margin-bottom: calc(variables.$spacing * 2);
+  display: flex;
+  gap: calc(variables.$spacing * 2);
+  align-items: flex-start;
+  justify-content: space-between;
+  @media screen and (max-width: variables.$breakpoint-small) {
+    display: block;
     }
-    .card:nth-of-type(2) {
-        width:62%;
+  .card:nth-of-type(1) {
+    width: 38%;
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+      
+      margin-bottom: calc(variables.$spacing*2);
     }
+  }
+  .card:nth-of-type(2) {
+    width: 62%;
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+    }
+  }
 }
 .cards-62-38 {
-    margin-bottom: calc(variables.$spacing*2);
-    display:flex;
-    gap: calc(variables.$spacing*2);
-    align-items: flex-start;
-    justify-content: space-between;
-    .card:nth-of-type(1) {
-        width:62%;
+  margin-bottom: calc(variables.$spacing * 2);
+  display: flex;
+  gap: calc(variables.$spacing * 2);
+  align-items: flex-start;
+  justify-content: space-between;
+  @media screen and (max-width: variables.$breakpoint-small) {
+      display: block;
+  }
+  .card:nth-of-type(1) {
+    width: 62%;
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+      margin-bottom: calc(variables.$spacing*2);
     }
-    .card:nth-of-type(2) {
-        width:38%;
+  }
+  .card:nth-of-type(2) {
+    width: 38%;
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
     }
+  }
+  .card {
     .card {
-        .card {
-            width:auto;
-        }
+      width: auto;
     }
+  }
 }
 
 .cards-33 {
-    margin-bottom: calc(variables.$spacing*2);
-    display:flex;
-    flex-wrap: wrap;
-    gap: calc(variables.$spacing*2);
-    .card {
-        width:calc(33.33333% - (12px));
+  margin-bottom: calc(variables.$spacing * 2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(variables.$spacing * 2);
+  .card {
+    width: calc(33.33333% - (12px));
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
     }
+  }
 }

@@ -49,9 +49,16 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: calc(variables.$spacing*2);
+    @media screen and (max-width: variables.$breakpoint-small) {
+      flex-direction: column-reverse;
+    }
   }
   .filter-controls-left {
     display: flex;
+    
+    @media screen and (max-width: variables.$breakpoint-small) {
+      flex-direction: column;
+    }
   }
   .audits-view-selector {
     display: inline-flex;

@@ -4,16 +4,19 @@
 .navigation {
   width: 100%;
   background: variables.$paper;
-  border-bottom:1px solid variables.$paper-dark;
+  border-bottom: 1px solid variables.$paper-dark;
   padding: variables.$spacing;
-  margin-bottom:variables.$spacing*2;
-  .content{
+  margin-bottom: variables.$spacing * 2;
+  .content {
     width: 100%;
     max-width: variables.$max-width;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    @media screen and (max-width: variables.$breakpoint-small) {
+      flex-direction: column;
+    }
   }
   a {
     text-decoration: none;
@@ -22,45 +25,75 @@
     display: inline-flex;
     align-items: center;
     .link {
-        display: inline-block;
-        color:variables.$black;
-        padding: calc(variables.$spacing/2) variables.$spacing;
-        margin-left: calc(variables.$spacing/2);
-        margin-right: calc(variables.$spacing/2);
-        opacity:.8;
-        transition: background 0.12s ease-out, opacity 0.12s ease-out;
-        &:hover {
-            border-radius: calc(variables.$spacing / 2);
-            background-color: variables.$paper;
-            opacity:1;
+      display: inline-block;
+      color: variables.$black;
+      padding: calc(variables.$spacing/2) variables.$spacing;
+      margin-left: calc(variables.$spacing/2);
+      margin-right: calc(variables.$spacing/2);
+      opacity: 0.8;
+      transition:
+        background 0.12s ease-out,
+        opacity 0.12s ease-out;
+      &:hover {
+        border-radius: calc(variables.$spacing / 2);
+        background-color: variables.$paper;
+        opacity: 1;
+      }
+      &.active {
+        opacity: 1;
+        font-weight: 700;
+        position: relative;
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          bottom: -1em;
+          left: 0;
+          display: block;
+          border-bottom: 3px solid variables.$red;
+
+          @media screen and (max-width: variables.$breakpoint-small) {
+            bottom: 0;
+          }
         }
-        &.active {
-          opacity: 1;
-          font-weight: 700;
-          position: relative;
-            &::after{
-              content: "";
-              position: absolute;
-              width: 100%;
-              bottom: -1em;
-              left: 0;
-              display: block;
-              border-bottom: 3px solid variables.$red;
-            }
-        }
+      }
     }
   }
   .nav_buttons {
     button {
-        background: transparent;
-        border:0;
+      background: transparent;
+      border: 0;
+    }
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+      align-content: center;
+      align-items: center;
     }
   }
-  .user_info{
+  .user_info {
     @include fonts.font-size-small;
-    text-align:right;
-    .logout{
-        text-decoration: underline;
+    text-align: right;
+
+    
+      @media screen and (max-width: variables.$breakpoint-small) {
+        display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: variables.$black;
+    padding: 0px 8px;
+    color: variables.$paper;
+      }
+
+    .logout {
+      text-decoration: underline;
+    }
+    .br {
+      @media screen and (max-width: variables.$breakpoint-small) {
+        display: none;
+      }
     }
   }
 }

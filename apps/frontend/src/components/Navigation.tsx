@@ -176,11 +176,11 @@ export const Navigation = () => {
                   </Link>
                 ))}
               </div>
-              <div className={styles.nav_buttons}>
+              <div className={styles["nav_buttons"]}>
                 {authenticated && user && (
                   <div className={styles["user_info"]}>
                     Signed in as <b>{user.name}</b>
-                    <br />
+                    <br className={styles["br"]} />
                     <Link className={styles["logout"]} to="/logout">Logout</Link>
                   </div>
                 )}

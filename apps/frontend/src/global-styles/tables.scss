@@ -4,8 +4,12 @@
 .table-container {
   border: 1px solid variables.$gray;
   border-radius: variables.$spacing;
-  width:100%;
+  width: 100%;
   overflow: hidden;
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    overflow-x: scroll;
+  }
   table {
     width: 100%;
     border-collapse: collapse;
@@ -77,7 +81,7 @@
         }
       }
     }
-    select{
+    select {
       @include fonts.font-size-small;
       padding: calc(variables.$spacing/2) variables.$spacing;
       margin: 0;
@@ -89,7 +93,11 @@
     align-items: center;
     justify-content: space-between;
     padding: variables.$spacing;
-    select{
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+      flex-direction: column;
+    }
+    select {
       @include fonts.font-size-small;
       padding: 0 variables.$spacing;
       margin: 0;
@@ -117,12 +125,18 @@
       button:disabled {
         cursor: not-allowed;
       }
+
+      @media screen and (max-width: variables.$breakpoint-small) {
+        flex-direction: column;
+      }
     }
   }
   &.skeleton {
-    table,thead,tbody {
+    table,
+    thead,
+    tbody {
       display: table;
-      width:100%;
+      width: 100%;
     }
   }
 }
@@ -147,6 +161,10 @@
   align-content: flex-end;
   align-items: flex-end;
   width: 100%;
+  
+  @media screen and (max-width: variables.$breakpoint-small) {
+    display: block;
+  }
   .status-toggle-group {
     margin-left: variables.$spacing;
     button {
@@ -182,7 +200,8 @@
       }
     }
   }
-  .react-select, select {
+  .react-select,
+  select {
     margin-bottom: calc(variables.$spacing);
     min-width: 180px;
   }

@@ -83,6 +83,9 @@
     background: transparent;
     border: 1px solid variables.$gray;
     padding: calc(variables.$spacing * 2);
+    @media screen and (max-width: variables.$breakpoint-small) {
+      padding: calc(variables.$spacing);
+    }
     &[aria-selected="true"] {
       border: 1px solid variables.$red;
     }

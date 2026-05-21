@@ -3,6 +3,7 @@
 
 .AuditHeader {
   margin-bottom: calc(variables.$spacing) * 2;
+
   .audit-name-label {
     display: block;
     @include fonts.font-size-small;
@@ -15,6 +16,12 @@
     align-items: flex-end;
     width: 100%;
     display: inline-flex;
+    
+    @media screen and (max-width: variables.$breakpoint-small) {
+      flex-direction: column-reverse;
+      align-items:center;
+    }
+
     h1 {
       margin: 0;
       line-height: 1em;
@@ -41,3 +48,4 @@
     }
   }
 }
+

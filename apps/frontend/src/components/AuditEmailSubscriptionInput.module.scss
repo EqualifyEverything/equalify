@@ -8,6 +8,10 @@
   }
   .row {
     display: inline-flex;
+    
+    @media screen and (max-width: variables.$breakpoint-small) {
+      display: block;
+    }
     button {
       margin-bottom:0;
       padding-bottom:0;
