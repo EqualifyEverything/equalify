@@ -187,6 +187,7 @@ export const getAuditTable = async () => {
       blockers(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
         id
         short_id
+        content_hash_id
         created_at
         content
         url_id
@@ -297,6 +298,7 @@ export const getAuditTable = async () => {
     return {
       id: blocker.id,
       short_id: blocker.short_id,
+      content_hash_id: blocker.content_hash_id,
       created_at: blocker.created_at,
       url: blocker.url?.url || "Unknown URL",
       type: blocker.url?.type || "unknown",

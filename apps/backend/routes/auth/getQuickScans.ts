@@ -16,7 +16,7 @@ export const getQuickScans = async () => {
                     s.status AS scan_status,
                     s.percentage AS scan_percentage,
                     s.updated_at AS scan_updated_at,
-                    (SELECT COUNT(*) FROM blockers b WHERE b.scan_id = s.id) AS blocker_count
+                    COALESCE(s.blocker_count, 0) AS blocker_count
                 FROM audits a
                 LEFT JOIN urls u ON u.audit_id = a.id
                 LEFT JOIN LATERAL (
