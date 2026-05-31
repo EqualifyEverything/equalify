@@ -98,7 +98,9 @@ export const migrateStaleBlockers = async () => {
             // Batched: process N stale scans per Lambda invocation. Caller re-invokes until done.
             const scansPerBatch: number = body.scansPerBatch ?? 5;
             const maxBatches: number = body.maxBatches ?? 20;
-            const softDeadlineMs = 100000; // stop starting new batches after ~100s (Lambda timeout buffer)
+            // Stop starting new batches with this much headroom left in the Lambda budget.
+            // Default 100s (fits 2-min Lambda). Bump for longer Lambdas via body.softDeadlineMs.
+            const softDeadlineMs: number = body.softDeadlineMs ?? 100000;
 
             // Pre-check: how many stale scans remain to migrate (have blockers still in active table)
             const remainingResult = await db.query({
@@ -188,6 +190,84 @@ export const migrateStaleBlockers = async () => {
                             : "no_more_work",
                     batches: batchResults,
                 },
+            };
+        }
+
+        if (phase === "move_orphan_blocker_messages") {
+            // After move_stale, blocker_messages rows still reference the moved blockers.
+            // Move those orphans to stale_blocker_messages so the link table shrinks too.
+            // Batched: process rowsPerBatch rows per round.
+            const rowsPerBatch: number = body.rowsPerBatch ?? 200000;
+            const maxBatches: number = body.maxBatches ?? 50;
+            const softDeadlineMs: number = body.softDeadlineMs ?? 100000;
+
+            let totalRowsMoved = 0;
+            let batchesRun = 0;
+            const batchResults: any[] = [];
+
+            while (batchesRun < maxBatches && Date.now() - t0 < softDeadlineMs) {
+                const moveResult = await db.query({
+                    text: `
+                        WITH targets AS (
+                            SELECT bm.id
+                            FROM blocker_messages bm
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM blockers b WHERE b.id = bm.blocker_id
+                            )
+                            LIMIT ${rowsPerBatch}
+                        ),
+                        moved AS (
+                            DELETE FROM blocker_messages
+                            WHERE id IN (SELECT id FROM targets)
+                            RETURNING id, created_at, updated_at, message_id, blocker_id
+                        )
+                        INSERT INTO stale_blocker_messages
+                            (id, created_at, updated_at, message_id, blocker_id)
+                        SELECT id, created_at, updated_at, message_id, blocker_id FROM moved
+                    `,
+                });
+
+                const rowsMoved = moveResult.rowCount ?? 0;
+                batchesRun++;
+                totalRowsMoved += rowsMoved;
+                batchResults.push({ batch: batchesRun, rowsMoved });
+
+                if (rowsMoved === 0) break;
+            }
+
+            await db.clean();
+            return {
+                statusCode: 200,
+                body: {
+                    phase,
+                    batchesRun,
+                    totalRowsMoved,
+                    ms: Date.now() - t0,
+                    stoppedReason: batchesRun >= maxBatches
+                        ? "max_batches_reached"
+                        : Date.now() - t0 >= softDeadlineMs
+                            ? "soft_deadline"
+                            : "no_more_work",
+                    batches: batchResults,
+                },
+            };
+        }
+
+        if (phase === "vacuum_full") {
+            // VACUUM FULL rewrites the heap to reclaim space from dead tuples.
+            // Takes an ACCESS EXCLUSIVE lock for the duration — table is unavailable.
+            // Hasura SQL console won't let you run this (TX wrapper); this route works
+            // because serverless-postgres runs each query non-transactionally.
+            const tableName: string = body.tableName;
+            if (!tableName || !/^[a-z_]+$/.test(tableName)) {
+                await db.clean();
+                return { statusCode: 400, body: { error: "tableName required, lowercase letters/underscores only" } };
+            }
+            await db.query({ text: `VACUUM FULL public.${tableName}` });
+            await db.clean();
+            return {
+                statusCode: 200,
+                body: { phase, tableName, ms: Date.now() - t0 },
             };
         }
 

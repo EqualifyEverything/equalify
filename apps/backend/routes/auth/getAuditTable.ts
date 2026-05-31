@@ -69,31 +69,25 @@ export const getAuditTable = async () => {
     });
   }
 
-  // Status filtering ('ignore' field true/false)
+  // Status filtering ('ignore' field true/false).
+  // Filter directly on the blocker → ignored_blocker relationship — going through
+  // blocker_messages forces a 20M-row sequential scan over that table.
   if (statusParam) {
     if (statusParam === "active") {
       whereConditions.push({
-        blocker_messages: {
-          blocker: {
-            _not: {
-              ignored_blocker: {
-                blocker_id: {
-                  _is_null: false,
-                },
-              },
+        _not: {
+          ignored_blocker: {
+            blocker_id: {
+              _is_null: false,
             },
           },
         },
       });
     } else if (statusParam === "ignored") {
       whereConditions.push({
-        blocker_messages: {
-          blocker: {
-            ignored_blocker: {
-              id: {
-                _is_null: false,
-              },
-            },
+        ignored_blocker: {
+          id: {
+            _is_null: false,
           },
         },
       });
@@ -130,12 +124,13 @@ export const getAuditTable = async () => {
   }
 
   // Build where clauses for status counts (excluding status filter)
-  // Get Where conditions without ignore conditions
+  // Strip the active/ignored status condition so the count queries can apply
+  // their own active/ignored filters independently.
   const baseWhereConditions = whereConditions.filter(
     (cond) =>
       !(
-        cond.blocker_messages?.blocker?.ignored_blocker ||
-        cond.blocker_messages?.blocker?._not?.ignored_blocker
+        cond.ignored_blocker ||
+        cond._not?.ignored_blocker
       )
   );
   const baseWhereClause =
@@ -145,14 +140,10 @@ export const getAuditTable = async () => {
     _and: [
       ...baseWhereConditions,
       {
-        blocker_messages: {
-          blocker: {
-            _not: {
-              ignored_blocker: {
-                blocker_id: {
-                  _is_null: false,
-                },
-              },
+        _not: {
+          ignored_blocker: {
+            blocker_id: {
+              _is_null: false,
             },
           },
         },
@@ -164,13 +155,9 @@ export const getAuditTable = async () => {
     _and: [
       ...baseWhereConditions,
       {
-        blocker_messages: {
-          blocker: {
-            ignored_blocker: {
-              id: {
-                _is_null: false,
-              },
-            },
+        ignored_blocker: {
+          id: {
+            _is_null: false,
           },
         },
       },

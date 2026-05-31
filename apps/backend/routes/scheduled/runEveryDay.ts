@@ -16,6 +16,8 @@ export const runEveryDay = async () => {
 
     let totalMoved = 0;
     let batches = 0;
+    let bmMoved = 0;
+    let bmBatches = 0;
 
     try {
         while (Date.now() - t0 < SOFT_DEADLINE_MS) {
@@ -54,6 +56,35 @@ export const runEveryDay = async () => {
 
             if (rowsMoved === 0) break; // nothing left to move
         }
+
+        // Also sweep any orphan blocker_messages whose blocker now lives in stale_blockers.
+        // Bounded so a backlog can't blow the daily run.
+        const ORPHAN_BM_BATCH_ROWS = 200000;
+        const ORPHAN_BM_MAX_BATCHES = 10;
+        while (bmBatches < ORPHAN_BM_MAX_BATCHES && Date.now() - t0 < SOFT_DEADLINE_MS) {
+            const result = await db.query({
+                text: `
+                    WITH targets AS (
+                        SELECT bm.id FROM blocker_messages bm
+                        WHERE NOT EXISTS (SELECT 1 FROM blockers b WHERE b.id = bm.blocker_id)
+                        LIMIT ${ORPHAN_BM_BATCH_ROWS}
+                    ),
+                    moved AS (
+                        DELETE FROM blocker_messages
+                        WHERE id IN (SELECT id FROM targets)
+                        RETURNING id, created_at, updated_at, message_id, blocker_id
+                    )
+                    INSERT INTO stale_blocker_messages
+                        (id, created_at, updated_at, message_id, blocker_id)
+                    SELECT id, created_at, updated_at, message_id, blocker_id FROM moved
+                `,
+            });
+            const moved = result.rowCount ?? 0;
+            bmBatches++;
+            bmMoved += moved;
+            if (moved === 0) break;
+        }
+        console.log(`runEveryDay: also moved ${bmMoved} orphan blocker_messages in ${bmBatches} batch(es)`);
     } catch (err: any) {
         console.error("runEveryDay error:", err);
         try { await db.clean(); } catch {}
@@ -61,6 +92,6 @@ export const runEveryDay = async () => {
     }
 
     await db.clean();
-    console.log(`runEveryDay: moved ${totalMoved} stale blockers in ${batches} batch(es) (${Date.now() - t0}ms)`);
-    return { totalMoved, batches, ms: Date.now() - t0 };
+    console.log(`runEveryDay: moved ${totalMoved} stale blockers in ${batches} batch(es), ${bmMoved} orphan blocker_messages in ${bmBatches} batch(es) (${Date.now() - t0}ms)`);
+    return { totalMoved, batches, bmMoved, bmBatches, ms: Date.now() - t0 };
 };
