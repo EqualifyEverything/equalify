@@ -54,6 +54,7 @@ interface BlockerTag {
 export interface Blocker {
   id: string;
   short_id: string;
+  content_hash_id: string;
   created_at: string;
   url: string;
   url_id: string;
@@ -132,9 +133,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const toggleIgnoreMutation = useMutation({
     mutationFn: async ({
       blockerId,
+      contentHashId,
       isCurrentlyIgnored,
     }: {
       blockerId: string;
+      contentHashId: string;
       isCurrentlyIgnored: boolean;
     }) => {
       if (isCurrentlyIgnored) {
@@ -151,18 +154,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           variables: { audit_id: auditId, blocker_id: blockerId },
         });
       } else {
-        // Insert into ignored_blockers
+        // Insert into ignored_blockers (with content_hash_id denormalized for fast lookups)
         await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!) {
+          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!) {
             insert_ignored_blockers_one(object: {
               audit_id: $audit_id,
-              blocker_id: $blocker_id
+              blocker_id: $blocker_id,
+              content_hash_id: $content_hash_id
             }) {
               audit_id
               blocker_id
             }
           }`,
-          variables: { audit_id: auditId, blocker_id: blockerId },
+          variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
         });
       }
     },
@@ -528,8 +532,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       {
         accessorKey: "id",
         header: "Ignore",
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const blockerId = getValue() as string;
+          const contentHashId = row.original.content_hash_id;
           const isIgnored = ignoredBlockers?.has(blockerId) || false;
           return (
             <StyledButton
@@ -537,6 +542,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 if (!authenticated) return;
                 toggleIgnoreMutation.mutate({
                   blockerId,
+                  contentHashId,
                   isCurrentlyIgnored: isIgnored,
                 });
                 setAnnounceMessage(

@@ -22,7 +22,7 @@ interface graphResponse {
 //"{\"emails\":[{\"id\":\"742170ae-37a2-4c22-b732-af19029130e3\",\"email\":\"sdanie28@uic.edu\",\"frequency\":\"Weekly\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"},{\"id\":\"cd0bbc97-8e1c-4e2c-b3a3-3306a864dd61\",\"email\":\"negatia@gmail.com\",\"frequency\":\"Daily\",\"lastSent\":\"2025-10-17T12:53:00.180Z\"}]}",
 
 export const processScheduledAuditEmails = async () => {
-  console.log("Started processing scheduled audit emails...");
+  // console.log("Started processing scheduled audit emails...");
   await db.connect();
   // fetch the email_notification fields (when email_notifications and response are not null)
   const query = {
@@ -93,9 +93,9 @@ export const processScheduledAuditEmails = async () => {
           values: [JSON.stringify(audit.email_notifications), audit.id],
         });
 
-        console.log(
-          `Sending email to ${email.email}. Last sent ${lastSent.toISO()}, frequency: ${email.frequency}.`
-        );
+        // console.log(
+        //   `Sending email to ${email.email}. Last sent ${lastSent.toISO()}, frequency: ${email.frequency}.`
+        // );
         sentCount++;
         await sendEmail({
           to: email.email,
@@ -121,17 +121,17 @@ export const processScheduledAuditEmails = async () => {
           </tr>`,
         });
       } else {
-        console.log(
-          `Skipping email to ${email.email}, last sent ${email.lastSent}, frequency: ${email.frequency}.`
-        );
+        // console.log(
+        //   `Skipping email to ${email.email}, last sent ${email.lastSent}, frequency: ${email.frequency}.`
+        // );
       }
     }
   }
 
   await db.clean();
-  console.log(
-    `Finished processing ${subscriptionsCount} scheduled audit emails, ${sentCount} emails sent.`
-  );
+  // console.log(
+  //   `Finished processing ${subscriptionsCount} scheduled audit emails, ${sentCount} emails sent.`
+  // );
   return;
 };
 

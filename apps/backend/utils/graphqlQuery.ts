@@ -1,6 +1,6 @@
 import { event, isStaging } from '.';
 
-const GRAPHQL_TIMEOUT_MS = 25_000;
+const GRAPHQL_TIMEOUT_MS = 60_000;
 const RETRY_DELAYS_MS = [1_000, 2_000];
 
 export const graphqlQuery = async ({ query, variables = {} }) => {
@@ -42,7 +42,10 @@ export const graphqlQuery = async ({ query, variables = {} }) => {
             return response?.data;
         } catch (err) {
             clearTimeout(timer);
-            const isRetryable = err.name === 'AbortError' || err.message?.includes('fetch failed');
+            // Only retry actual network failures. Don't retry our own timeout (AbortError):
+            // it's the same query against the same DB — retrying just multiplies load and creates
+            // a stampede that makes everything worse.
+            const isRetryable = err.message?.includes('fetch failed');
             console.log(JSON.stringify({ graphqlError: { message: err.message, attempt } }));
             if (isRetryable && attempt < RETRY_DELAYS_MS.length) {
                 lastError = err;

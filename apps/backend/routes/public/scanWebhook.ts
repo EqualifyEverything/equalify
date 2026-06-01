@@ -224,21 +224,21 @@ export const scanWebhook = async () => {
                 }
             }
 
-            // 2. Bulk insert ignored_blockers
+            // 2. Bulk insert ignored_blockers (with content_hash_id denormalized for fast lookups)
             const ignoredEntries = prepared
-                .map((bd, i) => ({ blockerId: blockerIds[i], isIgnored: bd.isIgnored }))
+                .map((bd, i) => ({ blockerId: blockerIds[i], contentHashId: bd.contentHashId, isIgnored: bd.isIgnored }))
                 .filter(e => e.isIgnored);
             if (ignoredEntries.length > 0) {
                 const vals = [];
                 const params = [];
                 let p = 1;
                 for (const entry of ignoredEntries) {
-                    vals.push(`($${p}, $${p+1})`);
-                    params.push(auditId, entry.blockerId);
-                    p += 2;
+                    vals.push(`($${p}, $${p+1}, $${p+2})`);
+                    params.push(auditId, entry.blockerId, entry.contentHashId);
+                    p += 3;
                 }
                 await db.query({
-                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id") VALUES ${vals.join(', ')} ON CONFLICT DO NOTHING`,
+                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id", "content_hash_id") VALUES ${vals.join(', ')} ON CONFLICT DO NOTHING`,
                     values: params,
                 });
             }
@@ -333,12 +333,25 @@ export const scanWebhook = async () => {
     const { isComplete, percentage, scannedCount, totalPages } = await updateScanProgress();
     console.log(`Scan progress: ${scannedCount}/${totalPages} pages (${percentage}%) - ${isComplete ? 'COMPLETE' : 'processing'}`);
 
-    // Update audit status when scan is complete
+    // Update audit status when scan is complete + freeze rolled-up counts onto the scan row
     if (isComplete) {
         await db.query({
             text: `UPDATE "audits" SET "status"=$1 WHERE "id"=$2`,
             values: ['complete', auditId],
         });
+        // Denormalize counts so we never need to aggregate over historical blockers later
+        if (effectiveScanId) {
+            await db.query({
+                text: `
+                    UPDATE "scans"
+                    SET
+                        "blocker_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1), 0),
+                        "equalified_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1 AND "equalified" = true), 0)
+                    WHERE "id" = $1
+                `,
+                values: [effectiveScanId],
+            });
+        }
     }
 
     await db.clean();

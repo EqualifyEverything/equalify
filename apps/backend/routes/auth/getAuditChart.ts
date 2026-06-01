@@ -13,21 +13,20 @@ export const getAuditChart = async () => {
   ).rows?.[0];
   await db.clean();
 
-  // Query to get all scans for the audit with blocker counts
+  // Query to get all scans for the audit with their frozen blocker counts.
+  // Reads scans.blocker_count (denormalized at scan completion) instead of
+  // aggregating live over blockers — survives the stale_blockers migration
+  // and stays fast as the table grows.
   const query = {
     query: `query ($audit_id: uuid!) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: asc}) {
       id
       created_at
-      # processed_pages 
+      # processed_pages
       pages
       errors
-      blockers_aggregate(where: {_not: {ignored_blocker: {id: {_is_null: false}}}}) {
-        aggregate {
-          count
-        }
-      }
+      blocker_count
     }
   }
 }`,
@@ -52,7 +51,7 @@ export const getAuditChart = async () => {
     //console.log("scanDate", scanDate);
     const dateKey = scanDate.toISOString().split("T")[0]; // YYYY-MM-DD format
     //console.log("dateKey", dateKey)
-    const blockerCount = scan.blockers_aggregate?.aggregate?.count || 0;
+    const blockerCount = scan.blocker_count ?? 0;
 
     const pagesCount = scan.pages.length;
     //const processedPagesCount = scan.processed_pages.length;
