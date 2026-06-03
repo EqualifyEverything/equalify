@@ -8,10 +8,10 @@ import { MetricUnit } from "@aws-lambda-powertools/metrics";
 import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
 const sqsClient = new SQSClient({ region: process.env.AWS_REGION ?? "us-east-2" });
 const htmlQueueUrl =
-  "https://sqs.us-east-2.amazonaws.com/380610849750/scanHtml.fifo";
+  process.env.SQS_HTML_QUEUE_URL ?? "https://sqs.us-east-2.amazonaws.com/380610849750/scanHtml.fifo";
 
 const pdfQueueUrl =
-  "https://sqs.us-east-2.amazonaws.com/380610849750/scanPdf.fifo";
+  process.env.SQS_PDF_QUEUE_URL ?? "https://sqs.us-east-2.amazonaws.com/380610849750/scanPdf.fifo";
 
 export const handler = middy()
   .use(parser({ schema: scansSchema }))
