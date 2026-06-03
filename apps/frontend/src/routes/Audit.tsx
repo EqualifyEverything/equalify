@@ -586,10 +586,15 @@ export const Audit = () => {
                           <YAxis
                             //axisLine={false}
                             orientation="left"
-                            label={{/* 
+                            label={{/*
                         value: "Blockers", */
                               angle: -90,
                               position: "insideLeft",
+                            }}
+                            tickFormatter={(value: number) => {
+                              if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(value % 1_000_000 === 0 ? 0 : 1)}M`;
+                              if (value >= 1_000) return `${(value / 1_000).toFixed(value % 1_000 === 0 ? 0 : 1)}k`;
+                              return String(value);
                             }}
                           />
                           <Tooltip content={<ChartTooltipContent />} />
