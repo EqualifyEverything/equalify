@@ -11,7 +11,8 @@ export const graphqlQuery = async ({ query, variables = {} }) => {
         ...authorization ? { authorization } : { 'x-hasura-admin-secret': process.env.DB_PASSWORD },
         ...role && ({ 'x-hasura-role': role }),
     };
-    const url = `https://graphql${isStaging ? '-staging' : ''}.equalifyapp.com/v1/graphql`;
+    const graphqlBase = process.env.GRAPHQL_URL ?? `https://graphql${isStaging ? '-staging' : ''}.equalifyapp.com`;
+    const url = `${graphqlBase}/v1/graphql`;
     const body = JSON.stringify({ query, variables });
 
     let lastError: Error;

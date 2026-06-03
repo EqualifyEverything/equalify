@@ -18,8 +18,8 @@ import { SqsScanJob } from "../../../shared/types/sqsScanJob.ts";
 //import convertToEqualifyV2 from "../../../shared/convertors/VeraToEqualify2.ts"
 
 const processor = new BatchProcessor(EventType.SQS);
-const RESULTS_ENDPOINT_PROD = "https://api.equalifyapp.com/public/scanWebhook";
-const RESULTS_ENDPOINT_STAGING = "https://api-staging.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT_PROD = process.env.SCAN_WEBHOOK_URL ?? "https://api.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT_STAGING = process.env.SCAN_WEBHOOK_URL_STAGING ?? "https://api-staging.equalifyapp.com/public/scanWebhook";
 const getResultsEndpoint = (isStaging?: boolean) => isStaging ? RESULTS_ENDPOINT_STAGING : RESULTS_ENDPOINT_PROD;
 
 // {"data":{"auditId":"51a5077e-f8e6-4f75-939e-9c91b00a1f2e","urlId":"ea350f8f-5e56-4361-8cd5-570fcea0025d","url":"http://decubing.com/wp-content/uploads/2025/05/zombieplan.pdf","type":"pdf"}}

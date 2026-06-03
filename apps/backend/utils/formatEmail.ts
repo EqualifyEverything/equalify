@@ -1,6 +1,9 @@
 import { isStaging } from './isStaging';
 
 export const formatEmail = ({ body }) => {
+    const appUrl = process.env.APP_URL ?? `https://app${isStaging ? '-staging' : ''}.equalify.uic.edu`;
+    const brandUrl = process.env.BRAND_URL ?? 'https://equalify.app/';
+    const brandLogoUrl = process.env.BRAND_LOGO_URL ?? 'https://equalify.app/wp-content/uploads/2024/04/Equalify-Logo-768x237.png';
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +20,7 @@ export const formatEmail = ({ body }) => {
           <!-- Header -->
           <tr>
             <td align="center" style="padding:20px 24px 10px 24px; background-color:#ffffff; border-bottom:1px solid #e5e7eb;">
-              <a href="https://equalify.app/"><img src="https://equalify.app/wp-content/uploads/2024/04/Equalify-Logo-768x237.png" alt="Equalify" style="max-width:160px; height:auto; display:block;" /></a>
+              <a href="${brandUrl}"><img src="${brandLogoUrl}" alt="Equalify" style="max-width:160px; height:auto; display:block;" /></a>
             </td>
           </tr>
 
@@ -27,7 +30,7 @@ export const formatEmail = ({ body }) => {
           <tr>
             <td style="padding:0 24px 24px 24px; font-size:13px; line-height:1.4; color:#334155;">
               Don't want these emails?
-              <a href="https://app${isStaging ? '-staging' : ''}.equalify.uic.edu/unsubscribe" style="color:#334155; text-decoration:underline;">
+              <a href="${appUrl}/unsubscribe" style="color:#334155; text-decoration:underline;">
                 Unsubscribe
               </a>
             </td>
