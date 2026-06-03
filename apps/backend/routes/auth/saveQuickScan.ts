@@ -38,7 +38,7 @@ export const saveQuickScan = async () => {
             values: [id, 'processing', JSON.stringify([{ url, type }])],
         })).rows[0].id;
         await lambda.send(new InvokeCommand({
-            FunctionName: "aws-lambda-scan-sqs-router",
+            FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
             InvocationType: "Event",
             Payload: JSON.stringify({
                 urls: [{ auditId: id, scanId, urlId: urlRow.id, url, type, isStaging }]

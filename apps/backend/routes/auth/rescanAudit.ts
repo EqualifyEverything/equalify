@@ -40,7 +40,7 @@ export const rescanAudit = async () => {
         values: [audit_id, 'processing', JSON.stringify(urls.map(obj => ({ url: obj.url, type: obj.type })))],
     })).rows[0].id;
     await lambda.send(new InvokeCommand({
-        FunctionName: "aws-lambda-scan-sqs-router",
+        FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
         InvocationType: "Event",
         Payload: JSON.stringify({
             urls: urls?.map(url => ({ auditId: audit_id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))

@@ -19,7 +19,7 @@ export const crawlUrl = async () => {
 
   const response = await lambda.send(
     new InvokeCommand({
-      FunctionName: "aws-lambda-crawler",
+      FunctionName: process.env.CRAWLER_FUNCTION_NAME ?? "aws-lambda-crawler",
       InvocationType: "RequestResponse",
       Payload: JSON.stringify({
         body: JSON.stringify({ url }),

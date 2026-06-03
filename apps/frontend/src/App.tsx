@@ -145,9 +145,7 @@ Amplify.configure(
 
 cognitoUserPoolsTokenProvider.setKeyValueStorage(
   new CookieStorage({
-    domain: location.hostname.endsWith("equalifyapp.com")
-      ? "equalifyapp.com"
-      : location.hostname,
+    domain: (() => { const d = import.meta.env.VITE_APP_DOMAIN ?? "equalify.uic.edu"; return location.hostname.endsWith(d) ? d : location.hostname; })(),
     secure: false,
     sameSite: "lax",
   })

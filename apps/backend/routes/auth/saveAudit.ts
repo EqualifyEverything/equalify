@@ -45,7 +45,7 @@ export const saveAudit = async () => {
                 })).rows;
                 console.log('Found URLs for audit:', { auditId: id, count: urls?.length, urls });
                 await lambda.send(new InvokeCommand({
-                    FunctionName: "aws-lambda-scan-sqs-router",
+                    FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
                     InvocationType: "Event",
                     Payload: JSON.stringify({
                         urls: urls?.map(url => ({ auditId: id, scanId: scanId, urlId: url.id, url: url.url, type: url.type, isStaging }))

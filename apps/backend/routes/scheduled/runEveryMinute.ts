@@ -78,7 +78,7 @@ export const runEveryMinute = async () => {
     ).rows[0].id;
     await lambda.send(
       new InvokeCommand({
-        FunctionName: "aws-lambda-scan-sqs-router",
+        FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
         InvocationType: "Event",
         Payload: JSON.stringify({
           urls: urls?.map((url: { id: string; url: string; type: string; }) => ({

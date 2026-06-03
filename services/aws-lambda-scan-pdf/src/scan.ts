@@ -20,7 +20,7 @@ export default async function (job: SqsScanJob) {
   // invoke java scannning lambda
   const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION ?? "us-east-2" });
   const invokeParams = {
-    FunctionName: "aws-lambda-verapdf-interface", 
+    FunctionName: process.env.VERAPDF_FUNCTION_NAME ?? "aws-lambda-verapdf-interface",
     InvocationType: InvocationType.RequestResponse, 
     Payload: JSON.stringify(url),
   };
