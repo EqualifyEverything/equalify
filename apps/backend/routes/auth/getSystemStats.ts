@@ -3,7 +3,7 @@ import { CloudWatchClient, GetMetricStatisticsCommand } from "@aws-sdk/client-cl
 
 const cloudwatch = new CloudWatchClient({ region: process.env.AWS_REGION ?? "us-east-2" });
 
-const NAMESPACE = "equalifyuic";
+const NAMESPACE = process.env.POWERTOOLS_METRICS_NAMESPACE ?? "equalifyuic";
 
 async function getCwMetric(
     serviceName: string,
