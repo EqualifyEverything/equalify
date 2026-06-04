@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../queries";
@@ -45,6 +45,7 @@ export const BuildAudit = () => {
   const [auditNameValid, setAuditNameValid] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
+  const submittingRef = useRef(false);
   const [scanFrequency, setScanFrequency] = useState("Manually");
 
   const [validRemoteCsv, setValidRemoteCsv] = useState(false);
@@ -101,6 +102,7 @@ export const BuildAudit = () => {
 
   const saveAndRunAudit = async (e: FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     if (pages.length === 0) {
       window.alert(`You need to add at least 1 URL to your audit.`);
       return;
@@ -110,6 +112,7 @@ export const BuildAudit = () => {
     const formData = new FormData(form);
     const auditData = buildAuditData(formData);
     console.log("Audit Data (Save & Run):", JSON.stringify(auditData));
+    submittingRef.current = true;
     setIsSavingAndRunning(true);
     try {
       const response = (await (
@@ -123,6 +126,7 @@ export const BuildAudit = () => {
       await createLog(`Audit created and audit run started!`, response.id);
       navigate(`/audits/${response?.id}`);
     } finally {
+      submittingRef.current = false;
       queryClient.invalidateQueries({ queryKey: ["audits"]});
       setIsSavingAndRunning(false);
     }
@@ -130,6 +134,7 @@ export const BuildAudit = () => {
 
   const saveAudit = async (e: FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     if (pages.length === 0) {
       window.alert(`You need to add at least 1 URL to your audit.`);
       return;
@@ -140,6 +145,7 @@ export const BuildAudit = () => {
     const auditData = buildAuditData(formData);
 
     console.log("Audit Data (Save):", JSON.stringify(auditData));
+    submittingRef.current = true;
     setIsSaving(true);
     try {
       const response = (await (
@@ -153,6 +159,7 @@ export const BuildAudit = () => {
       await createLog(`Audit created!`, response.id);
       navigate(`/audits/${response?.id}`);
     } finally {
+      submittingRef.current = false;
       queryClient.invalidateQueries({ queryKey: ["audits"]});
       setIsSaving(false);
     }
