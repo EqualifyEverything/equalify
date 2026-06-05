@@ -4,6 +4,7 @@
 .UsersTable {
   table {
     display:table !important;
+    min-height: unset;
   }
   
   th:last-child,

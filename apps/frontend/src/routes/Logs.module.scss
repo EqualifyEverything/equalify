@@ -1,0 +1,10 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.Logs {
+}
+.message {
+  width: 400px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}

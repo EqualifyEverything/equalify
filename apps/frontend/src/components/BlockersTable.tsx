@@ -873,6 +873,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       ) : (
         <>
           <div className="table-container">
+            <div className="table-scroll-wrapper">
             <table aria-label="Blockers table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -911,6 +912,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                 )}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination Controls */}
             <div
@@ -925,50 +927,52 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   ` (Page ${page + 1} of ${data.pagination.totalPages})`}
               </div>
               <div className="pagination-buttons">
-                <label htmlFor="pageSize">Blockers per page:</label>
-                <select
-                  id="pageSize"
-                  value={pageSize}
-                  onChange={handlePageSizeChange}
-                >
-                  <option value="10">10</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-                <button
+                <div className="page-size-control">
+                  <label htmlFor="pageSize">Blockers per page:</label>
+                  <select
+                    id="pageSize"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                  >
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <div className="pagination-buttons-prev-next">
+                <StyledButton
                   onClick={() => setPage(0)}
                   disabled={page === 0}
-                  aria-label="Go to first page"
-                >
-                  First
-                </button>
-                <button
+                  label="First"
+                  variant="light"
+                  className="pagination-edge"
+                />
+                <StyledButton
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  aria-label="Go to previous page"
-                >
-                  Previous
-                </button>
-                <button
+                  label="Previous"
+                  variant="light"
+                />
+                <StyledButton
                   onClick={() => setPage((p) => p + 1)}
                   disabled={
                     !data?.pagination || page >= data.pagination.totalPages - 1
                   }
-                  aria-label="Go to next page"
-                >
-                  Next
-                </button>
-                <button
+                  label="Next"
+                  variant="light"
+                />
+                <StyledButton
                   onClick={() =>
                     data?.pagination && setPage(data.pagination.totalPages - 1)
                   }
                   disabled={
                     !data?.pagination || page >= data.pagination.totalPages - 1
                   }
-                  aria-label="Go to last page"
-                >
-                  Last
-                </button>
+                  label="Last"
+                  variant="light"
+                  className="pagination-edge"
+                />
+                </div>
               </div>
             </div>
           </div>

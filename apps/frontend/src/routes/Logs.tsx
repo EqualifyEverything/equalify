@@ -10,6 +10,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { SkeletonTable } from "#src/components/Skeleton.tsx";
+import { StyledButton } from "#src/components/StyledButton.tsx";
+import style from './Logs.module.scss';
 
 export const Logs = () => {
   const [page, setPage] = useState(0);
@@ -53,13 +55,7 @@ export const Logs = () => {
           });
         },
       },
-      {
-        accessorKey: "message",
-        header: "Message",
-        cell: ({ getValue }) => {
-          return getValue();
-        },
-      },
+      
       {
         accessorKey: "LogToUser",
         header: "User",
@@ -67,6 +63,16 @@ export const Logs = () => {
             const userObj = getValue() as userObj;
             return `${userObj.name} (${userObj.email})`;
         }
+      },
+      {
+        accessorKey: "message",
+        header: "Message",
+        meta: {
+          className: style["message"]
+        },
+        cell: ({ getValue }) => {
+          return getValue();
+        },
       },
       {
         accessorKey: "LogToAudit",
@@ -102,6 +108,7 @@ export const Logs = () => {
       ) : (
         <>
           <div className="table-container" style={{ marginBottom : "16px" }}>
+            <div className="table-scroll-wrapper">
             <table
               aria-label="Logs table"
             >
@@ -130,7 +137,6 @@ export const Logs = () => {
                   <tr>
                     <td
                       colSpan={columns.length}
-                      className="border border-gray-300 px-4 py-8 text-center text-gray-500"
                     >
                       No logs found
                     </td>
@@ -139,13 +145,12 @@ export const Logs = () => {
                   table.getRowModel().rows.map((row, index) => (
                     <tr
                       key={row.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                    >
+                      >
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
-                          className="border border-gray-300 px-4 py-2"
-                        >
+                          className={cell.column.columnDef.meta?.className ?? ""}
+                          >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -157,65 +162,66 @@ export const Logs = () => {
                 )}
               </tbody>
             </table>
-          
+            </div>
 
-          {/* Pagination Controls */}
-           
-                <div
-                  className="pagination"
-                  role="navigation"
-                  aria-label="Pagination"
-                >
-                  <div className="pagination-text">
-                    Showing {logs?.logs?.length || 0} of{" "}
-                    {logs?.logs_aggregate.aggregate.count || 0} logs
-                    {logs?.logs_aggregate.aggregate.count &&
-                      ` (Page ${page + 1} of ${Math.ceil(logs.logs_aggregate.aggregate.count / pageSize)})`}
-                  </div>
-                  <div className="pagination-buttons">
-                    <label htmlFor="pageSize" className="text-sm">Logs per page:</label>
-                    <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
-                      <option value="10">10</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                    </select>
-                    <button
-                      onClick={() => setPage(0)}
-                      disabled={page === 0}
-                      aria-label="Go to first page"
-                    >
-                      First
-                    </button>
-                    <button
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                      disabled={page === 0}
-                      aria-label="Go to previous page"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setPage((p) => p + 1)}
-                      disabled={
-                        !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
-                      }
-                      aria-label="Go to next page"
-                    >
-                      Next
-                    </button>
-                    <button
-                      onClick={() =>
-                        logs && setPage(Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1)
-                      }
-                      disabled={
-                        !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
-                      }
-                      aria-label="Go to last page"
-                    >
-                      Last
-                    </button>
-                  </div>
-                </div> 
+            {/* Pagination Controls */}
+            <div
+              className="pagination"
+              role="navigation"
+              aria-label="Pagination"
+            >
+              <div className="pagination-text">
+                Showing {logs?.logs?.length || 0} of{" "}
+                {logs?.logs_aggregate.aggregate.count || 0} logs
+                {logs?.logs_aggregate.aggregate.count &&
+                  ` (Page ${page + 1} of ${Math.ceil(logs.logs_aggregate.aggregate.count / pageSize)})`}
+              </div>
+              <div className="pagination-buttons">
+                <div className="page-size-control">
+                  <label htmlFor="pageSize">Logs per page:</label>
+                  <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
                 </div>
+                <div className="pagination-buttons-prev-next">
+                  <StyledButton
+                    onClick={() => setPage(0)}
+                    disabled={page === 0}
+                    label="First"
+                    variant="light"
+                    className="pagination-edge"
+                  />
+                  <StyledButton
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                    label="Previous"
+                    variant="light"
+                  />
+                  <StyledButton
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={
+                      !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
+                    }
+                    label="Next"
+                    variant="light"
+                  />
+                  <StyledButton
+                    onClick={() =>
+                      logs && setPage(Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1)
+                    }
+                    disabled={
+                      !logs || page >= Math.ceil(logs.logs_aggregate.aggregate.count / pageSize) - 1
+                    }
+                    label="Last"
+                    variant="light"
+                    className="pagination-edge"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
     </>

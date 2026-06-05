@@ -89,10 +89,18 @@
   }
   /* table cells */
   td.url {
-    min-width: 400px;
+    width:430px;
+    word-break: break-all;
+    line-height: 1.4em;
+    a {
+      overflow-wrap: anywhere;
+    }
   }
   td.issue {
     min-width: 300px;
+    max-width: 400px;
+  }
+  td.content {
   }
   td.tags {
     min-width: 140px;

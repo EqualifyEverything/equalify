@@ -3,6 +3,9 @@
 
 .AuditPagesInputTable {
   margin-top:calc(variables.$spacing*2);
+  table {
+    min-height: unset !important;
+  }
   /* th:last-of-type {
     text-align: center;
   };

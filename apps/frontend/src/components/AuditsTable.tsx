@@ -13,7 +13,7 @@ import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
 import { useMemo, useState } from "react";
 import { Scan } from "#src/routes/Audits.tsx";
-import { StyledLabeledInput } from "./StyledLabeledInput";
+
 import { formatId } from "../utils";
 import { Link } from "react-router-dom";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
@@ -174,6 +174,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       ) : (
         <>
           <div className="table-container">
+            <div className="table-scroll-wrapper">
             <table aria-label="Audits table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -238,6 +239,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
                 )}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination Controls */}
             <div
@@ -246,14 +248,11 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
               aria-label="Pagination"
             >
               <div className="pagination-text">
-                Showing {table.getState().pagination.pageSize} of{" "}
-                {audits.length} Audits
+                {audits &&
+                  `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
               </div>
               <div className="pagination-buttons">
-                {audits &&
-                  ` Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
-
-                <StyledLabeledInput>
+                <div className="page-size-control">
                   <label htmlFor="pageSize">Audits per page:</label>
                   <select
                     id="pageSize"
@@ -266,39 +265,38 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
                     <option value="50">50</option>
                     <option value="100">100</option>
                   </select>
-                </StyledLabeledInput>
-
-                <button
-                  onClick={() => table.firstPage()}
-                  disabled={table.getState().pagination.pageIndex == 0}
-                  aria-label="Go to first page"
-                >
-                  First
-                </button>
-                <button
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                  aria-label="Go to previous page"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                  aria-label="Go to next page"
-                >
-                  Next
-                </button>
-                <button
-                  onClick={() => table.lastPage()}
-                  disabled={
-                    table.getState().pagination.pageIndex + 1 >=
-                    table.getPageCount()
-                  }
-                  aria-label="Go to last page"
-                >
-                  Last
-                </button>
+                </div>
+                <div className="pagination-buttons-prev-next">
+                  <StyledButton
+                    onClick={() => table.firstPage()}
+                    disabled={table.getState().pagination.pageIndex === 0}
+                    label="First"
+                    variant="light"
+                    className="pagination-edge"
+                  />
+                  <StyledButton
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    label="Previous"
+                    variant="light"
+                  />
+                  <StyledButton
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    label="Next"
+                    variant="light"
+                  />
+                  <StyledButton
+                    onClick={() => table.lastPage()}
+                    disabled={
+                      table.getState().pagination.pageIndex + 1 >=
+                      table.getPageCount()
+                    }
+                    label="Last"
+                    variant="light"
+                    className="pagination-edge"
+                  />
+                </div>
               </div>
             </div>
           </div>

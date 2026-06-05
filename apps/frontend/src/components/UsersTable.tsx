@@ -216,6 +216,7 @@ export const UsersTable = () => {
       ) : (
         <>
           <div className="table-container">
+            <div className="table-scroll-wrapper">
             <table
               className="w-full border-collapse border border-gray-300"
               aria-label="Users table"
@@ -272,13 +273,13 @@ export const UsersTable = () => {
                 )}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination Controls */}
             <div
               className="pagination"
               role="navigation"
               aria-label="Pagination"
-              
             >
               <div className="pagination-text">
                 Showing {data?.users?.length || 0} of {data?.totalCount || 0}{" "}
@@ -286,30 +287,34 @@ export const UsersTable = () => {
                 {data && ` (Page ${page + 1} of ${data.totalPages})`}
               </div>
               <div className="pagination-buttons">
-                <StyledButton
-                  label="First"
-                  onClick={() => setPage(0)}
-                  disabled={page === 0}
-                  aria-label="Go to first page"
-                />
-                <StyledButton
-                  label="Previous"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  aria-label="Go to previous page"
-                />
-                <StyledButton
-                  label="Next"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={!data || page >= data.totalPages - 1}
-                  aria-label="Go to next page"
-                />
-                <StyledButton
-                  label="Last"
-                  onClick={() => data && setPage(data.totalPages - 1)}
-                  disabled={!data || page >= data.totalPages - 1}
-                  aria-label="Go to last page"
-                />
+                <div className="pagination-buttons-prev-next">
+                  <StyledButton
+                    label="First"
+                    variant="light"
+                    onClick={() => setPage(0)}
+                    disabled={page === 0}
+                    className="pagination-edge"
+                  />
+                  <StyledButton
+                    label="Previous"
+                    variant="light"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                  />
+                  <StyledButton
+                    label="Next"
+                    variant="light"
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!data || page >= data.totalPages - 1}
+                  />
+                  <StyledButton
+                    label="Last"
+                    variant="light"
+                    onClick={() => data && setPage(data.totalPages - 1)}
+                    disabled={!data || page >= data.totalPages - 1}
+                    className="pagination-edge"
+                  />
+                </div>
               </div>
             </div>
           </div>

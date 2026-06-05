@@ -7,15 +7,15 @@
   width: 100%;
   overflow: hidden;
 
-  @media screen and (max-width: variables.$breakpoint-small) {
-    overflow-x: scroll;
+  .table-scroll-wrapper {
+    overflow-x: auto;
   }
   table {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     display: block;
-    overflow-x: auto;
     min-height: 300px;
     @include fonts.font-size-small;
     thead {
@@ -108,26 +108,41 @@
     }
     .pagination-buttons {
       display: inline-flex;
-      justify-content: space-between;
-      align-content: center;
-      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
       gap: calc(variables.$spacing/2);
-      button {
-        padding-left: variables.$spacing;
-        padding-right: variables.$spacing;
-        padding-top: calc(variables.$spacing/2);
-        padding-bottom: calc(variables.$spacing/2);
-        border-width: 1px;
-        border-style: solid;
-        border-radius: calc(variables.$spacing/2);
+      .pagination-buttons-prev-next {
+        display:inline-flex;
+        
+        gap: calc(variables.$spacing/2);
       }
 
-      button:disabled {
-        cursor: not-allowed;
+      .page-size-control {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: calc(variables.$spacing/2);
+
+        select {
+          width: auto;
+          min-width: 48px;
+        }
+
+        @media screen and (max-width: variables.$breakpoint-small) {
+          flex-direction: column;
+          align-items: flex-start;
+        }
       }
 
       @media screen and (max-width: variables.$breakpoint-small) {
-        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+        width: 100%;
+
+        .pagination-edge {
+          display: none;
+        }
       }
     }
   }
