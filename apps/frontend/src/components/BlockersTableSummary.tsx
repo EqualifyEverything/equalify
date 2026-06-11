@@ -6,6 +6,7 @@ import { DataRow } from "./DataRow";
 import { Card } from "./Card";
 import { Page } from "#src/routes/Audit.tsx";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
+import { GrPowerCycle } from "react-icons/gr";
 
 import themeVariables from "../global-styles/variables.module.scss";
 import { SkeletonAuditHeader } from "./Skeleton";
@@ -39,9 +40,11 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const [mostCommonCategoriesLimit, setMostCommonCategoriesLimit] = useState(3);
   const [mostCommonTagsLimit, setMostCommonTagsLimit] = useState(3);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isFetching, error } = useQuery({
     queryKey: [
-      "auditSummary", auditId
+      "auditSummary", auditId,
+      mostCommonUrlsLimit, mostCommonBlockersLimit,
+      mostCommonCategoriesLimit, mostCommonTagsLimit
     ],
     queryFn: async () => {
       const params: Record<string, string> = {
@@ -181,6 +184,11 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
         </>
       ) : (<><SkeletonAuditHeader /></>)}
+      {isFetching && !isLoading && (
+        <span role="img" aria-label="Refreshing">
+          <GrPowerCycle className={style.spinning} />
+        </span>
+      )}
     </div >
   );
 };

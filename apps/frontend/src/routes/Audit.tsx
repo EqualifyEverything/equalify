@@ -33,7 +33,7 @@ import {
   EmailSubscriptionList,
 } from "#src/components/AuditEmailSubscriptionInput.tsx";
 
-import { CustomizedDot } from "#src/components/ChartCustomizedDot.tsx";
+import { CustomizedDot, CustomizedActiveDot } from "#src/components/ChartCustomizedDot.tsx";
 import { ChartTooltipContent } from "#src/components/ChartTooltipContent.tsx";
 
 import { AuditHeader } from "#src/components/AuditHeader.tsx";
@@ -552,7 +552,7 @@ export const Audit = () => {
                           //margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                           accessibilityLayer={true}
                           margin={{
-                            top: 5,
+                            top: 10,
                             right: 10,
                             left: -20,
                             bottom: 5,
@@ -605,6 +605,7 @@ export const Audit = () => {
                             stroke={themeVariables.white}
                             strokeWidth={4}
                             dot={CustomizedDot}
+                            activeDot={CustomizedActiveDot}
                             name="Blockers"
                             isAnimationActive={false}
                           />
