@@ -15,7 +15,7 @@
   justify-content: center;
   padding-top:variables.$spacing;
   padding-bottom:variables.$spacing;
-  a, a:visited {   
+  a, a:visited {
     display: inline-block;
     padding:variables.$spacing;
     text-decoration: none;
@@ -27,6 +27,18 @@
     transition: opacity 0.12s ease-out;
     &:hover {
       opacity: 1;
+    }
+  }
+}
+
+:global(body.dark) {
+  .footer {
+    background: variables.$dark-surface;
+    border-top-color: variables.$dark-border;
+    color: variables.$paper;
+
+    a, a:visited {
+      color: variables.$paper;
     }
   }
 }

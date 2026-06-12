@@ -15,6 +15,7 @@
 @use "./global-styles/inputs";
 @use "./global-styles/flex";
 @use "./global-styles/navigation.scss";
+@use "./global-styles/dark";
 
 html {
   scrollbar-gutter: auto !important;
@@ -40,11 +41,6 @@ body {
     color: variables.$red;
     text-decoration: underline;
   }
-
-  &.dark {
-    background: variables.$black;
-    color:  variables.$paper;
-  }
 }
 
 .app-container {
@@ -52,6 +48,7 @@ body {
   max-width:100%;
   margin:0 auto;
   min-height:100dvh;
+  overflow-x: clip;
 }
 
 .container {

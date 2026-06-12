@@ -76,6 +76,31 @@
 .popoverClose:focus {
 }
 
+:global(body.dark) {
+  .blockersTableToggleButton {
+    color: variables.$paper !important;
+  }
+
+  .popoverContent {
+    background-color: variables.$dark-surface;
+    color: variables.$paper;
+  }
+
+  .popoverFieldset {
+    legend {
+      border-bottom-color: variables.$dark-border;
+    }
+  }
+
+  .popoverArrow {
+    fill: variables.$dark-surface;
+  }
+
+  .popoverClose {
+    color: variables.$paper;
+  }
+}
+
 @keyframes slideUpAndFade {
   from {
     opacity: 0;

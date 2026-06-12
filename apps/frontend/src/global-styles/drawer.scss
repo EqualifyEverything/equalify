@@ -17,18 +17,29 @@
   width: 50vw;
   border-radius: variables.$spacing;
   overflow: hidden;
-  margin-right: variables.$spacing;
-  border-width: 1px; /* Equivalent to border */
+  border: 1px solid variables.$gray;
   max-width: 50vw;
   color: variables.$black;
   background: variables.$paper;
   margin: calc(2 * variables.$spacing);
 
   .drawer-content-inner {
-    margin: calc(2 * variables.$spacing);
-    h4 {
-      margin: 0;
+    padding: calc(2 * variables.$spacing);
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing;
+
+    .drawer-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      h4 {
+        margin: 0;
+      }
     }
+
     .drawer-code {
       max-width: 100%;
       max-height: 35vw;
@@ -39,7 +50,22 @@
         white-space: pre-wrap !important;
       }
     }
-    .drawer-content-close {
+  }
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    width: calc(100vw - #{variables.$spacing * 2});
+    max-width: calc(100vw - #{variables.$spacing * 2});
+    top: 0;
+    bottom: 0;
+    min-height: 100%;
+    margin: variables.$spacing;
+    border-radius: variables.$spacing;
+    overflow-y: auto;
+
+    .drawer-content-inner {
+      .drawer-code {
+        max-height: 60vh;
+      }
     }
   }
 }

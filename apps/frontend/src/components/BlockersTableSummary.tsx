@@ -10,6 +10,7 @@ import { GrPowerCycle } from "react-icons/gr";
 
 import themeVariables from "../global-styles/variables.module.scss";
 import { SkeletonAuditHeader } from "./Skeleton";
+import { useGlobalStore } from "#src/utils";
 //const apiClient = API.generateClient();
 
 interface BlockersTableSummaryProps {
@@ -34,6 +35,10 @@ interface SummaryResp {
 }
 
 export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scans }: BlockersTableSummaryProps) => {
+
+  const { darkMode } = useGlobalStore();
+  const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
+  const chartFillSecondary = darkMode ? themeVariables.dark_border : themeVariables.paper;
 
   const [mostCommonUrlsLimit, setMostCommonUrlsLimit] = useState(5);
   const [mostCommonBlockersLimit, setMostCommonBlockersLimit] = useState(5);
@@ -85,7 +90,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
             </Card>
             <Card className="short" variant="light">
               <div className={style["graph-card"]}>
-                <h2><span style={{ color: themeVariables.red }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: themeVariables.red }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h2>
+                <h2><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h2>
                 <ResponsiveContainer className={style["donut-chart"]}>
                   <PieChart>
                     <Pie
@@ -93,12 +98,12 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                         {
                           name: "URLs with Blockers",
                           value: data.urlsWithBlockersCount,
-                          fill: themeVariables.red
+                          fill: accentColor
                         },
                         {
                           name: "URLs without Blockers",
                           value: pages.length - data.urlsWithBlockersCount,
-                          fill: themeVariables.paper
+                          fill: chartFillSecondary
                         },
                       ]}
                       cx={"50%"}

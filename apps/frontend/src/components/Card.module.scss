@@ -110,3 +110,47 @@
     display: flex;
   }
 }
+
+:global(body.dark) {
+  .card {
+    &.dark {
+      background: variables.$dark-surface;
+    }
+
+    &.light {
+      background: variables.$dark-surface;
+      border-color: variables.$dark-border;
+      color: variables.$paper;
+    }
+
+    &.empty-state-card {
+      background: variables.$dark-surface;
+      border-color: variables.$dark-border;
+      color: variables.$paper;
+
+      svg {
+        fill: rgba(variables.$paper, 0.3);
+      }
+    }
+
+    &.inset-light {
+      background: variables.$black;
+      border-color: variables.$dark-border;
+      color: variables.$paper;
+
+      h3 {
+        border-bottom-color: variables.$dark-border;
+      }
+
+      select {
+        background-color: variables.$dark-surface;
+        color: variables.$paper;
+        border-color: variables.$dark-border;
+      }
+    }
+
+    &.short-success {
+      color: variables.$paper;
+    }
+  }
+}

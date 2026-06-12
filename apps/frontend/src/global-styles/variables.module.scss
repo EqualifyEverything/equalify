@@ -1,6 +1,10 @@
+@use 'sass:color';
+
 $white: #fff;
 $black: #18191a;
 $black-translucent: #334155ad;
+$dark-surface: color.mix($white, $black, 10%);
+$dark-border: color.mix($white, $black, 22%);
 $paper: #eff0eb;
 $paper-dark: #ddded8;
 $gray: #e0dcd0;
@@ -26,6 +30,8 @@ $breakpoint-small: 581px;
   white: $white;
   black: $black;
   black_translucent: $black-translucent;
+  dark_surface: $dark-surface;
+  dark_border: $dark-border;
   paper:$paper;
   paper_dark: $paper-dark;
   gray: $gray;

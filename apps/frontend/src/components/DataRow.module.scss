@@ -53,3 +53,21 @@
     border-bottom: 1px solid variables.$gray;
   }
 }
+
+:global(body.dark) {
+  .dataRow {
+    &.highlight {
+      background: variables.$dark-surface;
+      border-bottom-color: variables.$yellow;
+    }
+
+    &.tight {
+      border-bottom-color: variables.$dark-border;
+    }
+
+    &.light {
+      background: variables.$dark-surface;
+      border-bottom-color: variables.$dark-border;
+    }
+  }
+}

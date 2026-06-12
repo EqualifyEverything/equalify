@@ -115,3 +115,19 @@
     text-align: center;
   }
 }
+
+:global(body.dark) {
+  .view-code-button {
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+
+    &.disabled {
+      border-color: variables.$dark-border;
+      color: variables.$dark-border;
+    }
+  }
+
+  .tooltip-rondel {
+    background: variables.$dark-border;
+  }
+}

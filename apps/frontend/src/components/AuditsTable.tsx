@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 interface Audit {
   created_at: string;
@@ -61,7 +62,12 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {
         accessorFn: (row) => (row.scans[0]?.status === "processing" ? 1 : 0),
         id: "status",
-        header: "Status",
+        header: () => (
+          <>
+            <GrPowerCycle aria-hidden="true" />
+            <VisuallyHidden.Root>Status</VisuallyHidden.Root>
+          </>
+        ),
         sortingFn: "basic",
         cell: ({ row }) => {
           if (row.original.scans[0]?.status === "processing") {
@@ -192,7 +198,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
                             onClick: header.column.getToggleSortingHandler()
                           }}
                         >
-                          <button className={styles["header-sort"]} aria-label={`Sort by "${header.column.columnDef.header}" ${header.column.getIsSorted() === 'asc' ? 'descending' : 'ascending'
+                          <button className={styles["header-sort"]} aria-label={`Sort by "${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : header.column.id}" ${header.column.getIsSorted() === 'asc' ? 'descending' : 'ascending'
                             }`}>
                             <div className={styles["header-label"]}>
                               {flexRender(

@@ -53,3 +53,29 @@
     color: variables.$black-translucent;
     margin: 0;
 }
+
+:global(body.dark) {
+  .statCard {
+    background: variables.$black;
+  }
+
+  .sectionHeading {
+    color: rgba(variables.$paper, 0.5);
+  }
+
+  .statValue {
+    color: variables.$paper;
+  }
+
+  .statLabel {
+    color: variables.$paper;
+  }
+
+  .statSub {
+    color: rgba(variables.$paper, 0.5);
+  }
+
+  .note {
+    color: rgba(variables.$paper, 0.5);
+  }
+}

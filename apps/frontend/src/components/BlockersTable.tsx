@@ -21,6 +21,7 @@ import {
   FaCode,
   FaDownload,
   FaRegFilePdf,
+  FaTimes,
 } from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
@@ -107,8 +108,77 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setAnnounceMessage,
     authenticated,
     blockerTableColumnVisibility,
-    setBlockerTableColumnVisibility
+    setBlockerTableColumnVisibility,
+    darkMode,
   } = useGlobalStore();
+
+  const darkSelectStyles = darkMode
+    ? {
+        control: (base: any, _state: any) => ({
+          ...base,
+          backgroundColor: themeVariables.dark_surface,
+          borderColor: themeVariables.dark_border,
+          color: themeVariables.paper,
+        }),
+        menu: (base: any, _state: any) => ({
+          ...base,
+          backgroundColor: themeVariables.dark_surface,
+          borderColor: themeVariables.dark_border,
+        }),
+        option: (base: any, state: any) => ({
+          ...base,
+          backgroundColor: state.isSelected
+            ? themeVariables.black
+            : state.isFocused
+              ? themeVariables.dark_border
+              : "transparent",
+          color: themeVariables.paper,
+        }),
+        multiValue: (base: any, _state: any) => ({
+          ...base,
+          backgroundColor: themeVariables.dark_border,
+        }),
+        multiValueLabel: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+        }),
+        multiValueRemove: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+          ":hover": {
+            backgroundColor: themeVariables.black,
+            color: themeVariables.paper,
+          },
+        }),
+        placeholder: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+          opacity: 0.5,
+        }),
+        singleValue: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+        }),
+        input: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+        }),
+        indicatorSeparator: (base: any, _state: any) => ({
+          ...base,
+          backgroundColor: themeVariables.dark_border,
+        }),
+        dropdownIndicator: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+          opacity: 0.6,
+        }),
+        clearIndicator: (base: any, _state: any) => ({
+          ...base,
+          color: themeVariables.paper,
+          opacity: 0.6,
+        }),
+      }
+    : {};
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -405,7 +475,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                     {/* <Drawer.Handle className="top-4" />
                      */}
                     <div className="drawer-content-inner">
-                      <h4>Blocker Code</h4>
+                      <div className="drawer-header">
+                        <h4>Blocker Code</h4>
+                        <Drawer.Close
+                          render={(props) => (
+                            <StyledButton
+                              onClick={props.onClick}
+                              label="Close"
+                              variant="light"
+                              icon={<FaTimes />}
+                            />
+                          )}
+                        />
+                      </div>
                       <SyntaxHighlighter
                         style={prism}
                         language={"jsx"}
@@ -415,9 +497,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                       >
                         {content}
                       </SyntaxHighlighter>
-                      <Drawer.Close className={"drawer-content-close"}>
-                        Close
-                      </Drawer.Close>
                     </div>
                   </Drawer.Content>
                 </Drawer.Portal>
@@ -805,18 +884,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               aria-label="Filter by Tags"
               onChange={handleTagToggle}
               styles={{
+                ...darkSelectStyles,
                 control: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
                   borderRadius: themeVariables.spacing,
                   fontSize: "13px",
                   minHeight: "24px",
                 }),
                 dropdownIndicator: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
                   padding: "4px",
                 }),
                 clearIndicator: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
                   padding: "4px",
                 }),
               }}
@@ -834,18 +917,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               aria-label="Filter by Categories"
               onChange={handleCategoryToggle}
               styles={{
+                ...darkSelectStyles,
                 control: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
                   borderRadius: themeVariables.spacing,
                   fontSize: "13px",
                   minHeight: "24px",
                 }),
                 dropdownIndicator: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
                   padding: "4px",
                 }),
                 clearIndicator: (baseStyles, state) => ({
                   ...baseStyles,
+                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
                   padding: "4px",
                 }),
               }}

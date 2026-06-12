@@ -71,3 +71,13 @@
     }
   }
 }
+
+:global(body.dark) {
+  .Audits {
+    h2 {
+      svg {
+        color: variables.$paper;
+      }
+    }
+  }
+}

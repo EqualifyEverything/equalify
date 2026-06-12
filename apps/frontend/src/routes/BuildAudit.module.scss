@@ -60,6 +60,16 @@
     }
   }
 }
+:global(body.dark) {
+  .buildAudit {
+    .switch-thumb {
+      &[data-state="checked"] {
+        background-color: variables.$dark-surface;
+      }
+    }
+  }
+}
+
 .pages-input-card {
   table {
     display:table !important;

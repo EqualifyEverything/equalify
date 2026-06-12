@@ -7,6 +7,7 @@
   border-bottom: 1px solid variables.$paper-dark;
   padding: variables.$spacing;
   margin-bottom: variables.$spacing * 2;
+  position: relative;
   .content {
     width: 100%;
     max-width: variables.$max-width;
@@ -60,24 +61,55 @@
     }
   }
   .nav_buttons {
-    button {
-      background: transparent;
-      border: 0;
-    }
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing;
 
     @media screen and (max-width: variables.$breakpoint-small) {
       width: 100%;
-      display: flex;
       justify-content: space-evenly;
       align-content: center;
-      align-items: center;
+    }
+  }
+
+  .dark_mode_toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: calc(variables.$spacing / 2);
+    border-radius: calc(variables.$spacing / 2);
+    color: variables.$black;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.65;
+    transition:
+      opacity 0.12s ease-out,
+      background 0.12s ease-out;
+
+    &:hover {
+      opacity: 1;
+      background-color: variables.$paper-dark;
+    }
+
+    &:focus-visible {
+      outline: 2px solid variables.$red;
+      outline-offset: 2px;
+      opacity: 1;
+    }
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+      position: absolute;
+      top: variables.$spacing;
+      right: variables.$spacing;
     }
   }
   .user_info {
     @include fonts.font-size-small;
     text-align: right;
 
-    
+
       @media screen and (max-width: variables.$breakpoint-small) {
         display: flex;
     justify-content: space-between;
@@ -93,6 +125,35 @@
     .br {
       @media screen and (max-width: variables.$breakpoint-small) {
         display: none;
+      }
+    }
+  }
+}
+
+:global(body.dark) {
+  .navigation {
+    background: variables.$dark-surface;
+    border-bottom-color: variables.$dark-border;
+
+    .link {
+      color: variables.$paper;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .dark_mode_toggle {
+      color: variables.$paper;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .user_info {
+      @media screen and (max-width: variables.$breakpoint-small) {
+        background-color: variables.$dark-border;
       }
     }
   }

@@ -6,6 +6,7 @@
   border-radius: variables.$spacing;
   width: 100%;
   overflow: hidden;
+  position:relative;
 
   .table-scroll-wrapper {
     overflow-x: auto;

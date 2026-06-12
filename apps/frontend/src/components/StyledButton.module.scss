@@ -208,3 +208,60 @@
     transform: rotate(360deg);
   }
 }
+
+:global(body.dark) {
+  .button {
+    &.dark {
+      background: variables.$dark-border;
+      border-color: variables.$dark-border;
+      color: variables.$paper;
+
+      &:hover {
+        background: variables.$dark-border;
+      }
+
+      &.disabled {
+        background: variables.$dark-surface;
+        border-color: variables.$dark-surface;
+      }
+    }
+
+    &.light {
+      border-color: variables.$paper;
+      color: variables.$paper;
+
+      &.disabled {
+        border-color: variables.$dark-border;
+        color: variables.$dark-border;
+      }
+    }
+
+    &.tab-card-button {
+      color: variables.$paper;
+      border-color: variables.$dark-border;
+
+      &[aria-selected="true"] {
+        border-color: variables.$red;
+      }
+
+      &:hover {
+        background-color: variables.$dark-surface;
+      }
+    }
+
+    &.naked {
+      color: variables.$yellow;
+    }
+
+    &.toggle-ignored {
+      background: variables.$dark-surface;
+      color: variables.$paper;
+    }
+
+    &.icon-only {
+      &.dark {
+        color: variables.$paper;
+      }
+    }
+  }
+}

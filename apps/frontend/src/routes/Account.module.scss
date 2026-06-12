@@ -30,3 +30,17 @@
         border-bottom-color: variables.$black;
     }
 }
+
+:global(body.dark) {
+    .tabList {
+        border-bottom-color: variables.$dark-border;
+    }
+
+    .tabTrigger {
+        color: variables.$paper;
+
+        &[aria-selected="true"] {
+            border-bottom-color: variables.$paper;
+        }
+    }
+}

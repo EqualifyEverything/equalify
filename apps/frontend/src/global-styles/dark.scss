@@ -1,0 +1,138 @@
+@use "./variables.module.scss";
+
+body.dark {
+  background: variables.$black;
+  color: variables.$paper;
+
+  // Links
+  a,
+  a:visited {
+    color: variables.$yellow;
+  }
+
+  // Form controls
+  input,
+  textarea {
+    background-color: variables.$dark-surface;
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+  }
+
+  select {
+    background-color: variables.$dark-surface;
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+
+    // overrides the :has() rule in selects.scss that forces $black
+    &:has(option:not([hidden]):checked) {
+      color: variables.$paper;
+    }
+
+    &::picker(select) {
+      background-color: variables.$dark-surface;
+      border-color: variables.$dark-border;
+    }
+
+    & option {
+      background-color: variables.$dark-surface;
+      color: variables.$paper;
+
+      // replace hardcoded black checkmark SVG with a paper-colored one
+      &::after {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23eff0eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'%3E%3C/path%3E%3C/svg%3E");
+      }
+
+      &:hover,
+      &:focus-visible {
+        background-color: variables.$dark-border;
+        color: variables.$paper;
+      }
+    }
+  }
+
+  // Tables
+  .table-container {
+    border-color: variables.$dark-border;
+
+    table {
+      thead {
+        background-color: variables.$dark-border;
+
+        tr th {
+          color: variables.$paper;
+          border-bottom-color: rgba(variables.$paper, 0.15);
+        }
+      }
+
+      tbody {
+        background-color: variables.$dark-surface;
+
+        tr {
+          td {
+            color: variables.$paper;
+            border-bottom-color: variables.$dark-border;
+          }
+
+          &:nth-child(even) td {
+            background-color: variables.$black;
+          }
+        }
+      }
+    }
+
+    .pagination {
+      background: variables.$black;
+      border-top: 1px solid variables.$dark-border;
+      color: variables.$paper;
+
+      select {
+        background-color: variables.$dark-surface;
+        color: variables.$paper;
+        border-color: variables.$dark-border;
+      }
+    }
+
+    .filter-group {
+      .content-toggle-group .root {
+        background-color: variables.$dark-surface;
+
+        button {
+          color: variables.$paper;
+
+          &[aria-checked="true"] {
+            background: variables.$paper;
+            color: variables.$black;
+          }
+        }
+      }
+
+      .status-toggle-group button {
+        color: variables.$paper;
+      }
+    }
+  }
+
+  // Tags
+  .tags .tag {
+    background-color: variables.$dark-border;
+    color: variables.$paper;
+  }
+
+  // Tooltips
+  .tooltip {
+    background: variables.$dark-surface;
+    border-color: variables.$dark-border;
+    color: variables.$paper;
+  }
+
+  .tooltip-arrow {
+    fill: variables.$dark-surface;
+  }
+
+  // Drawer
+  .drawer-content {
+    background: variables.$dark-surface;
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+  }
+}

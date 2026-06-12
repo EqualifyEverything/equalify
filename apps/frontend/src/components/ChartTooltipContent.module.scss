@@ -19,3 +19,11 @@
         display:block
     }
 }
+
+:global(body.dark) {
+  .tooltip {
+    background: variables.$dark-surface;
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+  }
+}

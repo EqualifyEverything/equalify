@@ -91,6 +91,30 @@
   }
 }
 
+:global(body.dark) {
+  .content {
+    background: variables.$dark-surface;
+    color: variables.$paper;
+  }
+
+  .description {
+    color: variables.$paper;
+  }
+
+  .url-row input {
+    background: variables.$black;
+  }
+
+  .close-button {
+    color: variables.$paper;
+    border-color: variables.$dark-border;
+
+    &:hover {
+      background: variables.$dark-border;
+    }
+  }
+}
+
 @keyframes overlayShow {
   from {
     opacity: 0;

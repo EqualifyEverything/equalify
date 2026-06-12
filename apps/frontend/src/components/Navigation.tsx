@@ -11,7 +11,7 @@ import { useMsalTokenRefresh } from "../hooks";
 import styles from "./Navigation.module.scss";
 import { Logo } from "./Logo";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
-import { MdDarkMode, MdOutlineDarkMode } from "react-icons/md";
+import { MdDarkMode, MdOutlineDarkMode, MdLightMode } from "react-icons/md";
 import { Footer } from "./Footer";
 
 export const Navigation = () => {
@@ -184,13 +184,16 @@ export const Navigation = () => {
                     <Link className={styles["logout"]} to="/logout">Logout</Link>
                   </div>
                 )}
-                {/* <button onClick={() => setDarkMode(!darkMode)}>
+                <button
+                  className={styles.dark_mode_toggle}
+                  onClick={() => setDarkMode(!darkMode)}
+                >
                   <AccessibleIcon.Root
-                    label={`Switch to ${darkMode ? "Light Mode" : "Dark Mode"}`}
+                    label={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                   >
-                    {!darkMode ? <MdOutlineDarkMode /> : <MdDarkMode />}
+                    {darkMode ? <MdLightMode /> : <MdOutlineDarkMode />}
                   </AccessibleIcon.Root>
-                </button> */}
+                </button>
               </div>
             </div>
           </div>
