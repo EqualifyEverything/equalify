@@ -9,17 +9,6 @@ export const trackUser = async () => {
         values: [JSON.stringify(analytics), sub],
     });
 
-    /*
-    if (!event.claims.email.includes('+')) {
-        await fetch(process.env.SLACK_WEBHOOK, {
-            method: 'POST',
-            body: JSON.stringify({
-                text: `${isStaging ? '[STAGING] ' : ''}*${event.claims.email}* just signed up from *${analytics?.city}, ${analytics?.state}* on *${analytics?.device}*`
-            })
-        })
-    }
-    */
-
     await db.clean();
     return;
 }

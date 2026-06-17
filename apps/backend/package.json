@@ -22,7 +22,6 @@
     "aws-jwt-verify": "^5.1.0",
     "cheerio": "^1.1.2",
     "esbuild": "^0.25.10",
-    "openai": "^5.22.0",
     "serverless-postgres": "^2.1.2",
     "string-strip-html": "^13.4.13",
     "uuid": "^13.0.0",
