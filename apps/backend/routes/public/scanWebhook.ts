@@ -204,12 +204,15 @@ export const scanWebhook = async () => {
                     const params = [];
                     let p = 1;
                     for (const bd of prepared) {
-                        vals.push(`($${p}, $${p+1}, $${p+2}, $${p+3}, $${p+4}, $${p+5}, $${p+6}, $${p+7})`);
-                        params.push(auditId, JSON.stringify([]), bd.node, bd.contentNormalized, bd.contentHashId, bd.shortId, urlId, effectiveScanId);
-                        p += 8;
+                        vals.push(`($${p}, $${p+1}, $${p+2}, $${p+3}, $${p+4}, $${p+5}, $${p+6}, $${p+7}, $${p+8})`);
+                        // Snapshot the URL string as `url_text` so it survives URL row deletion
+                        // (e.g., CSV format change removing/replacing URLs). Falls back to NULL
+                        // if the webhook payload didn't include the url.
+                        params.push(auditId, JSON.stringify([]), bd.node, bd.contentNormalized, bd.contentHashId, bd.shortId, urlId, effectiveScanId, url ?? null);
+                        p += 9;
                     }
                     const result = await db.query({
-                        text: `INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id") VALUES ${vals.join(', ')} RETURNING "id"`,
+                        text: `INSERT INTO "blockers" ("audit_id", "targets", "content", "content_normalized", "content_hash_id", "short_id", "url_id", "scan_id", "url_text") VALUES ${vals.join(', ')} RETURNING "id"`,
                         values: params,
                     });
                     blockerIds = result.rows.map((r: any) => r.id);
