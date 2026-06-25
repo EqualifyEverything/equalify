@@ -178,6 +178,7 @@ export const getAuditTable = async () => {
         created_at
         content
         url_id
+        url_text
         url {
           url
           type
@@ -287,7 +288,9 @@ export const getAuditTable = async () => {
       short_id: blocker.short_id,
       content_hash_id: blocker.content_hash_id,
       created_at: blocker.created_at,
-      url: blocker.url?.url || "Unknown URL",
+      // Fallback chain: live join → snapshotted url_text (preserved at scan time) → Unknown URL.
+      // This keeps the URL visible even if the urls row was later deleted (CSV change, manual removal).
+      url: blocker.url?.url || blocker.url_text || "Unknown URL",
       type: blocker.url?.type || "unknown",
       url_id: blocker.url_id,
       content: blocker.content,
