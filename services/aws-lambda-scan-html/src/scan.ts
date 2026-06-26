@@ -7,7 +7,7 @@ import chromium from "@sparticuz/chromium-min";
 import { logger } from "./telemetry.ts";
 import { AxeResults } from "axe-core";
 
-const BROWSER_LOAD_TIMEOUT = 25000;
+const BROWSER_LOAD_TIMEOUT = 30000;
 import {SqsScanJob} from '../../../shared/types/sqsScanJob.ts'
 
 // disable webgl
