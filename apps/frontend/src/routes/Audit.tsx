@@ -439,6 +439,11 @@ export const Audit = () => {
 
         // Active scan in progress
         if (hasActiveScan && currentScan) {
+          const urlCount = urls?.length || 0;
+          const isLargeScan = urlCount >= 100;
+          const slowPageCount = (currentScan.errors as ScanError[] | undefined)?.filter(
+            (e) => e.type === 'page_timeout'
+          ).length ?? 0;
           return (
             <Card variant="dark">
               <div style={{ padding: "20px 0" }}>
@@ -446,7 +451,23 @@ export const Audit = () => {
                   <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
                   Scanning...
                 </h2>
-                <p style={{ marginBottom: "100px", color: themeVariables.white }}>
+                <p style={{ marginBottom: "24px", color: themeVariables.white, opacity: 0.85, lineHeight: 1.5 }}>
+                  {isLargeScan ? (
+                    <>
+                      Large audits with {urlCount.toLocaleString()} URLs can take <strong>several hours</strong> to complete — total time depends on how quickly each origin site responds. You can safely close this page; the scan continues running in the background.
+                      {emailNotificationsCount === 0 && (
+                        <> We recommend enabling <strong>Email Notifications</strong> above so you're alerted when results are ready.</>
+                      )}
+                    </>
+                  ) : (
+                    <>You can safely close this page; the scan continues running in the background. The report will refresh automatically when it's done.</>
+                  )}
+                  {slowPageCount > 0 && (
+                    <>
+                      {" "}
+                      <strong>{slowPageCount.toLocaleString()}</strong> {slowPageCount === 1 ? "page has" : "pages have"} responded too slowly so far (over 30 seconds) and could not be fully scanned.
+                    </>
+                  )}
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                   <Progress.Root
