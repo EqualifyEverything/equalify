@@ -7,14 +7,15 @@ export const rescanAudit = async () => {
     const { id: audit_id } = event.body;
 
     await db.connect();
+
+    // sync remote CSV first so the scan runs against the fresh URL list (#628)
+    await syncAuditUrlsFromRemoteCsv(audit_id);
+
     const urls = (await db.query({
         text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
         values: [audit_id],
     })).rows;
     console.log('Found URLs for audit:', { auditId: audit_id, count: urls?.length, urls });
-
-    // hook to check for remote CSV
-    await syncAuditUrlsFromRemoteCsv(audit_id);
 
     // Handle empty URLs case - create a complete scan immediately
     if (!urls || urls.length === 0) {
