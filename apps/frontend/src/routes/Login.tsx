@@ -181,7 +181,8 @@ export const Login = () => {
                 <input id='password' name="password" required type="password" placeholder='Password' />
                 <StyledButton
                     variant='green'
-                    onClick={``}
+                    type='submit'
+                    onClick={undefined}
                     label={`Log In`}
                 />
                 {error && <div className={`${styles.error}`}>{error}</div>}
@@ -190,7 +191,7 @@ export const Login = () => {
         <p>
             <span>New here? </span>
             <Link to="/signup" className={styles.authLink}>
-                Create an account
+                {import.meta.env.VITE_SSO_ENABLED ? 'Request access' : 'Create an account'}
             </Link>
         </p>
     </form>)

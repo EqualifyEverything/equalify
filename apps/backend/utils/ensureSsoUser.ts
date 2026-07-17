@@ -41,7 +41,7 @@ export const ensureSsoUser = async (claims: SsoClaims) => {
         // Create user if doesn't exist
         if (existingUser.rows.length === 0) {
             const inviteId = (await db.query({
-                text: `SELECT id FROM invites WHERE email=$1`,
+                text: `SELECT id FROM invites WHERE lower(email)=lower($1)`,
                 values: [email],
             }))?.rows?.[0]?.id;
             if (inviteId) {
