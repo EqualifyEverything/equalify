@@ -48,7 +48,11 @@
   }
 
   .scan-url {
+    margin: 0;
+    font-size: 1em;
     font-weight: 600;
+    line-height: inherit;
+    letter-spacing: normal;
     word-break: break-all;
   }
 

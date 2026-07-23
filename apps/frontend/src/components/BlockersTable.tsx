@@ -869,7 +869,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   >
                     <FaDownload className="icon-small" aria-hidden="true" />
                     <div>
-                      <div className={style["export-dropdown-item-label"]}>Export filtered view</div>
+                      <div className={style["export-dropdown-item-label"]}>Export filtered blockers</div>
                       <div className={style["export-dropdown-item-desc"]}>
                         {data?.pagination?.totalCount
                           ? `${data.pagination.totalCount.toLocaleString()} blockers matching current filters`
@@ -898,7 +898,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                       >
                         <FaRegFilePdf className="icon-small" aria-hidden="true" />
                         <div>
-                          <div className={style["export-dropdown-item-label"]}>Export PDF source links</div>
+                          <div className={style["export-dropdown-item-label"]}>Export PDF Source Page URLs</div>
                           <div className={style["export-dropdown-item-desc"]}>Source pages and linked PDF URLs found in this audit</div>
                         </div>
                       </DropdownMenu.Item>

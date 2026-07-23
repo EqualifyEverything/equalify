@@ -78,10 +78,26 @@
   display: flex;
   flex-wrap: wrap;
   gap: calc(variables.$spacing * 2);
+  padding: 0;
+  list-style: none;
   .card {
     width: calc(33.33333% - (12px));
 
     @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+    }
+  }
+
+  // when used as a <ul>, each item is an <li> wrapping a .card
+  > li {
+    list-style: none;
+    width: calc(33.33333% - (12px));
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+      width: 100%;
+    }
+
+    .card {
       width: 100%;
     }
   }
