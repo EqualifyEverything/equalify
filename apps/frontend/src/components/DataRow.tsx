@@ -7,12 +7,14 @@ interface DataRowProps extends React.PropsWithChildren {
   the_key: string | ReactNode;
   the_value:string | ReactNode;
   className?: string;
+  asTableRow?: boolean;
 }
 
-export const DataRow = ({ variant = "light", the_key, the_value, className="" }:DataRowProps) => {
+export const DataRow = ({ variant = "light", the_key, the_value, className="", asTableRow=false }:DataRowProps) => {
+    const cellRole = asTableRow ? (variant === "highlight" ? "columnheader" : "cell") : undefined;
     return (
-        <div className={styles.dataRow +" dataRow "+ styles[variant] + " "+className}>
-            <div className={styles["key"] + " key"}>{the_key}</div>
-            <div className={styles["value"]+ " value"}>{the_value}</div>
+        <div role={asTableRow ? "row" : undefined} className={styles.dataRow +" dataRow "+ styles[variant] + " "+className}>
+            <div role={cellRole} className={styles["key"] + " key"}>{the_key}</div>
+            <div role={cellRole} className={styles["value"]+ " value"}>{the_value}</div>
         </div>
     )}

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useId, useState } from "react";
 import style from "./BlockersTableSummary.module.scss";
 import * as API from "aws-amplify/api";
 import { DataRow } from "./DataRow";
@@ -39,6 +39,10 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const { darkMode } = useGlobalStore();
   const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
   const chartFillSecondary = darkMode ? themeVariables.dark_border : themeVariables.paper;
+
+  const baseId = useId();
+  const urlsHeadingId = `${baseId}-urls-heading`;
+  const blockersHeadingId = `${baseId}-blockers-heading`;
 
   const [mostCommonUrlsLimit, setMostCommonUrlsLimit] = useState(5);
   const [mostCommonBlockersLimit, setMostCommonBlockersLimit] = useState(5);
@@ -85,74 +89,80 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
             <Card className="short">
               <div className={style["blockers-count"]}>
-                <h2><span className="font-extra-large">{chartData.data[chartData.data.length - 1].blockers.toLocaleString()}</span> Blockers Found</h2>
+                <h3><span className="font-extra-large">{chartData.data[chartData.data.length - 1].blockers.toLocaleString()}</span> Blockers Found</h3>
               </div>
             </Card>
             <Card className="short" variant="light">
               <div className={style["graph-card"]}>
-                <h2><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h2>
+                <h3><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h3>
                 <ResponsiveContainer className={style["donut-chart"]}>
-                  <PieChart>
+                  <PieChart {...{ "aria-hidden": "true" }}>
                     <Pie
-                      data={[
-                        {
-                          name: "URLs with Blockers",
-                          value: data.urlsWithBlockersCount,
-                          fill: accentColor
-                        },
-                        {
-                          name: "URLs without Blockers",
-                          value: pages.length - data.urlsWithBlockersCount,
-                          fill: chartFillSecondary
-                        },
-                      ]}
-                      cx={"50%"}
-                      cy={"50%"}
-                      innerRadius={"70%"}
-                      outerRadius={"100%"}
-                      paddingAngle={0}
-                      stroke="0"
-                      dataKey="value"
-                    >
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                        data={[
+                          {
+                            name: "URLs with Blockers",
+                            value: data.urlsWithBlockersCount,
+                            fill: accentColor
+                          },
+                          {
+                            name: "URLs without Blockers",
+                            value: pages.length - data.urlsWithBlockersCount,
+                            fill: chartFillSecondary
+                          },
+                        ]}
+                        cx={"50%"}
+                        cy={"50%"}
+                        innerRadius={"70%"}
+                        outerRadius={"100%"}
+                        paddingAngle={0}
+                        stroke="0"
+                        dataKey="value"
+                      >
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
               </div>
             </Card>
             <Card variant="light" className="short">
               <div className={style["blockers-count"]}>
-                <h2><span className="font-extra-large">{daysSince(new Date(scans[scans.length - 1].created_at))}
-                </span> Days Since Last Scanned </h2>
+                <h3><span className="font-extra-large">{daysSince(new Date(scans[scans.length - 1].created_at))}
+                </span> Days Since Last Scanned </h3>
               </div>
             </Card>
           </div>
 
           <div className="cards-50">
             <Card variant="light">
-              <h2>URLs with Most Blockers</h2>
-              <DataRow variant="highlight" the_value="Blockers" the_key="URL" />
-              {data.urlsWithMostErrors.map((item, index) => {
-                return <DataRow
-                  key={index}
-                  the_key={<a href={item.key} target="_blank">{item.key}</a>}
-                  the_value={item.count.toString()}
-                  variant="tight"
-                />
-              })}
+              <h3 id={urlsHeadingId}>URLs with Most Blockers</h3>
+              <div role="table" aria-labelledby={urlsHeadingId}>
+                <DataRow asTableRow variant="highlight" the_value="Blockers" the_key="URL" />
+                {data.urlsWithMostErrors.map((item, index) => {
+                  return <DataRow
+                    asTableRow
+                    key={index}
+                    the_key={<a href={item.key} target="_blank">{item.key}</a>}
+                    the_value={item.count.toString()}
+                    variant="tight"
+                  />
+                })}
+              </div>
             </Card>
             <Card variant="light">
-              <h2>Most Common Blockers</h2>
-              <DataRow variant="highlight" the_value="Count" the_key="Blocker" />
-              {data.mostCommonErrors.map((item, index) => {
-                return <DataRow
-                  key={index}
-                  the_key={item.key}
-                  the_value={item.count.toString()}
-                  variant="tight"
-                />
-              })}
+              <h3 id={blockersHeadingId}>Most Common Blockers</h3>
+              <div role="table" aria-labelledby={blockersHeadingId}>
+                <DataRow asTableRow variant="highlight" the_value="Count" the_key="Blocker" />
+                {data.mostCommonErrors.map((item, index) => {
+                  return <DataRow
+                    asTableRow
+                    key={index}
+                    the_key={item.key}
+                    the_value={item.count.toString()}
+                    variant="tight"
+                  />
+                })}
+              </div>
             </Card>
-          </div>{/* 
+          </div>{/*
           <div className="cards-50">
             <Card variant="light">
               <div className={style["category-tag-card"]}>

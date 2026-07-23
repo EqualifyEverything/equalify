@@ -166,7 +166,7 @@ export const Audits = () => {
                 <StyledButton
                   icon={<FaTableList />}
                   onClick={() => { }}
-                  label={"Cards View"}
+                  label={"Table View"}
                   showLabel={false}
                 />
               </Tabs.Trigger>

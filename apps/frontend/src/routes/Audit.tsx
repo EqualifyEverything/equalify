@@ -542,6 +542,7 @@ export const Audit = () => {
                         name="ChartRangeSelect"
                         value={chartRange}
                         onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                          event.preventDefault();
                           setChartRange(parseInt(event.target.value));
                         }}
                         aria-label="Select Date Range"
@@ -558,11 +559,23 @@ export const Audit = () => {
                     orientation="horizontal"
                     className="chart-tabs"
                   >
-                    <Tabs.List aria-label="Select a Chart View">
-                      <Tabs.Trigger value="chart" className="trigger">
+                    <span id="blockers-chart-tabs-hint" className="sr-only">
+                      Both views show the same blockers-over-time data.
+                      Table view presents it as text instead of a chart.
+                    </span>
+                    <Tabs.List aria-label="Blockers over time: chart or table view">
+                      <Tabs.Trigger
+                        value="chart"
+                        className="trigger"
+                        aria-describedby="blockers-chart-tabs-hint"
+                      >
                         Chart View
                       </Tabs.Trigger>
-                      <Tabs.Trigger value="table" className="trigger">
+                      <Tabs.Trigger
+                        value="table"
+                        className="trigger"
+                        aria-describedby="blockers-chart-tabs-hint"
+                      >
                         Table View
                       </Tabs.Trigger>
                     </Tabs.List>
@@ -579,7 +592,7 @@ export const Audit = () => {
                             bottom: 5,
                           }}
                           title="Blockers over time trend chart"
-                          desc="Line chart showing blocker counts over time. See the data table below for detailed values."
+                          desc="Line chart showing blocker counts over time. Switch to the table view for detailed values."
                         >
                           {/* <CartesianGrid strokeDasharray="6 6" />
                      */}
@@ -607,8 +620,8 @@ export const Audit = () => {
                           <YAxis
                             //axisLine={false}
                             orientation="left"
-                            label={{/*
-                        value: "Blockers", */
+                            label={{
+                              value: "Blockers",
                               angle: -90,
                               position: "insideLeft",
                             }}
@@ -635,8 +648,6 @@ export const Audit = () => {
                     </Tabs.Content>
                     <Tabs.Content value="table">
                       <div className={style["blockers-data-table"]}>
-                        <h3>Blockers Data Table</h3>
-                        <p>Use this table to review exact blocker counts by date.</p>
                         <div className={"table-container card-table"}>
                           <table aria-labelledby="blockers-chart-heading">
                             <thead>
@@ -709,6 +720,7 @@ export const Audit = () => {
                     className={themeVariables["input-element"]}
                     value={audit.interval}
                     onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                      event.preventDefault();
                       updateAuditInterval(event.target.value);
                     }}
                   >
@@ -731,6 +743,7 @@ export const Audit = () => {
                       <input
                         value={audit?.remote_csv_url}
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          event.preventDefault();
                           updateAuditRemoteCsv(event.target.value);
                         }}
                       />
@@ -995,21 +1008,17 @@ export const Audit = () => {
           onValueChange={(value) => setBlockersTableView(value)}
           activationMode="manual"
         >
-          <div className={style["blockers-table-header"]} style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }}>
-            <h3>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h3>
+          <div className={style["blockers-table-header"]} /* style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }} */>
+            <h2>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h2>
 
-            <Tabs.List aria-label="Select a View" className={style["blockers-view-selector"]}>
-              {blockersTableView !== "summary" &&
+            <Tabs.List aria-label="Audit Report View" className={style["blockers-view-selector"]}>
                 <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
-                  <StyledButton variant="naked" label="Switch to Summary View" onClick={() => { }}>Switch to Summary View</StyledButton>
+                  <StyledButton variant="naked" label="Summary View" onClick={undefined}>Summary View</StyledButton>
                 </Tabs.Trigger>
-              }
-              {blockersTableView !== "detailed" &&
                 <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
-                  <StyledButton variant="naked" label="Switch to Detailed View" onClick={() => { }}>Switch to Detailed View</StyledButton>
+                  <StyledButton variant="naked" label="Detailed View" onClick={undefined}>Detailed View</StyledButton>
                 </Tabs.Trigger>
-              }
-            </Tabs.List>
+              </Tabs.List>
           </div>
           <Tabs.Content value="summary">
             <BlockersTableSummary
