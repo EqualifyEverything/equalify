@@ -18,7 +18,7 @@
     justify-content: space-between;
     flex-direction: row-reverse;
     padding-left: variables.$spacing;
-    h2 {
+    h3 {
       display: block;
       min-width: 66%;
       line-height: 1.2rem;
@@ -30,7 +30,7 @@
   }
   .blockers-count {
     padding: calc(variables.$spacing * 2) 0;
-    h2 {
+    h3 {
       display: block;
       line-height: 2rem;
     }

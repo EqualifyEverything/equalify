@@ -12,7 +12,32 @@ export const Signup = () => {
     const queryClient = useQueryClient();
     const { loading, setLoading, setAuthenticated } = useGlobalStore();
     const [error, setError] = useState('');
+    const [requestSubmitted, setRequestSubmitted] = useState('');
     const navigate = useNavigate();
+    const isSso = !!import.meta.env.VITE_SSO_ENABLED;
+
+    const requestAccess = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const { name, email } = Object.fromEntries(new FormData(e.currentTarget));
+        setError('');
+        setLoading(true);
+        try {
+            const response = (await (await API.post({
+                apiName: 'public', path: '/requestAccess', options: { body: { name: String(name), email: String(email) } }
+            }).response).body.json()) as any;
+            if (response?.status === 'success') {
+                setRequestSubmitted(response?.message ?? 'Request submitted! An administrator will review it shortly.');
+            }
+            else {
+                setError(response?.message ?? 'Something went wrong — please try again.');
+            }
+        }
+        catch (err) {
+            console.log(err);
+            setError('Something went wrong — please try again.');
+        }
+        setLoading(false);
+    }
     const signup = async (e) => {
         e.preventDefault();
         const { name, email, password } = Object.fromEntries(new FormData(e.currentTarget));
@@ -64,15 +89,31 @@ export const Signup = () => {
         }
     }
 
-    return (<form onSubmit={signup} className={styles.signup}>
+    return (<form onSubmit={isSso ? requestAccess : signup} className={styles.signup}>
         <div className={styles.header}>
             <div className={styles.logo}>
                 <Logo />
             </div>
-            <h1 className={`${styles.title} initial-focus-element`}>Sign up for Equalify</h1>
+            <h1 className={`${styles.title} initial-focus-element`}>{isSso ? 'Request Access to Equalify' : 'Sign up for Equalify'}</h1>
         </div>
 
-        {import.meta.env.VITE_SSO_ENABLED ? <div className={`${styles.error}`}>Sorry, you may only login using your SSO provider.</div> : <>
+        {isSso ? (requestSubmitted ? <div className={`${styles.signUpForm}`} role="status">
+            <p>{requestSubmitted}</p>
+        </div> : <div className={`${styles.signUpForm}`}>
+            <p>Enter your institutional email address and an administrator will review your request.</p>
+            <label htmlFor='name'>Name</label>
+            <input id='name' name='name' required type='text' placeholder='John Doe' />
+            <label htmlFor='email'>Email address</label>
+            <input id='email' name='email' required type='email' placeholder='johndoe@uic.edu' />
+            {error && <div className={`${styles.error}`} role="alert">{error}</div>}
+            <StyledButton
+                variant='green'
+                type='submit'
+                onClick={undefined}
+                label={loading ? `Submitting...` : `Request Access`}
+                disabled={loading}
+            />
+        </div>) : <>
         <div className={`${styles.signUpForm}`}>
             <label htmlFor='name'>Name</label>
             <input id='name' name='name' required type='text' placeholder='John Doe' />
@@ -88,7 +129,8 @@ export const Signup = () => {
 
             <StyledButton
                 variant='green'
-                onClick={``}
+                type='submit'
+                onClick={undefined}
                 label={`Sign Up`}
             />
             

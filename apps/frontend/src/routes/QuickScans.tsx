@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatId, useGlobalStore } from "../utils";
 import * as API from "aws-amplify/api";
@@ -38,6 +38,37 @@ export const QuickScans = () => {
       return hasActiveScan ? 15000 : false;
     },
   });
+
+  const prevStatusesRef = useRef<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!quickScans) return;
+    const prevStatuses = prevStatusesRef.current;
+    const nextStatuses: Record<string, string> = {};
+    const justFinished: { url: string; label: string }[] = [];
+
+    for (const scan of quickScans) {
+      nextStatuses[scan.id] = scan.scan_status;
+      const wasActive =
+        prevStatuses[scan.id] &&
+        prevStatuses[scan.id] !== "complete" &&
+        prevStatuses[scan.id] !== "failed";
+      const isNowDone = scan.scan_status === "complete" || scan.scan_status === "failed";
+      if (wasActive && isNowDone) {
+        justFinished.push({ url: scan.url, label: getScanStatusLabel(scan) });
+      }
+    }
+    prevStatusesRef.current = nextStatuses;
+
+    if (justFinished.length === 1) {
+      setAnnounceMessage(
+        `Scan for ${justFinished[0].url} finished: ${justFinished[0].label}`,
+        justFinished[0].label === "Complete" ? "success" : "error"
+      );
+    } else if (justFinished.length > 1) {
+      setAnnounceMessage(`${justFinished.length} scans finished`, "success");
+    }
+  }, [quickScans, setAnnounceMessage]);
 
   const formatUrl = (input: string): string | null => {
     let u = input.trim();
@@ -142,61 +173,66 @@ export const QuickScans = () => {
       <div className={styles["quick-scans-list"]}>
         <h2>Scan History</h2>
         {isLoading ? (
-          <SkeletonAuditGrid count={3} />
+          <>
+            <p className="sr-only" role="status">
+              Loading scan history…
+            </p>
+            <SkeletonAuditGrid count={3} />
+          </>
         ) : quickScans?.length > 0 ? (
-          <div className="cards-33">
-            {quickScans.map((scan: any, index: number) => (
-              <Card variant="light" key={index}>
-                <Link to={`/quick-scans/${formatId(scan.id)}`}>
-                  <div className={styles["scan-card"]}>
-                    <div>
-                      <div className={styles["scan-url"]}>{scan.url}</div>
-                      <div className={styles["scan-meta"]}>
-                        <span
-                          className={`${styles["scan-status"]} ${
-                            styles[scan.scan_status] || ""
-                          }`}
-                        >
-                          {scan.scan_status === "processing"
-                            ? `Scanning${
-                                scan.scan_percentage
-                                  ? ` (${scan.scan_percentage}%)`
-                                  : "..."
-                              }`
-                            : scan.scan_status === "complete"
-                            ? "Complete"
-                            : scan.scan_status || "Pending"}
-                        </span>
-                        <span>{scan.type?.toUpperCase()}</span>
+          <ul className="cards-33">
+            {quickScans.map((scan: any, index: number) => {
+              const statusLabel = getScanStatusLabel(scan);
+              return (
+                <li key={scan.id ?? index}>
+                  <Card variant="light">
+                    <Link
+                      to={`/quick-scans/${formatId(scan.id)}`}
+                      aria-label={`View scan of ${scan.url}, status: ${statusLabel}, type: ${scan.type?.toUpperCase()}`}
+                    >
+                      <div className={styles["scan-card"]}>
+                        <div>
+                          <h3 className={styles["scan-url"]}>{scan.url}</h3>
+                          <div className={styles["scan-meta"]}>
+                            <span
+                              className={`${styles["scan-status"]} ${
+                                styles[scan.scan_status] || ""
+                              }`}
+                            >
+                              {statusLabel}
+                            </span>
+                            <span>{scan.type?.toUpperCase()}</span>
+                          </div>
+                        </div>
                       </div>
+                    </Link>
+                    <div style={{ marginTop: "8px" }}>
+                      <DataRow
+                        variant="highlight"
+                        the_key="Blockers"
+                        the_value={scan.blocker_count ?? "—"}
+                      />
+                      <DataRow
+                        the_key="Scanned"
+                        the_value={
+                          scan.scan_updated_at
+                            ? prettyDate(scan.scan_updated_at) +
+                              " at " +
+                              prettyTime(scan.scan_updated_at)
+                            : "Not scanned yet"
+                        }
+                      />
+                      <DataRow
+                        variant="no-border"
+                        the_key="Created"
+                        the_value={prettyDate(scan.created_at)}
+                      />
                     </div>
-                  </div>
-                </Link>
-                <div style={{ marginTop: "8px" }}>
-                  <DataRow
-                    variant="highlight"
-                    the_key="Blockers"
-                    the_value={scan.blocker_count ?? "—"}
-                  />
-                  <DataRow
-                    the_key="Scanned"
-                    the_value={
-                      scan.scan_updated_at
-                        ? prettyDate(scan.scan_updated_at) +
-                          " at " +
-                          prettyTime(scan.scan_updated_at)
-                        : "Not scanned yet"
-                    }
-                  />
-                  <DataRow
-                    variant="no-border"
-                    the_key="Created"
-                    the_value={prettyDate(scan.created_at)}
-                  />
-                </div>
-              </Card>
-            ))}
-          </div>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <Card variant="light">
             <div className={styles["empty-state"]}>
@@ -208,6 +244,14 @@ export const QuickScans = () => {
     </div>
   );
 };
+
+function getScanStatusLabel(scan: any) {
+  if (scan.scan_status === "processing") {
+    return `Scanning${scan.scan_percentage ? ` (${scan.scan_percentage}%)` : "..."}`;
+  }
+  if (scan.scan_status === "complete") return "Complete";
+  return scan.scan_status || "Pending";
+}
 
 function prettyDate(dateTime: string) {
   return new Date(dateTime).toLocaleDateString("en-US", {

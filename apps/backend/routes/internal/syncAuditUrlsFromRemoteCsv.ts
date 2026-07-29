@@ -30,9 +30,9 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId: string) => {
         values: [auditId],
       })
     ).rows?.[0];
-    const remoteCsvUrl = audit.remote_csv_url;
+    const remoteCsvUrl = audit?.remote_csv_url;
 
-    if (!audit.remote_csv_url.trim()) {
+    if (!audit?.remote_csv_url?.trim()) {
       // doesn't use remote csv, skip
       console.log(`Audit ${auditId} doesn't use remote CSV, skipping sync`);
       return;
@@ -57,7 +57,6 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId: string) => {
         values: [auditId],
       })
     ).rows as DBUrl[];
-    await db.clean();
 
     // cache the url objects for efficiency and also why not
     const existingKeys = new Set(
@@ -98,17 +97,20 @@ export const syncAuditUrlsFromRemoteCsv = async (auditId: string) => {
     // Store updates in db
     //
 
-    // new URLs
-    for (const url of urlsToAdd) {
-      await graphqlQuery({
-        query: `mutation ($audit_id: uuid, $url: String, $type: String) {
-                insert_urls_one(object: {audit_id: $audit_id, url: $url, type: $type}) {id}
-            }`,
-        variables: {
-          audit_id: auditId,
-          url: url.url,
-          type: url.type,
-        },
+    // new URLs — inserted via SQL with an explicit user_id. The previous GraphQL
+    // mutation relied on Hasura's user-role column preset to fill user_id, which only
+    // exists when a user JWT is forwarded; from the scheduled path (no HTTP headers)
+    // it ran as admin and every insert failed the urls.user_id NOT NULL constraint.
+    if (urlsToAdd.length > 0) {
+      await db.query({
+        text: `INSERT INTO "urls" ("user_id", "audit_id", "url", "type")
+               SELECT * FROM UNNEST($1::uuid[], $2::uuid[], $3::text[], $4::text[])`,
+        values: [
+          urlsToAdd.map(() => audit.user_id),
+          urlsToAdd.map(() => auditId),
+          urlsToAdd.map((url: newUrl) => url.url),
+          urlsToAdd.map((url: newUrl) => url.type),
+        ],
       });
     }
 

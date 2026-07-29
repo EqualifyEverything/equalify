@@ -82,6 +82,10 @@
     }
   }
 
+  .blockers-view-selector {
+    display:inline-flex;
+    gap: 1rem;
+  }
   .blockers-table-header {
     display: inline-flex;
     align-content: center;

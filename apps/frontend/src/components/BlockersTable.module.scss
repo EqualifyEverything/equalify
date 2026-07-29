@@ -1,6 +1,114 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
+// Export dropdown trigger — sits inside .BlockersTable DOM, scoped normally
+.export-trigger {
+  background: transparent;
+  border: 0;
+  color: variables.$red;
+  opacity: 0.6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+
+  svg {
+    min-width: 14px;
+    min-height: 14px;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+  }
+  &[data-state="open"] {
+    opacity: 1;
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+}
+
+.export-trigger-caret {
+  font-size: 10px;
+  margin-top: 1px;
+}
+
+.export-trigger-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: export-spin 0.8s linear infinite;
+}
+
+@keyframes export-spin {
+  to { transform: rotate(360deg); }
+}
+
+// Export dropdown content — renders in a portal, so NOT nested inside .BlockersTable
+.export-dropdown-content {
+  min-width: 280px;
+  background: variables.$white;
+  border: 1px solid variables.$gray;
+  border-radius: calc(variables.$spacing / 2);
+  box-shadow: variables.$shadow-small;
+  padding: calc(variables.$spacing / 2);
+  z-index: 50;
+  animation: dropdown-fade-in 0.1s ease-out;
+}
+
+@keyframes dropdown-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  gap: variables.$spacing;
+  padding: variables.$spacing calc(variables.$spacing * 1.5);
+  border-radius: calc(variables.$spacing / 2);
+  cursor: pointer;
+  outline: none;
+
+  svg {
+    margin-top: 3px;
+    flex-shrink: 0;
+    color: variables.$red;
+  }
+
+  &[data-highlighted] {
+    background: variables.$gray;
+  }
+  &[data-disabled] {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.export-dropdown-item-label {
+  @include fonts.font-size-normal;
+  font-weight: bold;
+  color: variables.$black;
+}
+
+.export-dropdown-item-desc {
+  @include fonts.font-size-small;
+  color: variables.$black;
+  opacity: 0.65;
+  margin-top: 1px;
+}
+
+.export-dropdown-separator {
+  height: 1px;
+  background: variables.$gray;
+  margin: calc(variables.$spacing / 2) 0;
+}
+
 .BlockersTable {
   .table-top-buttons {
     display: flex;
@@ -128,6 +236,36 @@
   }
 
   .tooltip-rondel {
+    background: variables.$dark-border;
+  }
+
+  .export-trigger {
+    color: variables.$yellow;
+  }
+
+  .export-dropdown-content {
+    background: variables.$dark-surface;
+    border-color: variables.$dark-border;
+  }
+
+  .export-dropdown-item {
+    svg {
+      color: variables.$yellow;
+    }
+    &[data-highlighted] {
+      background: variables.$dark-border;
+    }
+  }
+
+  .export-dropdown-item-label {
+    color: variables.$paper;
+  }
+
+  .export-dropdown-item-desc {
+    color: variables.$paper;
+  }
+
+  .export-dropdown-separator {
     background: variables.$dark-border;
   }
 }

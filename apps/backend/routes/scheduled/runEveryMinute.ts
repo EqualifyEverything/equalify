@@ -39,48 +39,53 @@ export const runEveryMinute = async () => {
     })
   ).rows.map((obj: { id: string; }) => obj.id);
   for (const scheduledAuditId of scheduledAuditIds) {
-    // hook to check for remote CSV
-    await syncAuditUrlsFromRemoteCsv(scheduledAuditId);
+    // isolate each audit so one failure can't starve the rest of the batch
+    try {
+      // hook to check for remote CSV
+      await syncAuditUrlsFromRemoteCsv(scheduledAuditId);
 
-    const urls = (
-      await db.query({
-        text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
-        values: [scheduledAuditId],
-      })
-    ).rows;
+      const urls = (
+        await db.query({
+          text: `SELECT * FROM "urls" WHERE "audit_id"=$1`,
+          values: [scheduledAuditId],
+        })
+      ).rows;
 
-    // Skip scheduled audits with no URLs to prevent hung scans
-    if (!urls || urls.length === 0) {
-      console.log("Skipping scheduled audit with no URLs:", scheduledAuditId);
-      continue;
-    }
+      // Skip scheduled audits with no URLs to prevent hung scans
+      if (!urls || urls.length === 0) {
+        console.log("Skipping scheduled audit with no URLs:", scheduledAuditId);
+        continue;
+      }
 
-    const scanId = (
-      await db.query({
-        text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
-        values: [
-          scheduledAuditId,
-          "processing",
-          JSON.stringify(urls.map((obj: { url: string; type: string; }) => ({ url: obj.url, type: obj.type }))),
-        ],
-      })
-    ).rows[0].id;
-    await lambda.send(
-      new InvokeCommand({
-        FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
-        InvocationType: "Event",
-        Payload: JSON.stringify({
-          urls: urls?.map((url: { id: string; url: string; type: string; }) => ({
-            auditId: scheduledAuditId,
-            scanId: scanId,
-            urlId: url.id,
-            url: url.url,
-            type: url.type,
-          })),
+      const scanId = (
+        await db.query({
+          text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
+          values: [
+            scheduledAuditId,
+            "processing",
+            JSON.stringify(urls.map((obj: { url: string; type: string; }) => ({ url: obj.url, type: obj.type }))),
+          ],
+        })
+      ).rows[0].id;
+      await lambda.send(
+        new InvokeCommand({
+          FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
+          InvocationType: "Event",
+          Payload: JSON.stringify({
+            urls: urls?.map((url: { id: string; url: string; type: string; }) => ({
+              auditId: scheduledAuditId,
+              scanId: scanId,
+              urlId: url.id,
+              url: url.url,
+              type: url.type,
+            })),
+          }),
         }),
-      }),
-    );
-    console.log("Scan jobs queued for audit:", scheduledAuditId);
+      );
+      console.log("Scan jobs queued for audit:", scheduledAuditId);
+    } catch (error) {
+      console.error("Scheduled scan failed for audit:", scheduledAuditId, error);
+    }
   }
 
   // See if there are any "stuck" scans that we should error out!

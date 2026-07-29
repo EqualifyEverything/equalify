@@ -11,12 +11,14 @@ import {
 import * as API from "aws-amplify/api";
 import { useState, useMemo, ChangeEvent, ChangeEventHandler } from "react";
 //import { formatDate } from "../utils";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
 import {
   FaArrowDown,
   FaArrowUp,
+  FaCaretDown,
   FaClipboard,
   FaCode,
   FaDownload,
@@ -46,6 +48,19 @@ import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const apiClient = API.generateClient();
+
+const triggerCsvDownload = (csv: string, filename: string) => {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
 
 interface BlockerTag {
   id: string;
@@ -733,7 +748,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
-  const exportMutation = useMutation({
+  const exportFilteredMutation = useMutation({
     mutationFn: async () => {
       const params: Record<string, string> = {
         id: auditId,
@@ -753,27 +768,32 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       if (searchString.length >= 3 || searchString === "") {
         params.searchString = searchString;
       }
-
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/exportAuditTable",
         options: { queryParams: params },
       }).response;
       const csv = await response.body.text();
+      triggerCsvDownload(csv, `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
+    },
+    onSuccess: () => {
+      setAnnounceMessage("Exported filtered blockers to CSV", "success");
+    },
+    onError: (err) => {
+      console.error(err);
+      setAnnounceMessage("Failed to export blockers", "error");
+    },
+  });
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute(
-        "download",
-        `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`
-      );
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+  const exportAllMutation = useMutation({
+    mutationFn: async () => {
+      const response = await API.get({
+        apiName: isShared ? "public" : "auth",
+        path: "/exportAuditTable",
+        options: { queryParams: { id: auditId } },
+      }).response;
+      const csv = await response.body.text();
+      triggerCsvDownload(csv, `blockers-all-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
     },
     onSuccess: () => {
       setAnnounceMessage("Exported all blockers to CSV", "success");
@@ -784,14 +804,26 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     },
   });
 
-  const exportToCsv = () => {
-    if (exportMutation.isPending) return;
-    if (!data?.pagination?.totalCount) {
-      setAnnounceMessage("No blockers to export", "error");
-      return;
-    }
-    exportMutation.mutate();
-  };
+  const exportPdfLinksMutation = useMutation({
+    mutationFn: async () => {
+      const response = await API.get({
+        apiName: "auth",
+        path: "/exportAuditTablePdfSourceLinks",
+        options: { queryParams: { id: auditId } },
+      }).response;
+      const csv = await response.body.text();
+      triggerCsvDownload(csv, `pdf-links-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
+    },
+    onSuccess: () => {
+      setAnnounceMessage("Exported PDF source links to CSV", "success");
+    },
+    onError: (err) => {
+      console.error(err);
+      setAnnounceMessage("Failed to export PDF source links", "error");
+    },
+  });
+
+  const anyExportPending = exportFilteredMutation.isPending || exportAllMutation.isPending || exportPdfLinksMutation.isPending;
 
   return (
     <div className={style.BlockersTable}>
@@ -810,21 +842,71 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             <BlockersTableColumnToggle
               table={table}
             />
-            {/* CSV Export Button */}
-            <StyledButton
-              onClick={exportToCsv}
-              icon={<FaDownload className="icon-small" />}
-              label={
-                exportMutation.isPending
-                  ? `Exporting${data?.pagination?.totalCount ? ` ${data.pagination.totalCount} blockers` : ""}...`
-                  : `Export ${data?.pagination?.totalCount || 0} blockers as CSV`
-              }
-              loading={exportMutation.isPending}
-              loadingText="Exporting..."
-              variant="naked"
-              showLabel={false}
-              disabled={!data?.pagination?.totalCount}
-            />
+            {/* Export CSV Dropdown */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger
+                className={style["export-trigger"]}
+                disabled={anyExportPending}
+                aria-label="Export CSV options"
+              >
+                {anyExportPending ? (
+                  <span className={style["export-trigger-spinner"]} aria-hidden="true" />
+                ) : (
+                  <FaDownload aria-hidden="true" />
+                )}
+                <FaCaretDown className={style["export-trigger-caret"]} aria-hidden="true" />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className={style["export-dropdown-content"]}
+                  align="end"
+                  sideOffset={4}
+                >
+                  <DropdownMenu.Item
+                    className={style["export-dropdown-item"]}
+                    onSelect={() => exportFilteredMutation.mutate()}
+                    disabled={exportFilteredMutation.isPending || !data?.pagination?.totalCount}
+                  >
+                    <FaDownload className="icon-small" aria-hidden="true" />
+                    <div>
+                      <div className={style["export-dropdown-item-label"]}>Export filtered blockers</div>
+                      <div className={style["export-dropdown-item-desc"]}>
+                        {data?.pagination?.totalCount
+                          ? `${data.pagination.totalCount.toLocaleString()} blockers matching current filters`
+                          : "No blockers match current filters"}
+                      </div>
+                    </div>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className={style["export-dropdown-item"]}
+                    onSelect={() => exportAllMutation.mutate()}
+                    disabled={exportAllMutation.isPending}
+                  >
+                    <FaDownload className="icon-small" aria-hidden="true" />
+                    <div>
+                      <div className={style["export-dropdown-item-label"]}>Export all blockers</div>
+                      <div className={style["export-dropdown-item-desc"]}>All blockers in this audit, ignoring current filters</div>
+                    </div>
+                  </DropdownMenu.Item>
+                  {!isShared && (
+                    <>
+                      <DropdownMenu.Separator className={style["export-dropdown-separator"]} />
+                      <DropdownMenu.Item
+                        className={style["export-dropdown-item"]}
+                        onSelect={() => exportPdfLinksMutation.mutate()}
+                        disabled={exportPdfLinksMutation.isPending}
+                      >
+                        <FaRegFilePdf className="icon-small" aria-hidden="true" />
+                        <div>
+                          <div className={style["export-dropdown-item-label"]}>Export PDF Source Page URLs</div>
+                          <div className={style["export-dropdown-item-desc"]}>Source pages and linked PDF URLs found in this audit</div>
+                        </div>
+                      </DropdownMenu.Item>
+                    </>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
           </div>
         </div>
         <div className="filter-group">
