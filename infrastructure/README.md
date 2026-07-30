@@ -2,9 +2,9 @@
 
 Provisions a complete, self-contained AWS environment for Equalify: RDS
 (PostgreSQL), the 6 Lambda functions in `services/` and `apps/backend`, SQS
-FIFO queues, Hasura GraphQL Engine (ECS Fargate + ALB), Cognito, and the
-frontend's S3 + CloudFront static hosting — with least-privilege IAM
-throughout.
+FIFO queues, Hasura GraphQL Engine (ECS Fargate + ALB), Cognito, the
+frontend's S3 + CloudFront static hosting, and a small SSM-only bastion for
+one-off DB access — with least-privilege IAM throughout.
 
 Terraform owns **infrastructure only**. Application code is still pushed by
 the existing GitHub Actions workflows (`aws lambda update-function-code`,
@@ -110,6 +110,7 @@ code — Terraform owns the function/role/triggers, CI owns the code inside it.
 | `modules/networking` | VPC, 2 AZ public+private subnets, NAT, security group chain |
 | `modules/secrets` | Secrets Manager: DB password, Hasura admin secret, webhook secret, optional SSO config |
 | `modules/rds` | PostgreSQL 17.5 instance, private subnet group |
+| `modules/bastion` | SSM-only EC2 instance (no SSH key, no public IP, no inbound rules) for `scripts/deploy-app.sh`'s one-off DB access to the otherwise fully private RDS instance |
 | `modules/cognito` | User pool + SPA app client + hosted UI domain |
 | `modules/sqs` | `scanHtml.fifo` / `scanPdf.fifo` + DLQs |
 | `modules/lambda_function` | Reusable: IAM role, log group, optional VPC attach, optional SQS trigger, optional Function URL |

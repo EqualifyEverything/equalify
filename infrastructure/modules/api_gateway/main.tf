@@ -45,17 +45,28 @@ resource "aws_apigatewayv2_integration" "backend" {
   payload_format_version = "2.0"
 }
 
-# Matches apps/backend/index.ts's own path-based router — a single catch-all
-# route forwards everything to the backend Lambda.
+# Matches apps/backend/index.ts's own path-based router — every real method
+# forwards to the backend Lambda. Deliberately NOT "ANY", which also matches
+# OPTIONS: that would route CORS preflight requests to the Lambda itself
+# (which has no preflight handling and 401s without an Authorization header)
+# instead of letting API Gateway's own cors_configuration auto-answer them.
+locals {
+  proxy_methods = toset(["GET", "POST", "PUT", "PATCH", "DELETE"])
+}
+
 resource "aws_apigatewayv2_route" "proxy" {
+  for_each = local.proxy_methods
+
   api_id    = aws_apigatewayv2_api.this.id
-  route_key = "ANY /{proxy+}"
+  route_key = "${each.value} /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.backend.id}"
 }
 
 resource "aws_apigatewayv2_route" "root" {
+  for_each = local.proxy_methods
+
   api_id    = aws_apigatewayv2_api.this.id
-  route_key = "ANY /"
+  route_key = "${each.value} /"
   target    = "integrations/${aws_apigatewayv2_integration.backend.id}"
 }
 

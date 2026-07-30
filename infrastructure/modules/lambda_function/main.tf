@@ -105,6 +105,7 @@ resource "aws_lambda_function" "this" {
   timeout       = var.timeout
 
   reserved_concurrent_executions = var.reserved_concurrent_executions
+  layers                         = var.layers
 
   environment {
     variables = var.environment_variables
@@ -126,7 +127,9 @@ resource "aws_lambda_function" "this" {
   lifecycle {
     # Real code is pushed by GitHub Actions (`aws lambda update-function-code`)
     # after this initial apply — don't let `terraform apply` clobber it.
-    ignore_changes = [filename, source_code_hash]
+    # layers is ignored for the same reason: scripts/deploy-app.sh attaches
+    # the chromium layer for scan-html out-of-band the same way.
+    ignore_changes = [filename, source_code_hash, layers]
   }
 }
 

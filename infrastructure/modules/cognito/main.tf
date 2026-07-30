@@ -30,6 +30,25 @@ resource "aws_cognito_user_pool" "this" {
       priority = 1
     }
   }
+
+  # apps/backend's index.ts dispatches on event.triggerSource to
+  # routes/cognito/{preSignUpSignUp,postConfirmationConfirmSignUp,tokenGeneration}.ts
+  # — without these wired up, new native-Cognito users are never synced into
+  # the users table (postConfirmationConfirmSignUp) and never get Hasura JWT
+  # claims (tokenGeneration), breaking auth almost entirely for non-SSO use.
+  lambda_config {
+    pre_sign_up          = var.backend_lambda_predicted_arn
+    post_confirmation    = var.backend_lambda_predicted_arn
+    pre_token_generation = var.backend_lambda_predicted_arn
+  }
+}
+
+resource "aws_lambda_permission" "cognito_invoke" {
+  statement_id  = "AllowCognitoInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.backend_lambda_function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.this.arn
 }
 
 # Matches VITE_USERPOOLWEBCLIENTID usage in apps/frontend — an SPA public

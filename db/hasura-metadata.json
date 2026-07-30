@@ -321,7 +321,8 @@
                     "content_hash_id",
                     "id",
                     "scan_id",
-                    "url_id"
+                    "url_id",
+                    "url_text"
                   ],
                   "filter": {},
                   "limit": 1
@@ -343,7 +344,8 @@
                     "content_hash_id",
                     "id",
                     "scan_id",
-                    "url_id"
+                    "url_id",
+                    "url_text"
                   ],
                   "filter": {},
                   "allow_aggregations": true
@@ -741,7 +743,9 @@
                     "created_at",
                     "updated_at",
                     "audit_id",
-                    "id"
+                    "id",
+                    "blocker_count",
+                    "equalified_count"
                   ],
                   "filter": {},
                   "allow_aggregations": true
@@ -760,7 +764,9 @@
                     "created_at",
                     "updated_at",
                     "audit_id",
-                    "id"
+                    "id",
+                    "blocker_count",
+                    "equalified_count"
                   ],
                   "filter": {},
                   "allow_aggregations": true

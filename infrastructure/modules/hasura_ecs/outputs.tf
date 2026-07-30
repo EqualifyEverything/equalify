@@ -8,13 +8,13 @@ output "alb_zone_id" {
 }
 
 output "graphql_url" {
-  description = "GraphQL HTTP endpoint, using the custom domain if set, otherwise the ALB DNS name."
-  value       = var.domain_name != null ? "https://${var.domain_name}/v1/graphql" : "http://${aws_lb.this.dns_name}/v1/graphql"
+  description = "GraphQL HTTP endpoint: the custom domain if set, otherwise the CloudFront HTTPS front for the ALB."
+  value       = var.domain_name != null ? "https://${var.domain_name}/v1/graphql" : "https://${aws_cloudfront_distribution.this[0].domain_name}/v1/graphql"
 }
 
 output "graphql_wss_url" {
-  description = "GraphQL WebSocket endpoint, using the custom domain if set, otherwise the ALB DNS name."
-  value       = var.domain_name != null ? "wss://${var.domain_name}/v1/graphql" : "ws://${aws_lb.this.dns_name}/v1/graphql"
+  description = "GraphQL WebSocket endpoint: the custom domain if set, otherwise the same CloudFront distribution (wss, passed through unchanged)."
+  value       = var.domain_name != null ? "wss://${var.domain_name}/v1/graphql" : "wss://${aws_cloudfront_distribution.this[0].domain_name}/v1/graphql"
 }
 
 output "cluster_name" {

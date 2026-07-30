@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   frontend_domain = var.domain_name != null ? "app.${var.domain_name}" : null
   api_domain      = var.domain_name != null ? "api.${var.domain_name}" : null
@@ -6,6 +8,11 @@ locals {
   use_custom_domains = var.domain_name != null && var.route53_zone_id != null
 
   artifacts_dir = "${path.module}/artifacts"
+
+  # Predicted (not referenced-from-resource) name/ARN for the backend Lambda —
+  # see modules/cognito/variables.tf's backend_lambda_predicted_arn for why.
+  backend_lambda_name          = "${var.project_name}-${var.environment}-api"
+  backend_lambda_predicted_arn = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.backend_lambda_name}"
 }
 
 # =============================================================================
@@ -67,6 +74,19 @@ module "rds" {
   skip_final_snapshot = var.db_skip_final_snapshot
 }
 
+# SSM-only bastion: no SSH key, no public IP, no inbound rules — a relay for
+# scripts/deploy-app.sh's one-off DB access (schema load, migrations) to the
+# otherwise fully private RDS instance. See infrastructure/README.md.
+module "bastion" {
+  source = "./modules/bastion"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  subnet_id         = module.networking.private_subnet_ids[0]
+  security_group_id = module.networking.bastion_security_group_id
+  instance_type     = var.bastion_instance_type
+}
+
 # =============================================================================
 # Cognito
 # =============================================================================
@@ -80,6 +100,9 @@ module "cognito" {
 
   callback_urls = [local.use_custom_domains ? "https://${local.frontend_domain}" : "https://${module.frontend_hosting.distribution_domain_name}"]
   logout_urls   = [local.use_custom_domains ? "https://${local.frontend_domain}" : "https://${module.frontend_hosting.distribution_domain_name}"]
+
+  backend_lambda_function_name = module.lambda_backend.function_name
+  backend_lambda_predicted_arn = local.backend_lambda_predicted_arn
 }
 
 # =============================================================================
@@ -205,6 +228,54 @@ resource "aws_acm_certificate_validation" "graphql" {
 }
 
 # =============================================================================
+# Deploy artifacts
+# =============================================================================
+# Transit bucket for scripts/deploy-app.sh: some deploy artifacts (e.g. the
+# @sparticuz/chromium Lambda layer) exceed the ~70MB direct-upload limit for
+# PublishLayerVersion/UpdateFunctionCode and must be staged in S3 instead of
+# uploaded inline. Lambda copies the content internally once published, so
+# nothing here needs to persist — force_destroy + a short expiration are
+# both safe.
+resource "aws_s3_bucket" "deploy_artifacts" {
+  bucket        = "${var.project_name}-${var.environment}-deploy-artifacts"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_public_access_block" "deploy_artifacts" {
+  bucket = aws_s3_bucket.deploy_artifacts.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "deploy_artifacts" {
+  bucket = aws_s3_bucket.deploy_artifacts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "deploy_artifacts" {
+  bucket = aws_s3_bucket.deploy_artifacts.id
+
+  rule {
+    id     = "expire-after-1-day"
+    status = "Enabled"
+
+    filter {}
+
+    expiration {
+      days = 1
+    }
+  }
+}
+
+# =============================================================================
 # Lambda functions
 # =============================================================================
 
@@ -221,7 +292,6 @@ module "lambda_scan_sqs_router" {
   timeout     = 30
 
   environment_variables = {
-    AWS_REGION                   = var.aws_region
     SQS_HTML_QUEUE_URL           = module.sqs.scan_html_queue_url
     SQS_PDF_QUEUE_URL            = module.sqs.scan_pdf_queue_url
     POWERTOOLS_METRICS_NAMESPACE = "${var.project_name}${var.environment}"
@@ -287,7 +357,6 @@ module "lambda_scan_pdf" {
   environment_variables = {
     SCAN_WEBHOOK_URL             = local.use_custom_domains ? "https://${local.api_domain}/public/scanWebhook" : "${module.api_gateway.api_endpoint}/public/scanWebhook"
     VERAPDF_FUNCTION_NAME        = module.lambda_verapdf_interface.function_name
-    AWS_REGION                   = var.aws_region
     POWERTOOLS_METRICS_NAMESPACE = "${var.project_name}${var.environment}"
   }
 
@@ -328,7 +397,7 @@ module "lambda_crawler" {
 module "lambda_backend" {
   source = "./modules/lambda_function"
 
-  function_name = "${var.project_name}-${var.environment}-api"
+  function_name = local.backend_lambda_name
   description   = "Equalify backend API (apps/backend) — auth, scans orchestration, GraphQL passthrough."
   runtime       = "nodejs22.x"
   handler       = "index.handler"
@@ -349,14 +418,17 @@ module "lambda_backend" {
       DB_NAME     = module.rds.db_name
       DB_PASSWORD = module.secrets.db_password
 
-      GRAPHQL_URL = local.use_custom_domains ? "https://${local.graphql_domain}/v1/graphql" : module.hasura_ecs.graphql_url
+      # apps/backend/utils/graphqlQuery.ts appends /v1/graphql itself (its
+      # own fallback default is the bare "https://graphql...equalifyapp.com",
+      # no path) — same bare-domain convention as the frontend's
+      # VITE_GRAPHQL_URL, so trim it back off graphql_url the same way.
+      GRAPHQL_URL = trimsuffix(local.use_custom_domains ? "https://${local.graphql_domain}/v1/graphql" : module.hasura_ecs.graphql_url, "/v1/graphql")
 
       USER_POOL_ID  = module.cognito.user_pool_id
       WEB_CLIENT_ID = module.cognito.web_client_id
 
       SSO_ENABLED = var.sso_enabled ? "1" : "0"
 
-      AWS_REGION      = var.aws_region
       SES_ADMIN_EMAIL = var.ses_admin_email
 
       SQS_ROUTER_FUNCTION_NAME = module.lambda_scan_sqs_router.function_name
@@ -466,6 +538,10 @@ module "hasura_ecs" {
   hasura_image = var.hasura_image
   database_url = "postgresql://${var.db_username}:${module.secrets.db_password}@${module.rds.address}:${module.rds.port}/${module.rds.db_name}"
   admin_secret = module.secrets.hasura_admin_secret
+
+  aws_region    = var.aws_region
+  user_pool_id  = module.cognito.user_pool_id
+  web_client_id = module.cognito.web_client_id
 
   cpu           = var.hasura_cpu
   memory        = var.hasura_memory

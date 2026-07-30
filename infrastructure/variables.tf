@@ -143,6 +143,14 @@ variable "hasura_desired_count" {
   default = 1
 }
 
+# --- Bastion (SSM-only, for one-off DB access) -------------------------------
+
+variable "bastion_instance_type" {
+  description = "Only used as an SSM Session Manager relay for scripts/deploy-app.sh's DB access (schema load, migrations) — a small instance is intentional."
+  type        = string
+  default     = "t3.micro"
+}
+
 # --- Lambda sizing ------------------------------------------------------------
 
 variable "scan_lambda_memory_size" {

@@ -185,9 +185,28 @@ resource "aws_security_group" "backend_lambda" {
   tags = { Name = "${local.name}-backend-lambda" }
 }
 
+resource "aws_security_group" "bastion" {
+  name_prefix = "${local.name}-bastion-"
+  description = "SSM-only bastion for one-off DB access (schema load, migrations): no ingress, egress only"
+  vpc_id      = aws_vpc.this.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = { Name = "${local.name}-bastion" }
+}
+
 resource "aws_security_group" "rds" {
   name_prefix = "${local.name}-rds-"
-  description = "RDS Postgres: ingress from backend Lambda and Hasura task only"
+  description = "RDS Postgres: ingress from backend Lambda, Hasura task, and the SSM bastion only"
   vpc_id      = aws_vpc.this.id
 
   ingress {
@@ -204,6 +223,14 @@ resource "aws_security_group" "rds" {
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [aws_security_group.hasura_task.id]
+  }
+
+  ingress {
+    description     = "Postgres from SSM bastion (schema load / migrations)"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
   }
 
   egress {

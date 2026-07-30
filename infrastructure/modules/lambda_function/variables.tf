@@ -102,3 +102,15 @@ variable "reserved_concurrent_executions" {
   type        = number
   default     = -1
 }
+
+# --- Layers -------------------------------------------------------------
+# Same pattern as the artifact above: starts empty/whatever's declared here,
+# then scripts/deploy-app.sh attaches real layers (e.g. the @sparticuz/chromium
+# binary for scan-html) via `aws lambda update-function-configuration
+# --layers`. Terraform ignores drift on this attribute so it doesn't revert
+# what the script attaches.
+
+variable "layers" {
+  type    = list(string)
+  default = []
+}

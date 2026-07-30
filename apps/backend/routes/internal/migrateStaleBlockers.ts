@@ -25,7 +25,7 @@ export const migrateStaleBlockers = async () => {
     if (!phase) {
         return {
             statusCode: 400,
-            body: { error: "phase is required: 'ignored_hashes' | 'scan_counts' | 'move_stale'" },
+            body: JSON.stringify({ error: "phase is required: 'ignored_hashes' | 'scan_counts' | 'move_stale'" }),
         };
     }
 
@@ -54,7 +54,7 @@ export const migrateStaleBlockers = async () => {
             await db.clean();
             return {
                 statusCode: 200,
-                body: { phase, dryRun, updated, ms: Date.now() - t0 },
+                body: JSON.stringify({ phase, dryRun, updated, ms: Date.now() - t0 }),
             };
         }
 
@@ -72,7 +72,7 @@ export const migrateStaleBlockers = async () => {
                 await db.clean();
                 return {
                     statusCode: 200,
-                    body: { phase, dryRun, scansToUpdate: result.rows[0]?.scan_count, ms: Date.now() - t0 },
+                    body: JSON.stringify({ phase, dryRun, scansToUpdate: result.rows[0]?.scan_count, ms: Date.now() - t0 }),
                 };
             }
 
@@ -89,7 +89,7 @@ export const migrateStaleBlockers = async () => {
             await db.clean();
             return {
                 statusCode: 200,
-                body: { phase, scansUpdated: result.rowCount, ms: Date.now() - t0 },
+                body: JSON.stringify({ phase, scansUpdated: result.rowCount, ms: Date.now() - t0 }),
             };
         }
 
@@ -125,7 +125,7 @@ export const migrateStaleBlockers = async () => {
                 await db.clean();
                 return {
                     statusCode: 200,
-                    body: { phase, dryRun, remainingStaleScans, ms: Date.now() - t0 },
+                    body: JSON.stringify({ phase, dryRun, remainingStaleScans, ms: Date.now() - t0 }),
                 };
             }
 
@@ -177,7 +177,7 @@ export const migrateStaleBlockers = async () => {
             await db.clean();
             return {
                 statusCode: 200,
-                body: {
+                body: JSON.stringify({
                     phase,
                     batchesRun,
                     totalRowsMoved,
@@ -189,7 +189,7 @@ export const migrateStaleBlockers = async () => {
                             ? "soft_deadline"
                             : "no_more_work",
                     batches: batchResults,
-                },
+                }),
             };
         }
 
@@ -238,7 +238,7 @@ export const migrateStaleBlockers = async () => {
             await db.clean();
             return {
                 statusCode: 200,
-                body: {
+                body: JSON.stringify({
                     phase,
                     batchesRun,
                     totalRowsMoved,
@@ -249,7 +249,7 @@ export const migrateStaleBlockers = async () => {
                             ? "soft_deadline"
                             : "no_more_work",
                     batches: batchResults,
-                },
+                }),
             };
         }
 
@@ -261,27 +261,27 @@ export const migrateStaleBlockers = async () => {
             const tableName: string = body.tableName;
             if (!tableName || !/^[a-z_]+$/.test(tableName)) {
                 await db.clean();
-                return { statusCode: 400, body: { error: "tableName required, lowercase letters/underscores only" } };
+                return { statusCode: 400, body: JSON.stringify({ error: "tableName required, lowercase letters/underscores only" }) };
             }
             await db.query({ text: `VACUUM FULL public.${tableName}` });
             await db.clean();
             return {
                 statusCode: 200,
-                body: { phase, tableName, ms: Date.now() - t0 },
+                body: JSON.stringify({ phase, tableName, ms: Date.now() - t0 }),
             };
         }
 
         await db.clean();
         return {
             statusCode: 400,
-            body: { error: `unknown phase '${phase}'` },
+            body: JSON.stringify({ error: `unknown phase '${phase}'` }),
         };
     } catch (err: any) {
         try { await db.clean(); } catch {}
         console.error("migrateStaleBlockers error:", err);
         return {
             statusCode: 500,
-            body: { error: err?.message || String(err), phase, ms: Date.now() - t0 },
+            body: JSON.stringify({ error: err?.message || String(err), phase, ms: Date.now() - t0 }),
         };
     }
 };

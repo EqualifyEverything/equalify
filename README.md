@@ -1,5 +1,7 @@
 <img src="logo.svg" alt="Equalify Logo" width="300">
 
+Want to run your own instance? See the [Quickstart Guide](QUICKSTART.md).
+
 ## Big Changes are Coming!
 Equalify has officially transitioned to a project of the [University of Illinois Chicago (UIC) Technology Solutions](https://it.uic.edu/about/technology-solutions/ "University of Illinois Chicago (UIC) Technology Solutions") department! This marks a new chapter for Equalify, but we remain focused on our goal: bringing top-in-class acessibility scanning and reporting tools to the widest possible audience. 
 

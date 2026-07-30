@@ -46,6 +46,21 @@ variable "admin_secret" {
   sensitive   = true
 }
 
+variable "aws_region" {
+  description = "Used to build the Cognito JWKS/issuer URLs for HASURA_GRAPHQL_JWT_SECRET."
+  type        = string
+}
+
+variable "user_pool_id" {
+  description = "Cognito user pool ID — HASURA_GRAPHQL_JWT_SECRET validates tokens against this pool's JWKS."
+  type        = string
+}
+
+variable "web_client_id" {
+  description = "Cognito app client ID — used as the expected `audience` in HASURA_GRAPHQL_JWT_SECRET."
+  type        = string
+}
+
 variable "cpu" {
   type    = number
   default = 512

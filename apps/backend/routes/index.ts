@@ -10,7 +10,7 @@ const verifier = CognitoJwtVerifier.create({ userPoolId: process.env.USER_POOL_I
 
 export const authRouter = async () => {
     try {
-        if (process.env.SSO_ENABLED) {
+        if (process.env.SSO_ENABLED === '1') {
             const rawClaims: any = await verifySsoToken(event.headers.authorization.replace('Bearer ', ''));
             
             // Ensure SSO user exists in DB and get normalized claims + Hasura claims
