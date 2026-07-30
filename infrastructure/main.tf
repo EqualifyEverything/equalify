@@ -432,6 +432,7 @@ module "lambda_backend" {
       SES_ADMIN_EMAIL = var.ses_admin_email
 
       SQS_ROUTER_FUNCTION_NAME = module.lambda_scan_sqs_router.function_name
+      CRAWLER_FUNCTION_NAME    = module.lambda_crawler.function_name
 
       POWERTOOLS_METRICS_NAMESPACE = "${var.project_name}${var.environment}"
 
@@ -481,8 +482,23 @@ module "lambda_backend" {
       resources = [module.lambda_scan_sqs_router.function_arn]
     },
     {
+      # crawlUrl.ts invokes this synchronously to discover URLs from a
+      # site's sitemap for the /audits/build flow.
+      sid       = "InvokeCrawler"
+      actions   = ["lambda:InvokeFunction"]
+      resources = [module.lambda_crawler.function_arn]
+    },
+    {
       sid       = "PutMetrics"
       actions   = ["cloudwatch:PutMetricData"]
+      resources = ["*"]
+    },
+    {
+      # getSystemStats.ts reads back scan-duration/count metrics for the
+      # admin System tab — PutMetrics above only covers the Lambdas
+      # publishing their own metrics, not this Lambda reading them back.
+      sid       = "ReadMetrics"
+      actions   = ["cloudwatch:GetMetricStatistics"]
       resources = ["*"]
     },
   ]
