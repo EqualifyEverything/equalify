@@ -9,7 +9,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import * as API from "aws-amplify/api";
-import { useState, useMemo, ChangeEvent, ChangeEventHandler } from "react";
+import { useState, useMemo, useEffect, useRef, ChangeEvent, ChangeEventHandler } from "react";
 //import { formatDate } from "../utils";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
@@ -42,7 +42,7 @@ import style from "./BlockersTable.module.scss";
 import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { useDebouncedCallback } from 'use-debounce';
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
@@ -101,8 +101,19 @@ declare module '@tanstack/table-core' {
 
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const queryClient = useQueryClient();
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page") ?? "0", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") ?? "10", 10);
+
+  const setPage = (updater: number | ((p: number) => number)) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const newPage = typeof updater === "function" ? updater(page) : updater;
+      if (newPage === 0) next.delete("page");
+      else next.set("page", newPage.toString());
+      return next;
+    });
+  };
 
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
   const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
@@ -329,6 +340,23 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     refetchInterval: Infinity,
     placeholderData: (previousData) => previousData,
   });
+
+  // Announce pagination changes to screen readers once the newly requested
+  // page has actually loaded (data still holds the previous page until then).
+  const announcedPageRef = useRef(page);
+  const announcedPageSizeRef = useRef(pageSize);
+  useEffect(() => {
+    if (!data?.pagination) return;
+    if (announcedPageRef.current !== page || announcedPageSizeRef.current !== pageSize) {
+      setAnnounceMessage(
+        `Showing ${data.blockers?.length ?? 0} of ${data.pagination.totalCount} blockers, page ${page + 1} of ${data.pagination.totalPages}`,
+        "normal",
+        true
+      );
+    }
+    announcedPageRef.current = page;
+    announcedPageSizeRef.current = pageSize;
+  }, [data]);
 
   const getElementTagFromContent = (content: string) => {
     const parser = new DOMParser();
@@ -716,7 +744,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   };
 
   const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(parseInt(e.target.value));
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const size = e.target.value;
+      if (size === "10") next.delete("pageSize");
+      else next.set("pageSize", size);
+      return next;
+    });
   };
 
   const handleSortByUrl = () => {

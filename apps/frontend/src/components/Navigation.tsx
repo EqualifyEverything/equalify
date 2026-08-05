@@ -136,7 +136,7 @@ export const Navigation = () => {
     const tabIndex = focusEl?.getAttribute("tabindex");
     focusEl?.setAttribute("tabindex", tabIndex ?? "-1");
     focusEl?.focus();
-  }, [location]);
+  }, [location.pathname]);
 
   const isAuthRoute =
     location.pathname.startsWith("/login") ||

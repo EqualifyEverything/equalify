@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDate, useGlobalStore, unformatId } from "../utils";
 import * as API from "aws-amplify/api";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 const apiClient = API.generateClient();
 import { useEffect, useState, ChangeEvent } from "react";
 import {
@@ -99,7 +99,16 @@ export const Audit = () => {
   const isShared = location.pathname.startsWith("/shared/");
   const isQuickScan = location.pathname.startsWith("/quick-scans/");
   const { setAnnounceMessage } = useGlobalStore();
-  const { blockersTableView, setBlockersTableView } = useGlobalStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const blockersTableView = searchParams.get("view") === "detailed" ? "detailed" : "summary";
+  const setBlockersTableView = (value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value === "detailed") next.set("view", "detailed");
+      else next.delete("view"); // "summary" is the default, keep the URL clean
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (emailNotifications)
