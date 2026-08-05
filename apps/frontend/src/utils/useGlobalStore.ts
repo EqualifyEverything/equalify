@@ -94,6 +94,8 @@ export const useGlobalStore = create<EqualifyState>()(
         darkMode: state.darkMode,
         authenticated: state.authenticated,
         ssoAuthenticated: state.ssoAuthenticated,
+        auditsTableView: state.auditsTableView,
+        auditsTableCreatedByView: state.auditsTableCreatedByView,
       }),
     },
   ),
