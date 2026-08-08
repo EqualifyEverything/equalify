@@ -79,6 +79,29 @@ export const getAuditSummaryFast = async () => {
   };
   const response = (await graphqlQuery(query)) as AuditSummaryResp;
 
+  // Most common blockers are grouped by message content, but the Detailed View
+  // can only be filtered by category — look up each content's category so the
+  // summary table can link straight into a filtered Detailed View.
+  const contents = response.mostCommonBlockers.map((item) => item.key);
+  const categoriesResponse = contents.length > 0
+    ? ((await graphqlQuery({
+        query: `query GetMessageCategories($contents: [String!]) {
+  messages(where: { content: { _in: $contents } }, distinct_on: content, order_by: { content: asc }) {
+    content
+    category
+  }
+}`,
+        variables: { contents },
+      })) as { messages: { content: string; category: string }[] })
+    : { messages: [] };
+  const contentToCategory = new Map(
+    categoriesResponse.messages.map((m) => [m.content, m.category])
+  );
+  const mostCommonErrors = response.mostCommonBlockers.map((item) => ({
+    ...item,
+    category: contentToCategory.get(item.key) ?? null,
+  }));
+
   const end = performance.now();
   return {
     statusCode: 200,
@@ -86,7 +109,7 @@ export const getAuditSummaryFast = async () => {
     body: {
       urlsWithBlockersCount: response.unique_url_stats.aggregate.count,
       urlsWithMostErrors: response.mostCommonUrls,
-      mostCommonErrors: response.mostCommonBlockers,
+      mostCommonErrors,
       mostCommonTags: response.mostCommonTags,
       executionTime: end - start
     },

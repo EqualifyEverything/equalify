@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, buildUrlSearchClause } from "#src/utils";
 
 const BATCH_SIZE = 1000;
 
@@ -80,9 +80,7 @@ export const exportAuditTable = async () => {
     if (validateShortId(searchString)) {
       whereConditions.push({ short_id: { _eq: searchString } });
     } else {
-      whereConditions.push({
-        url: { url: { _ilike: `%${searchString}%` } },
-      });
+      whereConditions.push(buildUrlSearchClause(searchString));
     }
   }
 

@@ -7,6 +7,7 @@ import { Card } from "./Card";
 import { Page } from "#src/routes/Audit.tsx";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
 import { GrPowerCycle } from "react-icons/gr";
+import { Link, useSearchParams } from "react-router-dom";
 
 import themeVariables from "../global-styles/variables.module.scss";
 import { SkeletonAuditHeader } from "./Skeleton";
@@ -23,7 +24,8 @@ interface BlockersTableSummaryProps {
 
 interface SummaryRespCountItem {
   "count": number,
-  "key": string
+  "key": string,
+  "category"?: string | null
 }
 
 interface SummaryResp {
@@ -39,6 +41,26 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const { darkMode } = useGlobalStore();
   const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
   const chartFillSecondary = darkMode ? themeVariables.dark_border : themeVariables.paper;
+
+  const [searchParams] = useSearchParams();
+
+  const getUrlBlockersLinkSearch = (url: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("view", "detailed");
+    // Quoted so the Detailed View search matches this URL exactly, rather than
+    // also matching URLs that merely contain it as a substring (e.g. sub-pages).
+    params.set("search", `"${url}"`);
+    params.delete("page");
+    return params.toString();
+  };
+
+  const getCategoryBlockersLinkSearch = (category: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("view", "detailed");
+    params.set("categories", category);
+    params.delete("page");
+    return params.toString();
+  };
 
   const baseId = useId();
   const urlsHeadingId = `${baseId}-urls-heading`;
@@ -141,7 +163,14 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                     asTableRow
                     key={index}
                     the_key={<a href={item.key} target="_blank">{item.key}</a>}
-                    the_value={item.count.toString()}
+                    the_value={
+                      <Link
+                        to={{ search: getUrlBlockersLinkSearch(item.key) }}
+                        aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
+                      >
+                        {item.count.toString()}
+                      </Link>
+                    }
                     variant="tight"
                   />
                 })}
@@ -156,7 +185,16 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                     asTableRow
                     key={index}
                     the_key={item.key}
-                    the_value={item.count.toString()}
+                    the_value={
+                      item.category ? (
+                        <Link
+                          to={{ search: getCategoryBlockersLinkSearch(item.category) }}
+                          aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
+                        >
+                          {item.count.toString()}
+                        </Link>
+                      ) : item.count.toString()
+                    }
                     variant="tight"
                   />
                 })}

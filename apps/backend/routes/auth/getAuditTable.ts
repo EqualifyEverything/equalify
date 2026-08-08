@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, buildUrlSearchClause } from "#src/utils";
 
 export const getAuditTable = async () => {
   const auditId = (event.queryStringParameters as any).id;
@@ -103,9 +103,7 @@ export const getAuditTable = async () => {
       });
     } else {
       // otherwise search URL
-      whereConditions.push({
-        url: { url: { _ilike: `%${searchString}%` } },
-      });
+      whereConditions.push(buildUrlSearchClause(searchString));
     }
   }
 

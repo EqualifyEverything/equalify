@@ -118,14 +118,19 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
   const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
 
-  const [selectedCategories, setSelectedCategories] = useState<Option[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Option[]>(() => {
+    const categories = searchParams.get("categories");
+    return categories
+      ? categories.split(",").filter(Boolean).map((category) => ({ value: category, label: category }))
+      : [];
+  });
   const [availableCategories, setAvailableCategories] = useState<Option[]>([]); // Added to prevent content flicker while fetching
 
   const [selectedStatus, setSelectedStatus] = useState<string>("active");
 
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
 
-  const [searchString, setSearchString] = useState<string>("");
+  const [searchString, setSearchString] = useState<string>(() => searchParams.get("search") ?? "");
 
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -948,7 +953,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           {/* Search Filter */}
           <StyledLabeledInput className={style["search-input"]}>
             <label>Search by URL</label>
-            <input onChange={(e) => handleSearch(e.target.value)} />
+            <input defaultValue={searchString} onChange={(e) => handleSearch(e.target.value)} />
           </StyledLabeledInput>
           
           {/* Status Filter */}
