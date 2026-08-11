@@ -31,7 +31,8 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region              = var.aws_region
+  allowed_account_ids = length(var.allowed_account_ids) > 0 ? var.allowed_account_ids : null
 }
 
 variable "aws_region" {
@@ -44,6 +45,12 @@ variable "project_name" {
   description = "Short name used as a prefix for the bootstrap resources. Must be globally unique enough that the resulting S3 bucket name is available."
   type        = string
   default     = "equalify"
+}
+
+variable "allowed_account_ids" {
+  description = "AWS account IDs this configuration may run against. Guards against provisioning into the wrong account (e.g. a prod profile left in the shell). Empty list = no restriction."
+  type        = list(string)
+  default     = []
 }
 
 resource "random_id" "suffix" {

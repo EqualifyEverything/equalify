@@ -14,7 +14,11 @@ application code and schema into it.
 - An AWS account, and credentials/CLI access with sufficient privileges (VPC,
   RDS, ECS, Lambda, S3, CloudFront, Cognito, SQS, Secrets Manager, IAM, and
   Route53/ACM if you're using a custom domain)
-- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.5
+- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.5 —
+  note for macOS/Homebrew users: the core `terraform` formula was removed
+  after HashiCorp's license change, so install via
+  `brew tap hashicorp/tap && brew install hashicorp/tap/terraform`
+  (or use [OpenTofu](https://opentofu.org/))
 - [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - Node.js 22.x and npm
 - Java 17 and Maven (only needed to build the PDF-validation Lambda)

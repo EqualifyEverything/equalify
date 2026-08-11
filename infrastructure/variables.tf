@@ -181,3 +181,11 @@ variable "alarm_email" {
   type        = string
   default     = null
 }
+
+# --- Safety -------------------------------------------------------------------
+
+variable "allowed_account_ids" {
+  description = "AWS account IDs this configuration may run against. Set to your target account so credentials pointing anywhere else (e.g. a prod profile left in the shell) fail at plan time instead of touching the wrong account. Empty list = no restriction."
+  type        = list(string)
+  default     = []
+}
