@@ -32,10 +32,22 @@ export const getQuickScans = async () => {
 
         return {
             statusCode: 200,
-            body: result.rows,
+            body: JSON.stringify(result.rows),
         };
     }
     catch (err) {
-        return { message: err?.detail ?? err };
+        // An explicit statusCode opts this response out of API Gateway's
+        // "simple response" format (which treats a plain returned object as
+        // an implicit 200 JSON body) and into the strict Lambda-proxy
+        // contract, which requires `body` to already be a JSON string —
+        // without that, API Gateway rejects the response with its own
+        // opaque 500, masking whatever error actually happened. Logging
+        // here too: this catch previously returned silently, leaving no
+        // trace of the real error in CloudWatch.
+        console.error('getQuickScans error:', err);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: err?.detail ?? err?.message ?? String(err) }),
+        };
     }
 }

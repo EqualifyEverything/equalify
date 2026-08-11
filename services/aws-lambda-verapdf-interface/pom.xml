@@ -61,11 +61,6 @@
       <version>2.11.0</version>
     </dependency>
     <dependency>
-      <groupId>com.github.edwgiz</groupId>
-      <artifactId>maven-shade-plugin.log4j2-cachefile-transformer</artifactId>
-      <version>2.13.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.verapdf</groupId>
       <artifactId>validation-model</artifactId>
       <version>1.28.1</version>
@@ -97,21 +92,6 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.4.2</version>
-          <!--
-          <configuration>
-            <archive>
-              <manifest>
-                <mainClass>com.equalifyuic.app.handler</mainClass>
-              </manifest>
-            </archive>
-          </configuration>
-          -->
-          <configuration>
-            <transformers>
-              <transformer implementation="com.github.edwgiz.maven_shade_plugin.log4j2_cache_transformer.PluginsCacheFileTransformer">
-              </transformer>
-            </transformers>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -146,7 +126,22 @@
               </filter>
             </filters>
             <createDependencyReducedPom>false</createDependencyReducedPom>
+            <transformers>
+              <transformer implementation="com.github.edwgiz.maven_shade_plugin.log4j2_cache_transformer.PluginsCacheFileTransformer">
+              </transformer>
+            </transformers>
           </configuration>
+          <!-- A transformer *implementation* has to be on the plugin's own
+               classpath, not the project's — declaring this as a regular
+               project <dependency> (as it was before) puts it in the wrong
+               classloader realm and the plugin can't find the class. -->
+          <dependencies>
+            <dependency>
+              <groupId>com.github.edwgiz</groupId>
+              <artifactId>maven-shade-plugin.log4j2-cachefile-transformer</artifactId>
+              <version>2.13.0</version>
+            </dependency>
+          </dependencies>
           <executions>
             <execution>
               <phase>package</phase>
@@ -159,5 +154,19 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <!-- pluginManagement above only sets version/config — it never
+           activates a plugin on its own, and maven-shade-plugin (unlike
+           maven-jar-plugin) isn't part of the default lifecycle bindings
+           for jar packaging. Without this, `mvn package` silently produces
+           a plain jar containing only this project's own classes, with
+           none of its dependencies (veraPDF, aws-lambda-java-core, ...)
+           bundled in — which surfaces at Lambda runtime as
+           NoClassDefFoundError for any dependency class. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 </project>

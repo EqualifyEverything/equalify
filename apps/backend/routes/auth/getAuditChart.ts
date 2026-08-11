@@ -142,11 +142,11 @@ export const getAuditChart = async () => {
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
-    body: {
+    body: JSON.stringify({
       audit_id: auditId,
       audit_name: audit?.name,
       period_days: days,
       data: chartData,
-    },
+    }),
   };
 };

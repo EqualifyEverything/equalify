@@ -303,7 +303,7 @@ export const getAuditTable = async () => {
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
-    body: {
+    body: JSON.stringify({
       audit_id: auditId,
       audit_name: audit?.name,
       scan_date: latestScan?.created_at,
@@ -328,6 +328,6 @@ export const getAuditTable = async () => {
         types: typeFilters,
         status: statusParam,
       },
-    },
+    }),
   };
 };

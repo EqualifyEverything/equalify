@@ -106,12 +106,12 @@ export const getAuditSummaryFast = async () => {
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
-    body: {
+    body: JSON.stringify({
       urlsWithBlockersCount: response.unique_url_stats.aggregate.count,
       urlsWithMostErrors: response.mostCommonUrls,
       mostCommonErrors,
       mostCommonTags: response.mostCommonTags,
       executionTime: end - start
-    },
+    }),
   };
 };

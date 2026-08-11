@@ -13,7 +13,7 @@ export const requestAccess = async () => {
         return { status: 'error', message: 'Please enter a valid email address.' };
     }
 
-    if (process.env.SSO_ENABLED && process.env.SSO_EMAIL_DOMAINS) {
+    if (process.env.SSO_ENABLED === '1' && process.env.SSO_EMAIL_DOMAINS) {
         const ssoEmailDomains = JSON.parse(process.env.SSO_EMAIL_DOMAINS);
         if (!ssoEmailDomains.includes(email.split('@')[1])) {
             return { status: 'error', message: `Please use your institutional email address (${ssoEmailDomains.map((domain: string) => `@${domain}`).join(', ')}).` };

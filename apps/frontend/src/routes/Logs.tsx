@@ -60,8 +60,8 @@ export const Logs = () => {
         accessorKey: "LogToUser",
         header: "User",
         cell: ({ getValue }) => {
-            const userObj = getValue() as userObj;
-            return `${userObj.name} (${userObj.email})`;
+            const userObj = getValue() as userObj ?? null;
+            return userObj ? `${userObj.name} (${userObj.email})` : "N/A";
         }
       },
       {

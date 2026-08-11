@@ -73,9 +73,9 @@ export const getAuditResults = async () => {
     return {
         statusCode: 200,
         headers: { 'content-type': 'application/json' },
-        body: {
+        body: JSON.stringify({
             ...audit,
             blockers: jsonRows,
-        },
+        }),
     };
 }

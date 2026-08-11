@@ -47,12 +47,16 @@ fi
 
 echo "Dumping $ENV..."
 
-# Export DB schema (no data)
+# Export DB schema (no data). hdb_catalog is Hasura's own auto-managed
+# metadata schema, not application schema -- Hasura recreates it itself on
+# connect, and dumping it here just causes "already exists" conflicts when
+# this file is loaded into a fresh database that Hasura has already touched.
 echo "Dumping database schema..."
 PGPASSWORD="$DB_PASSWORD" pg_dump \
     --schema-only \
     --no-owner \
     --no-privileges \
+    --exclude-schema=hdb_catalog \
     -h "$DB_HOST" \
     -U "$DB_USER" \
     "$DB_NAME" > "$SCRIPT_DIR/schema.sql"

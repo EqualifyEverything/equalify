@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 //import java.io.InputStream;
 //import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,10 +75,23 @@ public class handler implements RequestHandler<String, String> {
         if (url == null) {
             throw new IllegalArgumentException("URL format error!");
         }
-        String path = url.getPath();
-        String FILE_NAME = new File(path).getName() != "" ? new File(path).getName() : "file.pdf";
         int CONNECT_TIMEOUT = 30 * 1000;
         int READ_TIMEOUT = 30 * 1000;
+
+        // HttpURLConnection (what FileUtils.copyURLToFile uses internally)
+        // only auto-follows redirects within the same protocol — a JDK
+        // restriction, not a bug here. A plain-HTTP PDF URL that redirects
+        // to HTTPS (very common) otherwise falls through with the 301/302
+        // response's own tiny HTML body silently saved as if it were the
+        // PDF, which then fails to parse. Resolve the real final URL first.
+        try {
+            url = resolveRedirects(url, CONNECT_TIMEOUT);
+        } catch (IOException e) {
+            logger.log("Error resolving redirects for " + url + ": " + e.getMessage());
+        }
+
+        String path = url.getPath();
+        String FILE_NAME = new File(path).getName() != "" ? new File(path).getName() : "file.pdf";
         File filePath = new File("/tmp/" + FILE_NAME);
 
         // Save the PDF to /tmp
@@ -215,5 +229,33 @@ public class handler implements RequestHandler<String, String> {
         logger.log("Processing complete for " + input);
         logger.log(output);
         return output;
+    }
+
+    // Follows HTTP redirects manually (including cross-protocol ones, which
+    // HttpURLConnection's own instanceFollowRedirects deliberately does not
+    // do) and returns the final, non-redirect URL. Uses HEAD so redirect
+    // hops don't transfer response bodies we'd just discard.
+    private static URL resolveRedirects(URL url, int timeoutMs) throws IOException {
+        URL current = url;
+        for (int i = 0; i < 5; i++) {
+            HttpURLConnection conn = (HttpURLConnection) current.openConnection();
+            conn.setInstanceFollowRedirects(false);
+            conn.setConnectTimeout(timeoutMs);
+            conn.setReadTimeout(timeoutMs);
+            conn.setRequestMethod("HEAD");
+            int status = conn.getResponseCode();
+            if (status >= 300 && status < 400) {
+                String location = conn.getHeaderField("Location");
+                conn.disconnect();
+                if (location == null) {
+                    return current;
+                }
+                current = new URL(current, location);
+                continue;
+            }
+            conn.disconnect();
+            return current;
+        }
+        return current;
     }
 }
