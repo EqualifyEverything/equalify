@@ -391,8 +391,11 @@ credentials, Hasura/Cognito/SES config, etc.) — no `.env` file needed here.
 
 ### Deploy the frontend
 
-Populate `apps/frontend/.env.production` with `terraform output
-frontend_env_hints`:
+Populate `apps/frontend/.env.production.local` (not `.env.production` —
+that's the real org's committed production config for the existing
+GitHub Actions deploy; `.env.production.local` takes precedence in Vite
+and is already gitignored, so your own values never touch it) with
+`terraform output frontend_env_hints`:
 
 ```
 VITE_API_URL=<api_url>

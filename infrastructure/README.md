@@ -76,10 +76,13 @@ just gave you:
   (`terraform output lambda_function_names`). Update the workflow's target
   function names if you changed `project_name`/`environment` from the
   defaults.
-- **Frontend**: populate `apps/frontend/.env.production` (or `.env.staging`)
-  with `terraform output frontend_env_hints`, then run the existing
-  `npm run build:prod` script — it already does `vite build` + `aws s3 sync`
-  + CloudFront invalidation against `frontend_bucket_name` /
+- **Frontend**: populate `apps/frontend/.env.production.local` (not
+  `.env.production`/`.env.staging` directly — those hold the real org's
+  committed config for the existing GitHub Actions deploy;
+  `.env.production.local` takes precedence in Vite and is already
+  gitignored) with `terraform output frontend_env_hints`, then run the
+  existing `npm run build:prod` script — it already does `vite build` +
+  `aws s3 sync` + CloudFront invalidation against `frontend_bucket_name` /
   `frontend_cloudfront_distribution_id`.
 - **Database schema**: this stack provisions an empty RDS instance only.
   Run `db/schema.sql` (and the `pgcrypto` extension it depends on) plus

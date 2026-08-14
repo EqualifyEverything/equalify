@@ -345,7 +345,13 @@ if [ "$SKIP_FRONTEND" = 0 ]; then
   log "Building & publishing frontend -> s3://$FRONTEND_BUCKET"
   (
     cd apps/frontend
-    echo "$TF_OUT" | jq -r '.frontend_env_hints.value | to_entries[] | "\(.key)=\"\(.value)\""' > .env.production
+    # .local, not .env.production directly: Vite loads .env.production.local
+    # with higher precedence, and it's already covered by the repo's
+    # .gitignore (`.env.*`) — this deployment's own values never touch the
+    # tracked .env.production, which holds the real org's production config
+    # for the existing (non-Terraform) GitHub Actions deploy in
+    # .github/workflows/deploy-apps.yml.
+    echo "$TF_OUT" | jq -r '.frontend_env_hints.value | to_entries[] | "\(.key)=\"\(.value)\""' > .env.production.local
     npm install
     npx vite build --mode production
     aws s3 sync --delete ./dist "s3://$FRONTEND_BUCKET"
