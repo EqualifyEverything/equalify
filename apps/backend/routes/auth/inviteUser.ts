@@ -1,7 +1,7 @@
-import { db, event, isStaging, sendEmail } from "#src/utils";
+import { db, event, isStaging, isSsoEnabled, sendEmail } from "#src/utils";
 
 export const inviteUser = async () => {
-  if (process.env.SSO_ENABLED === '1' && process.env.SSO_EMAIL_DOMAINS) {
+  if (isSsoEnabled && process.env.SSO_EMAIL_DOMAINS) {
     const ssoEmailDomains = JSON.parse(process.env.SSO_EMAIL_DOMAINS);
     if (!ssoEmailDomains.includes(event.body.email.split('@')[1])) {
       return { status: 'error', message: `Email domain not authorized for invitation.` };
