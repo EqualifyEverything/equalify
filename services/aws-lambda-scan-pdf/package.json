@@ -7,7 +7,7 @@
     "aws",
     "scan"
   ],
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "author": "T. Daniel",
   "type": "module",
   "prefix": "./",

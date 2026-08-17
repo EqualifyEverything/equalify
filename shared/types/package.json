@@ -2,7 +2,7 @@
   "name": "equalify-shared-types",
   "version": "1.0.0",
   "description": "Shared types for the equalify platform",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "author": "T Daniel",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
