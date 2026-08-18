@@ -47,7 +47,7 @@ Once installed, sign in and start scanning. For a walkthrough of the dashboard, 
 
 Found a bug? [File an issue on GitHub](https://github.com/equalifyEverything/equalify/issues/new) — that's the fastest way to get it in front of us.
 
-Contributing code? PRs are welcome. See [`VERSIONING.md`](VERSIONING.md) for how we version releases and structure commits.
+Contributing code? PRs are welcome. Read our [contributor guide]('CONTRIBUTE.md') and see [our versioning documentation](VERSIONING.md) for how we version releases and structure commits.
 
 ## Get in Touch
 
