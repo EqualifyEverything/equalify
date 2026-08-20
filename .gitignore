@@ -4,3 +4,19 @@ dist
 .vscode
 .env
 .env.*
+
+# Terraform — local working state, never the source of truth (remote state
+# lives in S3 per infrastructure/README.md). .terraform.lock.hcl is
+# deliberately NOT ignored — like package-lock.json, it should be committed
+# so everyone gets the same provider versions.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

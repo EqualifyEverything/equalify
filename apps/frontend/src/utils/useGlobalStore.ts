@@ -20,8 +20,6 @@ interface EqualifyState {
   auditsTableCreatedByView: string;
   setAuditsTableCreatedByView: (val:string) => void;
   // blockers table
-  blockersTableView: string;
-  setBlockersTableView: (val: string) => void;
   blockerTableColumnVisibility: VisibilityState;
   setBlockerTableColumnVisibility: OnChangeFn<VisibilityState>;
   // screen reader announcer
@@ -44,8 +42,6 @@ export const useGlobalStore = create<EqualifyState>()(
       setAuditsTableView: (val) => set(() => ({ auditsTableView: val })),
       auditsTableCreatedByView: "user",
       setAuditsTableCreatedByView: (val) => set(() => ({auditsTableCreatedByView : val})),
-      blockersTableView: "summary",
-      setBlockersTableView: (val) => set(() => ({ blockersTableView: val })),
       authenticated: false,
       setAuthenticated: (val) => set(() => ({ authenticated: val })),
       ssoAuthenticated: false,
@@ -94,6 +90,8 @@ export const useGlobalStore = create<EqualifyState>()(
         darkMode: state.darkMode,
         authenticated: state.authenticated,
         ssoAuthenticated: state.ssoAuthenticated,
+        auditsTableView: state.auditsTableView,
+        auditsTableCreatedByView: state.auditsTableCreatedByView,
       }),
     },
   ),

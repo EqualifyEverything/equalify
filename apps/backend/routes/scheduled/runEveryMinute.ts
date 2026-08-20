@@ -1,4 +1,4 @@
-import { db, graphqlQuery } from "#src/utils";
+import { db } from "#src/utils";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 import {
   processScheduledAuditEmails,
@@ -7,17 +7,6 @@ import {
 const lambda = new LambdaClient();
 
 export const runEveryMinute = async () => {
-  // Perform health check
-  const response = await graphqlQuery({ query: `{users(limit:1){id}}` });
-  if (!response?.users?.[0]?.id && process.env.SLACK_WEBHOOK) {
-    await fetch(process.env.SLACK_WEBHOOK, {
-      method: "POST",
-      body: JSON.stringify({
-        text: `*Equalify UIC* - Database connection failure detected`,
-      }),
-    });
-  }
-
   // Determine whether we should run scheduled audits
   await db.connect();
   const scheduledAuditIds = (

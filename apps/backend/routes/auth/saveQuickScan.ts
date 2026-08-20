@@ -7,7 +7,7 @@ export const saveQuickScan = async () => {
         const { url, type } = event.body;
 
         if (!url || !['html', 'pdf'].includes(type)) {
-            return { statusCode: 400, body: { message: 'URL and type (html/pdf) are required' } };
+            return { statusCode: 400, body: JSON.stringify({ message: 'URL and type (html/pdf) are required' }) };
         }
 
         const scheduledAt = new Date();
@@ -51,6 +51,7 @@ export const saveQuickScan = async () => {
         return { id: formatId(id) };
     }
     catch (err) {
-        return { message: err?.detail ?? err };
+        console.error('saveQuickScan error:', err);
+        return { message: err?.detail ?? err?.message ?? String(err) };
     }
 }

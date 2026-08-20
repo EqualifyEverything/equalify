@@ -1,41 +1,61 @@
 <img src="logo.svg" alt="Equalify Logo" width="300">
 
-## Big Changes are Coming!
-Equalify has officially transitioned to a project of the [University of Illinois Chicago (UIC) Technology Solutions](https://it.uic.edu/about/technology-solutions/ "University of Illinois Chicago (UIC) Technology Solutions") department! This marks a new chapter for Equalify, but we remain focused on our goal: bringing top-in-class acessibility scanning and reporting tools to the widest possible audience. 
+**Equalify** is an open-source accessibility scanning and monitoring platform. Point it at your web pages and PDFs, and it finds accessibility errors, tracks them over time, and helps your team resolve them.
 
-We built Equalify as a multi-tenant, SaaS platform, but after 3 years and tens of thousands of scans, we believe users want something different - something simple, robust, and easy-to-use, and that can be deployed by users themselves, *without* a dedicated DevOps team. That means we'll be moving in a new direction for Equalify, with the goal of a streamlined application, with straightforward deployment. We aim to make Equalify as easy to install as any popular open source project. Here's what this means:
+Built by the [University of Illinois Chicago (UIC) Technology Solutions](https://it.uic.edu/about/technology-solutions/) Digital Accessibility Engineering team, and open source under the AGPL-3.0.
 
-### What to Expect:
+## Features
 
-- **Ease of Deployment** 
-Our priority will be to make it as simple and painless as possible for users to spin up their own instances of Equalify
-- **Unified Codebase**
-A consolidated codebase, to make it simpler for developers to contribute and act as a single entry point for end users and developers
-- **Customization**
-Prioritize extensibility, and make it as straightforward as possible for users to add their own scans, modify the user interface, etc
-- **Better Documentation**
-Simplify adoption by unifying and expanding existing documentation
-- **Always Open Source**
-Continued Open Source development under the AGPL.
-- **Best Accessible User Experience**
-Fixing accessibility bugs is mission-critical to Equalify.
+- **HTML & PDF scanning** — headless Chromium + [axe-core](https://github.com/dequelabs/axe-core) for pages, [veraPDF](https://verapdf.org/) PDF/UA validation for documents
+- **Built for scale** — audits fan out across concurrent AWS Lambda workers, so hundreds of URLs can be scanned in seconds
+- **Accessible** — built from the ground up to be usable via screen-readers and other assitive technologies
+- **Audits** — schedule recurring scans across many URLs
+- **Blocker tracking** — every issue found is tagged, categorized, and trackable to resolution
+- **Dashboards & trends** — audit summaries and blocker-count charts over time
+- **WordPress integration** — connect your WordPress site to Equalify with the official [plugin](https://github.com/EqualifyEverything/equalify-wp-integration) to keep your audits in sync with your latest pages, posts, and library PDF files
+- **AI-assisted summaries** — fully optional LLM-generated summaries of each issue, via AWS Bedrock
+- **Quick Scans** — scan a single URL on demand, no setup required
+- **Team accounts** — admin/member roles, invites, self-service access requests, and optional SSO (Azure AD)
+- **White-label branding** — swap in your own logo
+- **CSV export** — take audit results with you
+- **Email notifications** — scheduled audit summaries and account emails via SES
+- **Always Open Source** — licensed under the AGPL-3.0
 
-### Beta Roadmap (Q1 2026)
-- **Technology that Promotes our Open Source Community**
-  - Deployment in 30 minutes or less
-  - Handles 100 pages/minute without breaking a sweat
-  - Costs less than $1000/month for typical usage
-  - No critical bugs
-  - Documentation that doesn't suck
 
-### Stay in Touch! 
-Subscribe to our newsletter: [it.uic.edu/accessibility/engineering](http://it.uic.edu/accessibility/engineering "it.uic.edu/accessibility/engineering")
-Star or contribute on GitHub: [github.com/equalifyEverything/equalify](http://github.com/equalifyEverything/equalify "github.com/equalifyEverything/equalify")
+## Architecture
+
+Equalify runs entirely on your own AWS account:
+
+- **Frontend** — React + Vite single-page app, served from S3 via CloudFront
+- **Backend API** — a Node.js Lambda behind API Gateway, handling auth and business logic
+- **Data layer** — PostgreSQL (RDS) with a [Hasura](https://hasura.io/) GraphQL layer (ECS Fargate) for the frontend
+- **Scan pipeline** — a router Lambda fans scan requests out over SQS to dedicated HTML and PDF scan Lambdas, which post results back via webhook — see [`services/README.md`](services/README.md) for the full diagram
+- **Auth** — AWS Cognito, with optional Azure AD SSO
+- **Infrastructure as code** — the entire stack (VPC, RDS, ECS, Lambda, S3/CloudFront, Cognito, SQS) is defined in Terraform under [`infrastructure/`](infrastructure/)
+
+## Installing Equalify
+
+Equalify deploys to your own AWS account with Terraform and a couple of scripts — no manual clicking through the console required.
+
+**[Read the Quickstart Guide →](QUICKSTART.md)**
+
+## Using Equalify
+
+Once installed, sign in and start scanning. For a walkthrough of the dashboard, audits, and blocker management, see the **[user documentation](https://equalify.uic.edu/dashboard)**.
+
+## How to Contribute
+
+Found a bug? [File an issue on GitHub](https://github.com/equalifyEverything/equalify/issues/new) — that's the fastest way to get it in front of us.
+
+Contributing code? PRs are welcome. Read our [contributor guide]('CONTRIBUTE.md') and see [our versioning documentation](VERSIONING.md) for how we version releases and structure commits.
+
+## Get in Touch
+
+- Subscribe to our newsletter: [it.uic.edu/accessibility/engineering](https://it.uic.edu/accessibility/engineering)
+- Star or contribute on GitHub: [github.com/equalifyEverything/equalify](https://github.com/equalifyEverything/equalify)
 
 We welcome your questions, feedback, and continued participation.
 
 **Together, we can equalify the internet.**
 
-All the best, 
-**Digital Accessibility Engineering 
-UIC Technology Solutions**
+— Digital Accessibility Engineering, UIC Technology Solutions

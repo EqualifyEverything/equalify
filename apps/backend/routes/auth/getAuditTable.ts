@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, buildUrlSearchClause } from "#src/utils";
 
 export const getAuditTable = async () => {
   const auditId = (event.queryStringParameters as any).id;
@@ -103,9 +103,7 @@ export const getAuditTable = async () => {
       });
     } else {
       // otherwise search URL
-      whereConditions.push({
-        url: { url: { _ilike: `%${searchString}%` } },
-      });
+      whereConditions.push(buildUrlSearchClause(searchString));
     }
   }
 
@@ -305,7 +303,7 @@ export const getAuditTable = async () => {
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
-    body: {
+    body: JSON.stringify({
       audit_id: auditId,
       audit_name: audit?.name,
       scan_date: latestScan?.created_at,
@@ -330,6 +328,6 @@ export const getAuditTable = async () => {
         types: typeFilters,
         status: statusParam,
       },
-    },
+    }),
   };
 };

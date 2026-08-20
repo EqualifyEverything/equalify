@@ -1,0 +1,48 @@
+# Copy this file to terraform.tfvars and fill in the values marked REQUIRED.
+# Everything else has a working default.
+
+aws_region   = "us-east-2"
+project_name = "equalify"
+environment  = "prod" # one apply = one environment; use "staging" in a second account/state for a second one
+
+# --- REQUIRED -----------------------------------------------------------
+
+# Must be globally unique (becomes <prefix>.auth.<region>.amazoncognito.com)
+cognito_domain_prefix = "your-org-equalify"
+
+# Must be a verified SES identity (domain or address) in this account/region,
+# or all transactional email (invites, scan summaries) will fail to send.
+ses_admin_email = "noreply@example.com"
+
+# --- Optional custom domain ----------------------------------------------
+# Leave both null to deploy on AWS-issued default endpoints (no DNS needed).
+# Set both to get app.<domain_name> / api.<domain_name> / graphql.<domain_name>
+# with Terraform-managed ACM certs + Route53 records.
+
+# domain_name     = "example.com"
+# route53_zone_id = "Z0123456789ABCDEFGHIJ"
+
+# --- App config (mirrors prod env vars in apps/backend) -------------------
+
+# brand_url       = "https://equalify.app/"
+# brand_logo_url  = "https://equalify.app/wp-content/uploads/2024/04/Equalify-Logo-768x237.png"
+# sso_enabled     = false # Azure AD SSO — real tenant config goes in Secrets Manager post-apply, see README
+
+# --- Sizing / cost knobs ----------------------------------------------------
+
+# db_instance_class      = "db.t4g.micro"
+# db_multi_az            = false
+# single_nat_gateway     = true
+# hasura_desired_count   = 1
+# scan_lambda_memory_size = 2048
+# bastion_instance_type  = "t3.micro" # SSM-only relay for scripts/deploy-app.sh's DB access; stopped between uses
+
+# --- Monitoring -------------------------------------------------------------
+
+# alarm_email = "oncall@example.com"
+
+# --- Safety -----------------------------------------------------------------
+# Strongly recommended: pin the AWS account this config may touch, so a wrong
+# profile in your shell fails at plan time instead of deploying somewhere else.
+
+# allowed_account_ids = ["123456789012"]

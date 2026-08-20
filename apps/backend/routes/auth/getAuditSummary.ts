@@ -123,14 +123,14 @@ export const getAuditSummary = async () => {
   return {
     statusCode: 200,
     headers: { "content-type": "application/json" },
-    body: {
+    body: JSON.stringify({
       urlsWithBlockersCount,
       urlsWithMostErrors,
       mostCommonErrors,
       mostCommonCategory,
       mostCommonTags,
       executionTime: end - start
-    },
+    }),
   };
 };
 
