@@ -8,7 +8,7 @@ Built by the [University of Illinois Chicago (UIC) Technology Solutions](https:/
 
 - **HTML & PDF scanning** — headless Chromium + [axe-core](https://github.com/dequelabs/axe-core) for pages, [veraPDF](https://verapdf.org/) PDF/UA validation for documents
 - **Built for scale** — audits fan out across concurrent AWS Lambda workers, so hundreds of URLs can be scanned in seconds
-- **Accessible** — built from the ground up to be usable via screen-readers and other assitive technologies
+- **Accessible** — built from the ground up to be usable via screen-readers and other assistive technologies
 - **Audits** — schedule recurring scans across many URLs
 - **Blocker tracking** — every issue found is tagged, categorized, and trackable to resolution
 - **Dashboards & trends** — audit summaries and blocker-count charts over time
