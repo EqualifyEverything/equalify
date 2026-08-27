@@ -79,6 +79,44 @@ export const getAuditSummaryFast = async () => {
   };
   const response = (await graphqlQuery(query)) as AuditSummaryResp;
 
+  // Blockers-per-URL delta needs the actual URL count each scan ran against
+  // (not the audit's current URL list, which can change between scans).
+  // jsonb_array_length reads the element count off the jsonb container header
+  // rather than walking the array, so this stays cheap even for scans with
+  // thousands of pages.
+  await db.connect();
+  const recentScans = (
+    await db.query({
+      text: `SELECT "blocker_count", jsonb_array_length("pages") AS "pages_count"
+             FROM "scans"
+             WHERE "audit_id" = $1 AND "status" = 'complete'
+             ORDER BY "created_at" DESC
+             LIMIT 2`,
+      values: [auditId],
+    })
+  ).rows as { blocker_count: number; pages_count: number }[];
+  const [latestScan, previousScan] = recentScans;
+
+  // Mirrors blocker_summary_view's own "latest scan" definition (most recent
+  // scan regardless of status) so these counts stay consistent with
+  // unique_url_stats above, which reads from that same view.
+  const blockerTypeRows = (
+    await db.query({
+      text: `SELECT COALESCE("u"."type", 'html') AS "type", COUNT(*)::int AS "count"
+             FROM "blockers" "b"
+             LEFT JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+             WHERE "b"."scan_id" = (
+               SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1
+             )
+             GROUP BY COALESCE("u"."type", 'html')`,
+      values: [auditId],
+    })
+  ).rows as { type: string; count: number }[];
+  await db.clean();
+
+  const pdfBlockersCount = blockerTypeRows.find((row) => row.type === "pdf")?.count ?? 0;
+  const htmlBlockersCount = blockerTypeRows.find((row) => row.type === "html")?.count ?? 0;
+
   // Most common blockers are grouped by message content, but the Detailed View
   // can only be filtered by category — look up each content's category so the
   // summary table can link straight into a filtered Detailed View.
@@ -111,6 +149,14 @@ export const getAuditSummaryFast = async () => {
       urlsWithMostErrors: response.mostCommonUrls,
       mostCommonErrors,
       mostCommonTags: response.mostCommonTags,
+      latestScan: latestScan
+        ? { blockerCount: latestScan.blocker_count, pagesCount: latestScan.pages_count }
+        : null,
+      previousScan: previousScan
+        ? { blockerCount: previousScan.blocker_count, pagesCount: previousScan.pages_count }
+        : null,
+      pdfBlockersCount,
+      htmlBlockersCount,
       executionTime: end - start
     }),
   };

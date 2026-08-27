@@ -28,12 +28,21 @@ interface SummaryRespCountItem {
   "category"?: string | null
 }
 
+interface SummaryRespScan {
+  "blockerCount": number,
+  "pagesCount": number
+}
+
 interface SummaryResp {
   "mostCommonErrors": SummaryRespCountItem[],
   "urlsWithBlockersCount": number,
   "urlsWithMostErrors": SummaryRespCountItem[],
   "mostCommonCategory": SummaryRespCountItem[],
-  "mostCommonTags": SummaryRespCountItem[]
+  "mostCommonTags": SummaryRespCountItem[],
+  "latestScan": SummaryRespScan | null,
+  "previousScan": SummaryRespScan | null,
+  "pdfBlockersCount": number,
+  "htmlBlockersCount": number
 }
 
 export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scans }: BlockersTableSummaryProps) => {
@@ -41,6 +50,18 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const { darkMode } = useGlobalStore();
   const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
   const chartFillSecondary = darkMode ? themeVariables.dark_border : themeVariables.paper;
+  // This card is always rendered with the "dark" Card variant (near-black
+  // background in both light and dark app themes), so its accent colors are
+  // fixed rather than following the app-wide darkMode toggle — red and the
+  // default green both fall below 4.5:1 contrast against that background.
+  const increaseColor = themeVariables.yellow;
+  const decreaseColor = themeVariables.green_light;
+  // The "Blockers per URL" card uses the "light" Card variant, which (unlike
+  // the card above) does flip background with the app theme, so its accent
+  // colors follow darkMode like accentColor does. Plain green fails 4.5:1 on
+  // the dark-theme background, and green_light fails it on the light-theme
+  // (white) background, so each needs its own theme-appropriate shade.
+  const decreaseColorOnLightVariant = darkMode ? themeVariables.green_light : themeVariables.green_dark;
 
   const [searchParams] = useSearchParams();
 
@@ -103,6 +124,63 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
     return daysDifference;
   }
 
+  // Only scans that have finished have a frozen blocker_count, so the delta
+  // compares the two most recent completed scans rather than raw array position.
+  const completedScans = scans.filter(
+    (scan: any) => scan.status === "complete" && scan.blocker_count !== null && scan.blocker_count !== undefined
+  );
+  const latestCompletedScan = completedScans[completedScans.length - 1];
+  const previousCompletedScan = completedScans[completedScans.length - 2];
+  const blockersDelta = latestCompletedScan && previousCompletedScan
+    ? latestCompletedScan.blocker_count - previousCompletedScan.blocker_count
+    : null;
+
+  const blockersDeltaText = blockersDelta === null
+    ? null
+    : blockersDelta > 0
+      ? `${blockersDelta.toLocaleString()} more blocker${blockersDelta === 1 ? "" : "s"} since last scan`
+      : blockersDelta < 0
+        ? `${Math.abs(blockersDelta).toLocaleString()} fewer blocker${Math.abs(blockersDelta) === 1 ? "" : "s"} since last scan`
+        : "No change since last scan";
+
+  const daysSinceLastScan = scans.length > 0 ? daysSince(new Date(scans[scans.length - 1].created_at)) : null;
+  const daysSinceLastScanNode = daysSinceLastScan === null
+    ? null
+    : daysSinceLastScan === 0
+      ? <>Scanned <strong>today</strong></>
+      : <><strong>{daysSinceLastScan.toLocaleString()} day{daysSinceLastScan === 1 ? "" : "s"}</strong> since last scan</>;
+
+  const currentBlockersCount = chartData.data[chartData.data.length - 1].blockers;
+
+  // getAuditSummaryFast looks up each scan's own page count (via
+  // jsonb_array_length on that scan's frozen `pages` array) rather than using
+  // the audit's current URL list, so this stays correct even if URLs were
+  // added or removed between the two scans being compared.
+  const currentBlockersPerUrl = (data?.latestScan && data.latestScan.pagesCount > 0)
+    ? data.latestScan.blockerCount / data.latestScan.pagesCount
+    : null;
+  const previousBlockersPerUrl = (data?.previousScan && data.previousScan.pagesCount > 0)
+    ? data.previousScan.blockerCount / data.previousScan.pagesCount
+    : null;
+  const blockersPerUrlDelta = (currentBlockersPerUrl !== null && previousBlockersPerUrl !== null)
+    ? Math.round((currentBlockersPerUrl - previousBlockersPerUrl) * 10) / 10
+    : null;
+
+  const blockersPerUrlDeltaText = blockersPerUrlDelta === null
+    ? null
+    : blockersPerUrlDelta > 0
+      ? `${blockersPerUrlDelta.toFixed(1)} more blockers per URL since last scan`
+      : blockersPerUrlDelta < 0
+        ? `${Math.abs(blockersPerUrlDelta).toFixed(1)} fewer blockers per URL since last scan`
+        : "No change since last scan";
+
+  const pdfBlockersCount = data?.pdfBlockersCount ?? 0;
+  const htmlBlockersCount = data?.htmlBlockersCount ?? 0;
+  const totalTypedBlockersCount = pdfBlockersCount + htmlBlockersCount;
+  const blockerTypeBreakdownText = totalTypedBlockersCount > 0
+    ? `${pdfBlockersCount.toLocaleString()} PDF Blocker${pdfBlockersCount === 1 ? "" : "s"} (${((pdfBlockersCount / totalTypedBlockersCount) * 100).toFixed(1)}%) and ${htmlBlockersCount.toLocaleString()} HTML Blocker${htmlBlockersCount === 1 ? "" : "s"} (${((htmlBlockersCount / totalTypedBlockersCount) * 100).toFixed(1)}%)`
+    : null;
+
   return (
     <div className={style["BlockersTableSummary"]}>
       {!error && !isLoading && data ? (
@@ -111,12 +189,32 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
             <Card className="short">
               <div className={style["blockers-count"]}>
-                <h3><span className="font-extra-large">{chartData.data[chartData.data.length - 1].blockers.toLocaleString()}</span> Blockers Found</h3>
+                <h3><span className="font-extra-large">{currentBlockersCount.toLocaleString()}</span> Blockers Found</h3>
+                {(blockersDeltaText || daysSinceLastScanNode) && (
+                  <div className={style["blockers-meta-group"]}>
+                    {blockersDeltaText && (
+                      <p
+                        className={style["blockers-delta"]}
+                        style={{ color: blockersDelta! > 0 ? increaseColor : blockersDelta! < 0 ? decreaseColor : undefined }}
+                      >
+                        {blockersDeltaText}
+                      </p>
+                    )}
+                    {daysSinceLastScanNode && (
+                      <p className={style["blockers-meta"]}>{daysSinceLastScanNode}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </Card>
             <Card className="short" variant="light">
               <div className={style["graph-card"]}>
-                <h3><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h3>
+                <div className={style["graph-card-text"]}>
+                  <h3><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h3>
+                  {blockerTypeBreakdownText && (
+                    <p className={style["blocker-type-breakdown"]}>{blockerTypeBreakdownText}</p>
+                  )}
+                </div>
                 <ResponsiveContainer className={style["donut-chart"]}>
                   <PieChart {...{ "aria-hidden": "true" }}>
                     <Pie
@@ -147,8 +245,17 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
             </Card>
             <Card variant="light" className="short">
               <div className={style["blockers-count"]}>
-                <h3><span className="font-extra-large">{daysSince(new Date(scans[scans.length - 1].created_at))}
-                </span> Days Since Last Scanned </h3>
+                <h3><span className="font-extra-large">{currentBlockersPerUrl !== null ? currentBlockersPerUrl.toFixed(1) : "0.0"}</span> Blockers per URL</h3>
+                {blockersPerUrlDeltaText && (
+                  <div className={style["blockers-meta-group"]}>
+                    <p
+                      className={style["blockers-delta"]}
+                      style={{ color: blockersPerUrlDelta! > 0 ? accentColor : blockersPerUrlDelta! < 0 ? decreaseColorOnLightVariant : undefined }}
+                    >
+                      {blockersPerUrlDeltaText}
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
           </div>

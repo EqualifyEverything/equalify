@@ -132,7 +132,7 @@ export const Audit = () => {
     queryFn: async () =>
       ((
         await apiClient.graphql({
-          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage status errors}}`,
+          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage status errors blocker_count}}`,
           variables: { audit_id: auditId },
         })
       ) as any)?.data?.scans,
