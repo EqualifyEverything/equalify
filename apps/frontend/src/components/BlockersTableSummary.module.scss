@@ -32,6 +32,7 @@
     .blocker-type-breakdown {
       margin: 0;
       font-size: 0.833rem;
+      line-height: 1.2em;
     }
   }
   .donut-chart {
@@ -46,10 +47,11 @@
     padding: calc(variables.$spacing * 2) 0;
     h3 {
       display: block;
-      line-height: 2rem;
+      line-height: 1rem;
     }
     span {
       display: block;
+      line-height: 2.5rem;
     }
     .blockers-meta-group {
       display: flex;
