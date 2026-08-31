@@ -2,6 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .card {
+  position: relative;
   border-radius: variables.$spacing;
   padding: calc(variables.$spacing * 3) calc(variables.$spacing * 2);
   h1,

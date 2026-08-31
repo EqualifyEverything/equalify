@@ -25,6 +25,12 @@ interface PaginatedListResp<T> {
   pageSize: number;
 }
 
+const CardSpinner = () => (
+  <span className={style["card-spinner"]} role="img" aria-label="Refreshing">
+    <GrPowerCycle className={style.spinning} />
+  </span>
+);
+
 const PaginationControls = ({
   page,
   totalPages,
@@ -306,6 +312,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
           <div className="cards-50">
 
             <Card className="short">
+              {isFetching && !isLoading && <CardSpinner />}
               <div className={style["blockers-count"]}>
                 <h3><span className="font-extra-large">{currentBlockersCount.toLocaleString()}</span> Blockers Found</h3>
                 {(blockersDeltaText || daysSinceLastScanNode) && (
@@ -326,6 +333,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               </div>
             </Card>
             <Card className="short" variant="light">
+              {isFetching && !isLoading && <CardSpinner />}
               <div className={style["graph-card"]}>
                 <div className={style["graph-card-text"]}>
                   <h3><span style={{ color: accentColor }}>{data.urlsWithBlockersCount}</span> of {pages.length} URLs (<span style={{ color: accentColor }}>{((data.urlsWithBlockersCount / pages.length) * 100).toFixed(1)}%</span>) in this audit have blockers.</h3>
@@ -362,6 +370,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               </div>
             </Card>
             <Card variant="light" className="short">
+              {isFetching && !isLoading && <CardSpinner />}
               <div className={style["blockers-count"]}>
                 <h3><span className="font-extra-large">{currentBlockersPerUrl !== null ? currentBlockersPerUrl.toFixed(1) : "0.0"}</span> Blockers per URL</h3>
                 {blockersPerUrlDeltaText && (
@@ -380,6 +389,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
           <div className="cards-50">
             <Card variant="light">
+              {isMostCommonUrlsFetching && !isMostCommonUrlsLoading && <CardSpinner />}
               <h3 id={urlsHeadingId}>URLs with Most Blockers</h3>
               {mostCommonUrlsError ? (
                 <p>Couldn&apos;t load this list.</p>
@@ -437,6 +447,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               )}
             </Card>
             <Card variant="light">
+              {isMostCommonBlockersFetching && !isMostCommonBlockersLoading && <CardSpinner />}
               <h3 id={blockersHeadingId}>Most Common Blockers</h3>
               {mostCommonBlockersError ? (
                 <p>Couldn&apos;t load this list.</p>
@@ -514,11 +525,6 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
         </>
       ) : (<><SkeletonAuditHeader /></>)}
-      {((isFetching && !isLoading) || (isMostCommonUrlsFetching && !isMostCommonUrlsLoading) || (isMostCommonBlockersFetching && !isMostCommonBlockersLoading)) && (
-        <span role="img" aria-label="Refreshing">
-          <GrPowerCycle className={style.spinning} />
-        </span>
-      )}
     </div >
   );
 };

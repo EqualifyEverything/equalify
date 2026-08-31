@@ -12,6 +12,12 @@
 }
 
 .BlockersTableSummary {
+  .card-spinner {
+    position: absolute;
+    top: variables.$spacing;
+    right: variables.$spacing;
+    line-height: 0;
+  }
   .graph-card {
     display: flex;
     align-items: center;
