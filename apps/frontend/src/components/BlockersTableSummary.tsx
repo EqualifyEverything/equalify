@@ -1,18 +1,51 @@
 import { useQuery } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import style from "./BlockersTableSummary.module.scss";
 import * as API from "aws-amplify/api";
 import { DataRow } from "./DataRow";
 import { Card } from "./Card";
+import { StyledButton } from "./StyledButton";
 import { Page } from "#src/routes/Audit.tsx";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
 import { GrPowerCycle } from "react-icons/gr";
+import { FiExternalLink } from "react-icons/fi";
 import { Link, useSearchParams } from "react-router-dom";
 
 import themeVariables from "../global-styles/variables.module.scss";
 import { SkeletonAuditHeader } from "./Skeleton";
 import { useGlobalStore } from "#src/utils";
 //const apiClient = API.generateClient();
+
+const MOST_COMMON_PAGE_SIZE = 5;
+
+interface PaginatedListResp<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+const PaginationControls = ({
+  page,
+  totalPages,
+  onPrevious,
+  onNext,
+  label,
+}: {
+  page: number;
+  totalPages: number;
+  onPrevious: () => void;
+  onNext: () => void;
+  label: string;
+}) => (
+  <div className={style["pagination"]} role="navigation" aria-label={`${label} pagination`}>
+    <span className={style["pagination-text"]}>Page {page + 1} of {totalPages}</span>
+    <div className={style["pagination-buttons"]}>
+      <StyledButton onClick={onPrevious} disabled={page <= 0} label="Previous" variant="light" />
+      <StyledButton onClick={onNext} disabled={page >= totalPages - 1} label="Next" variant="light" />
+    </div>
+  </div>
+);
 
 interface BlockersTableSummaryProps {
   auditId: string;
@@ -34,9 +67,7 @@ interface SummaryRespScan {
 }
 
 interface SummaryResp {
-  "mostCommonErrors": SummaryRespCountItem[],
   "urlsWithBlockersCount": number,
-  "urlsWithMostErrors": SummaryRespCountItem[],
   "mostCommonCategory": SummaryRespCountItem[],
   "mostCommonTags": SummaryRespCountItem[],
   "latestScan": SummaryRespScan | null,
@@ -47,7 +78,7 @@ interface SummaryResp {
 
 export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scans }: BlockersTableSummaryProps) => {
 
-  const { darkMode } = useGlobalStore();
+  const { darkMode, setAnnounceMessage } = useGlobalStore();
   const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
   const chartFillSecondary = darkMode ? themeVariables.dark_border : themeVariables.paper;
   // This card is always rendered with the "dark" Card variant (near-black
@@ -87,22 +118,17 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const urlsHeadingId = `${baseId}-urls-heading`;
   const blockersHeadingId = `${baseId}-blockers-heading`;
 
-  const [mostCommonUrlsLimit, setMostCommonUrlsLimit] = useState(5);
-  const [mostCommonBlockersLimit, setMostCommonBlockersLimit] = useState(5);
   const [mostCommonCategoriesLimit, setMostCommonCategoriesLimit] = useState(3);
   const [mostCommonTagsLimit, setMostCommonTagsLimit] = useState(3);
 
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: [
       "auditSummary", auditId,
-      mostCommonUrlsLimit, mostCommonBlockersLimit,
       mostCommonCategoriesLimit, mostCommonTagsLimit
     ],
     queryFn: async () => {
       const params: Record<string, string> = {
         id: auditId,
-        mostCommonUrlsLimit: mostCommonUrlsLimit.toString(),
-        mostCommonBlockersLimit: mostCommonBlockersLimit.toString(),
         mostCommonCategoriesLimit: mostCommonCategoriesLimit.toString(),
         mostCommonTagsLimit: mostCommonTagsLimit.toString()
       };
@@ -116,6 +142,98 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
       return resp;
     }
   });
+
+  const [urlsPage, setUrlsPage] = useState(0);
+  const [blockersPage, setBlockersPage] = useState(0);
+
+  // A new audit means these page numbers are stale — start back at page 1
+  // rather than requesting, say, page 4 of a brand-new audit's short list.
+  useEffect(() => {
+    setUrlsPage(0);
+    setBlockersPage(0);
+  }, [auditId]);
+
+  const {
+    data: mostCommonUrlsData,
+    isLoading: isMostCommonUrlsLoading,
+    isFetching: isMostCommonUrlsFetching,
+    error: mostCommonUrlsError,
+  } = useQuery({
+    queryKey: ["mostCommonUrls", auditId, urlsPage],
+    queryFn: async () => {
+      const response = await API.get({
+        apiName: isShared ? "public" : "auth",
+        path: "/getMostCommonUrls",
+        options: {
+          queryParams: {
+            id: auditId,
+            page: urlsPage.toString(),
+            pageSize: MOST_COMMON_PAGE_SIZE.toString(),
+          },
+        },
+      }).response;
+      return (await response.body.json()) as any as PaginatedListResp<SummaryRespCountItem>;
+    },
+    placeholderData: (previousData) => previousData,
+  });
+  const urlsTotalPages = mostCommonUrlsData
+    ? Math.max(1, Math.ceil(mostCommonUrlsData.totalCount / mostCommonUrlsData.pageSize))
+    : 1;
+
+  const {
+    data: mostCommonBlockersData,
+    isLoading: isMostCommonBlockersLoading,
+    isFetching: isMostCommonBlockersFetching,
+    error: mostCommonBlockersError,
+  } = useQuery({
+    queryKey: ["mostCommonBlockers", auditId, blockersPage],
+    queryFn: async () => {
+      const response = await API.get({
+        apiName: isShared ? "public" : "auth",
+        path: "/getMostCommonBlockers",
+        options: {
+          queryParams: {
+            id: auditId,
+            page: blockersPage.toString(),
+            pageSize: MOST_COMMON_PAGE_SIZE.toString(),
+          },
+        },
+      }).response;
+      return (await response.body.json()) as any as PaginatedListResp<SummaryRespCountItem>;
+    },
+    placeholderData: (previousData) => previousData,
+  });
+  const blockersTotalPages = mostCommonBlockersData
+    ? Math.max(1, Math.ceil(mostCommonBlockersData.totalCount / mostCommonBlockersData.pageSize))
+    : 1;
+
+  // Announce pagination changes to screen readers once the newly requested
+  // page has actually loaded (data still holds the previous page until then).
+  const announcedUrlsPageRef = useRef(urlsPage);
+  useEffect(() => {
+    if (!mostCommonUrlsData) return;
+    if (announcedUrlsPageRef.current !== urlsPage) {
+      setAnnounceMessage(
+        `Showing ${mostCommonUrlsData.items.length} of ${mostCommonUrlsData.totalCount} URLs, page ${urlsPage + 1} of ${urlsTotalPages}`,
+        "normal",
+        true
+      );
+    }
+    announcedUrlsPageRef.current = urlsPage;
+  }, [mostCommonUrlsData]);
+
+  const announcedBlockersPageRef = useRef(blockersPage);
+  useEffect(() => {
+    if (!mostCommonBlockersData) return;
+    if (announcedBlockersPageRef.current !== blockersPage) {
+      setAnnounceMessage(
+        `Showing ${mostCommonBlockersData.items.length} of ${mostCommonBlockersData.totalCount} blockers, page ${blockersPage + 1} of ${blockersTotalPages}`,
+        "normal",
+        true
+      );
+    }
+    announcedBlockersPageRef.current = blockersPage;
+  }, [mostCommonBlockersData]);
 
   function daysSince(date: Date) {
     const timeDifferenceInMs = new Date().getTime() - date.getTime();
@@ -263,49 +381,101 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
           <div className="cards-50">
             <Card variant="light">
               <h3 id={urlsHeadingId}>URLs with Most Blockers</h3>
-              <div role="table" aria-labelledby={urlsHeadingId}>
-                <DataRow asTableRow variant="highlight" the_value="Blockers" the_key="URL" />
-                {data.urlsWithMostErrors.map((item, index) => {
-                  return <DataRow
-                    asTableRow
-                    key={index}
-                    the_key={<a href={item.key} target="_blank">{item.key}</a>}
-                    the_value={
-                      <Link
-                        to={{ search: getUrlBlockersLinkSearch(item.key) }}
-                        aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
-                      >
-                        {item.count.toString()}
-                      </Link>
-                    }
-                    variant="tight"
+              {mostCommonUrlsError ? (
+                <p>Couldn&apos;t load this list.</p>
+              ) : !mostCommonUrlsData ? (
+                <p>Loading…</p>
+              ) : mostCommonUrlsData.totalCount === 0 ? (
+                <p>No URLs with blockers found.</p>
+              ) : (
+                <>
+                  <div role="table" aria-labelledby={urlsHeadingId}>
+                    <DataRow asTableRow variant="highlight" the_value="Blockers" the_key="URL" />
+                    {mostCommonUrlsData.items.map((item) => {
+                      return <DataRow
+                        asTableRow
+                        key={item.key}
+                        the_key={
+                          <>
+                            <Link
+                              to={{ search: getUrlBlockersLinkSearch(item.key) }}
+                              aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
+                            >
+                              {item.key}
+                            </Link>
+                            <a
+                              href={item.key}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Open ${item.key} in a new tab`}
+                              className={style["external-link"]}
+                            >
+                              <FiExternalLink aria-hidden="true" focusable="false" />
+                            </a>
+                          </>
+                        }
+                        the_value={
+                          <Link
+                            to={{ search: getUrlBlockersLinkSearch(item.key) }}
+                            aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
+                          >
+                            {item.count.toString()}
+                          </Link>
+                        }
+                        variant="tight"
+                      />
+                    })}
+                  </div>
+                  <PaginationControls
+                    page={urlsPage}
+                    totalPages={urlsTotalPages}
+                    onPrevious={() => setUrlsPage((p) => Math.max(0, p - 1))}
+                    onNext={() => setUrlsPage((p) => Math.min(urlsTotalPages - 1, p + 1))}
+                    label="URLs with Most Blockers"
                   />
-                })}
-              </div>
+                </>
+              )}
             </Card>
             <Card variant="light">
               <h3 id={blockersHeadingId}>Most Common Blockers</h3>
-              <div role="table" aria-labelledby={blockersHeadingId}>
-                <DataRow asTableRow variant="highlight" the_value="Count" the_key="Blocker" />
-                {data.mostCommonErrors.map((item, index) => {
-                  return <DataRow
-                    asTableRow
-                    key={index}
-                    the_key={item.key}
-                    the_value={
-                      item.category ? (
-                        <Link
-                          to={{ search: getCategoryBlockersLinkSearch(item.category) }}
-                          aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
-                        >
-                          {item.count.toString()}
-                        </Link>
-                      ) : item.count.toString()
-                    }
-                    variant="tight"
+              {mostCommonBlockersError ? (
+                <p>Couldn&apos;t load this list.</p>
+              ) : !mostCommonBlockersData ? (
+                <p>Loading…</p>
+              ) : mostCommonBlockersData.totalCount === 0 ? (
+                <p>No blockers found.</p>
+              ) : (
+                <>
+                  <div role="table" aria-labelledby={blockersHeadingId}>
+                    <DataRow asTableRow variant="highlight" the_value="Count" the_key="Blocker" />
+                    {mostCommonBlockersData.items.map((item) => {
+                      return <DataRow
+                        asTableRow
+                        key={item.key}
+                        the_key={item.key}
+                        the_value={
+                          item.category ? (
+                            <Link
+                              to={{ search: getCategoryBlockersLinkSearch(item.category) }}
+                              aria-label={`View ${item.count} blockers for ${item.key} in Detailed View`}
+                            >
+                              {item.count.toString()}
+                            </Link>
+                          ) : item.count.toString()
+                        }
+                        variant="tight"
+                      />
+                    })}
+                  </div>
+                  <PaginationControls
+                    page={blockersPage}
+                    totalPages={blockersTotalPages}
+                    onPrevious={() => setBlockersPage((p) => Math.max(0, p - 1))}
+                    onNext={() => setBlockersPage((p) => Math.min(blockersTotalPages - 1, p + 1))}
+                    label="Most Common Blockers"
                   />
-                })}
-              </div>
+                </>
+              )}
             </Card>
           </div>{/*
           <div className="cards-50">
@@ -344,7 +514,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
         </>
       ) : (<><SkeletonAuditHeader /></>)}
-      {isFetching && !isLoading && (
+      {((isFetching && !isLoading) || (isMostCommonUrlsFetching && !isMostCommonUrlsLoading) || (isMostCommonBlockersFetching && !isMostCommonBlockersLoading)) && (
         <span role="img" aria-label="Refreshing">
           <GrPowerCycle className={style.spinning} />
         </span>

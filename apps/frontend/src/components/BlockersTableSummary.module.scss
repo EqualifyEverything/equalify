@@ -72,6 +72,28 @@
       color: variables.$paper;
     }
   }
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: variables.$spacing;
+    margin-top: variables.$spacing;
+    padding-top: variables.$spacing;
+    @include fonts.font-size-small;
+    .pagination-buttons {
+      display: inline-flex;
+      gap: calc(variables.$spacing / 2);
+    }
+  }
+  .external-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: calc(variables.$spacing / 2);
+    padding: calc(variables.$spacing / 4);
+    vertical-align: middle;
+    color: inherit;
+  }
   .category-tag-card {
     display: flex;
     .column {

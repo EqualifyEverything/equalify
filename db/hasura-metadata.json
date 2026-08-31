@@ -522,6 +522,40 @@
           },
           {
             "table": {
+              "name": "item_count_with_total_template",
+              "schema": "public"
+            },
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "count",
+                    "key",
+                    "total_count"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "count",
+                    "key",
+                    "total_count"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
               "name": "logs",
               "schema": "public"
             },
@@ -1043,6 +1077,18 @@
           {
             "function": {
               "name": "get_most_common_urls",
+              "schema": "public"
+            }
+          },
+          {
+            "function": {
+              "name": "get_most_common_urls_paginated",
+              "schema": "public"
+            }
+          },
+          {
+            "function": {
+              "name": "get_most_common_messages_paginated",
               "schema": "public"
             }
           }
