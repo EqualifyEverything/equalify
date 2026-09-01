@@ -386,6 +386,7 @@
                     "updated_at",
                     "audit_id",
                     "blocker_id",
+                    "content_hash_id",
                     "id"
                   ]
                 },
@@ -401,6 +402,7 @@
                     "updated_at",
                     "audit_id",
                     "blocker_id",
+                    "content_hash_id",
                     "id"
                   ],
                   "filter": {},
@@ -416,6 +418,7 @@
                     "updated_at",
                     "audit_id",
                     "blocker_id",
+                    "content_hash_id",
                     "id"
                   ],
                   "filter": {},

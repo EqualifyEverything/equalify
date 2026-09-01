@@ -385,7 +385,8 @@ CREATE TABLE public.ignored_blockers (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     audit_id uuid NOT NULL,
-    blocker_id uuid NOT NULL
+    blocker_id uuid NOT NULL,
+    content_hash_id uuid
 );
 
 

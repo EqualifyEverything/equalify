@@ -12,6 +12,11 @@
 }
 
 .BlockersTableSummary {
+  .duplicates-filter {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: variables.$spacing;
+  }
   .card-spinner {
     position: absolute;
     top: variables.$spacing;

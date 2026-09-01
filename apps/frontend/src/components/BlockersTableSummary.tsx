@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useId, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 import style from "./BlockersTableSummary.module.scss";
 import * as API from "aws-amplify/api";
 import { DataRow } from "./DataRow";
 import { Card } from "./Card";
 import { StyledButton } from "./StyledButton";
+import { StyledLabeledInput } from "./StyledLabeledInput";
 import { Page } from "#src/routes/Audit.tsx";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
 import { GrPowerCycle } from "react-icons/gr";
@@ -79,7 +80,9 @@ interface SummaryResp {
   "latestScan": SummaryRespScan | null,
   "previousScan": SummaryRespScan | null,
   "pdfBlockersCount": number,
-  "htmlBlockersCount": number
+  "htmlBlockersCount": number,
+  "totalBlockersCount": number,
+  "uniqueBlockersCount": number
 }
 
 export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scans }: BlockersTableSummaryProps) => {
@@ -152,6 +155,24 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const [urlsPage, setUrlsPage] = useState(0);
   const [blockersPage, setBlockersPage] = useState(0);
 
+  // Duplicate handling for the two "Most Common" lists: "all" counts every
+  // occurrence, "group" counts unique blockers (by content hash), "hide"
+  // only counts blockers that appear exactly once.
+  const [duplicatesMode, setDuplicatesMode] = useState<string>("all");
+
+  const handleDuplicatesModeChange = (mode: string) => {
+    setDuplicatesMode(mode);
+    setUrlsPage(0);
+    setBlockersPage(0);
+    setAnnounceMessage(
+      mode === "group"
+        ? "Counting one per unique blocker"
+        : mode === "hide"
+          ? "Hiding blockers that have duplicates"
+          : "Counting every blocker occurrence"
+    );
+  };
+
   // A new audit means these page numbers are stale — start back at page 1
   // rather than requesting, say, page 4 of a brand-new audit's short list.
   useEffect(() => {
@@ -165,7 +186,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
     isFetching: isMostCommonUrlsFetching,
     error: mostCommonUrlsError,
   } = useQuery({
-    queryKey: ["mostCommonUrls", auditId, urlsPage],
+    queryKey: ["mostCommonUrls", auditId, urlsPage, duplicatesMode],
     queryFn: async () => {
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
@@ -175,6 +196,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
             id: auditId,
             page: urlsPage.toString(),
             pageSize: MOST_COMMON_PAGE_SIZE.toString(),
+            ...(duplicatesMode !== "all" && { duplicates: duplicatesMode }),
           },
         },
       }).response;
@@ -192,7 +214,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
     isFetching: isMostCommonBlockersFetching,
     error: mostCommonBlockersError,
   } = useQuery({
-    queryKey: ["mostCommonBlockers", auditId, blockersPage],
+    queryKey: ["mostCommonBlockers", auditId, blockersPage, duplicatesMode],
     queryFn: async () => {
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
@@ -202,6 +224,7 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
             id: auditId,
             page: blockersPage.toString(),
             pageSize: MOST_COMMON_PAGE_SIZE.toString(),
+            ...(duplicatesMode !== "all" && { duplicates: duplicatesMode }),
           },
         },
       }).response;
@@ -276,6 +299,13 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
 
   const currentBlockersCount = chartData.data[chartData.data.length - 1].blockers;
 
+  // "1,240 blockers · 87 unique issues" — the same DOM node repeated across
+  // pages counts once here, so this is the real remediation workload.
+  const uniqueBlockersCount = data?.uniqueBlockersCount ?? 0;
+  const uniqueBlockersText = uniqueBlockersCount > 0
+    ? <><strong>{uniqueBlockersCount.toLocaleString()}</strong> unique issue{uniqueBlockersCount === 1 ? "" : "s"} across all pages</>
+    : null;
+
   // getAuditSummaryFast looks up each scan's own page count (via
   // jsonb_array_length on that scan's frozen `pages` array) rather than using
   // the audit's current URL list, so this stays correct even if URLs were
@@ -315,8 +345,11 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
               {isFetching && !isLoading && <CardSpinner />}
               <div className={style["blockers-count"]}>
                 <h3><span className="font-extra-large">{currentBlockersCount.toLocaleString()}</span> Blockers Found</h3>
-                {(blockersDeltaText || daysSinceLastScanNode) && (
+                {(blockersDeltaText || daysSinceLastScanNode || uniqueBlockersText) && (
                   <div className={style["blockers-meta-group"]}>
+                    {uniqueBlockersText && (
+                      <p className={style["blockers-meta"]}>{uniqueBlockersText}</p>
+                    )}
                     {blockersDeltaText && (
                       <p
                         className={style["blockers-delta"]}
@@ -385,6 +418,22 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                 )}
               </div>
             </Card>
+          </div>
+
+          <div className={style["duplicates-filter"]}>
+            <StyledLabeledInput>
+              <label>Filter Duplicates</label>
+              <select
+                id="summaryDuplicatesToggleGroup"
+                aria-label="Filter duplicates:"
+                value={duplicatesMode}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDuplicatesModeChange(e.target.value)}
+              >
+                <option value="all">Show All Blockers</option>
+                <option value="group">Group Duplicate Blockers</option>
+                <option value="hide">Hide Duplicate Blockers</option>
+              </select>
+            </StyledLabeledInput>
           </div>
 
           <div className="cards-50">

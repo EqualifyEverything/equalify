@@ -24,6 +24,13 @@ export const getAuditTable = async () => {
 
   const searchString = (event.queryStringParameters as any).searchString || "";
 
+  // Duplicate handling: "all" shows every occurrence, "group" collapses to
+  // one row per unique content_hash_id (distinct_on), "hide" drops blockers
+  // that appear more than once in the latest scan.
+  const duplicatesMode =
+    (event.queryStringParameters as any).duplicates || "all";
+  const dedupe = duplicatesMode === "group";
+
   await db.connect();
   const audit = (
     await db.query({
@@ -31,7 +38,43 @@ export const getAuditTable = async () => {
       values: [auditId],
     })
   ).rows?.[0];
+
+  // Duplicate groups in the latest scan: hashes appearing on more than one
+  // row, with the pages they appear on. Powers the ×N occurrences chip, the
+  // "duplicated" status filter, and per-blocker URL drilldown.
+  const latestScanId = (
+    await db.query({
+      text: `SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1`,
+      values: [auditId],
+    })
+  ).rows?.[0]?.id;
+
+  // urls capped to 10 per group — the tooltip shows at most 10 and a "+N
+  // more" line from url_count, so shipping full arrays (potentially thousands
+  // of URLs per template blocker, repeated on every row) would bloat the
+  // response for no UI benefit.
+  const duplicateGroups: { content_hash_id: string; occurrences: number; url_count: number; urls: string[] }[] =
+    latestScanId
+      ? (
+          await db.query({
+            text: `SELECT "b"."content_hash_id", COUNT(*)::int AS "occurrences",
+                          COUNT(DISTINCT COALESCE("u"."url", "b"."url_text", 'Unknown URL'))::int AS "url_count",
+                          (ARRAY_AGG(DISTINCT COALESCE("u"."url", "b"."url_text", 'Unknown URL')))[1:10] AS "urls"
+                   FROM "blockers" "b"
+                   LEFT JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+                   WHERE "b"."scan_id" = $1
+                   GROUP BY "b"."content_hash_id"
+                   HAVING COUNT(*) > 1`,
+            values: [latestScanId],
+          })
+        ).rows
+      : [];
   await db.clean();
+
+  const duplicateGroupsByHash = new Map(
+    duplicateGroups.map((group) => [group.content_hash_id, group])
+  );
+  const duplicatedHashIds = duplicateGroups.map((group) => group.content_hash_id);
 
   // Build the where clause with multiple filters
   const whereConditions: any[] = [];
@@ -91,7 +134,22 @@ export const getAuditTable = async () => {
           },
         },
       });
+    } else if (statusParam === "duplicated") {
+      // An empty _in list matches nothing, which is correct when no duplicates exist
+      whereConditions.push({
+        content_hash_id: { _in: duplicatedHashIds },
+      });
     }
+  }
+
+  // Hide duplicated blockers entirely — only nodes appearing once remain.
+  // Wrapped in _not so the status-count base clause keeps it: this is a view
+  // mode, not a status, so all the dropdown counts should reflect it (the
+  // strip below only removes bare content_hash_id status conditions).
+  if (duplicatesMode === "hide") {
+    whereConditions.push({
+      _not: { content_hash_id: { _in: duplicatedHashIds } },
+    });
   }
 
   // Add search string to where clause
@@ -128,7 +186,8 @@ export const getAuditTable = async () => {
     (cond) =>
       !(
         cond.ignored_blocker ||
-        cond._not?.ignored_blocker
+        cond._not?.ignored_blocker ||
+        cond.content_hash_id
       )
   );
   const baseWhereClause =
@@ -162,14 +221,29 @@ export const getAuditTable = async () => {
     ],
   };
 
+  const duplicatedWhereClause = {
+    _and: [
+      ...baseWhereConditions,
+      { content_hash_id: { _in: duplicatedHashIds } },
+    ],
+  };
+
+  // In dedupe mode, distinct_on requires order_by to lead with the distinct
+  // column, and every count switches to distinct-by-hash so pagination and
+  // the status dropdown stay consistent with what the table shows.
+  const distinctClause = dedupe ? ", distinct_on: content_hash_id" : "";
+  const countField = dedupe
+    ? "count(columns: content_hash_id, distinct: true)"
+    : "count";
+
   // Query to get blockers from the latest scan with pagination
   const query = {
-    query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $ignoredWhere: blockers_bool_exp!) {
+    query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $ignoredWhere: blockers_bool_exp!, $duplicatedWhere: blockers_bool_exp!) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: desc}, limit: 1) {
       id
       created_at
-      blockers(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
+      blockers(where: $where, limit: $limit, offset: $offset, order_by: $order_by${distinctClause}) {
         id
         short_id
         content_hash_id
@@ -198,22 +272,27 @@ export const getAuditTable = async () => {
       }
       blockers_aggregate(where: $where) {
         aggregate {
-          count
+          ${countField}
         }
       }
       all_blockers_count: blockers_aggregate(where: $baseWhere) {
         aggregate {
-          count
+          ${countField}
         }
       }
       active_blockers_count: blockers_aggregate(where: $activeWhere) {
         aggregate {
-          count
+          ${countField}
         }
       }
       ignored_blockers_count: blockers_aggregate(where: $ignoredWhere) {
         aggregate {
-          count
+          ${countField}
+        }
+      }
+      duplicated_blockers_count: blockers_aggregate(where: $duplicatedWhere) {
+        aggregate {
+          ${countField}
         }
       }
     }
@@ -231,10 +310,13 @@ export const getAuditTable = async () => {
       limit: pageSize,
       offset: page * pageSize,
       where: whereClause,
-      order_by: [orderByClause],
+      order_by: dedupe
+        ? [{ content_hash_id: "asc" }, orderByClause]
+        : [orderByClause],
       baseWhere: baseWhereClause,
       activeWhere: activeWhereClause,
       ignoredWhere: ignoredWhereClause,
+      duplicatedWhere: duplicatedWhereClause,
     },
   };
 
@@ -251,6 +333,8 @@ export const getAuditTable = async () => {
     latestScan?.active_blockers_count?.aggregate?.count || 0;
   const ignoredBlockersCount =
     latestScan?.ignored_blockers_count?.aggregate?.count || 0;
+  const duplicatedBlockersCount =
+    latestScan?.duplicated_blockers_count?.aggregate?.count || 0;
   const availableTags = response.tags || [];
   const availableCategories = response.messages || [];
 
@@ -281,7 +365,12 @@ export const getAuditTable = async () => {
       (bm) => `[${bm.message.category}] ${bm.message.content}`
     );
 
+    const duplicateGroup = duplicateGroupsByHash.get(blocker.content_hash_id);
+
     return {
+      duplicateCount: duplicateGroup?.occurrences ?? 1,
+      duplicateUrlCount: duplicateGroup?.url_count ?? 1,
+      duplicateUrls: duplicateGroup?.urls ?? [],
       id: blocker.id,
       short_id: blocker.short_id,
       content_hash_id: blocker.content_hash_id,
@@ -318,6 +407,7 @@ export const getAuditTable = async () => {
         all: allBlockersCount,
         active: activeBlockersCount,
         ignored: ignoredBlockersCount,
+        duplicated: duplicatedBlockersCount,
       },
       availableTags,
       availableCategories: availableCategories
@@ -327,6 +417,7 @@ export const getAuditTable = async () => {
         tags: tagFilters,
         types: typeFilters,
         status: statusParam,
+        duplicates: duplicatesMode,
       },
     }),
   };

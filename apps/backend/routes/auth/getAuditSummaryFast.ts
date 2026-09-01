@@ -86,6 +86,19 @@ export const getAuditSummaryFast = async () => {
       values: [auditId],
     })
   ).rows as { type: string; count: number }[];
+
+  // Unique (distinct content_hash_id) blockers in the latest scan — the
+  // "87 unique issues" headline. The total comes free from blockerTypeRows.
+  const uniqueBlockers = (
+    await db.query({
+      text: `SELECT COUNT(DISTINCT "content_hash_id")::int AS "unique_count"
+             FROM "blockers"
+             WHERE "scan_id" = (
+               SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1
+             )`,
+      values: [auditId],
+    })
+  ).rows[0] as { unique_count: number } | undefined;
   await db.clean();
 
   const pdfBlockersCount = blockerTypeRows.find((row) => row.type === "pdf")?.count ?? 0;
@@ -106,6 +119,8 @@ export const getAuditSummaryFast = async () => {
         : null,
       pdfBlockersCount,
       htmlBlockersCount,
+      totalBlockersCount: blockerTypeRows.reduce((sum, row) => sum + row.count, 0),
+      uniqueBlockersCount: uniqueBlockers?.unique_count ?? 0,
       executionTime: end - start
     }),
   };

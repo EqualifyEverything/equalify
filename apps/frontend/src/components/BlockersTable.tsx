@@ -81,6 +81,9 @@ export interface Blocker {
   tags: BlockerTag[];
   categories: string[];
   type: string;
+  duplicateCount: number;
+  duplicateUrlCount: number;
+  duplicateUrls: string[]; // capped to 10 server-side; duplicateUrlCount has the real total
 }
 
 interface BlockersTableProps {
@@ -129,6 +132,10 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [selectedStatus, setSelectedStatus] = useState<string>("active");
 
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
+
+  // Duplicate handling: "all" shows every occurrence, "group" collapses to
+  // one row per unique blocker (by content hash), "hide" drops duplicated ones
+  const [duplicatesMode, setDuplicatesMode] = useState<string>("all");
 
   const [searchString, setSearchString] = useState<string>(() => searchParams.get("search") ?? "");
 
@@ -260,24 +267,51 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
         });
       } else {
-        // Insert into ignored_blockers (with content_hash_id denormalized for fast lookups)
-        await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!) {
-            insert_ignored_blockers_one(object: {
-              audit_id: $audit_id,
-              blocker_id: $blocker_id,
-              content_hash_id: $content_hash_id
-            }) {
-              audit_id
-              blocker_id
+        // Ignore every occurrence of this exact node (same content hash), not
+        // just the clicked row — the next scan's hash carry-forward would
+        // ignore them all anyway, and un-ignore already deletes hash-wide.
+        // Scoped to the latest scan so historical scans' rows (pre-migration)
+        // don't balloon the payload — carry-forward covers them regardless.
+        const idsResponse = (await apiClient.graphql({
+          query: `query ($audit_id: uuid!, $content_hash_id: uuid!) {
+            audits_by_pk(id: $audit_id) {
+              scans(order_by: {created_at: desc}, limit: 1) {
+                blockers(where: {content_hash_id: {_eq: $content_hash_id}}) {
+                  id
+                }
+              }
             }
           }`,
-          variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
+          variables: { audit_id: auditId, content_hash_id: contentHashId },
+        })) as any;
+        const latestScanBlockers = idsResponse.data?.audits_by_pk?.scans?.[0]?.blockers;
+        const blockerIds: string[] = latestScanBlockers?.length
+          ? latestScanBlockers.map((b: any) => b.id)
+          : [blockerId];
+        await apiClient.graphql({
+          query: `mutation ($objects: [ignored_blockers_insert_input!]!) {
+            insert_ignored_blockers(objects: $objects) {
+              affected_rows
+            }
+          }`,
+          variables: {
+            objects: blockerIds.map((id) => ({
+              audit_id: auditId,
+              blocker_id: id,
+              content_hash_id: contentHashId,
+            })),
+          },
         });
       }
     },
     onSuccess: () => {
       // Refetch the ignored blockers list
+      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
+    },
+    onError: (err) => {
+      console.error("Failed to toggle ignore status:", err);
+      setAnnounceMessage("Failed to update blocker status", "error");
+      // Resync in case a partial change landed
       queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
     },
   });
@@ -292,6 +326,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       selectedCategories,
       selectedStatus,
       selectedContentType,
+      duplicatesMode,
       sortBy,
       sortOrder,
       searchString
@@ -318,6 +353,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       }
       if (selectedStatus) {
         params.status = selectedStatus;
+      }
+      if (duplicatesMode !== "all") {
+        params.duplicates = duplicatesMode;
       }
 
       if (searchString.length >= 3 || searchString == "") {
@@ -435,10 +473,16 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           className: style["url"],
         },
         header: () => (
+          // Sorting is unavailable while grouping: Hasura's distinct_on forces
+          // the result to be ordered by content hash, so a sort click would
+          // silently do nothing — disable it instead.
           <StyledButton
             onClick={handleSortByUrl}
+            disabled={duplicatesMode === "group"}
             className="font-small"
-            label={`Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
+            label={duplicatesMode === "group"
+              ? "Sorting unavailable while grouping duplicates"
+              : `Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
             icon={sortOrder === "asc" ? <FaArrowUp /> : <FaArrowDown />}
             variant="naked"
             showLabel={false}
@@ -452,17 +496,55 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             )} */}
           </StyledButton>
         ),
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const url = getValue() as string;
+          const duplicateCount = row.original.duplicateCount ?? 1;
+          const duplicateUrls = row.original.duplicateUrls ?? [];
+          const duplicateUrlCount = row.original.duplicateUrlCount ?? duplicateUrls.length;
+          const URLS_TO_SHOW_IN_TOOLTIP = 10;
           return (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline break-all block max-w-xs"
-            >
-              {url}
-            </a>
+            <>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline break-all block max-w-xs"
+              >
+                {url}
+              </a>
+              {duplicateCount > 1 && (
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger
+                      className={style["duplicate-chip"]}
+                      aria-label={`This exact blocker appears ${duplicateCount} times across ${duplicateUrlCount} ${duplicateUrlCount === 1 ? "page" : "pages"}`}
+                    >
+                      {`×${duplicateCount}`}
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        side="bottom"
+                        className="tooltip"
+                        collisionPadding={8}
+                      >
+                        <div>
+                          <p>{`Appears ${duplicateCount} times across ${duplicateUrlCount} ${duplicateUrlCount === 1 ? "page" : "pages"}:`}</p>
+                          <ul>
+                            {duplicateUrls.slice(0, URLS_TO_SHOW_IN_TOOLTIP).map((dupUrl) => (
+                              <li key={dupUrl}>{dupUrl}</li>
+                            ))}
+                          </ul>
+                          {duplicateUrlCount > URLS_TO_SHOW_IN_TOOLTIP && (
+                            <p>{`+${duplicateUrlCount - URLS_TO_SHOW_IN_TOOLTIP} more pages`}</p>
+                          )}
+                        </div>
+                        <Tooltip.Arrow className="tooltip-arrow" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              )}
+            </>
           );
         },
       },
@@ -678,7 +760,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   isCurrentlyIgnored: isIgnored,
                 });
                 setAnnounceMessage(
-                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`,
+                  // isIgnored is the pre-toggle state, so the new status is its opposite
+                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Active" : "Ignored"}`,
                   "success"
                 );
               }}
@@ -704,7 +787,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, duplicatesMode]
   );
 
   const table = useReactTable({
@@ -751,6 +834,23 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const handleContentTypeChange = (contentType: string) => {
     setSelectedContentType(contentType);
     setPage(0);
+  };
+
+  const handleDuplicatesModeChange = (mode: string) => {
+    setDuplicatesMode(mode);
+    // Hiding duplicates while filtering to duplicated-only is self-cancelling
+    // (guaranteed empty table) — fall back to the default status filter.
+    if (mode === "hide" && selectedStatus === "duplicated") {
+      setSelectedStatus("active");
+    }
+    setPage(0);
+    setAnnounceMessage(
+      mode === "group"
+        ? "Showing one row per unique blocker"
+        : mode === "hide"
+          ? "Hiding blockers that have duplicates"
+          : "Showing every blocker occurrence"
+    );
   };
 
   const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -808,6 +908,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       }
       if (selectedStatus) {
         params.status = selectedStatus;
+      }
+      if (duplicatesMode !== "all") {
+        params.duplicates = duplicatesMode;
       }
       if (searchString.length >= 3 || searchString === "") {
         params.searchString = searchString;
@@ -879,7 +982,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             <span className={style["total-blockers-count"]}>
               {data?.pagination?.totalCount?.toLocaleString() ?? "—"}
             </span>{" "}
-            {data?.pagination?.totalCount === 1 ? "Blocker" : "Blockers"}
+            {data?.pagination?.totalCount === 1
+              ? (duplicatesMode === "group" ? "Unique Blocker" : "Blocker")
+              : (duplicatesMode === "group" ? "Unique Blockers" : "Blockers")}
           </div>
           <div className={style["table-top-actions"]}>
             {/* ColumnToggle */}
@@ -977,9 +1082,27 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <option value="ignored">Ignored{" "}
                 {data?.statusCounts?.ignored !== undefined &&
                   `(${data.statusCounts.ignored})`}</option>
+              <option value="duplicated" disabled={duplicatesMode === "hide"}>Duplicated{" "}
+                {data?.statusCounts?.duplicated !== undefined &&
+                  `(${data.statusCounts.duplicated})`}</option>
               <option value="all">All{" "}
                 {data?.statusCounts?.all !== undefined &&
                   `(${data.statusCounts.all})`}</option>
+            </select>
+          </StyledLabeledInput>
+
+          {/* Duplicate Filtering */}
+          <StyledLabeledInput>
+            <label>Filter Duplicates</label>
+            <select
+              id="duplicatesToggleGroup"
+              aria-label="Filter duplicates:"
+              value={duplicatesMode}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDuplicatesModeChange(e.target.value)}
+            >
+              <option value="all">Show All Blockers</option>
+              <option value="group">Group Duplicate Blockers</option>
+              <option value="hide">Hide Duplicate Blockers</option>
             </select>
           </StyledLabeledInput>
 

@@ -25,6 +25,10 @@ export const exportAuditTable = async () => {
 
   const searchString = (event.queryStringParameters as any).searchString || "";
 
+  // Mirrors getAuditTable: "all" | "group" (one row per unique hash) | "hide"
+  // (only blockers appearing once in the latest scan).
+  const duplicatesMode = (event.queryStringParameters as any).duplicates || "all";
+
   await db.connect();
   const audit = (
     await db.query({
@@ -32,7 +36,25 @@ export const exportAuditTable = async () => {
       values: [auditId],
     })
   ).rows?.[0];
+
+  // Duplicated hashes in the latest scan (same definition as getAuditTable),
+  // for the duplicated/hide filters and the Occurrences CSV column.
+  const duplicateRows = (
+    await db.query({
+      text: `SELECT "content_hash_id", COUNT(*)::int AS "occurrences"
+             FROM "blockers"
+             WHERE "scan_id" = (SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1)
+             GROUP BY "content_hash_id"
+             HAVING COUNT(*) > 1`,
+      values: [auditId],
+    })
+  ).rows as { content_hash_id: string; occurrences: number }[];
   await db.clean();
+
+  const occurrencesByHash = new Map(
+    duplicateRows.map((row) => [row.content_hash_id, row.occurrences])
+  );
+  const duplicatedHashIds = duplicateRows.map((row) => row.content_hash_id);
 
   const whereConditions: any[] = [];
 
@@ -73,7 +95,17 @@ export const exportAuditTable = async () => {
           },
         },
       });
+    } else if (statusParam === "duplicated") {
+      whereConditions.push({
+        content_hash_id: { _in: duplicatedHashIds },
+      });
     }
+  }
+
+  if (duplicatesMode === "hide") {
+    whereConditions.push({
+      _not: { content_hash_id: { _in: duplicatedHashIds } },
+    });
   }
 
   if (searchString !== "") {
@@ -113,7 +145,7 @@ export const exportAuditTable = async () => {
         "content-type": "text/csv; charset=utf-8",
         "content-disposition": `attachment; filename="blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv"`,
       },
-      body: "Type,URL,Issue,Code,Tags,Categories,Status,ID\n",
+      body: "Type,URL,Issue,Code,Tags,Categories,Status,ID,Occurrences\n",
     };
   }
 
@@ -143,6 +175,7 @@ export const exportAuditTable = async () => {
   blockers(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
     id
     short_id
+    content_hash_id
     created_at
     content
     url_id
@@ -189,6 +222,8 @@ export const exportAuditTable = async () => {
     return {
       id: blocker.id,
       short_id: blocker.short_id,
+      content_hash_id: blocker.content_hash_id,
+      occurrences: occurrencesByHash.get(blocker.content_hash_id) ?? 1,
       url: blocker.url?.url || "Unknown URL",
       type: blocker.url?.type || "unknown",
       content: blocker.content,
@@ -207,6 +242,19 @@ export const exportAuditTable = async () => {
     );
   }
 
+  // Group mode: keep the first row per content hash (after the contentType
+  // filter so the kept representative matches the requested type).
+  if (duplicatesMode === "group") {
+    const seenHashes = new Set<string>();
+    formattedBlockers = formattedBlockers.filter((b) => {
+      if (seenHashes.has(b.content_hash_id)) return false;
+      seenHashes.add(b.content_hash_id);
+      return true;
+    });
+  }
+
+  // Occurrences is appended last so consumers addressing the export by
+  // column position keep the original eight columns unchanged.
   const headers = [
     "Type",
     "URL",
@@ -216,6 +264,7 @@ export const exportAuditTable = async () => {
     "Categories",
     "Status",
     "ID",
+    "Occurrences",
   ];
   const rows = formattedBlockers.map((b) =>
     [
@@ -227,6 +276,7 @@ export const exportAuditTable = async () => {
       b.categories.join("; "),
       ignoredSet.has(b.id) ? "Ignored" : "Active",
       b.short_id || "",
+      b.occurrences,
     ]
       .map(csvEscape)
       .join(",")

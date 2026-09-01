@@ -195,6 +195,20 @@
     border-radius: 999px;
     cursor: pointer;
   }
+  .duplicate-chip {
+    @include fonts.font-size-small;
+    color: variables.$white;
+    background: variables.$black;
+    border: none;
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin-left: 6px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.5;
+    white-space: nowrap;
+    cursor: pointer;
+  }
   /* table cells */
   td.url {
     width:430px;
@@ -236,6 +250,10 @@
   }
 
   .tooltip-rondel {
+    background: variables.$dark-border;
+  }
+
+  .duplicate-chip {
     background: variables.$dark-border;
   }
 
