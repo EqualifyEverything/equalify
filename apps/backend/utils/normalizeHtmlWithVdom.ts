@@ -47,11 +47,12 @@ export const normalizeHtmlWithVdom = (html) => {
     // Remove all whitespace between tags for more reliable comparison
     let result = root.html();
 
-    // Remove excess whitespace for more consistent matching
-    result = result.replace(/>\s+</g, '><');
-
     // Remove all text node whitespace variations
     result = result.replace(/\s{2,}/g, ' ');
 
-    return result;
+    // Strip whitespace adjacent to tags (covers inter-tag gaps and
+    // leading/trailing text-node whitespace, which otherwise defeats dedup)
+    result = result.replace(/>\s+/g, '>').replace(/\s+</g, '<');
+
+    return result.trim();
 }

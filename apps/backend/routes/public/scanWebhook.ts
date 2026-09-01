@@ -32,8 +32,10 @@ export const scanWebhook = async () => {
         }
     }
 
+    // Read the denormalized hash directly — joining blockers breaks once
+    // move_stale archives old rows (the join returns NULLs and drops ignores).
     const ignoredBlockerHashes = (await db.query({
-        text: `SELECT b.content_hash_id FROM ignored_blockers as ib LEFT OUTER JOIN blockers as b ON ib.blocker_id = b.id WHERE ib.audit_id=$1`,
+        text: `SELECT content_hash_id FROM ignored_blockers WHERE audit_id=$1 AND content_hash_id IS NOT NULL`,
         values: [auditId],
     }))?.rows?.map(obj => obj.content_hash_id.replaceAll('-', ''));
 

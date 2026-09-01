@@ -242,17 +242,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       isCurrentlyIgnored: boolean;
     }) => {
       if (isCurrentlyIgnored) {
-        // Delete from ignored_blockers
+        // Delete every row for this content hash, not just this blocker's row —
+        // sibling rows from earlier scans share the hash and would re-ignore the
+        // node on the next scan. blocker_id catches legacy rows with a NULL hash.
         await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!) {
+          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!) {
             delete_ignored_blockers(where: {
               audit_id: {_eq: $audit_id},
-              blocker_id: {_eq: $blocker_id}
+              _or: [
+                {content_hash_id: {_eq: $content_hash_id}},
+                {blocker_id: {_eq: $blocker_id}}
+              ]
             }) {
               affected_rows
             }
           }`,
-          variables: { audit_id: auditId, blocker_id: blockerId },
+          variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
         });
       } else {
         // Insert into ignored_blockers (with content_hash_id denormalized for fast lookups)
