@@ -41,6 +41,11 @@ import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
 import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
+import {
+  getAccessibilityStandardLabel,
+  getAccessibilityStandardTagInfo,
+  ACCESSIBILITY_STANDARD_GROUP_ORDER,
+} from "#src/utils/accessibilityStandardTags.ts";
 import { useDebouncedCallback } from 'use-debounce';
 import { Link, useSearchParams } from "react-router-dom";
 import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
@@ -96,6 +101,11 @@ interface Option {
   label: string;
 }
 
+interface GroupedOption {
+  label: string;
+  options: Option[];
+}
+
 declare module '@tanstack/table-core' {
   interface ColumnMeta<TData extends RowData, TValue> {
     className?: string; // Add your custom property
@@ -119,7 +129,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   };
 
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
-  const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
+  const [availableTags, setAvailableTags] = useState<GroupedOption[]>([]); // Added to prevent content flicker while fetching
 
   const [selectedCategories, setSelectedCategories] = useState<Option[]>(() => {
     const categories = searchParams.get("categories");
@@ -371,10 +381,28 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       const resp = (await response.body.json()) as any;
 
       // we need to parse the server data to convert BlockerTag[] to Options[]
-      resp.availableTags = resp.availableTags?.map((tag: BlockerTag) => ({
-        value: tag.id,
-        label: tag.content,
-      }));
+      // Only tags that name a recognized accessibility standard (WCAG,
+      // Section 508, EN 301 549, Trusted Tester) are worth filtering by —
+      // axe-core's internal categories and veraPDF's PDF-structure tags
+      // share this same "tags" column but aren't meaningful filter values.
+      // Grouped by standard and sorted within each group (WCAG/EN 301 549 by
+      // criterion number, Section 508 by paragraph letter, Trusted Tester by
+      // test number) rather than left in whatever order the backend returned.
+      const taggedOptions: { value: string; label: string; group: string; sortKey: string }[] = [];
+      for (const tag of (resp.availableTags as BlockerTag[] | undefined) ?? []) {
+        const info = getAccessibilityStandardTagInfo(tag.content);
+        if (info) taggedOptions.push({ value: tag.id, label: info.label, group: info.group, sortKey: info.sortKey });
+      }
+      taggedOptions.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+      const optionsByGroup = new Map<string, Option[]>();
+      for (const { value, label, group } of taggedOptions) {
+        if (!optionsByGroup.has(group)) optionsByGroup.set(group, []);
+        optionsByGroup.get(group)!.push({ value, label });
+      }
+      resp.availableTags = ACCESSIBILITY_STANDARD_GROUP_ORDER
+        .filter((group) => optionsByGroup.has(group))
+        .map((group) => ({ label: group, options: optionsByGroup.get(group)! }));
       // Then we store it in local state
       setAvailableTags(resp.availableTags);
 
@@ -642,17 +670,25 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "tags",
-        header: "Tags",
+        header: "Accessibility Standards",
         meta: {
           className: style["tags"],
         },
         cell: ({ getValue }) => {
-          const tags = getValue() as BlockerTag[];
+          // Only tags naming a recognized accessibility standard are shown
+          // here — axe-core's internal categories and veraPDF's PDF-structure
+          // tags share this same column but aren't standards themselves.
+          const tags = (getValue() as BlockerTag[])
+            .map((tag) => {
+              const label = getAccessibilityStandardLabel(tag.content);
+              return label ? { id: tag.id, label } : null;
+            })
+            .filter((tag): tag is { id: string; label: string } => tag !== null);
           return (
             <div className="tags">
               {tags.slice(0, TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                 <span key={tag.id} className="tag">
-                  {tag.content}
+                  {tag.label}
                 </span>
               ))}
               {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
@@ -670,7 +706,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                         <div className="tags">
                           {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                             <span key={tag.id} className="tag">
-                              {tag.content}
+                              {tag.label}
                             </span>
                           ))}
                         </div>
@@ -1129,8 +1165,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               options={availableTags}
               isMulti
               value={selectedTags}
-              placeholder="Filter by Tags..."
-              aria-label="Filter by Tags"
+              placeholder="Filter by Accessibility Standard..."
+              aria-label="Filter by Accessibility Standard"
               onChange={handleTagToggle}
               styles={{
                 ...darkSelectStyles,
