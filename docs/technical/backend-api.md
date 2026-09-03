@@ -61,13 +61,14 @@ Endpoints requiring a valid JWT token:
 | `getLogs` | GET | Get activity logs |
 | `inviteUser` | POST | Invite a new user |
 | `trackUser` | POST | Track user analytics events |
+| `trackSession` | POST | Record an authenticated app load or login (optionally with SSO org fields from Microsoft Graph) for monthly KPIs |
 | `saveQuickScan` | POST | Run and save a one-off quick scan |
 | `getQuickScans` | GET | List quick scans |
 | `fetchRemoteCsv` | POST | Fetch a remote CSV of URLs |
 | `syncFromRemoteCsv` | POST | Sync audit URLs from a remote CSV |
 | `crawlUrl` | POST | Crawl a URL to discover pages |
 | `getBedrockModels` | GET | List available Bedrock models for AI features |
-| `getSystemStats` | GET | Get system-wide usage stats (admin) |
+| `getSystemStats` | GET | Get system-wide usage stats plus a month-over-month KPI series (admin) |
 | `getAccessRequests` | GET | List pending SSO access requests (admin) |
 | `reviewAccessRequest` | POST | Approve or deny an SSO access request (admin) |
 

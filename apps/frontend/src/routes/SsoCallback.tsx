@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
-import { useGlobalStore } from '#src/utils';
+import { useGlobalStore, trackSession } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const SsoCallback = () => {
@@ -31,6 +31,7 @@ export const SsoCallback = () => {
                         // Only set authenticated if backend validation succeeds
                         setAuthenticated(claims?.oid || claims?.sub);
                         setSsoAuthenticated(true);
+                        trackSession(instance);
 
                         setAnnounceMessage("Login Success!", "success");
                         setTimeout(() => queryClient.refetchQueries({ queryKey: ['user'] }), 100);

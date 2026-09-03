@@ -503,6 +503,35 @@ CREATE TRIGGER set_public_access_requests_updated_at BEFORE UPDATE ON public.acc
 
 
 --
+-- Name: sessions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sessions (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    user_id uuid NOT NULL,
+    auth_method text,
+    department text,
+    analytics jsonb,
+    PRIMARY KEY (id)
+);
+
+
+--
+-- Name: sessions_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX sessions_created_at_idx ON public.sessions USING btree (created_at);
+
+
+--
+-- Name: sessions_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX sessions_user_id_created_at_idx ON public.sessions USING btree (user_id, created_at);
+
+
+--
 -- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 

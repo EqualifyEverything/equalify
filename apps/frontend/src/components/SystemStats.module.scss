@@ -54,6 +54,16 @@
     margin: 0;
 }
 
+.tableWrap {
+    overflow-x: auto;
+    margin-bottom: variables.$spacing * 2;
+}
+
+.numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 :global(body.dark) {
   .statCard {
     background: variables.$black;

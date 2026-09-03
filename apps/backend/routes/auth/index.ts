@@ -1,5 +1,6 @@
 export * from './updateUser'
 export * from './trackUser'
+export * from './trackSession'
 export * from './saveAudit'
 export * from './getAccount'
 export * from './getAuditDetails'

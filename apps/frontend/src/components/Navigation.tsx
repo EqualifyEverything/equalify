@@ -8,6 +8,8 @@ import * as Avatar from "@radix-ui/react-avatar";
 import generateAbbreviation from "#src/utils/generateAbbreviation.ts";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useMsalTokenRefresh } from "../hooks";
+import { useMsal } from "@azure/msal-react";
+import { trackSession } from "../utils/trackSession";
 import styles from "./Navigation.module.scss";
 import { Logo } from "./Logo";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
@@ -23,6 +25,7 @@ export const Navigation = () => {
 
   // Handle MSAL token refresh
   useMsalTokenRefresh();
+  const { instance: msalInstance } = useMsal();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -57,6 +60,7 @@ export const Navigation = () => {
 
               // Only set authenticated if backend validation succeeds
               setAuthenticated(userId);
+              trackSession(msalInstance);
             } catch (backendError: any) {
               // Backend rejected - token is invalid or user not authorized
               console.error(
@@ -119,6 +123,7 @@ export const Navigation = () => {
         }
       } else {
         setAuthenticated(attributes?.sub as unknown as boolean);
+        trackSession();
         if (location.pathname === "/") {
           navigate("/audits");
         }
