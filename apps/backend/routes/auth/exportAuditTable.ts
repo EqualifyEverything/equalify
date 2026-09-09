@@ -145,7 +145,7 @@ export const exportAuditTable = async () => {
         "content-type": "text/csv; charset=utf-8",
         "content-disposition": `attachment; filename="blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv"`,
       },
-      body: "Type,URL,Issue,Code,Tags,Categories,Status,ID,Occurrences\n",
+      body: "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences\n",
     };
   }
 
@@ -261,7 +261,7 @@ export const exportAuditTable = async () => {
     "Issue",
     "Code",
     "Tags",
-    "Categories",
+    "Rules",
     "Status",
     "ID",
     "Occurrences",

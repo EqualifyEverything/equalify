@@ -18,7 +18,7 @@ const labelMap: StringMap = {
   'messages': "Issue",
   'content': "Code",
   'tags': "Accessibility Standards",
-  'categories': "Category",
+  'categories': "Rule",
   'id': "Ignore"
 }
 

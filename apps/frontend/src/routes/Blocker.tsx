@@ -183,7 +183,7 @@ export const Blocker = () => {
               return <div key={index}>
                 <DataRow the_key="Error:" the_value={messages.message.content} />
 
-                <DataRow the_key="Category" the_value={
+                <DataRow the_key="Rule" the_value={
                   <div className="category tags">
                     <span className="tag">{messages.message.category}</span>
                   </div>

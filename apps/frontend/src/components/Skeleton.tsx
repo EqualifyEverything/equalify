@@ -164,8 +164,8 @@ export const SkeletonBlockersTable = ({ rows = 5 }: { rows?: number }) => (
           <th className="border border-gray-300 px-4 py-2 text-left font-semibold">URL</th>
           <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Issue</th>
           <th className="border border-gray-300 px-4 py-2 text-left font-semibold" style={{ width: "100px" }}>Code</th>
-          <th className="border border-gray-300 px-4 py-2 text-left font-semibold" style={{ width: "120px" }}>Tags</th>
-          <th className="border border-gray-300 px-4 py-2 text-left font-semibold" style={{ width: "120px" }}>Category</th>
+          <th className="border border-gray-300 px-4 py-2 text-left font-semibold" style={{ width: "120px" }}>Accessibility Standards</th>
+          <th className="border border-gray-300 px-4 py-2 text-left font-semibold" style={{ width: "120px" }}>Rule</th>
         </tr>
       </thead>
       <tbody>

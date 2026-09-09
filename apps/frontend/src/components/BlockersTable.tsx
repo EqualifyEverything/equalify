@@ -722,7 +722,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "categories",
-        header: "Category",
+        header: "Rule",
         meta: {
           className: style["categories"],
         },
@@ -1158,7 +1158,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </select>
           </StyledLabeledInput>
 
-          {/* Tag Filter */}
+          {/* Tag (Accessibility Standard) Filter */}
           {availableTags && availableTags.length > 0 && (
             <Select
               className="react-select tag-select"
@@ -1191,15 +1191,15 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             />
           )}
 
-          {/* Type Filter */}
+          {/* Rules Filter */}
           {availableCategories && availableCategories.length > 0 && (
             <Select
               className="react-select categories-select"
               options={availableCategories}
               isMulti
               value={selectedCategories}
-              placeholder="Filter by Categories..."
-              aria-label="Filter by Categories"
+              placeholder="Filter by Rules..."
+              aria-label="Filter by Rules"
               onChange={handleCategoryToggle}
               styles={{
                 ...darkSelectStyles,
