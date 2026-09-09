@@ -13,9 +13,12 @@ import { useState, useMemo, useEffect, useRef, ChangeEvent, ChangeEventHandler }
 //import { formatDate } from "../utils";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
 import {
+  FaAngleDown,
+  FaAngleUp,
   FaArrowDown,
   FaArrowUp,
   FaCaretDown,
@@ -37,6 +40,7 @@ import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { StyledButton } from "./StyledButton";
+import { Card } from "./Card";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
 import { SkeletonBlockersTable } from "./Skeleton";
@@ -158,75 +162,92 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     blockerTableColumnVisibility,
     setBlockerTableColumnVisibility,
     darkMode,
+    blockerTableAdvancedFiltersOpen,
+    setBlockerTableAdvancedFiltersOpen,
   } = useGlobalStore();
 
-  const darkSelectStyles = darkMode
-    ? {
-        control: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_surface,
-          borderColor: themeVariables.dark_border,
-          color: themeVariables.paper,
-        }),
-        menu: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_surface,
-          borderColor: themeVariables.dark_border,
-        }),
-        option: (base: any, state: any) => ({
-          ...base,
-          backgroundColor: state.isSelected
-            ? themeVariables.black
-            : state.isFocused
-              ? themeVariables.dark_border
-              : "transparent",
-          color: themeVariables.paper,
-        }),
-        multiValue: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_border,
-        }),
-        multiValueLabel: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        multiValueRemove: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          ":hover": {
-            backgroundColor: themeVariables.black,
-            color: themeVariables.paper,
-          },
-        }),
-        placeholder: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.5,
-        }),
-        singleValue: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        input: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        indicatorSeparator: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_border,
-        }),
-        dropdownIndicator: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.6,
-        }),
-        clearIndicator: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.6,
-        }),
-      }
-    : {};
+  // Matches the resting (unfocused) look of the plain <select> filters
+  // (global-styles/inputs.scss + selects.scss for light mode, dark.scss's
+  // `body.dark select` for dark mode) so the two react-select multiboxes
+  // read as the same kind of control, not a visually distinct widget.
+  // Focus states are deliberately left as react-select's own
+  // border/box-shadow (`base.borderColor`/`base.boxShadow`) rather than
+  // reimplemented here — overriding those for every state would risk
+  // silently weakening the focus indicator keyboard users rely on.
+  const selectBg = darkMode ? themeVariables.dark_surface : themeVariables.white;
+  const selectBorder = darkMode ? themeVariables.dark_border : themeVariables.gray;
+  const selectText = darkMode ? themeVariables.paper : themeVariables.black;
+  const selectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: selectBg,
+      borderColor: state.isFocused ? base.borderColor : selectBorder,
+      borderRadius: `calc(${themeVariables.spacing} / 2)`,
+      boxShadow: state.isFocused ? base.boxShadow : themeVariables["shadow-inset"],
+      color: selectText,
+      fontSize: "16px",
+      cursor: "pointer",
+    }),
+    menu: (base: any) => ({
+      ...base,
+      backgroundColor: selectBg,
+      borderColor: selectBorder,
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? (darkMode ? themeVariables.black : themeVariables.gray)
+        : state.isFocused
+          ? (darkMode ? themeVariables.dark_border : themeVariables.paper)
+          : "transparent",
+      color: selectText,
+    }),
+    multiValue: (base: any) => ({
+      ...base,
+      backgroundColor: darkMode ? themeVariables.dark_border : themeVariables.paper,
+    }),
+    multiValueLabel: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    multiValueRemove: (base: any) => ({
+      ...base,
+      color: selectText,
+      ":hover": {
+        backgroundColor: darkMode ? themeVariables.black : themeVariables.gray,
+        color: selectText,
+      },
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: selectText,
+      opacity: 0.5,
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    input: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    indicatorSeparator: (base: any) => ({
+      ...base,
+      backgroundColor: selectBorder,
+    }),
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      color: selectText,
+      padding: "4px",
+      cursor: "pointer",
+    }),
+    clearIndicator: (base: any) => ({
+      ...base,
+      color: selectText,
+      opacity: 0.6,
+      padding: "4px",
+    }),
+  };
 
   // Query to get ignored blockers for this audit
   const { data: ignoredBlockers } = useQuery({
@@ -578,7 +599,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "messages",
-        header: "Issue",
+        header: "Description",
         meta: {
           className: style["issue"],
         },
@@ -1095,13 +1116,69 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           </div>
         </div>
         <div className="filter-group">
-          
           {/* Search Filter */}
           <StyledLabeledInput className={style["search-input"]}>
             <label>Search by URL</label>
             <input defaultValue={searchString} onChange={(e) => handleSearch(e.target.value)} />
           </StyledLabeledInput>
-          
+
+          <div className="filter-group-right">
+          {/* Content Type Filter */}
+          <StyledLabeledInput>
+            <label>Filter by Content Type</label>
+            <select
+              id="contentToggleGroup"
+              defaultValue="all"
+              aria-label="Filter by content type:"
+              value={selectedContentType}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleContentTypeChange(e.target.value)}
+            >
+              <option value="all">All{" "}
+                {data?.typeCounts?.all !== undefined &&
+                  `(${data.typeCounts.all})`}</option>
+              <option value="html">HTML{" "}
+                {data?.typeCounts?.html !== undefined &&
+                  `(${data.typeCounts.html})`}</option>
+              <option value="pdf">PDF{" "}
+                {data?.typeCounts?.pdf !== undefined &&
+                  `(${data.typeCounts.pdf})`}</option>
+            </select>
+          </StyledLabeledInput>
+
+          {/* Tag (Accessibility Standard) Filter */}
+          {availableTags && availableTags.length > 0 && (
+            <StyledLabeledInput>
+              <label>Filter by Accessibility Standard</label>
+              <Select
+                className="react-select tag-select"
+                options={availableTags}
+                isMulti
+                value={selectedTags}
+                placeholder="Accessibility Standard..."
+                aria-label="Filter by Accessibility Standard"
+                onChange={handleTagToggle}
+                styles={selectStyles}
+              />
+            </StyledLabeledInput>
+          )}
+          </div>
+        </div>
+
+        <Card variant="light" className={style["advanced-filters-card"]}>
+          <Collapsible.Root
+            open={blockerTableAdvancedFiltersOpen}
+            onOpenChange={setBlockerTableAdvancedFiltersOpen}
+          >
+            <Collapsible.Trigger asChild>
+              <StyledButton
+                variant="naked"
+                label={blockerTableAdvancedFiltersOpen ? "Hide Advanced Filter Options" : "Show Advanced Filter Options"}
+                icon={blockerTableAdvancedFiltersOpen ? <FaAngleUp /> : <FaAngleDown />}
+                onClick={() => { }}
+              />
+            </Collapsible.Trigger>
+            <Collapsible.Content>
+        <div className="filter-group-secondary">
           {/* Status Filter */}
           <StyledLabeledInput>
             <label>Filter by Status</label>
@@ -1127,6 +1204,24 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </select>
           </StyledLabeledInput>
 
+
+          {/* Rules Filter */}
+          {availableCategories && availableCategories.length > 0 && (
+            <StyledLabeledInput>
+              <label>Filter by Rules</label>
+              <Select
+                className="react-select categories-select"
+                options={availableCategories}
+                isMulti
+                value={selectedCategories}
+                placeholder="Rules..."
+                aria-label="Filter by Rules"
+                onChange={handleCategoryToggle}
+                styles={selectStyles}
+              />
+            </StyledLabeledInput>
+          )}
+
           {/* Duplicate Filtering */}
           <StyledLabeledInput>
             <label>Filter Duplicates</label>
@@ -1142,88 +1237,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </select>
           </StyledLabeledInput>
 
-          {/* Content Type Filter */}
-          <StyledLabeledInput>
-            <label>Filter by Content Type</label>
-            <select
-              id="contentToggleGroup"
-              defaultValue="all"
-              aria-label="Filter by content type:"
-              value={selectedContentType}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleContentTypeChange(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="html">HTML</option>
-              <option value="pdf">PDF</option>
-            </select>
-          </StyledLabeledInput>
-
-          {/* Tag (Accessibility Standard) Filter */}
-          {availableTags && availableTags.length > 0 && (
-            <Select
-              className="react-select tag-select"
-              options={availableTags}
-              isMulti
-              value={selectedTags}
-              placeholder="Filter by Accessibility Standard..."
-              aria-label="Filter by Accessibility Standard"
-              onChange={handleTagToggle}
-              styles={{
-                ...darkSelectStyles,
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
-                  borderRadius: themeVariables.spacing,
-                  fontSize: "13px",
-                  minHeight: "24px",
-                }),
-                dropdownIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-                clearIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-              }}
-            />
-          )}
-
-          {/* Rules Filter */}
-          {availableCategories && availableCategories.length > 0 && (
-            <Select
-              className="react-select categories-select"
-              options={availableCategories}
-              isMulti
-              value={selectedCategories}
-              placeholder="Filter by Rules..."
-              aria-label="Filter by Rules"
-              onChange={handleCategoryToggle}
-              styles={{
-                ...darkSelectStyles,
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
-                  borderRadius: themeVariables.spacing,
-                  fontSize: "13px",
-                  minHeight: "24px",
-                }),
-                dropdownIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-                clearIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-              }}
-            />
-          )}
-
           {/* Clear Filters Button */}
           {/* {hasFilters && (
             <div>
@@ -1237,6 +1250,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
 
         </div>
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </Card>
 
       </div>
 

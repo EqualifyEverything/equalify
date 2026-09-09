@@ -217,7 +217,7 @@ export const exportAuditTable = async () => {
       new Set(blocker.blocker_messages.map((bm: any) => bm.message.category))
     );
     const messages = blocker.blocker_messages.map(
-      (bm: any) => `[${bm.message.category}] ${bm.message.content}`
+      (bm: any) => bm.message.content
     );
     return {
       id: blocker.id,

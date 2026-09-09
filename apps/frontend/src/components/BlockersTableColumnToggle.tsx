@@ -15,7 +15,7 @@ interface StringMap {
 const labelMap: StringMap = {
   'type': "Type",
   'url': "URL",
-  'messages': "Issue",
+  'messages': "Description",
   'content': "Code",
   'tags': "Accessibility Standards",
   'categories': "Rule",

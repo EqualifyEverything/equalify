@@ -228,6 +228,26 @@ export const getAuditTable = async () => {
     ],
   };
 
+  // Build where clauses for content-type counts (excluding the content-type
+  // filter itself), same technique as the status counts above — matched on
+  // `url.type` specifically rather than any `url` key, since the URL search
+  // clause also nests under `url` (as `url.url`, not `url.type`).
+  const contentTypeBaseWhereConditions = whereConditions.filter(
+    (cond) => !cond.url?.type
+  );
+  const contentTypeBaseWhereClause =
+    contentTypeBaseWhereConditions.length > 0
+      ? { _and: contentTypeBaseWhereConditions }
+      : {};
+
+  const htmlWhereClause = {
+    _and: [...contentTypeBaseWhereConditions, { url: { type: { _eq: "html" } } }],
+  };
+
+  const pdfWhereClause = {
+    _and: [...contentTypeBaseWhereConditions, { url: { type: { _eq: "pdf" } } }],
+  };
+
   // In dedupe mode, distinct_on requires order_by to lead with the distinct
   // column, and every count switches to distinct-by-hash so pagination and
   // the status dropdown stay consistent with what the table shows.
@@ -238,7 +258,7 @@ export const getAuditTable = async () => {
 
   // Query to get blockers from the latest scan with pagination
   const query = {
-    query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $ignoredWhere: blockers_bool_exp!, $duplicatedWhere: blockers_bool_exp!) {
+    query: `query ($audit_id: uuid!, $limit: Int!, $offset: Int!, $where: blockers_bool_exp!, $order_by: [blockers_order_by!], $baseWhere: blockers_bool_exp!, $activeWhere: blockers_bool_exp!, $ignoredWhere: blockers_bool_exp!, $duplicatedWhere: blockers_bool_exp!, $contentTypeBaseWhere: blockers_bool_exp!, $htmlWhere: blockers_bool_exp!, $pdfWhere: blockers_bool_exp!) {
   audits_by_pk(id: $audit_id) {
     scans(order_by: {created_at: desc}, limit: 1) {
       id
@@ -295,6 +315,21 @@ export const getAuditTable = async () => {
           ${countField}
         }
       }
+      all_type_count: blockers_aggregate(where: $contentTypeBaseWhere) {
+        aggregate {
+          ${countField}
+        }
+      }
+      html_count: blockers_aggregate(where: $htmlWhere) {
+        aggregate {
+          ${countField}
+        }
+      }
+      pdf_count: blockers_aggregate(where: $pdfWhere) {
+        aggregate {
+          ${countField}
+        }
+      }
     }
   }
   tags(order_by: {content: asc}) {
@@ -317,6 +352,9 @@ export const getAuditTable = async () => {
       activeWhere: activeWhereClause,
       ignoredWhere: ignoredWhereClause,
       duplicatedWhere: duplicatedWhereClause,
+      contentTypeBaseWhere: contentTypeBaseWhereClause,
+      htmlWhere: htmlWhereClause,
+      pdfWhere: pdfWhereClause,
     },
   };
 
@@ -335,6 +373,9 @@ export const getAuditTable = async () => {
     latestScan?.ignored_blockers_count?.aggregate?.count || 0;
   const duplicatedBlockersCount =
     latestScan?.duplicated_blockers_count?.aggregate?.count || 0;
+  const allTypeCount = latestScan?.all_type_count?.aggregate?.count || 0;
+  const htmlCount = latestScan?.html_count?.aggregate?.count || 0;
+  const pdfCount = latestScan?.pdf_count?.aggregate?.count || 0;
   const availableTags = response.tags || [];
   const availableCategories = response.messages || [];
 
@@ -362,7 +403,7 @@ export const getAuditTable = async () => {
 
     // Extract message contents
     const messages = blocker.blocker_messages.map(
-      (bm) => `[${bm.message.category}] ${bm.message.content}`
+      (bm) => bm.message.content
     );
 
     const duplicateGroup = duplicateGroupsByHash.get(blocker.content_hash_id);
@@ -408,6 +449,11 @@ export const getAuditTable = async () => {
         active: activeBlockersCount,
         ignored: ignoredBlockersCount,
         duplicated: duplicatedBlockersCount,
+      },
+      typeCounts: {
+        all: allTypeCount,
+        html: htmlCount,
+        pdf: pdfCount,
       },
       availableTags,
       availableCategories: availableCategories

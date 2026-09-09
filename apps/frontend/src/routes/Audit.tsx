@@ -751,6 +751,7 @@ export const Audit = () => {
                       <label htmlFor="remote-csv-input">Remote CSV URL</label>
                       <input
                         value={audit?.remote_csv_url}
+                        id="remote-csv-input"
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
                           event.preventDefault();
                           updateAuditRemoteCsv(event.target.value);

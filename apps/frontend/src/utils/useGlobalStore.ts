@@ -22,6 +22,8 @@ interface EqualifyState {
   // blockers table
   blockerTableColumnVisibility: VisibilityState;
   setBlockerTableColumnVisibility: OnChangeFn<VisibilityState>;
+  blockerTableAdvancedFiltersOpen: boolean;
+  setBlockerTableAdvancedFiltersOpen: (val: boolean) => void;
   // screen reader announcer
   announceMessage: string;
   setAnnounceMessage: (
@@ -83,6 +85,11 @@ export const useGlobalStore = create<EqualifyState>()(
               ? updater(state.blockerTableColumnVisibility)
               : updater,
         })),
+      // Hidden by default — these are the secondary/advanced filters, not
+      // the primary search box.
+      blockerTableAdvancedFiltersOpen: false,
+      setBlockerTableAdvancedFiltersOpen: (val) =>
+        set(() => ({ blockerTableAdvancedFiltersOpen: val })),
     }),
     {
       name: "equalify-storage",
@@ -92,6 +99,7 @@ export const useGlobalStore = create<EqualifyState>()(
         ssoAuthenticated: state.ssoAuthenticated,
         auditsTableView: state.auditsTableView,
         auditsTableCreatedByView: state.auditsTableCreatedByView,
+        blockerTableAdvancedFiltersOpen: state.blockerTableAdvancedFiltersOpen,
       }),
     },
   ),

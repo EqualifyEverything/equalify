@@ -177,6 +177,17 @@
   align-content: flex-end;
   align-items: flex-end;
   width: 100%;
+  padding-top:1rem;
+
+  .filter-group-right {
+    display: inline-flex;
+    justify-content: space-between;
+    align-content: flex-end;
+  }
+
+  .filter-group-right .labeled-input:last-child {
+      margin-right:0;
+  } 
   
   @media screen and (max-width: variables.$breakpoint-small) {
     display: block;
@@ -215,6 +226,41 @@
         }
       }
     }
+  }
+  .react-select,
+  select {
+    margin-bottom: calc(variables.$spacing);
+    min-width: 180px;
+  }
+  .clear-button {
+    margin-bottom: calc(variables.$spacing);
+    border: 0;
+    background: transparent;
+    opacity: 0.2;
+    cursor: pointer;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// The rest of the filters (status/duplicates/content type/tags/rules), kept
+// in their own row below .filter-group's search box. A left-aligned wrapping
+// row reads better here than .filter-group's space-between stretch, which
+// was designed to spread several varied-width controls across the full row
+// — now that .filter-group holds just the lone search box, that stretch no
+// longer does anything there, but this new row still has several controls
+// to lay out sensibly.
+.filter-group-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: variables.$spacing;
+  width: 100%;
+  margin-top: variables.$spacing;
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    display: block;
   }
   .react-select,
   select {
