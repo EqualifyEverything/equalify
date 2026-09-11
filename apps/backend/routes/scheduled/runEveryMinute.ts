@@ -98,41 +98,54 @@ export const runEveryMinute = async () => {
   ).rows;
 
   for (const scan of stuckScans) {
-    const timeoutError = {
-      type: "scan_timeout",
-      message: "Scan timed out after 15 minutes of inactivity",
-      timestamp: new Date().toISOString(),
-    };
-    const updatedErrors = [...(scan.errors || []), timeoutError];
-    await db.query({
-      text: `UPDATE "scans" 
-                   SET "status" = $1, "errors" = $2 
-                   WHERE "id" = $3`,
-      values: ["complete", JSON.stringify(updatedErrors), scan.id],
-    });
-
-    // Also update the parent audit so the frontend stops showing the spinner
-    if (scan.audit_id) {
-      const hasSuccessfulPages =
-        (
-          await db.query({
-            text: `SELECT COUNT(*) FROM "blockers" WHERE "scan_id"=$1`,
-            values: [scan.id],
-          })
-        ).rows[0].count > 0;
-
-      await db.query({
-        text: `UPDATE "audits" SET "status" = $1 WHERE "id" = $2 AND "status" NOT IN ('complete', 'failed')`,
-        values: [hasSuccessfulPages ? "complete" : "failed", scan.audit_id],
+    // isolate each scan so one failure (e.g. a deadlock) can't abort the whole run,
+    // which would skip db.clean() and the email pass below
+    try {
+      const timeoutError = {
+        type: "scan_timeout",
+        message: "Scan timed out after 15 minutes of inactivity",
+        timestamp: new Date().toISOString(),
+      };
+      // Atomic jsonb append + status guard so a concurrent scanWebhook write (still
+      // trickling in results right up to the 15-minute mark) can't be clobbered by
+      // this read-modify-write racing against it.
+      const updateResult = await db.query({
+        text: `UPDATE "scans"
+                     SET "status" = 'complete', "errors" = COALESCE("errors", '[]'::jsonb) || $1::jsonb
+                     WHERE "id" = $2 AND "status" = 'processing'`,
+        values: [JSON.stringify([timeoutError]), scan.id],
       });
-    }
 
-    console.log(
-      "Marked stuck scan as complete:",
-      scan.id,
-      "audit:",
-      scan.audit_id,
-    );
+      if (updateResult.rowCount === 0) {
+        // Scan already completed/failed on its own between the SELECT and here - nothing to do
+        continue;
+      }
+
+      // Also update the parent audit so the frontend stops showing the spinner
+      if (scan.audit_id) {
+        const hasSuccessfulPages =
+          (
+            await db.query({
+              text: `SELECT COUNT(*) FROM "blockers" WHERE "scan_id"=$1`,
+              values: [scan.id],
+            })
+          ).rows[0].count > 0;
+
+        await db.query({
+          text: `UPDATE "audits" SET "status" = $1 WHERE "id" = $2 AND "status" NOT IN ('complete', 'failed')`,
+          values: [hasSuccessfulPages ? "complete" : "failed", scan.audit_id],
+        });
+      }
+
+      console.log(
+        "Marked stuck scan as complete:",
+        scan.id,
+        "audit:",
+        scan.audit_id,
+      );
+    } catch (error) {
+      console.error("Failed to process stuck scan:", scan.id, error);
+    }
   }
 
   await db.clean();

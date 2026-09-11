@@ -13,6 +13,38 @@ const htmlQueueUrl =
 const pdfQueueUrl =
   process.env.SQS_PDF_QUEUE_URL ?? "https://sqs.us-east-2.amazonaws.com/380610849750/scanPdf.fifo";
 
+const RESULTS_ENDPOINT_PROD = process.env.SCAN_WEBHOOK_URL ?? "https://api.equalifyapp.com/public/scanWebhook";
+const RESULTS_ENDPOINT_STAGING = process.env.SCAN_WEBHOOK_URL_STAGING ?? "https://api-staging.equalifyapp.com/public/scanWebhook";
+const getResultsEndpoint = (isStaging?: boolean) => isStaging ? RESULTS_ENDPOINT_STAGING : RESULTS_ENDPOINT_PROD;
+
+// If a URL never makes it onto an scan-html/scan-pdf queue (SendMessageBatch partial
+// failure, or the whole send throwing), nothing will ever call scanWebhook for it and
+// its scan can never reach 100% - it just hangs until the 15-minute stuck-scan sweep.
+// Report it as failed directly so the scan can still complete.
+const reportUnsentUrlsAsFailed = async (items: { auditId: string; scanId: string; urlId: string; url: string; isStaging?: boolean }[], reason: string) => {
+  await Promise.allSettled(items.map((item) =>
+    fetch(getResultsEndpoint(item.isStaging), {
+      method: "post",
+      body: JSON.stringify({
+        auditId: item.auditId,
+        scanId: item.scanId,
+        urlId: item.urlId,
+        url: item.url,
+        status: "failed",
+        error: reason,
+        blockers: [],
+      }),
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => {
+      if (!res.ok) {
+        logger.error(`Failed to report unsent URL ${item.urlId} to webhook: ${res.status}`);
+      }
+    }).catch((err) => {
+      logger.error(`Error reporting unsent URL ${item.urlId} to webhook`, err as Error);
+    })
+  ));
+};
+
 export const handler = middy()
   .use(parser({ schema: scansSchema }))
   .handler(async (event): Promise<void> => {
@@ -55,9 +87,13 @@ export const handler = middy()
         }
         if (response.Failed && response.Failed.length > 0) {
           logger.error(`HTML Messages failed to send: ${JSON.stringify(response.Failed)}`);
+          const failedIds = new Set(response.Failed.map((f) => f.Id));
+          const failedItems = batch.filter((item) => failedIds.has(item.urlId));
+          await reportUnsentUrlsAsFailed(failedItems, "Failed to queue URL for scanning");
         }
       } catch (error) {
         logger.error("Error sending HTML batch:", error as Error);
+        await reportUnsentUrlsAsFailed(batch, "Failed to queue URL for scanning");
       }
     }
 
@@ -91,9 +127,13 @@ export const handler = middy()
         }
         if (response.Failed && response.Failed.length > 0) {
           logger.error(`PDF Messages failed to send: ${JSON.stringify(response.Failed)}`);
+          const failedIds = new Set(response.Failed.map((f) => f.Id));
+          const failedItems = batch.filter((item) => failedIds.has(item.urlId));
+          await reportUnsentUrlsAsFailed(failedItems, "Failed to queue URL for scanning");
         }
       } catch (error) {
         logger.error("Error sending PDF batch:", error as Error);
+        await reportUnsentUrlsAsFailed(batch, "Failed to queue URL for scanning");
       }
     }
 
