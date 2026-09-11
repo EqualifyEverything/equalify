@@ -43,6 +43,7 @@ import { StyledButton } from "./StyledButton";
 import { Card } from "./Card";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import {
@@ -118,6 +119,7 @@ declare module '@tanstack/table-core' {
 
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const queryClient = useQueryClient();
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") ?? "0", 10);
   const pageSize = parseInt(searchParams.get("pageSize") ?? "10", 10);
@@ -503,19 +505,26 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           }
         },
       },
-      /*  {
+      {
         accessorKey: "short_id",
         header: "ID",
         cell: ({ getValue }) => {
           const shortId = getValue() as string;
+          const auditIdNoDash = auditId.replace(/-/g, "");
           return (
-            <code className="text-sm font-bold bg-gray-100 px-2 py-1 rounded">
-              {shortId || "N/A"}
-            </code>
+            <div style={{ display: "inline-flex" }}>
+              <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
+              <StyledButton
+                onClick={() => copyToClipboard(shortId)}
+                icon={<FaClipboard className="icon-small" />}
+                label={shortId || "N/A"}
+                variant={"naked"}
+                showLabel={false}
+              />
+            </div>
           );
         },
       },
- */
       {
         accessorKey: "url",
         meta: {
@@ -603,26 +612,12 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         meta: {
           className: style["issue"],
         },
-        cell: ({ getValue, row }) => {
+        cell: ({ getValue }) => {
           const messages = getValue() as string[];
-          const shortId = row.original.short_id;
-          const auditIdNoDash = auditId.replace(/-/g,"");
           return (
-            <>
-              <div className="text-sm max-w-sm">
-                {messages[0] || "No message"}
-              </div>
-              <div style={{ display: "inline-flex" }}>
-                <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
-                <StyledButton
-                  onClick={() => copyToClipboard(shortId)}
-                  icon={<FaClipboard className="icon-small" />}
-                  label={shortId || "N/A"}
-                  variant={"naked"}
-                  showLabel={false}
-                />
-              </div>
-            </>
+            <div className="text-sm max-w-sm">
+              {messages[0] || "No message"}
+            </div>
           );
         },
       },
@@ -1261,7 +1256,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       ) : (
         <>
           <div className="table-container">
-            <div className="table-scroll-wrapper">
+            <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Blockers table, scrollable horizontally">
             <table aria-label="Blockers table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (

@@ -14,6 +14,7 @@ interface StringMap {
 }
 const labelMap: StringMap = {
   'type': "Type",
+  'short_id': "ID",
   'url': "URL",
   'messages': "Description",
   'content': "Code",

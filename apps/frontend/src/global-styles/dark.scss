@@ -62,6 +62,24 @@ body.dark {
   .table-container {
     border-color: variables.$dark-border;
 
+    .table-scroll-wrapper {
+      // $gray keeps ≥3:1 contrast against the dark-mode track (black/dark-surface);
+      // the light-mode #6b6b6b thumb would nearly disappear against them.
+      scrollbar-color: variables.$gray transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background-color: variables.$gray;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: variables.$paper;
+      }
+      // $red only clears ~3.2:1 against near-black backgrounds — matches
+      // the yellow-over-red swap already used elsewhere in dark mode.
+      &:focus-visible {
+        outline-color: variables.$yellow;
+      }
+    }
+
     table {
       thead {
         background-color: variables.$dark-border;

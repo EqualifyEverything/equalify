@@ -77,6 +77,7 @@ export const useGlobalStore = create<EqualifyState>()(
         messages: true,
         url: true,
         type: true,
+        short_id: true,
       },
       setBlockerTableColumnVisibility: (updater) =>
         set((state) => ({

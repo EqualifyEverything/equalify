@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { StyledButton } from "./StyledButton";
 import styles from "./AuditPagesInputTable.module.scss";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 
 interface ChildProps {
   pages: Page[];
@@ -33,6 +34,7 @@ export const AuditPagesInputTable = ({
   updatePageType,
   onSelectionChange,
 }: ChildProps) => {
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -151,7 +153,7 @@ export const AuditPagesInputTable = ({
     <>
       {/* {pages.length > 0 ? ( */}
       <div className={"table-container " + styles.AuditPagesInputTable}>
-        <div className="table-scroll-wrapper">
+        <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="URLs table, scrollable horizontally">
         <table aria-label="URLs table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
