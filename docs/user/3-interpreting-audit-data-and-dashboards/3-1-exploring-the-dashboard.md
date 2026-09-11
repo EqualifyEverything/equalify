@@ -29,10 +29,11 @@ You can customize how often Equalify checks your site and who gets notified when
 ### Critical Data Tables
 The bottom of the dashboard breaks down the "where" and "what" of your accessibility gaps.
 - **Scan Status:** View the date of the last check and the total number of URLs scanned.
-- **Audit Health:** Approximately what percent of the pages scanned contain blockers that need your attention?
-- **Days Since last scan:** When the last scan occurred.
-- **URLs with Most Blockers:** This table ranks your pages by the number of issues found.
-- **Most Common Blockers:** This section identifies the specific types of errors found and their frequency.
+- **Blockers Found:** The total number of blockers detected. This card also shows how that number has changed since your last scan (e.g., "12 more blockers since last scan") and how many days it's been since the last scan.
+- **Audit Health:** Approximately what percent of the pages scanned contain blockers that need your attention, plus a breakdown of how many of those blockers were found on HTML pages versus PDF documents.
+- **Blockers per URL:** The average number of blockers per page scanned, along with how that average has changed since your last scan.
+- **URLs with Most Blockers:** Ranks your pages by the number of issues found. Each URL links to the Detailed View filtered to that page, and includes a separate icon to open the live page itself in a new tab. The list is paginated, so you can browse beyond just the top few.
+- **Most Common Blockers:** Identifies the specific types of errors found and their frequency. Also paginated.
 - **Detailed view:** Toggle to the Detailed View to access the granular data behind the summary. We will cover the specifics of this view in the following page.<br>
 
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/1c69050655a9a9c15fdc750c5474e9b701645f7b/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Summary.png" alt="Audit Report Summary View displaying 138 Blockers Found, a chart showing 12 of 14 URLs (85.7%) have blockers, 1 days since last scanned, and lists of URLs with Most Blockers and Most Common Blockers." width="500"/>

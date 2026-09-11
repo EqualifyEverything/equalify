@@ -16,7 +16,7 @@ You can share audit reports with others, even if they don't have an Equalify acc
 2. Click "Share" to generate a public URL you can send to your team or stakeholders.
 
 ```important
-⚠️Important: Category and tag filters do not save to reports.
+⚠️Important: Rule and Accessibility Standard filters do not save to reports.
 ```
 ```important
 ⚠️ Important: Sharing a report allows others to view it. It does not permit them to edit the report. Only users with administrative credentials and proper access can edit audits.
