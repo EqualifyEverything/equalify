@@ -3,7 +3,7 @@ import { formatDate, useGlobalStore, unformatId } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 const apiClient = API.generateClient();
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useRef, useState, ChangeEvent } from "react";
 import {
   LineChart,
   Line,
@@ -144,6 +144,33 @@ export const Audit = () => {
       return hasActiveScan ? 2000 : false;
     },
   });
+
+  // The scans poll above is the only query that auto-refreshes while a scan runs.
+  // Everything derived from the scan's results (chart, summary cards, most-common
+  // lists, the blockers table) only fetches once on mount, so once the scan flips
+  // to complete/failed we need to explicitly invalidate them - otherwise the page
+  // keeps showing pre-scan data until a manual refresh.
+  const previousScanStatusRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const lastScan = scans?.[scans.length - 1];
+    const currentStatus = lastScan?.status;
+    const previousStatus = previousScanStatusRef.current;
+    const wasActive =
+      previousStatus !== undefined &&
+      previousStatus !== "complete" &&
+      previousStatus !== "failed";
+    const isNowTerminal = currentStatus === "complete" || currentStatus === "failed";
+
+    if (wasActive && isNowTerminal) {
+      queryClient.invalidateQueries({ queryKey: ["auditChart", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditSummary", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["mostCommonUrls", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["mostCommonBlockers", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditBlockers", auditId] });
+    }
+
+    previousScanStatusRef.current = currentStatus;
+  }, [scans, auditId, queryClient]);
 
   useEffect(() => {
     setPages(urls);
@@ -455,7 +482,7 @@ export const Audit = () => {
           ).length ?? 0;
           return (
             <Card variant="dark">
-              <div style={{ padding: "20px 0" }}>
+              <div style={{ padding: "20px 20px" }}>
                 <h2 id="scan-progress-heading" style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
                   Scanning...
@@ -662,37 +689,37 @@ export const Audit = () => {
                             <thead>
                               <tr>
                                 <th scope="col">Scan Date</th>
+                                <th scope="col">Time</th>
                                 <th scope="col">URLS</th>
                                 {/* <th scope="col">Successful Scans</th> */}
                                 <th scope="col">Blockers</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {chartData.data.map((row: any, index: number) => {
-                                if (row.timestamp) {
-                                  //console.log(row);
-                                  return (
-                                    <tr key={row.date}>
-                                      <td>
-                                        {new Date(row.timestamp).toLocaleDateString(
-                                          "en-US",
-                                          {
-                                            weekday: "short",
-                                            year: "numeric",
-                                            month: "short",
-                                            day: "numeric",
-                                          }
-                                        )}
-                                      </td>
-                                      <td>{row.pagesCount}</td>{/* 
-                                      <td>{row.processedPagesCount}</td> */}
-                                      <td>{row.blockers}</td>
-                                    </tr>
-                                  );
-                                } else {
-                                  return false;
-                                }
-                              })}
+                              {((chartData as any).individualScans ?? []).map((row: any) => (
+                                <tr key={row.timestamp}>
+                                  <td>
+                                    {new Date(row.timestamp).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        weekday: "short",
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      }
+                                    )}
+                                  </td>
+                                  <td>
+                                    {new Date(row.timestamp).toLocaleTimeString(
+                                      "en-US",
+                                      { hour: "numeric", minute: "2-digit" }
+                                    )}
+                                  </td>
+                                  <td>{row.pagesCount}</td>{/*
+                                  <td>{row.processedPagesCount}</td> */}
+                                  <td>{row.blockers}</td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>

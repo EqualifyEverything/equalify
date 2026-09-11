@@ -70,6 +70,25 @@ export const getAuditChart = async () => {
   // Generate array of the last N days
   const now = new Date();
   now.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
+
+  // Flat list of every individual scan within the window (not collapsed by day like
+  // scansByDate above) — the table view lists each same-day scan as its own row with
+  // its own time, while the line chart above keeps one point per day for a sane x-axis.
+  const windowStart = new Date(now);
+  windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
+  const individualScans = scans
+    .filter((scan: any) => new Date(scan.created_at) >= windowStart)
+    .map((scan: any) => {
+      const pagesCount = scan.pages.length;
+      const errorsCount = scan.errors.length;
+      return {
+        timestamp: scan.created_at,
+        blockers: scan.blocker_count ?? 0,
+        pagesCount: Number(pagesCount),
+        processedPagesCount: Number(pagesCount - errorsCount),
+      };
+    });
+
   const chartData = [];
   let lastKnownValue = 0;
 
@@ -147,6 +166,7 @@ export const getAuditChart = async () => {
       audit_name: audit?.name,
       period_days: days,
       data: chartData,
+      individualScans,
     }),
   };
 };
