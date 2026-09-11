@@ -17,6 +17,7 @@ import {
   //Dot,
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
+import { SkeletonChart } from "../components/Skeleton";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
 import { TbHistory, TbMail, TbAlertTriangle, TbReload } from "react-icons/tb";
@@ -188,8 +189,13 @@ export const Audit = () => {
       ) as any)?.data?.audits_by_pk,
   });
 
-  const { data: chartData } = useQuery({
+  const { data: chartData, isLoading: isChartLoading, isFetching: isChartFetching } = useQuery({
     queryKey: ["auditChart", auditId, chartRange],
+    // Keep showing the previous range's data while a new range loads instead of
+    // unmounting the card - avoids the layout collapsing/popping back on every
+    // date-range change. The (isChartFetching && !isChartLoading) spinner below
+    // signals that a refresh is in flight.
+    placeholderData: (previousData: any) => previousData,
     queryFn: async () => {
       const results = await (
         await API.get({
@@ -556,7 +562,8 @@ export const Audit = () => {
               </Card>
             )}
             <Card variant="dark" className="blockers-chart">
-              {chartData && (chartData as any)?.data && (chartData as any).data.length > 0 && (
+              {isChartLoading && <SkeletonChart />}
+              {!isChartLoading && chartData && (chartData as any)?.data && (chartData as any).data.length > 0 && (
                 <div>
                   <div className="blockers-chart-heading-wrapper">
                     <div>
@@ -569,6 +576,15 @@ export const Audit = () => {
                       </h2>
                       <span className="font-small">
                         Last {chartData.period_days} Days:
+                        {isChartFetching && (
+                          <span
+                            role="status"
+                            aria-label="Refreshing chart data"
+                            style={{ marginLeft: 8, display: "inline-flex", verticalAlign: "middle" }}
+                          >
+                            <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
+                          </span>
+                        )}
                       </span>
                     </div>
                     <div className="chart-ranger-select">
