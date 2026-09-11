@@ -693,6 +693,7 @@ export const Audit = () => {
                                 <th scope="col">URLS</th>
                                 {/* <th scope="col">Successful Scans</th> */}
                                 <th scope="col">Blockers</th>
+                                <th scope="col">Errors</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -718,6 +719,16 @@ export const Audit = () => {
                                   <td>{row.pagesCount}</td>{/*
                                   <td>{row.processedPagesCount}</td> */}
                                   <td>{row.blockers}</td>
+                                  <td
+                                    style={
+                                      row.errorsCount > 0
+                                        ? { color: themeVariables.red, fontWeight: "bold" }
+                                        : undefined
+                                    }
+                                  >
+                                    {row.errorsCount}
+                                    {row.hasTimeoutError ? " (timeout)" : ""}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
