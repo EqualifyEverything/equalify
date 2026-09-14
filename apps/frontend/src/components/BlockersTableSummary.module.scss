@@ -12,10 +12,10 @@
 }
 
 .BlockersTableSummary {
-  .duplicates-filter {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: variables.$spacing;
+  .recommendations-link {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: bold;
   }
   .card-spinner {
     position: absolute;

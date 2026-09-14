@@ -17,6 +17,7 @@ import {
   //Dot,
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
+import { BlockersRecommendations } from "../components/BlockersRecommendations";
 import { SkeletonChart } from "../components/Skeleton";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
@@ -101,11 +102,18 @@ export const Audit = () => {
   const isQuickScan = location.pathname.startsWith("/quick-scans/");
   const { setAnnounceMessage } = useGlobalStore();
   const [searchParams, setSearchParams] = useSearchParams();
-  const blockersTableView = searchParams.get("view") === "detailed" ? "detailed" : "summary";
+  const viewParam = searchParams.get("view");
+  const blockersTableView =
+    viewParam === "detailed" || viewParam === "recommendations" ? viewParam : "summary";
+  const blockersTableViewLabels: Record<string, string> = {
+    summary: "Summary View",
+    detailed: "Detailed View",
+    recommendations: "Recommendations",
+  };
   const setBlockersTableView = (value: string) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (value === "detailed") next.set("view", "detailed");
+      if (value === "detailed" || value === "recommendations") next.set("view", value);
       else next.delete("view"); // "summary" is the default, keep the URL clean
       return next;
     });
@@ -1073,7 +1081,7 @@ export const Audit = () => {
           activationMode="manual"
         >
           <div className={style["blockers-table-header"]} /* style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }} */>
-            <h2>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h2>
+            <h2>Audit Report <span className="font-normal">{blockersTableViewLabels[blockersTableView]}</span></h2>
 
             <Tabs.List aria-label="Audit Report View" className={style["blockers-view-selector"]}>
                 <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
@@ -1081,6 +1089,9 @@ export const Audit = () => {
                 </Tabs.Trigger>
                 <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
                   <StyledButton variant="naked" label="Detailed View" onClick={undefined}>Detailed View</StyledButton>
+                </Tabs.Trigger>
+                <Tabs.Trigger value="recommendations" className={style["blockers-view-trigger"]} asChild>
+                  <StyledButton variant="naked" label="Recommendations" badge={<span className={style["new-badge"]}>New</span>} onClick={undefined}>Recommendations</StyledButton>
                 </Tabs.Trigger>
               </Tabs.List>
           </div>
@@ -1097,6 +1108,9 @@ export const Audit = () => {
           <Tabs.Content value="detailed">
             {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
 
+          </Tabs.Content>
+          <Tabs.Content value="recommendations">
+            {auditId && <BlockersRecommendations auditId={auditId} isShared={isShared} />}
           </Tabs.Content>
         </Tabs.Root>
       }

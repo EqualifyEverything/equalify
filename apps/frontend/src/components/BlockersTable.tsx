@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -54,10 +54,10 @@ import {
 import { useDebouncedCallback } from 'use-debounce';
 import { Link, useSearchParams } from "react-router-dom";
 import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
+import { useIgnoredBlockers, useToggleIgnore } from "../hooks";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
-const apiClient = API.generateClient();
 
 const triggerCsvDownload = (csv: string, filename: string) => {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -118,7 +118,6 @@ declare module '@tanstack/table-core' {
 }
 
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
-  const queryClient = useQueryClient();
   const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") ?? "0", 10);
@@ -148,10 +147,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [selectedStatus, setSelectedStatus] = useState<string>("active");
 
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
-
-  // Duplicate handling: "all" shows every occurrence, "group" collapses to
-  // one row per unique blocker (by content hash), "hide" drops duplicated ones
-  const [duplicatesMode, setDuplicatesMode] = useState<string>("all");
 
   const [searchString, setSearchString] = useState<string>(() => searchParams.get("search") ?? "");
 
@@ -251,103 +246,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     }),
   };
 
-  // Query to get ignored blockers for this audit
-  const { data: ignoredBlockers } = useQuery({
-    queryKey: ["ignoredBlockers", auditId],
-    queryFn: async () => {
-      const response = await apiClient.graphql({
-        query: `query ($audit_id: uuid!) {
-          ignored_blockers(where: {audit_id: {_eq: $audit_id}}) {
-            blocker_id
-          }
-        }`,
-        variables: { audit_id: auditId },
-      });
-      const data = response as any;
-      return new Set(
-        data.data.ignored_blockers.map((ib: any) => ib.blocker_id)
-      );
-    },
-  });
-
-  // Mutation to toggle ignore status
-  const toggleIgnoreMutation = useMutation({
-    mutationFn: async ({
-      blockerId,
-      contentHashId,
-      isCurrentlyIgnored,
-    }: {
-      blockerId: string;
-      contentHashId: string;
-      isCurrentlyIgnored: boolean;
-    }) => {
-      if (isCurrentlyIgnored) {
-        // Delete every row for this content hash, not just this blocker's row —
-        // sibling rows from earlier scans share the hash and would re-ignore the
-        // node on the next scan. blocker_id catches legacy rows with a NULL hash.
-        await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!) {
-            delete_ignored_blockers(where: {
-              audit_id: {_eq: $audit_id},
-              _or: [
-                {content_hash_id: {_eq: $content_hash_id}},
-                {blocker_id: {_eq: $blocker_id}}
-              ]
-            }) {
-              affected_rows
-            }
-          }`,
-          variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
-        });
-      } else {
-        // Ignore every occurrence of this exact node (same content hash), not
-        // just the clicked row — the next scan's hash carry-forward would
-        // ignore them all anyway, and un-ignore already deletes hash-wide.
-        // Scoped to the latest scan so historical scans' rows (pre-migration)
-        // don't balloon the payload — carry-forward covers them regardless.
-        const idsResponse = (await apiClient.graphql({
-          query: `query ($audit_id: uuid!, $content_hash_id: uuid!) {
-            audits_by_pk(id: $audit_id) {
-              scans(order_by: {created_at: desc}, limit: 1) {
-                blockers(where: {content_hash_id: {_eq: $content_hash_id}}) {
-                  id
-                }
-              }
-            }
-          }`,
-          variables: { audit_id: auditId, content_hash_id: contentHashId },
-        })) as any;
-        const latestScanBlockers = idsResponse.data?.audits_by_pk?.scans?.[0]?.blockers;
-        const blockerIds: string[] = latestScanBlockers?.length
-          ? latestScanBlockers.map((b: any) => b.id)
-          : [blockerId];
-        await apiClient.graphql({
-          query: `mutation ($objects: [ignored_blockers_insert_input!]!) {
-            insert_ignored_blockers(objects: $objects) {
-              affected_rows
-            }
-          }`,
-          variables: {
-            objects: blockerIds.map((id) => ({
-              audit_id: auditId,
-              blocker_id: id,
-              content_hash_id: contentHashId,
-            })),
-          },
-        });
-      }
-    },
-    onSuccess: () => {
-      // Refetch the ignored blockers list
-      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
-    },
-    onError: (err) => {
-      console.error("Failed to toggle ignore status:", err);
-      setAnnounceMessage("Failed to update blocker status", "error");
-      // Resync in case a partial change landed
-      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
-    },
-  });
+  const { data: ignoredBlockers } = useIgnoredBlockers(auditId);
+  const toggleIgnoreMutation = useToggleIgnore(auditId);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -359,7 +259,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       selectedCategories,
       selectedStatus,
       selectedContentType,
-      duplicatesMode,
       sortBy,
       sortOrder,
       searchString
@@ -386,9 +285,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       }
       if (selectedStatus) {
         params.status = selectedStatus;
-      }
-      if (duplicatesMode !== "all") {
-        params.duplicates = duplicatesMode;
       }
 
       if (searchString.length >= 3 || searchString == "") {
@@ -531,16 +427,10 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           className: style["url"],
         },
         header: () => (
-          // Sorting is unavailable while grouping: Hasura's distinct_on forces
-          // the result to be ordered by content hash, so a sort click would
-          // silently do nothing — disable it instead.
           <StyledButton
             onClick={handleSortByUrl}
-            disabled={duplicatesMode === "group"}
             className="font-small"
-            label={duplicatesMode === "group"
-              ? "Sorting unavailable while grouping duplicates"
-              : `Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
+            label={`Sort by URL ${sortBy === "url" ? (sortOrder === "asc" ? "descending" : "ascending") : ""}`}
             icon={sortOrder === "asc" ? <FaArrowUp /> : <FaArrowDown />}
             variant="naked"
             showLabel={false}
@@ -839,7 +729,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, duplicatesMode]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation]
   );
 
   const table = useReactTable({
@@ -886,23 +776,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const handleContentTypeChange = (contentType: string) => {
     setSelectedContentType(contentType);
     setPage(0);
-  };
-
-  const handleDuplicatesModeChange = (mode: string) => {
-    setDuplicatesMode(mode);
-    // Hiding duplicates while filtering to duplicated-only is self-cancelling
-    // (guaranteed empty table) — fall back to the default status filter.
-    if (mode === "hide" && selectedStatus === "duplicated") {
-      setSelectedStatus("active");
-    }
-    setPage(0);
-    setAnnounceMessage(
-      mode === "group"
-        ? "Showing one row per unique blocker"
-        : mode === "hide"
-          ? "Hiding blockers that have duplicates"
-          : "Showing every blocker occurrence"
-    );
   };
 
   const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -960,9 +833,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       }
       if (selectedStatus) {
         params.status = selectedStatus;
-      }
-      if (duplicatesMode !== "all") {
-        params.duplicates = duplicatesMode;
       }
       if (searchString.length >= 3 || searchString === "") {
         params.searchString = searchString;
@@ -1034,9 +904,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             <span className={style["total-blockers-count"]}>
               {data?.pagination?.totalCount?.toLocaleString() ?? "—"}
             </span>{" "}
-            {data?.pagination?.totalCount === 1
-              ? (duplicatesMode === "group" ? "Unique Blocker" : "Blocker")
-              : (duplicatesMode === "group" ? "Unique Blockers" : "Blockers")}
+            {data?.pagination?.totalCount === 1 ? "Blocker" : "Blockers"}
           </div>
           <div className={style["table-top-actions"]}>
             {/* ColumnToggle */}
@@ -1190,9 +1058,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               <option value="ignored">Ignored{" "}
                 {data?.statusCounts?.ignored !== undefined &&
                   `(${data.statusCounts.ignored})`}</option>
-              <option value="duplicated" disabled={duplicatesMode === "hide"}>Duplicated{" "}
-                {data?.statusCounts?.duplicated !== undefined &&
-                  `(${data.statusCounts.duplicated})`}</option>
               <option value="all">All{" "}
                 {data?.statusCounts?.all !== undefined &&
                   `(${data.statusCounts.all})`}</option>
@@ -1216,21 +1081,6 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
               />
             </StyledLabeledInput>
           )}
-
-          {/* Duplicate Filtering */}
-          <StyledLabeledInput>
-            <label>Filter Duplicates</label>
-            <select
-              id="duplicatesToggleGroup"
-              aria-label="Filter duplicates:"
-              value={duplicatesMode}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDuplicatesModeChange(e.target.value)}
-            >
-              <option value="all">Show All Blockers</option>
-              <option value="group">Group Duplicate Blockers</option>
-              <option value="hide">Hide Duplicate Blockers</option>
-            </select>
-          </StyledLabeledInput>
 
           {/* Clear Filters Button */}
           {/* {hasFilters && (

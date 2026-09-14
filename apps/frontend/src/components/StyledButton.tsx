@@ -14,6 +14,8 @@ interface ButtonProps extends React.PropsWithChildren {
   loadingText?: string;
   className?: string;
   prependText?: string;
+  /** Small element rendered after the label, e.g. a "New" pill */
+  badge?: ReactNode;
   type?: "button" | "submit" | "reset";
   inline?: boolean;
 }
@@ -29,6 +31,7 @@ export const StyledButton = ({
   loadingText = "Loading...",
   className = "",
   prependText = "",
+  badge,
   type = "button",
   inline = false,
   ...props
@@ -72,6 +75,7 @@ export const StyledButton = ({
       ) : (
         <VisuallyHidden.Root>{loading ? loadingText : label}</VisuallyHidden.Root>
       )}
+      {badge && <span className={styles["badge"] + " badge"}>{badge}</span>}
     </button>
   );
 };

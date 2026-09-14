@@ -86,6 +86,23 @@
     display:inline-flex;
     gap: 1rem;
   }
+  // "New" pill on a view tab. Blue so it reads as informational, not as the
+  // red used for the tab links themselves. #1d4ed8 on white is 8.6:1.
+  .new-badge {
+    display: inline-block;
+    padding: 0 calc(variables.$spacing * 0.75);
+    border-radius: 999px;
+    background: #1d4ed8;
+    color: variables.$white;
+    font-size: 0.6rem;
+    font-weight: bold;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    transform: translateY(1px);
+    text-transform: uppercase;
+    text-decoration: none;
+    vertical-align: middle;
+  }
   .blockers-table-header {
     display: inline-flex;
     align-content: center;
@@ -125,5 +142,12 @@
       display: table !important;
       min-width: 100% !important;
     }
+  }
+}
+
+:global(body.dark) {
+  .new-badge {
+    background: #93c5fd;
+    color: variables.$black;
   }
 }

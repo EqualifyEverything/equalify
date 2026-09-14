@@ -1,0 +1,261 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.BlockersRecommendations {
+  display: flex;
+  flex-direction: column;
+  gap: calc(variables.$spacing * 2);
+
+  .stat-blocks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc(variables.$spacing * 2);
+
+    @media screen and (max-width: variables.$breakpoint-mid) {
+      grid-template-columns: 1fr;
+    }
+  }
+  .stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(variables.$spacing / 2);
+    text-align: left;
+    width: 100%;
+    padding: calc(variables.$spacing * 3) calc(variables.$spacing * 3);
+    background: variables.$white;
+    border: 1px solid variables.$gray;
+    border-radius: variables.$spacing;
+    color: variables.$black;
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: variables.$black;
+    }
+    &:focus-visible {
+      outline: 2px solid variables.$black;
+      outline-offset: 2px;
+    }
+    &.selected {
+      background: variables.$black;
+      border-color: variables.$black;
+      color: variables.$paper;
+      .stat-count { color: variables.$white; }
+      .stat-description { color: variables.$paper; opacity: 0.85; }
+    }
+
+    .stat-count {
+      @include fonts.font-size-extra-large;
+      font-weight: bold;
+      line-height: 1;
+    }
+    .stat-label {
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    .stat-description {
+      @include fonts.font-size-small;
+      line-height: 1.4;
+      color: variables.$black-translucent;
+    }
+    .stat-note {
+      @include fonts.font-size-small;
+      line-height: 1.4;
+      margin-top: calc(variables.$spacing / 2);
+      color: variables.$green-dark;
+      strong {
+        font-weight: bold;
+      }
+    }
+    &.selected .stat-note {
+      color: variables.$green-light;
+    }
+  }
+
+  .explainer {
+    margin: 0;
+    max-width: 90ch;
+    @include fonts.font-size-small;
+    line-height: 1.5;
+    color: variables.$black-translucent;
+    strong {
+      color: variables.$black;
+    }
+  }
+
+  .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: calc(variables.$spacing * 2);
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(variables.$spacing * 2);
+    }
+    .result-count {
+      font-weight: bold;
+      @include fonts.font-size-small;
+      padding-bottom: calc(variables.$spacing / 2);
+    }
+  }
+
+  .impact {
+    display: flex;
+    flex-direction: column;
+    gap: calc(variables.$spacing / 2);
+    align-items: flex-start;
+    white-space: nowrap;
+  }
+  .impact-chip {
+    @include fonts.font-size-small;
+    color: variables.$white;
+    background: variables.$black;
+    border: none;
+    border-radius: 999px;
+    padding: 1px 10px;
+    line-height: 1.6;
+    font-weight: bold;
+    cursor: pointer;
+    &.single {
+      background: variables.$gray;
+      color: variables.$black;
+      cursor: default;
+    }
+  }
+  .impact-text {
+    @include fonts.font-size-small;
+    color: variables.$black-translucent;
+  }
+
+  .description {
+    display: flex;
+    flex-direction: column;
+    gap: calc(variables.$spacing / 2);
+    .description-text {
+      line-height: 1.4;
+    }
+  }
+
+  .code-element {
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    align-items: center;
+    gap: calc(variables.$spacing / 2);
+    @include fonts.font-size-small;
+    code {
+      font-weight: bold;
+    }
+  }
+  .view-code-button {
+    @include fonts.font-size-small;
+    display: inline-flex;
+    align-items: center;
+    gap: calc(variables.$spacing / 2);
+    background: none;
+    border: 1px solid variables.$black;
+    border-radius: variables.$spacing;
+    padding: calc(variables.$spacing / 2) variables.$spacing;
+    margin-top: calc(variables.$spacing / 2);
+    cursor: pointer;
+    color: inherit;
+  }
+
+  .where {
+    a {
+      overflow-wrap: anywhere;
+    }
+    .where-more {
+      display: block;
+      margin-top: calc(variables.$spacing / 2);
+      @include fonts.font-size-small;
+      color: variables.$black-translucent;
+    }
+  }
+
+  .id-cell {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(variables.$spacing / 2);
+    .tag {
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+  }
+  .tooltip-rondel {
+    @include fonts.font-size-small;
+    color: variables.$white;
+    background: variables.$black;
+    border: none;
+    border-radius: 999px;
+    padding: calc(variables.$spacing / 2) variables.$spacing;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  /* table cells */
+  td.impact-cell { width: 110px; white-space: nowrap; }
+  td.description-cell { min-width: 320px; max-width: 520px; }
+  td.code-cell { min-width: 170px; white-space: nowrap; vertical-align: top; }
+  td.where-cell { min-width: 260px; max-width: 360px; word-break: break-all; line-height: 1.4em; }
+  td.id-td { white-space: nowrap; }
+  td.ignore-cell { white-space: nowrap; }
+  tbody td { vertical-align: top; padding-top: calc(variables.$spacing * 2); }
+  td.empty-table {
+    padding: calc(variables.$spacing * 6) variables.$spacing;
+    text-align: center;
+  }
+}
+
+:global(body.dark) {
+  .BlockersRecommendations {
+    .stat-block {
+      background: variables.$dark-surface;
+      border-color: variables.$dark-border;
+      color: variables.$paper;
+      &:hover { border-color: variables.$paper; }
+      &:focus-visible { outline-color: variables.$yellow; }
+      &.selected {
+        background: variables.$black;
+        border-color: variables.$yellow;
+        .stat-count { color: variables.$yellow; }
+      }
+      .stat-description { color: variables.$paper; opacity: 0.7; }
+      .stat-note { color: variables.$green-light; }
+    }
+    .explainer {
+      color: variables.$paper;
+      opacity: 0.85;
+      strong { color: variables.$white; }
+    }
+    .tooltip-rondel {
+      background: variables.$dark-border;
+    }
+    .impact-chip {
+      background: variables.$dark-border;
+      &.single {
+        background: variables.$dark-surface;
+        color: variables.$paper;
+      }
+    }
+    .impact-text,
+    .where-more {
+      color: variables.$paper;
+      opacity: 0.7;
+    }
+    .view-code-button {
+      color: variables.$paper;
+      border-color: variables.$dark-border;
+    }
+  }
+}
