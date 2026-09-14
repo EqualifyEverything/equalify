@@ -24,6 +24,13 @@ export const getAuditSummaryFast = async () => {
   const mostCommonTagsLimit = parseInt(
     (event.queryStringParameters as any).mostCommonTagsLimit ?? "3"
   );
+  // Limits for the legacy inline lists (see urlsWithMostErrors below)
+  const mostCommonUrlsLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonUrlsLimit ?? "5"
+  );
+  const mostCommonBlockersLimit = parseInt(
+    (event.queryStringParameters as any).mostCommonBlockersLimit ?? "5"
+  );
 
   const query = {
     query: `query GetFullAuditSummary(
@@ -99,6 +106,43 @@ export const getAuditSummaryFast = async () => {
       values: [auditId],
     })
   ).rows[0] as { unique_count: number } | undefined;
+
+  // Backwards compatibility: frontends built before the summary refactor read
+  // urlsWithMostErrors / mostCommonErrors straight off this response (the
+  // refactor moved them to the paginated getMostCommon* routes). Removing
+  // them blanks the whole audit page on any frontend still expecting them,
+  // so they stay here, computed with plain SQL so they don't depend on the
+  // paginated Hasura functions existing in every environment.
+  const urlsWithMostErrors = (
+    await db.query({
+      text: `SELECT "u"."url"::text AS "key", COUNT(*)::int AS "count"
+             FROM "blockers" "b"
+             JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+             WHERE "b"."scan_id" = (
+               SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1
+             )
+             GROUP BY "u"."url"
+             ORDER BY 2 DESC
+             LIMIT $2`,
+      values: [auditId, mostCommonUrlsLimit],
+    })
+  ).rows as { key: string; count: number }[];
+
+  const mostCommonErrors = (
+    await db.query({
+      text: `SELECT "m"."content"::text AS "key", COUNT(DISTINCT "b"."id")::int AS "count", MIN("m"."category") AS "category"
+             FROM "blockers" "b"
+             JOIN "blocker_messages" "bm" ON "b"."id" = "bm"."blocker_id"
+             JOIN "messages" "m" ON "bm"."message_id" = "m"."id"
+             WHERE "b"."scan_id" = (
+               SELECT "id" FROM "scans" WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1
+             )
+             GROUP BY "m"."content"
+             ORDER BY 2 DESC
+             LIMIT $2`,
+      values: [auditId, mostCommonBlockersLimit],
+    })
+  ).rows as { key: string; count: number; category: string | null }[];
   await db.clean();
 
   const pdfBlockersCount = blockerTypeRows.find((row) => row.type === "pdf")?.count ?? 0;
@@ -110,6 +154,8 @@ export const getAuditSummaryFast = async () => {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       urlsWithBlockersCount: response.unique_url_stats.aggregate.count,
+      urlsWithMostErrors,
+      mostCommonErrors,
       mostCommonTags: response.mostCommonTags,
       latestScan: latestScan
         ? { blockerCount: latestScan.blocker_count, pagesCount: latestScan.pages_count }

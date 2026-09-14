@@ -291,13 +291,13 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
   const uniqueBlockersCount = data?.uniqueBlockersCount ?? 0;
   const uniqueBlockersText = uniqueBlockersCount > 0
     ? <>
-        <strong>{uniqueBlockersCount.toLocaleString()}</strong> unique blocker{uniqueBlockersCount === 1 ? "" : "s"} —{" "}
+        <strong>{uniqueBlockersCount.toLocaleString()}</strong> unique blocker{uniqueBlockersCount === 1 ? "" : "s"}.{" "}
         <Link
           to={{ search: getRecommendationsLinkSearch() }}
           className={style["recommendations-link"]}
           aria-label={`View ${uniqueBlockersCount} unique blockers in Recommendations`}
         >
-          see Recommendations
+          See Recommendations
         </Link>
       </>
     : null;
