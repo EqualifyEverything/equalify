@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import * as API from "aws-amplify/api";
-import { useEffect, useRef, useState, ChangeEvent } from "react";
+import { useEffect, useId, useRef, useState, ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { FaClipboard } from "react-icons/fa";
 import { TbEye, TbEyeX, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
@@ -11,6 +10,7 @@ import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/pris
 import { StyledButton } from "./StyledButton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { SkeletonAuditHeader, SkeletonBlockersTable } from "./Skeleton";
+import { BlockerUrlsDrawer } from "./BlockerUrlsDrawer";
 import { useGlobalStore } from "../utils";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import { getAccessibilityStandardLabel } from "#src/utils/accessibilityStandardTags.ts";
@@ -20,7 +20,6 @@ import style from "./BlockersRecommendations.module.scss";
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const PAGE_SIZE = 10;
-const URLS_TO_SHOW_IN_TOOLTIP = 10;
 const STANDARDS_TO_SHOW = 1;
 
 interface RecommendationTag {
@@ -34,7 +33,6 @@ interface Recommendation {
   content_hash_id: string;
   occurrences: number;
   urlCount: number;
-  urls: string[];         // capped to 10 server-side; urlCount has the real total
   ignored: boolean;
   url: string;
   type: string;
@@ -78,6 +76,7 @@ const CodeBlock = ({ content }: { content: string }) => {
   const [expanded, setExpanded] = useState(false);
   const [overflowing, setOverflowing] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const contentId = useId();
 
   useEffect(() => {
     const node = contentRef.current;
@@ -87,7 +86,7 @@ const CodeBlock = ({ content }: { content: string }) => {
 
   return (
     <div className={style["code-block"] + (expanded ? " " + style["expanded"] : "")}>
-      <div className={style["code-content"]} ref={contentRef}>
+      <div className={style["code-content"]} id={contentId} ref={contentRef}>
         <SyntaxHighlighter style={prism} language="jsx" className={style["code-highlighter"]}>
           {content}
         </SyntaxHighlighter>
@@ -100,11 +99,14 @@ const CodeBlock = ({ content }: { content: string }) => {
           icon={expanded ? <TbChevronUp className="icon-small" /> : <TbChevronDown className="icon-small" />}
           variant="naked"
           className={style["code-toggle"]}
+          aria-expanded={expanded}
+          aria-controls={contentId}
         />
       )}
     </div>
   );
 };
+
 
 export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommendationsProps) => {
   const { setAnnounceMessage, authenticated } = useGlobalStore();
@@ -115,7 +117,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
   // View's ?page= param when a user flips between tabs.
   const [page, setPage] = useState(0);
   const [status, setStatus] = useState<string>("active");
-  const [repeat, setRepeat] = useState<"all" | "repeated" | "single">("all");
+  const [repeat, setRepeat] = useState<"all" | "repeated" | "single">("repeated");
 
   useEffect(() => {
     setPage(0);
@@ -229,66 +231,69 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
   return (
     <div className={style.BlockersRecommendations}>
       {/* Stat blocks — these ARE the repeat filter */}
-      <div className={style["stat-blocks"]} role="group" aria-label="Filter recommendations by how often they repeat">
-        {([
-          {
-            key: "all",
-            count: stats.filteredUnique,
-            label: "Unique Blockers",
-            description: "Every distinct blocker, counted once, no matter how many pages it appears on.",
-            note: null,
-          },
-          {
-            key: "repeated",
-            count: stats.filteredRepeated,
-            label: "Repeated Blockers",
-            description: "Appear in more than one place. Fix the source once and every copy clears.",
-            note: repeatedNote,
-          },
-          {
-            key: "single",
-            count: stats.filteredSingle,
-            label: "One-off Blockers",
-            description: "Appear in a single place. Each one is its own fix.",
-            note: null,
-          },
-        ] as const).map((block) => (
-          <button
-            key={block.key}
-            type="button"
-            className={style["stat-block"] + (repeat === block.key ? " " + style["selected"] : "")}
-            aria-pressed={repeat === block.key}
-            onClick={() => handleRepeatChange(block.key)}
-          >
-            <span className={style["stat-count"]}>{block.count.toLocaleString()}</span>
-            <span className={style["stat-label"]}>{block.label}</span>
-            <span className={style["stat-description"]}>{block.description}</span>
-            {block.note && <span className={style["stat-note"]}>{block.note}</span>}
-          </button>
-        ))}
-      </div>
+      <div className={style["stat-blocks-row"]}>
+        <div className={style["stat-blocks"]} role="group" aria-label="Filter recommendations by how often they repeat">
+          {([
+            // Unique Blockers view disabled — Repeated Blockers is the default/primary view now.
+            // {
+            //   key: "all",
+            //   count: stats.filteredUnique,
+            //   label: "Unique Blockers",
+            //   description: "Every distinct blocker, counted once, no matter how many pages it appears on.",
+            //   note: null,
+            // },
+            {
+              key: "repeated",
+              count: stats.filteredRepeated,
+              label: "Repeated Blockers",
+              description: "Appear in more than one place. Fix the source once and every copy clears.",
+              note: repeatedNote,
+            },
+            {
+              key: "single",
+              count: stats.filteredSingle,
+              label: "One-off Blockers",
+              description: "Appear in a single place. Each one is its own fix.",
+              note: null,
+            },
+          ] as const).map((block) => (
+            <button
+              key={block.key}
+              type="button"
+              className={style["stat-block"] + (repeat === block.key ? " " + style["selected"] : "")}
+              aria-pressed={repeat === block.key}
+              onClick={() => handleRepeatChange(block.key)}
+            >
+              <span className={style["stat-count"]}>{block.count.toLocaleString()}</span>
+              <span className={style["stat-label"]}>{block.label}</span>
+              <span className={style["stat-description"]}>{block.description}</span>
+              {block.note && <span className={style["stat-note"]}>{block.note}</span>}
+            </button>
+          ))}
+        </div>
 
-      <p className={style["explainer"]}>
-        {stats.totalBlockers === 0 ? (
-          <>The latest scan found no blockers, so there is nothing to recommend yet.</>
-        ) : stats.repeatedBlockers === 0 ? (
-          <>
-            The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> {stats.totalBlockers === 1 ? "blocker" : "blockers"} across{" "}
-            <strong>{stats.pagesWithBlockers.toLocaleString()}</strong> {stats.pagesWithBlockers === 1 ? "page" : "pages"}.
-            None of them repeat, so each one is its own fix.
-          </>
-        ) : (
-          <>
-            The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> blockers across{" "}
-            <strong>{stats.pagesWithBlockers.toLocaleString()}</strong> {stats.pagesWithBlockers === 1 ? "page" : "pages"}.
-            Some of those are the same piece of code showing up in more than one place, so we grouped them.
-            That leaves <strong>{stats.uniqueBlockers.toLocaleString()}</strong> unique blockers to fix.
-            Fix those and all <strong>{stats.totalBlockers.toLocaleString()}</strong> go away.
-            The list below puts the fixes that clear the most blockers first.
-            Ignoring a blocker here ignores every copy of it.
-          </>
-        )}
-      </p>
+        <p className={style["explainer"]}>
+          {stats.totalBlockers === 0 ? (
+            <>The latest scan found no blockers, so there is nothing to recommend yet.</>
+          ) : stats.repeatedBlockers === 0 ? (
+            <>
+              The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> {stats.totalBlockers === 1 ? "blocker" : "blockers"} across{" "}
+              <strong>{stats.pagesWithBlockers.toLocaleString()}</strong> {stats.pagesWithBlockers === 1 ? "page" : "pages"}.
+              None of them repeat, so each one is its own fix.
+            </>
+          ) : (
+            <>
+              The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> blockers across{" "}
+              <strong>{stats.pagesWithBlockers.toLocaleString()}</strong> {stats.pagesWithBlockers === 1 ? "page" : "pages"}. <br/><br/>
+              Some of those are the same piece of code showing up in more than one place, so we grouped them as <strong>repeated blockers</strong>.<br/>
+              That leaves <strong>{stats.uniqueBlockers.toLocaleString()}</strong> unique <strong>one-off blockers</strong> to fix.
+              Fix those and all <strong>{stats.totalBlockers.toLocaleString()}</strong> go away.<br/><br/>
+              The list below puts the fixes that clear the most blockers first.
+              Ignoring a blocker here ignores every copy of it.
+            </>
+          )}
+        </p>
+      </div>
 
       {/* Status + result count */}
       <div className={style["filters-row"]}>
@@ -326,8 +331,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
               <tr>
                 <th scope="col">Code</th>
                 <th scope="col">Description</th>
-                <th scope="col">Impact</th>
-                <th scope="col">Found on</th>
+                <th scope="col">Appears on...</th>
                 {/* <th scope="col">ID</th> */}
                 <th scope="col">Ignore</th>
               </tr>
@@ -335,7 +339,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
             <tbody>
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className={style["empty-table"]}>
+                  <td colSpan={4} className={style["empty-table"]}>
                     {stats.totalBlockers === 0
                       ? "No blockers found in the latest scan."
                       : "No recommendations match these filters."}
@@ -349,7 +353,6 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                       return label ? { id: tag.id, label } : null;
                     })
                     .filter((tag): tag is { id: string; label: string } => tag !== null);
-                  const placesText = `${item.occurrences} ${item.occurrences === 1 ? "time" : "times"} across ${item.urlCount} ${item.urlCount === 1 ? "page" : "pages"}`;
 
                   return (
                     <tr key={item.content_hash_id}>
@@ -399,53 +402,24 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                         </div>
                       </td>
 
-                      {/* Impact */}
+                      {/* Appears on... (occurrence count, with a drawer for the actual URLs) */}
                       <td className={style["impact-cell"]}>
                         <div className={style["impact"]}>
-                          {item.occurrences > 1 ? (
-                            <Tooltip.Provider>
-                              <Tooltip.Root>
-                                <Tooltip.Trigger
-                                  className={style["impact-chip"]}
-                                  aria-label={`This fix reaches ${placesText}`}
-                                >
-                                  {`×${item.occurrences}`}
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom" className="tooltip" collisionPadding={8}>
-                                    <div>
-                                      <p>{`Appears ${placesText}:`}</p>
-                                      <ul>
-                                        {item.urls.slice(0, URLS_TO_SHOW_IN_TOOLTIP).map((u) => (
-                                          <li key={u}>{u}</li>
-                                        ))}
-                                      </ul>
-                                      {item.urlCount > URLS_TO_SHOW_IN_TOOLTIP && (
-                                        <p>{`+${item.urlCount - URLS_TO_SHOW_IN_TOOLTIP} more pages`}</p>
-                                      )}
-                                    </div>
-                                    <Tooltip.Arrow className="tooltip-arrow" />
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            </Tooltip.Provider>
-                          ) : (
-                            <span className={`${style["impact-chip"]} ${style["single"]}`}>×1</span>
-                          )}
                           <span className={style["impact-text"]}>
-                            {item.urlCount === 1 ? "1 page" : `${item.urlCount} pages`}
+                            {`${item.occurrences} ${item.occurrences === 1 ? "occurrence" : "occurrences"} across ${item.urlCount} ${item.urlCount === 1 ? "URL" : "URLs"}`}
                           </span>
                         </div>
-                      </td>
-
-                      {/* Found on */}
-                      <td className={style["where-cell"]}>
                         <div className={style["where"]}>
-                          <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
-                          {item.urlCount > 1 && (
-                            <span className={style["where-more"]}>
-                              {`and ${item.urlCount - 1} other ${item.urlCount - 1 === 1 ? "page" : "pages"}`}
-                            </span>
+                          {item.occurrences === 1 ? (
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
+                          ) : (
+                            <BlockerUrlsDrawer
+                              auditId={auditId}
+                              isShared={isShared}
+                              contentHashId={item.content_hash_id}
+                              occurrences={item.occurrences}
+                              triggerLabel={`View all ${item.occurrences} occurrences`}
+                            />
                           )}
                         </div>
                       </td>

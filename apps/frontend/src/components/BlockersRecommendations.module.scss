@@ -6,10 +6,20 @@
   flex-direction: column;
   gap: calc(variables.$spacing * 2);
 
+  .stat-blocks-row {
+    display: flex;
+    align-items: center;
+    gap: calc(variables.$spacing * 2);
+
+    @media screen and (max-width: variables.$breakpoint-mid) {
+      flex-direction: column;
+    }
+  }
   .stat-blocks {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: calc(variables.$spacing * 2);
+    flex: 3 1 0;
 
     @media screen and (max-width: variables.$breakpoint-mid) {
       grid-template-columns: 1fr;
@@ -75,10 +85,12 @@
   }
 
   .explainer {
+    flex: 2 1 0;
     margin: 0;
-    max-width: 90ch;
+    max-width: 60ch;
     @include fonts.font-size-small;
-    line-height: 1.5;
+    line-height: 1.3;
+    padding: 0 1em;
     color: variables.$black-translucent;
     strong {
       color: variables.$black;
@@ -108,27 +120,10 @@
     flex-direction: column;
     gap: calc(variables.$spacing / 2);
     align-items: flex-start;
-    white-space: nowrap;
-  }
-  .impact-chip {
-    @include fonts.font-size-small;
-    color: variables.$white;
-    background: variables.$black;
-    border: none;
-    border-radius: 999px;
-    padding: 1px 10px;
-    line-height: 1.6;
-    font-weight: bold;
-    cursor: pointer;
-    &.single {
-      background: variables.$gray;
-      color: variables.$black;
-      cursor: default;
-    }
+    margin-bottom: variables.$spacing;
   }
   .impact-text {
     @include fonts.font-size-small;
-    color: variables.$black-translucent;
   }
 
   .description {
@@ -143,19 +138,21 @@
   .code-block {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: calc(variables.$spacing / 2);
     margin-top: calc(variables.$spacing / 2);
     max-width: 360px;
 
     .code-content {
       position: relative;
+      box-sizing: border-box;
       // ~2.5 lines: line-height (1.5) * font-size, plus the highlighter's own
       // vertical padding, both set below in the same font-size context.
       max-height: calc(3.75em + #{variables.$spacing * 2});
       overflow: hidden;
       width: 100%;
       border-radius: variables.$spacing;
+      border: 1px solid transparent;
       @include fonts.font-size-small;
     }
 
@@ -188,17 +185,16 @@
   }
   .code-toggle {
     @include fonts.font-size-small;
+    margin-bottom: 5px;
   }
 
   .where {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(variables.$spacing / 2);
     a {
       overflow-wrap: anywhere;
-    }
-    .where-more {
-      display: block;
-      margin-top: calc(variables.$spacing / 2);
-      @include fonts.font-size-small;
-      color: variables.$black-translucent;
     }
   }
 
@@ -229,10 +225,9 @@
   }
 
   /* table cells */
-  td.impact-cell { width: 110px; white-space: nowrap; }
+  td.impact-cell { min-width: 260px; max-width: 360px; line-height: 1.4em; }
   td.description-cell { min-width: 224px; max-width: 364px; }
   td.code-cell { min-width: 240px; max-width: 400px; vertical-align: top; }
-  td.where-cell { min-width: 260px; max-width: 360px; word-break: break-all; line-height: 1.4em; }
   td.id-td { white-space: nowrap; }
   td.ignore-cell { white-space: nowrap; }
   tbody td { vertical-align: top; padding-top: calc(variables.$spacing * 2); }
@@ -266,17 +261,11 @@
     .tooltip-rondel {
       background: variables.$dark-border;
     }
-    .impact-chip {
-      background: variables.$dark-border;
-      &.single {
-        background: variables.$dark-surface;
-        color: variables.$paper;
-      }
-    }
-    .impact-text,
-    .where-more {
+    .impact-text {
       color: variables.$paper;
-      opacity: 0.7;
+    }
+    .code-content {
+      border: 1px solid variables.$dark-border;
     }
   }
 }

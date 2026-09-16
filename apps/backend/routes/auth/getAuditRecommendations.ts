@@ -91,7 +91,6 @@ export const getAuditRecommendations = async () => {
             "b"."content_hash_id",
             COUNT(*)::int AS "occurrences",
             COUNT(DISTINCT COALESCE("u"."url", "b"."url_text", 'Unknown URL'))::int AS "url_count",
-            (ARRAY_AGG(DISTINCT COALESCE("u"."url", "b"."url_text", 'Unknown URL')))[1:10] AS "urls",
             (ARRAY_AGG("b"."id" ORDER BY "b"."created_at" DESC))[1] AS "representative_id",
             ("b"."content_hash_id" IN (SELECT "content_hash_id" FROM ignored_hashes)) AS "ignored"
           FROM "blockers" "b"
@@ -110,7 +109,7 @@ export const getAuditRecommendations = async () => {
           LIMIT $2 OFFSET $3
         )
         SELECT
-          "p"."content_hash_id", "p"."occurrences", "p"."url_count", "p"."urls",
+          "p"."content_hash_id", "p"."occurrences", "p"."url_count",
           "p"."ignored", "p"."total_count",
           "rb"."id", "rb"."short_id", "rb"."content",
           COALESCE("ru"."url", "rb"."url_text", 'Unknown URL') AS "url",
@@ -170,7 +169,6 @@ export const getAuditRecommendations = async () => {
         content_hash_id: row.content_hash_id,
         occurrences: row.occurrences,
         urlCount: row.url_count,
-        urls: row.urls ?? [],
         ignored: row.ignored,
         url: row.url,
         type: row.type,

@@ -3,7 +3,9 @@ import styles from "./StyledButton.module.scss";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
-interface ButtonProps extends React.PropsWithChildren {
+interface ButtonProps
+  extends React.PropsWithChildren,
+    Pick<React.AriaAttributes, "aria-expanded" | "aria-controls" | "aria-haspopup" | "aria-describedby"> {
   variant?: string;
   icon?: ReactNode;
   onClick: undefined | ((e?:any) => Promise<void> | void) ;

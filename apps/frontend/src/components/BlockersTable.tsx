@@ -40,6 +40,7 @@ import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { StyledButton } from "./StyledButton";
+import { BlockerUrlsDrawer } from "./BlockerUrlsDrawer";
 import { Card } from "./Card";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
@@ -92,8 +93,6 @@ export interface Blocker {
   categories: string[];
   type: string;
   duplicateCount: number;
-  duplicateUrlCount: number;
-  duplicateUrls: string[]; // capped to 10 server-side; duplicateUrlCount has the real total
 }
 
 interface BlockersTableProps {
@@ -444,55 +443,17 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             )} */}
           </StyledButton>
         ),
-        cell: ({ getValue, row }) => {
+        cell: ({ getValue }) => {
           const url = getValue() as string;
-          const duplicateCount = row.original.duplicateCount ?? 1;
-          const duplicateUrls = row.original.duplicateUrls ?? [];
-          const duplicateUrlCount = row.original.duplicateUrlCount ?? duplicateUrls.length;
-          const URLS_TO_SHOW_IN_TOOLTIP = 10;
           return (
-            <>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline break-all block max-w-xs"
-              >
-                {url}
-              </a>
-              {duplicateCount > 1 && (
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger
-                      className={style["duplicate-chip"]}
-                      aria-label={`This exact blocker appears ${duplicateCount} times across ${duplicateUrlCount} ${duplicateUrlCount === 1 ? "page" : "pages"}`}
-                    >
-                      {`×${duplicateCount}`}
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        side="bottom"
-                        className="tooltip"
-                        collisionPadding={8}
-                      >
-                        <div>
-                          <p>{`Appears ${duplicateCount} times across ${duplicateUrlCount} ${duplicateUrlCount === 1 ? "page" : "pages"}:`}</p>
-                          <ul>
-                            {duplicateUrls.slice(0, URLS_TO_SHOW_IN_TOOLTIP).map((dupUrl) => (
-                              <li key={dupUrl}>{dupUrl}</li>
-                            ))}
-                          </ul>
-                          {duplicateUrlCount > URLS_TO_SHOW_IN_TOOLTIP && (
-                            <p>{`+${duplicateUrlCount - URLS_TO_SHOW_IN_TOOLTIP} more pages`}</p>
-                          )}
-                        </div>
-                        <Tooltip.Arrow className="tooltip-arrow" />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
-              )}
-            </>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline break-all block max-w-xs"
+            >
+              {url}
+            </a>
           );
         },
       },
@@ -502,11 +463,23 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         meta: {
           className: style["issue"],
         },
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const messages = getValue() as string[];
+          const duplicateCount = row.original.duplicateCount ?? 1;
           return (
             <div className="text-sm max-w-sm">
               {messages[0] || "No message"}
+              {duplicateCount > 1 && (
+                <div style={{ marginTop: "4px" }}>
+                  <BlockerUrlsDrawer
+                    auditId={auditId}
+                    isShared={isShared}
+                    contentHashId={row.original.content_hash_id}
+                    occurrences={duplicateCount}
+                    triggerLabel={`View all ${duplicateCount} occurrences`}
+                  />
+                </div>
+              )}
             </div>
           );
         },
@@ -729,7 +702,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, auditId, isShared]
   );
 
   const table = useReactTable({
