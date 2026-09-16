@@ -140,29 +140,54 @@
     }
   }
 
-  .code-element {
+  .code-block {
     display: flex;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: calc(variables.$spacing / 2);
-    @include fonts.font-size-small;
-    code {
-      font-weight: bold;
+    margin-top: calc(variables.$spacing / 2);
+    max-width: 360px;
+
+    .code-content {
+      position: relative;
+      // ~2.5 lines: line-height (1.5) * font-size, plus the highlighter's own
+      // vertical padding, both set below in the same font-size context.
+      max-height: calc(3.75em + #{variables.$spacing * 2});
+      overflow: hidden;
+      width: 100%;
+      border-radius: variables.$spacing;
+      @include fonts.font-size-small;
+    }
+
+    &.expanded .code-content {
+      max-height: none;
+    }
+
+    .code-highlighter {
+      margin: 0 !important;
+      max-width: 100%;
+      overflow-x: hidden !important;
+      padding: variables.$spacing calc(variables.$spacing * 1.5) !important;
+      user-select: text;
+      code {
+        white-space: pre-wrap !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+      }
+    }
+
+    .code-fade {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(43, 43, 43, 0), #2b2b2b 90%);
     }
   }
-  .view-code-button {
+  .code-toggle {
     @include fonts.font-size-small;
-    display: inline-flex;
-    align-items: center;
-    gap: calc(variables.$spacing / 2);
-    background: none;
-    border: 1px solid variables.$black;
-    border-radius: variables.$spacing;
-    padding: calc(variables.$spacing / 2) variables.$spacing;
-    margin-top: calc(variables.$spacing / 2);
-    cursor: pointer;
-    color: inherit;
   }
 
   .where {
@@ -205,8 +230,8 @@
 
   /* table cells */
   td.impact-cell { width: 110px; white-space: nowrap; }
-  td.description-cell { min-width: 320px; max-width: 520px; }
-  td.code-cell { min-width: 170px; white-space: nowrap; vertical-align: top; }
+  td.description-cell { min-width: 224px; max-width: 364px; }
+  td.code-cell { min-width: 240px; max-width: 400px; vertical-align: top; }
   td.where-cell { min-width: 260px; max-width: 360px; word-break: break-all; line-height: 1.4em; }
   td.id-td { white-space: nowrap; }
   td.ignore-cell { white-space: nowrap; }
@@ -252,10 +277,6 @@
     .where-more {
       color: variables.$paper;
       opacity: 0.7;
-    }
-    .view-code-button {
-      color: variables.$paper;
-      border-color: variables.$dark-border;
     }
   }
 }

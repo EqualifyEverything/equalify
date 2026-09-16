@@ -3,9 +3,8 @@ import * as API from "aws-amplify/api";
 import { useEffect, useRef, useState, ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { Drawer } from "vaul-base";
-import { FaClipboard, FaCode, FaTimes } from "react-icons/fa";
-import { TbEye, TbEyeX } from "react-icons/tb";
+import { FaClipboard } from "react-icons/fa";
+import { TbEye, TbEyeX, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -72,6 +71,40 @@ interface BlockersRecommendationsProps {
   auditId: string;
   isShared: boolean;
 }
+
+// Renders a blocker's code with a capped height; only shows the fade/toggle
+// when the code actually overflows that cap, so short snippets render plainly.
+const CodeBlock = ({ content }: { content: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = contentRef.current;
+    if (!node) return;
+    setOverflowing(node.scrollHeight > node.clientHeight + 1);
+  }, [content]);
+
+  return (
+    <div className={style["code-block"] + (expanded ? " " + style["expanded"] : "")}>
+      <div className={style["code-content"]} ref={contentRef}>
+        <SyntaxHighlighter style={prism} language="jsx" className={style["code-highlighter"]}>
+          {content}
+        </SyntaxHighlighter>
+        {!expanded && overflowing && <div className={style["code-fade"]} aria-hidden="true" />}
+      </div>
+      {overflowing && (
+        <StyledButton
+          onClick={() => setExpanded((e) => !e)}
+          label={expanded ? "Show less" : "Show more"}
+          icon={expanded ? <TbChevronUp className="icon-small" /> : <TbChevronDown className="icon-small" />}
+          variant="naked"
+          className={style["code-toggle"]}
+        />
+      )}
+    </div>
+  );
+};
 
 export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommendationsProps) => {
   const { setAnnounceMessage, authenticated } = useGlobalStore();
@@ -149,12 +182,6 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
-  };
-
-  const getElementTagFromContent = (content: string) => {
-    const parser = new DOMParser();
-    const nodeName = parser.parseFromString(content, "text/html").body?.firstChild?.nodeName.toLowerCase();
-    return nodeName && nodeName !== "#text" ? `<${nodeName}>` : undefined;
   };
 
   if (error) {
@@ -297,18 +324,18 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
           <table aria-label="Recommendations table">
             <thead>
               <tr>
-                <th scope="col">Impact</th>
-                <th scope="col">Description</th>
                 <th scope="col">Code</th>
+                <th scope="col">Description</th>
+                <th scope="col">Impact</th>
                 <th scope="col">Found on</th>
-                <th scope="col">ID</th>
+                {/* <th scope="col">ID</th> */}
                 <th scope="col">Ignore</th>
               </tr>
             </thead>
             <tbody>
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={style["empty-table"]}>
+                  <td colSpan={5} className={style["empty-table"]}>
                     {stats.totalBlockers === 0
                       ? "No blockers found in the latest scan."
                       : "No recommendations match these filters."}
@@ -322,48 +349,13 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                       return label ? { id: tag.id, label } : null;
                     })
                     .filter((tag): tag is { id: string; label: string } => tag !== null);
-                  const elementTag = getElementTagFromContent(item.content);
                   const placesText = `${item.occurrences} ${item.occurrences === 1 ? "time" : "times"} across ${item.urlCount} ${item.urlCount === 1 ? "page" : "pages"}`;
 
                   return (
                     <tr key={item.content_hash_id}>
-                      {/* Impact */}
-                      <td className={style["impact-cell"]}>
-                        <div className={style["impact"]}>
-                          {item.occurrences > 1 ? (
-                            <Tooltip.Provider>
-                              <Tooltip.Root>
-                                <Tooltip.Trigger
-                                  className={style["impact-chip"]}
-                                  aria-label={`This fix reaches ${placesText}`}
-                                >
-                                  {`×${item.occurrences}`}
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom" className="tooltip" collisionPadding={8}>
-                                    <div>
-                                      <p>{`Appears ${placesText}:`}</p>
-                                      <ul>
-                                        {item.urls.slice(0, URLS_TO_SHOW_IN_TOOLTIP).map((u) => (
-                                          <li key={u}>{u}</li>
-                                        ))}
-                                      </ul>
-                                      {item.urlCount > URLS_TO_SHOW_IN_TOOLTIP && (
-                                        <p>{`+${item.urlCount - URLS_TO_SHOW_IN_TOOLTIP} more pages`}</p>
-                                      )}
-                                    </div>
-                                    <Tooltip.Arrow className="tooltip-arrow" />
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            </Tooltip.Provider>
-                          ) : (
-                            <span className={`${style["impact-chip"]} ${style["single"]}`}>×1</span>
-                          )}
-                          <span className={style["impact-text"]}>
-                            {item.urlCount === 1 ? "1 page" : `${item.urlCount} pages`}
-                          </span>
-                        </div>
+                      {/* Code */}
+                      <td className={style["code-cell"]}>
+                        <CodeBlock content={item.content} />
                       </td>
 
                       {/* Description */}
@@ -407,37 +399,43 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                         </div>
                       </td>
 
-                      {/* Code */}
-                      <td className={style["code-cell"]}>
-                        {elementTag && (
-                          <div className={style["code-element"]}>
-                            <span>Element:</span>
-                            <code>{elementTag}</code>
-                          </div>
-                        )}
-                        <Drawer.Root direction="right" shouldScaleBackground setBackgroundColorOnScale={false}>
-                          <Drawer.Trigger className={style["view-code-button"]}>
-                            <FaCode /> View Code
-                          </Drawer.Trigger>
-                          <Drawer.Portal>
-                            <Drawer.Overlay className="drawer-overlay" />
-                            <Drawer.Content className="drawer-content">
-                              <div className="drawer-content-inner">
-                                <div className="drawer-header">
-                                  <h4>Blocker Code</h4>
-                                  <Drawer.Close
-                                    render={(props) => (
-                                      <StyledButton onClick={props.onClick} label="Close" variant="light" icon={<FaTimes />} />
-                                    )}
-                                  />
-                                </div>
-                                <SyntaxHighlighter style={prism} language={"jsx"} className="drawer-code">
-                                  {item.content}
-                                </SyntaxHighlighter>
-                              </div>
-                            </Drawer.Content>
-                          </Drawer.Portal>
-                        </Drawer.Root>
+                      {/* Impact */}
+                      <td className={style["impact-cell"]}>
+                        <div className={style["impact"]}>
+                          {item.occurrences > 1 ? (
+                            <Tooltip.Provider>
+                              <Tooltip.Root>
+                                <Tooltip.Trigger
+                                  className={style["impact-chip"]}
+                                  aria-label={`This fix reaches ${placesText}`}
+                                >
+                                  {`×${item.occurrences}`}
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom" className="tooltip" collisionPadding={8}>
+                                    <div>
+                                      <p>{`Appears ${placesText}:`}</p>
+                                      <ul>
+                                        {item.urls.slice(0, URLS_TO_SHOW_IN_TOOLTIP).map((u) => (
+                                          <li key={u}>{u}</li>
+                                        ))}
+                                      </ul>
+                                      {item.urlCount > URLS_TO_SHOW_IN_TOOLTIP && (
+                                        <p>{`+${item.urlCount - URLS_TO_SHOW_IN_TOOLTIP} more pages`}</p>
+                                      )}
+                                    </div>
+                                    <Tooltip.Arrow className="tooltip-arrow" />
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
+                              </Tooltip.Root>
+                            </Tooltip.Provider>
+                          ) : (
+                            <span className={`${style["impact-chip"]} ${style["single"]}`}>×1</span>
+                          )}
+                          <span className={style["impact-text"]}>
+                            {item.urlCount === 1 ? "1 page" : `${item.urlCount} pages`}
+                          </span>
+                        </div>
                       </td>
 
                       {/* Found on */}
@@ -453,7 +451,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                       </td>
 
                       {/* ID */}
-                      <td className={style["id-td"]}>
+                      {/* <td className={style["id-td"]}>
                         <div className={style["id-cell"]}>
                           <Link to={"/shared/" + auditIdNoDash + "/" + item.short_id}>{item.short_id}</Link>
                           <StyledButton
@@ -464,7 +462,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                             showLabel={false}
                           />
                         </div>
-                      </td>
+                      </td> */}
 
                       {/* Ignore */}
                       <td className={style["ignore-cell"]}>

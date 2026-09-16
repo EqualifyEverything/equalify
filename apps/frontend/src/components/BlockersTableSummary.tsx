@@ -343,9 +343,9 @@ export const BlockersTableSummary = ({ auditId, isShared, chartData, pages, scan
                 <h3><span className="font-extra-large">{currentBlockersCount.toLocaleString()}</span> Blockers Found</h3>
                 {(blockersDeltaText || daysSinceLastScanNode || uniqueBlockersText) && (
                   <div className={style["blockers-meta-group"]}>
-                    {uniqueBlockersText && (
+                    {/* {uniqueBlockersText && (
                       <p className={style["blockers-meta"]}>{uniqueBlockersText}</p>
-                    )}
+                    )} */}
                     {blockersDeltaText && (
                       <p
                         className={style["blockers-delta"]}
