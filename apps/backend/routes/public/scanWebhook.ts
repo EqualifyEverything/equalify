@@ -32,8 +32,10 @@ export const scanWebhook = async () => {
         }
     }
 
+    // Read the denormalized hash directly — joining blockers breaks once
+    // move_stale archives old rows (the join returns NULLs and drops ignores).
     const ignoredBlockerHashes = (await db.query({
-        text: `SELECT b.content_hash_id FROM ignored_blockers as ib LEFT OUTER JOIN blockers as b ON ib.blocker_id = b.id WHERE ib.audit_id=$1`,
+        text: `SELECT content_hash_id FROM ignored_blockers WHERE audit_id=$1 AND content_hash_id IS NOT NULL`,
         values: [auditId],
     }))?.rows?.map(obj => obj.content_hash_id.replaceAll('-', ''));
 
@@ -106,6 +108,24 @@ export const scanWebhook = async () => {
         return { percentage, isComplete, scannedCount, totalPages };
     };
 
+    // Freeze rolled-up counts onto the scan row so the chart/summary endpoints
+    // (which read scans.blocker_count instead of aggregating live) stay in sync.
+    // Must run on every path that can complete a scan, including a failed-page
+    // webhook call that happens to be the last page (see logScanError call sites).
+    const denormalizeScanCounts = async () => {
+        if (!effectiveScanId) return;
+        await db.query({
+            text: `
+                UPDATE "scans"
+                SET
+                    "blocker_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1), 0),
+                    "equalified_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1 AND "equalified" = true), 0)
+                WHERE "id" = $1
+            `,
+            values: [effectiveScanId],
+        });
+    };
+
     // Handle failed scans
     if (status === 'failed') {
         // Determine the error type based on the error message
@@ -135,6 +155,8 @@ export const scanWebhook = async () => {
                 text: `UPDATE "audits" SET "status"=$1, "response"=$2 WHERE "id"=$3`,
                 values: [hasSuccessfulPages ? 'complete' : 'failed', JSON.stringify({ error, urlId }), auditId],
             });
+
+            await denormalizeScanCounts();
         }
 
         await db.clean();
@@ -342,19 +364,7 @@ export const scanWebhook = async () => {
             text: `UPDATE "audits" SET "status"=$1 WHERE "id"=$2`,
             values: ['complete', auditId],
         });
-        // Denormalize counts so we never need to aggregate over historical blockers later
-        if (effectiveScanId) {
-            await db.query({
-                text: `
-                    UPDATE "scans"
-                    SET
-                        "blocker_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1), 0),
-                        "equalified_count" = COALESCE((SELECT COUNT(*) FROM "blockers" WHERE "scan_id" = $1 AND "equalified" = true), 0)
-                    WHERE "id" = $1
-                `,
-                values: [effectiveScanId],
-            });
-        }
+        await denormalizeScanCounts();
     }
 
     await db.clean();

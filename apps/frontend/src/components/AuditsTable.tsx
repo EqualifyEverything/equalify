@@ -20,6 +20,7 @@ import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 
 interface Audit {
   created_at: string;
@@ -44,6 +45,7 @@ interface auditsTableProps {
 }
 
 export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   //console.log(audits);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -180,7 +182,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       ) : (
         <>
           <div className="table-container">
-            <div className="table-scroll-wrapper">
+            <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Audits table, scrollable horizontally">
             <table aria-label="Audits table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (

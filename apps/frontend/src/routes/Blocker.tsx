@@ -12,6 +12,7 @@ import { StyledButton } from "#src/components/StyledButton.tsx";
 import { marked } from "marked";
 import { GrPowerCycle } from "react-icons/gr";
 import { MdOutlineFlag, MdSmartToy } from "react-icons/md";
+import { getAccessibilityStandardLabel } from "#src/utils/accessibilityStandardTags.ts";
 
 const apiClient = API.generateClient();
 
@@ -182,22 +183,33 @@ export const Blocker = () => {
               return <div key={index}>
                 <DataRow the_key="Error:" the_value={messages.message.content} />
 
-                <DataRow the_key="Category" the_value={
+                <DataRow the_key="Rule" the_value={
                   <div className="category tags">
                     <span className="tag">{messages.message.category}</span>
                   </div>
                 } />
 
-                <DataRow the_key="Tags" the_value=
-                  {
-                    <div className="tags">
-                      {messages.message.message_tags.map((tag, index) => {
-                        return <span key={index} className="tag">
-                          {tag.tag.content}
-                        </span>
-                      })}
-                    </div>
-                  } />
+                {(() => {
+                  // Only tags naming a recognized accessibility standard are
+                  // shown here — axe-core's internal categories and
+                  // veraPDF's PDF-structure tags share this same data but
+                  // aren't standards themselves.
+                  const standardTags = messages.message.message_tags
+                    .map((tag) => getAccessibilityStandardLabel(tag.tag.content))
+                    .filter((label): label is string => label !== null);
+                  return standardTags.length > 0 && (
+                    <DataRow the_key="Accessibility Standards" the_value=
+                      {
+                        <div className="tags">
+                          {standardTags.map((label, index) => (
+                            <span key={index} className="tag">
+                              {label}
+                            </span>
+                          ))}
+                        </div>
+                      } />
+                  );
+                })()}
 
               </div>
             })}

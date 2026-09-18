@@ -182,6 +182,11 @@
     margin-right: 0;
     margin-bottom: calc(variables.$spacing);
   }
+  .advanced-filters-card {
+    margin-top: variables.$spacing;
+    margin-bottom: calc(variables.$spacing * 2);
+    padding: calc(variables.$spacing * 1.5) calc(variables.$spacing * 2);
+  }
   .view-code-details {
     span {
       @include fonts.font-size-small;

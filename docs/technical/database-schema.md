@@ -195,6 +195,18 @@ Activity audit trail.
 
 User accounts are standalone, and `invites` is how additional users get added.
 
+### sessions
+One row per authenticated app load or login, written by `trackSession`. Backs the month-over-month KPIs on the admin Statistics tab (sessions started, active users, units served).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | Authenticated user (matches `users.id`) |
+| `auth_method` | TEXT | `cognito` or `sso` |
+| `department` | TEXT | Campus unit from Microsoft Graph (SSO logins only; null otherwise) |
+| `analytics` | JSONB | Request analytics (location, device) plus any org fields sent at login |
+| `created_at` | TIMESTAMP | Session start |
+
 ## Relationships
 
 ```
@@ -213,7 +225,7 @@ users
 
 ## Content Hashing
 
-Blockers, messages, and tags all use content hashing for deduplication, via a shared `hashStringToUuid` helper (double SHA-256, truncated to a UUID-shaped hex string):
+Blockers, messages, and tags all use content hashing for deduplication, via a shared `hashStringToUuid` helper (double SHA-256, truncated to a UUID-shaped hex string). The blocker hash is what the Recommendations view groups by (`getAuditRecommendations`), and what makes ignoring hash-wide: `ignored_blockers.content_hash_id` lets both the UI and `scanWebhook` treat every identical node, on any page or in any future scan, as one ignored blocker:
 
 ```typescript
 const contentNormalized = normalizeHtmlWithVdom(blocker.node);

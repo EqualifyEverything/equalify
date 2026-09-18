@@ -12,8 +12,10 @@ import {
 import { SkeletonTable } from "#src/components/Skeleton.tsx";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import style from './Logs.module.scss';
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 
 export const Logs = () => {
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
 
@@ -108,7 +110,7 @@ export const Logs = () => {
       ) : (
         <>
           <div className="table-container" style={{ marginBottom : "16px" }}>
-            <div className="table-scroll-wrapper">
+            <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Logs table, scrollable horizontally">
             <table
               aria-label="Logs table"
             >

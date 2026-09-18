@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,9 +13,12 @@ import { useState, useMemo, useEffect, useRef, ChangeEvent, ChangeEventHandler }
 //import { formatDate } from "../utils";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import Select, { MultiValue } from "react-select";
 import {
+  FaAngleDown,
+  FaAngleUp,
   FaArrowDown,
   FaArrowUp,
   FaCaretDown,
@@ -37,17 +40,25 @@ import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { StyledButton } from "./StyledButton";
+import { BlockerUrlsDrawer } from "./BlockerUrlsDrawer";
+import { Card } from "./Card";
 import { TbEye, TbEyeX } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import { SkeletonBlockersTable } from "./Skeleton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
+import {
+  getAccessibilityStandardLabel,
+  getAccessibilityStandardTagInfo,
+  ACCESSIBILITY_STANDARD_GROUP_ORDER,
+} from "#src/utils/accessibilityStandardTags.ts";
 import { useDebouncedCallback } from 'use-debounce';
 import { Link, useSearchParams } from "react-router-dom";
 import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
+import { useIgnoredBlockers, useToggleIgnore } from "../hooks";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
-const apiClient = API.generateClient();
 
 const triggerCsvDownload = (csv: string, filename: string) => {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -81,6 +92,7 @@ export interface Blocker {
   tags: BlockerTag[];
   categories: string[];
   type: string;
+  duplicateCount: number;
 }
 
 interface BlockersTableProps {
@@ -93,6 +105,11 @@ interface Option {
   label: string;
 }
 
+interface GroupedOption {
+  label: string;
+  options: Option[];
+}
+
 declare module '@tanstack/table-core' {
   interface ColumnMeta<TData extends RowData, TValue> {
     className?: string; // Add your custom property
@@ -100,7 +117,7 @@ declare module '@tanstack/table-core' {
 }
 
 export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
-  const queryClient = useQueryClient();
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") ?? "0", 10);
   const pageSize = parseInt(searchParams.get("pageSize") ?? "10", 10);
@@ -116,7 +133,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   };
 
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
-  const [availableTags, setAvailableTags] = useState<Option[]>([]); // Added to prevent content flicker while fetching
+  const [availableTags, setAvailableTags] = useState<GroupedOption[]>([]); // Added to prevent content flicker while fetching
 
   const [selectedCategories, setSelectedCategories] = useState<Option[]>(() => {
     const categories = searchParams.get("categories");
@@ -141,141 +158,95 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     blockerTableColumnVisibility,
     setBlockerTableColumnVisibility,
     darkMode,
+    blockerTableAdvancedFiltersOpen,
+    setBlockerTableAdvancedFiltersOpen,
   } = useGlobalStore();
 
-  const darkSelectStyles = darkMode
-    ? {
-        control: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_surface,
-          borderColor: themeVariables.dark_border,
-          color: themeVariables.paper,
-        }),
-        menu: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_surface,
-          borderColor: themeVariables.dark_border,
-        }),
-        option: (base: any, state: any) => ({
-          ...base,
-          backgroundColor: state.isSelected
-            ? themeVariables.black
-            : state.isFocused
-              ? themeVariables.dark_border
-              : "transparent",
-          color: themeVariables.paper,
-        }),
-        multiValue: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_border,
-        }),
-        multiValueLabel: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        multiValueRemove: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          ":hover": {
-            backgroundColor: themeVariables.black,
-            color: themeVariables.paper,
-          },
-        }),
-        placeholder: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.5,
-        }),
-        singleValue: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        input: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-        }),
-        indicatorSeparator: (base: any, _state: any) => ({
-          ...base,
-          backgroundColor: themeVariables.dark_border,
-        }),
-        dropdownIndicator: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.6,
-        }),
-        clearIndicator: (base: any, _state: any) => ({
-          ...base,
-          color: themeVariables.paper,
-          opacity: 0.6,
-        }),
-      }
-    : {};
+  // Matches the resting (unfocused) look of the plain <select> filters
+  // (global-styles/inputs.scss + selects.scss for light mode, dark.scss's
+  // `body.dark select` for dark mode) so the two react-select multiboxes
+  // read as the same kind of control, not a visually distinct widget.
+  // Focus states are deliberately left as react-select's own
+  // border/box-shadow (`base.borderColor`/`base.boxShadow`) rather than
+  // reimplemented here — overriding those for every state would risk
+  // silently weakening the focus indicator keyboard users rely on.
+  const selectBg = darkMode ? themeVariables.dark_surface : themeVariables.white;
+  const selectBorder = darkMode ? themeVariables.dark_border : themeVariables.gray;
+  const selectText = darkMode ? themeVariables.paper : themeVariables.black;
+  const selectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: selectBg,
+      borderColor: state.isFocused ? base.borderColor : selectBorder,
+      borderRadius: `calc(${themeVariables.spacing} / 2)`,
+      boxShadow: state.isFocused ? base.boxShadow : themeVariables["shadow-inset"],
+      color: selectText,
+      fontSize: "16px",
+      cursor: "pointer",
+    }),
+    menu: (base: any) => ({
+      ...base,
+      backgroundColor: selectBg,
+      borderColor: selectBorder,
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? (darkMode ? themeVariables.black : themeVariables.gray)
+        : state.isFocused
+          ? (darkMode ? themeVariables.dark_border : themeVariables.paper)
+          : "transparent",
+      color: selectText,
+    }),
+    multiValue: (base: any) => ({
+      ...base,
+      backgroundColor: darkMode ? themeVariables.dark_border : themeVariables.paper,
+    }),
+    multiValueLabel: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    multiValueRemove: (base: any) => ({
+      ...base,
+      color: selectText,
+      ":hover": {
+        backgroundColor: darkMode ? themeVariables.black : themeVariables.gray,
+        color: selectText,
+      },
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: selectText,
+      opacity: 0.5,
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    input: (base: any) => ({
+      ...base,
+      color: selectText,
+    }),
+    indicatorSeparator: (base: any) => ({
+      ...base,
+      backgroundColor: selectBorder,
+    }),
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      color: selectText,
+      padding: "4px",
+      cursor: "pointer",
+    }),
+    clearIndicator: (base: any) => ({
+      ...base,
+      color: selectText,
+      opacity: 0.6,
+      padding: "4px",
+    }),
+  };
 
-  // Query to get ignored blockers for this audit
-  const { data: ignoredBlockers } = useQuery({
-    queryKey: ["ignoredBlockers", auditId],
-    queryFn: async () => {
-      const response = await apiClient.graphql({
-        query: `query ($audit_id: uuid!) {
-          ignored_blockers(where: {audit_id: {_eq: $audit_id}}) {
-            blocker_id
-          }
-        }`,
-        variables: { audit_id: auditId },
-      });
-      const data = response as any;
-      return new Set(
-        data.data.ignored_blockers.map((ib: any) => ib.blocker_id)
-      );
-    },
-  });
-
-  // Mutation to toggle ignore status
-  const toggleIgnoreMutation = useMutation({
-    mutationFn: async ({
-      blockerId,
-      contentHashId,
-      isCurrentlyIgnored,
-    }: {
-      blockerId: string;
-      contentHashId: string;
-      isCurrentlyIgnored: boolean;
-    }) => {
-      if (isCurrentlyIgnored) {
-        // Delete from ignored_blockers
-        await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!) {
-            delete_ignored_blockers(where: {
-              audit_id: {_eq: $audit_id},
-              blocker_id: {_eq: $blocker_id}
-            }) {
-              affected_rows
-            }
-          }`,
-          variables: { audit_id: auditId, blocker_id: blockerId },
-        });
-      } else {
-        // Insert into ignored_blockers (with content_hash_id denormalized for fast lookups)
-        await apiClient.graphql({
-          query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!) {
-            insert_ignored_blockers_one(object: {
-              audit_id: $audit_id,
-              blocker_id: $blocker_id,
-              content_hash_id: $content_hash_id
-            }) {
-              audit_id
-              blocker_id
-            }
-          }`,
-          variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId },
-        });
-      }
-    },
-    onSuccess: () => {
-      // Refetch the ignored blockers list
-      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
-    },
-  });
+  const { data: ignoredBlockers } = useIgnoredBlockers(auditId);
+  const toggleIgnoreMutation = useToggleIgnore(auditId);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -328,10 +299,28 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       const resp = (await response.body.json()) as any;
 
       // we need to parse the server data to convert BlockerTag[] to Options[]
-      resp.availableTags = resp.availableTags?.map((tag: BlockerTag) => ({
-        value: tag.id,
-        label: tag.content,
-      }));
+      // Only tags that name a recognized accessibility standard (WCAG,
+      // Section 508, EN 301 549, Trusted Tester) are worth filtering by —
+      // axe-core's internal categories and veraPDF's PDF-structure tags
+      // share this same "tags" column but aren't meaningful filter values.
+      // Grouped by standard and sorted within each group (WCAG/EN 301 549 by
+      // criterion number, Section 508 by paragraph letter, Trusted Tester by
+      // test number) rather than left in whatever order the backend returned.
+      const taggedOptions: { value: string; label: string; group: string; sortKey: string }[] = [];
+      for (const tag of (resp.availableTags as BlockerTag[] | undefined) ?? []) {
+        const info = getAccessibilityStandardTagInfo(tag.content);
+        if (info) taggedOptions.push({ value: tag.id, label: info.label, group: info.group, sortKey: info.sortKey });
+      }
+      taggedOptions.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+      const optionsByGroup = new Map<string, Option[]>();
+      for (const { value, label, group } of taggedOptions) {
+        if (!optionsByGroup.has(group)) optionsByGroup.set(group, []);
+        optionsByGroup.get(group)!.push({ value, label });
+      }
+      resp.availableTags = ACCESSIBILITY_STANDARD_GROUP_ORDER
+        .filter((group) => optionsByGroup.has(group))
+        .map((group) => ({ label: group, options: optionsByGroup.get(group)! }));
       // Then we store it in local state
       setAvailableTags(resp.availableTags);
 
@@ -411,19 +400,26 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           }
         },
       },
-      /*  {
+      {
         accessorKey: "short_id",
         header: "ID",
         cell: ({ getValue }) => {
           const shortId = getValue() as string;
+          const auditIdNoDash = auditId.replace(/-/g, "");
           return (
-            <code className="text-sm font-bold bg-gray-100 px-2 py-1 rounded">
-              {shortId || "N/A"}
-            </code>
+            <div style={{ display: "inline-flex" }}>
+              <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
+              <StyledButton
+                onClick={() => copyToClipboard(shortId)}
+                icon={<FaClipboard className="icon-small" />}
+                label={shortId || "N/A"}
+                variant={"naked"}
+                showLabel={false}
+              />
+            </div>
           );
         },
       },
- */
       {
         accessorKey: "url",
         meta: {
@@ -463,30 +459,28 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "messages",
-        header: "Issue",
+        header: "Description",
         meta: {
           className: style["issue"],
         },
         cell: ({ getValue, row }) => {
           const messages = getValue() as string[];
-          const shortId = row.original.short_id;
-          const auditIdNoDash = auditId.replace(/-/g,"");
+          const duplicateCount = row.original.duplicateCount ?? 1;
           return (
-            <>
-              <div className="text-sm max-w-sm">
-                {messages[0] || "No message"}
-              </div>
-              <div style={{ display: "inline-flex" }}>
-                <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
-                <StyledButton
-                  onClick={() => copyToClipboard(shortId)}
-                  icon={<FaClipboard className="icon-small" />}
-                  label={shortId || "N/A"}
-                  variant={"naked"}
-                  showLabel={false}
-                />
-              </div>
-            </>
+            <div className="text-sm max-w-sm">
+              {messages[0] || "No message"}
+              {duplicateCount > 1 && (
+                <div style={{ marginTop: "4px" }}>
+                  <BlockerUrlsDrawer
+                    auditId={auditId}
+                    isShared={isShared}
+                    contentHashId={row.original.content_hash_id}
+                    occurrences={duplicateCount}
+                    triggerLabel={`View all ${duplicateCount} occurrences`}
+                  />
+                </div>
+              )}
+            </div>
           );
         },
       },
@@ -555,17 +549,25 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "tags",
-        header: "Tags",
+        header: "Accessibility Standards",
         meta: {
           className: style["tags"],
         },
         cell: ({ getValue }) => {
-          const tags = getValue() as BlockerTag[];
+          // Only tags naming a recognized accessibility standard are shown
+          // here — axe-core's internal categories and veraPDF's PDF-structure
+          // tags share this same column but aren't standards themselves.
+          const tags = (getValue() as BlockerTag[])
+            .map((tag) => {
+              const label = getAccessibilityStandardLabel(tag.content);
+              return label ? { id: tag.id, label } : null;
+            })
+            .filter((tag): tag is { id: string; label: string } => tag !== null);
           return (
             <div className="tags">
               {tags.slice(0, TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                 <span key={tag.id} className="tag">
-                  {tag.content}
+                  {tag.label}
                 </span>
               ))}
               {tags.slice(TAGS_TO_SHOW_IN_TABLE).length > 0 && (
@@ -583,7 +585,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                         <div className="tags">
                           {tags.slice(TAGS_TO_SHOW_IN_TABLE).map((tag) => (
                             <span key={tag.id} className="tag">
-                              {tag.content}
+                              {tag.label}
                             </span>
                           ))}
                         </div>
@@ -599,7 +601,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       },
       {
         accessorKey: "categories",
-        header: "Category",
+        header: "Rule",
         meta: {
           className: style["categories"],
         },
@@ -673,7 +675,8 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                   isCurrentlyIgnored: isIgnored,
                 });
                 setAnnounceMessage(
-                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Ignored" : "Active"}`,
+                  // isIgnored is the pre-toggle state, so the new status is its opposite
+                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Active" : "Ignored"}`,
                   "success"
                 );
               }}
@@ -699,7 +702,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, auditId, isShared]
   );
 
   const table = useReactTable({
@@ -949,13 +952,69 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           </div>
         </div>
         <div className="filter-group">
-          
           {/* Search Filter */}
           <StyledLabeledInput className={style["search-input"]}>
             <label>Search by URL</label>
             <input defaultValue={searchString} onChange={(e) => handleSearch(e.target.value)} />
           </StyledLabeledInput>
-          
+
+          <div className="filter-group-right">
+          {/* Content Type Filter */}
+          <StyledLabeledInput>
+            <label>Filter by Content Type</label>
+            <select
+              id="contentToggleGroup"
+              defaultValue="all"
+              aria-label="Filter by content type:"
+              value={selectedContentType}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleContentTypeChange(e.target.value)}
+            >
+              <option value="all">All{" "}
+                {data?.typeCounts?.all !== undefined &&
+                  `(${data.typeCounts.all})`}</option>
+              <option value="html">HTML{" "}
+                {data?.typeCounts?.html !== undefined &&
+                  `(${data.typeCounts.html})`}</option>
+              <option value="pdf">PDF{" "}
+                {data?.typeCounts?.pdf !== undefined &&
+                  `(${data.typeCounts.pdf})`}</option>
+            </select>
+          </StyledLabeledInput>
+
+          {/* Tag (Accessibility Standard) Filter */}
+          {availableTags && availableTags.length > 0 && (
+            <StyledLabeledInput>
+              <label>Filter by Accessibility Standard</label>
+              <Select
+                className="react-select tag-select"
+                options={availableTags}
+                isMulti
+                value={selectedTags}
+                placeholder="Accessibility Standard..."
+                aria-label="Filter by Accessibility Standard"
+                onChange={handleTagToggle}
+                styles={selectStyles}
+              />
+            </StyledLabeledInput>
+          )}
+          </div>
+        </div>
+
+        <Card variant="light" className={style["advanced-filters-card"]}>
+          <Collapsible.Root
+            open={blockerTableAdvancedFiltersOpen}
+            onOpenChange={setBlockerTableAdvancedFiltersOpen}
+          >
+            <Collapsible.Trigger asChild>
+              <StyledButton
+                variant="naked"
+                label={blockerTableAdvancedFiltersOpen ? "Hide Advanced Filter Options" : "Show Advanced Filter Options"}
+                icon={blockerTableAdvancedFiltersOpen ? <FaAngleUp /> : <FaAngleDown />}
+                onClick={() => { }}
+              />
+            </Collapsible.Trigger>
+            <Collapsible.Content>
+        <div className="filter-group-secondary">
           {/* Status Filter */}
           <StyledLabeledInput>
             <label>Filter by Status</label>
@@ -978,86 +1037,22 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             </select>
           </StyledLabeledInput>
 
-          {/* Content Type Filter */}
-          <StyledLabeledInput>
-            <label>Filter by Content Type</label>
-            <select
-              id="contentToggleGroup"
-              defaultValue="all"
-              aria-label="Filter by content type:"
-              value={selectedContentType}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleContentTypeChange(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="html">HTML</option>
-              <option value="pdf">PDF</option>
-            </select>
-          </StyledLabeledInput>
 
-          {/* Tag Filter */}
-          {availableTags && availableTags.length > 0 && (
-            <Select
-              className="react-select tag-select"
-              options={availableTags}
-              isMulti
-              value={selectedTags}
-              placeholder="Filter by Tags..."
-              aria-label="Filter by Tags"
-              onChange={handleTagToggle}
-              styles={{
-                ...darkSelectStyles,
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
-                  borderRadius: themeVariables.spacing,
-                  fontSize: "13px",
-                  minHeight: "24px",
-                }),
-                dropdownIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-                clearIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-              }}
-            />
-          )}
-
-          {/* Type Filter */}
+          {/* Rules Filter */}
           {availableCategories && availableCategories.length > 0 && (
-            <Select
-              className="react-select categories-select"
-              options={availableCategories}
-              isMulti
-              value={selectedCategories}
-              placeholder="Filter by Categories..."
-              aria-label="Filter by Categories"
-              onChange={handleCategoryToggle}
-              styles={{
-                ...darkSelectStyles,
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.control?.(baseStyles, state) ?? {}),
-                  borderRadius: themeVariables.spacing,
-                  fontSize: "13px",
-                  minHeight: "24px",
-                }),
-                dropdownIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.dropdownIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-                clearIndicator: (baseStyles, state) => ({
-                  ...baseStyles,
-                  ...(darkSelectStyles.clearIndicator?.(baseStyles, state) ?? {}),
-                  padding: "4px",
-                }),
-              }}
-            />
+            <StyledLabeledInput>
+              <label>Filter by Rules</label>
+              <Select
+                className="react-select categories-select"
+                options={availableCategories}
+                isMulti
+                value={selectedCategories}
+                placeholder="Rules..."
+                aria-label="Filter by Rules"
+                onChange={handleCategoryToggle}
+                styles={selectStyles}
+              />
+            </StyledLabeledInput>
           )}
 
           {/* Clear Filters Button */}
@@ -1073,6 +1068,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
 
         </div>
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </Card>
 
       </div>
 
@@ -1081,7 +1079,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       ) : (
         <>
           <div className="table-container">
-            <div className="table-scroll-wrapper">
+            <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Blockers table, scrollable horizontally">
             <table aria-label="Blockers table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (

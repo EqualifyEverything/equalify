@@ -11,6 +11,7 @@ import { useGlobalStore } from "../utils";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
 import styles from "./UsersTable.module.scss";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 
 
 const apiClient = API.generateClient();
@@ -25,6 +26,7 @@ interface User {
 
 export const UsersTable = () => {
   const queryClient = useQueryClient();
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
   const { setAnnounceMessage } = useGlobalStore();
@@ -216,7 +218,7 @@ export const UsersTable = () => {
       ) : (
         <>
           <div className="table-container">
-            <div className="table-scroll-wrapper">
+            <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Users table, scrollable horizontally">
             <table
               className="w-full border-collapse border border-gray-300"
               aria-label="Users table"

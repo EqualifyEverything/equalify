@@ -3,7 +3,9 @@ import styles from "./StyledButton.module.scss";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
-interface ButtonProps extends React.PropsWithChildren {
+interface ButtonProps
+  extends React.PropsWithChildren,
+    Pick<React.AriaAttributes, "aria-expanded" | "aria-controls" | "aria-haspopup" | "aria-describedby"> {
   variant?: string;
   icon?: ReactNode;
   onClick: undefined | ((e?:any) => Promise<void> | void) ;
@@ -14,6 +16,8 @@ interface ButtonProps extends React.PropsWithChildren {
   loadingText?: string;
   className?: string;
   prependText?: string;
+  /** Small element rendered after the label, e.g. a "New" pill */
+  badge?: ReactNode;
   type?: "button" | "submit" | "reset";
   inline?: boolean;
 }
@@ -29,6 +33,7 @@ export const StyledButton = ({
   loadingText = "Loading...",
   className = "",
   prependText = "",
+  badge,
   type = "button",
   inline = false,
   ...props
@@ -72,6 +77,7 @@ export const StyledButton = ({
       ) : (
         <VisuallyHidden.Root>{loading ? loadingText : label}</VisuallyHidden.Root>
       )}
+      {badge && <span className={styles["badge"] + " badge"}>{badge}</span>}
     </button>
   );
 };

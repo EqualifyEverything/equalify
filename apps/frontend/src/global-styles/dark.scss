@@ -33,6 +33,14 @@ body.dark {
       border-color: variables.$dark-border;
     }
 
+    // replace the hardcoded currentColor-dependent arrow with an explicit
+    // paper-colored one — same reasoning as the checkmark below: relying on
+    // currentColor inside this embedded SVG doesn't reliably pick up
+    // dark mode's $paper text color, so the base icon is overridden directly.
+    &::picker-icon {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eff0eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'%3E%3Cpath d='m6 9 6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+    }
+
     & option {
       background-color: variables.$dark-surface;
       color: variables.$paper;
@@ -53,6 +61,24 @@ body.dark {
   // Tables
   .table-container {
     border-color: variables.$dark-border;
+
+    .table-scroll-wrapper {
+      // $gray keeps ≥3:1 contrast against the dark-mode track (black/dark-surface);
+      // the light-mode #6b6b6b thumb would nearly disappear against them.
+      scrollbar-color: variables.$gray transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background-color: variables.$gray;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: variables.$paper;
+      }
+      // $red only clears ~3.2:1 against near-black backgrounds — matches
+      // the yellow-over-red swap already used elsewhere in dark mode.
+      &:focus-visible {
+        outline-color: variables.$yellow;
+      }
+    }
 
     table {
       thead {

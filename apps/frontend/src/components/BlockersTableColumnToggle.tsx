@@ -14,11 +14,12 @@ interface StringMap {
 }
 const labelMap: StringMap = {
   'type': "Type",
+  'short_id': "ID",
   'url': "URL",
-  'messages': "Issue",
+  'messages': "Description",
   'content': "Code",
-  'tags': "Tags",
-  'categories': "Category",
+  'tags': "Accessibility Standards",
+  'categories': "Rule",
   'id': "Ignore"
 }
 

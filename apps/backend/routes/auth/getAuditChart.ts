@@ -42,7 +42,7 @@ export const getAuditChart = async () => {
   // Process scans to get the last scan per day
   const scansByDate = new Map<
     string,
-    { date: string; blockers: number; timestamp: string; pagesCount: number, processedPagesCount: number }
+    { date: string; blockers: number; timestamp: string; pagesCount: number, processedPagesCount: number, errorsCount: number, hasTimeoutError: boolean }
   >();
 
   scans.forEach((scan:any) => {
@@ -56,6 +56,9 @@ export const getAuditChart = async () => {
     const pagesCount = scan.pages.length;
     //const processedPagesCount = scan.processed_pages.length;
     const errorsCount = scan.errors.length;
+    // scan_timeout is set only by the audit-level 15-minute stuck-scan sweep
+    // (runEveryMinute.ts) — distinct from ordinary per-page scan errors.
+    const hasTimeoutError = scan.errors.some((e: any) => e.type === "scan_timeout");
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
     scansByDate.set(dateKey, {
@@ -63,13 +66,36 @@ export const getAuditChart = async () => {
       blockers: blockerCount,
       timestamp: scan.created_at,
       pagesCount: Number(pagesCount),
-      processedPagesCount: Number(pagesCount-errorsCount)
+      processedPagesCount: Number(pagesCount-errorsCount),
+      errorsCount: Number(errorsCount),
+      hasTimeoutError,
     });
   });
 
   // Generate array of the last N days
   const now = new Date();
   now.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
+
+  // Flat list of every individual scan within the window (not collapsed by day like
+  // scansByDate above) — the table view lists each same-day scan as its own row with
+  // its own time, while the line chart above keeps one point per day for a sane x-axis.
+  const windowStart = new Date(now);
+  windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
+  const individualScans = scans
+    .filter((scan: any) => new Date(scan.created_at) >= windowStart)
+    .map((scan: any) => {
+      const pagesCount = scan.pages.length;
+      const errorsCount = scan.errors.length;
+      return {
+        timestamp: scan.created_at,
+        blockers: scan.blocker_count ?? 0,
+        pagesCount: Number(pagesCount),
+        processedPagesCount: Number(pagesCount - errorsCount),
+        errorsCount: Number(errorsCount),
+        hasTimeoutError: scan.errors.some((e: any) => e.type === "scan_timeout"),
+      };
+    });
+
   const chartData = [];
   let lastKnownValue = 0;
 
@@ -109,7 +135,8 @@ export const getAuditChart = async () => {
         blockers: scanData.blockers,
         timestamp: scanData.timestamp,
         pagesCount: scanData.pagesCount,
-        processedPagesCount: scanData.processedPagesCount
+        processedPagesCount: scanData.processedPagesCount,
+        hasTimeoutError: scanData.hasTimeoutError,
       });
     } else {
       // Fill with the last known value
@@ -147,6 +174,7 @@ export const getAuditChart = async () => {
       audit_name: audit?.name,
       period_days: days,
       data: chartData,
+      individualScans,
     }),
   };
 };

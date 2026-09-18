@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as Auth from 'aws-amplify/auth';
 import * as API from 'aws-amplify/api';
 import { Link, useNavigate } from 'react-router-dom';
-import { sleep, useGlobalStore } from '#src/utils';
+import { sleep, useGlobalStore, trackSession } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import styles from "./Signup.module.scss";
 import { Logo } from "#src/components/Logo";
@@ -78,6 +78,7 @@ export const Signup = () => {
             setLoading(false);
             setTimeout(() => {
                 API.post({ apiName: 'auth', path: '/trackUser' }).response
+                trackSession()
                 queryClient.refetchQueries({ queryKey: ['user'] })
             }, 1000);
             navigate('/audits');

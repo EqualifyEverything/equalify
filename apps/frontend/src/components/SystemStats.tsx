@@ -17,6 +17,25 @@ interface SystemStatsData {
     pdfScans30d: number;
     avgHtmlScanDurationMs30d: number;
     avgPdfScanDurationMs30d: number;
+    monthly?: MonthlyKpi[];
+}
+
+// One row per calendar month (UTC), oldest first; the last row is the current, partial month
+interface MonthlyKpi {
+    month: string;       // YYYY-MM
+    sessions: number;    // authenticated app loads / logins (sessions table)
+    activeUsers: number; // distinct users with a session that month
+    unitsServed: number; // distinct SSO departments with a session that month
+    scanRuns: number;    // audit-level scan records
+    htmlScans: number;   // page scans started (CloudWatch)
+    pdfScans: number;    // document scans started (CloudWatch)
+    newUsers: number;
+    newAudits: number;
+}
+
+function formatMonth(month: string): string {
+    const [year, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(year, m - 1, 1)).toLocaleDateString(undefined, { month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 function formatDuration(ms: number): string {
@@ -100,6 +119,38 @@ export const SystemStats = () => {
                     <StatCard label="Avg PDF Scan Time"    value={formatDuration(data.avgPdfScanDurationMs30d)} />
                 </div>
             </section>
+
+            {data.monthly && data.monthly.length > 0 && (
+                <section>
+                    <h3 className={style.sectionHeading}>Monthly KPIs (Last {data.monthly.length} Months)</h3>
+                    <div className={style.tableWrap}>
+                        <table className="w-full border-collapse border border-gray-300" aria-label="Monthly KPIs">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    {["Month", "Sessions", "Active Users", "Units Served", "Scan Runs", "HTML Pages", "PDF Pages", "New Users", "New Audits"].map((header) => (
+                                        <th key={header} scope="col" className="border border-gray-300 px-4 py-2 text-left font-semibold">{header}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.monthly.map((row, index) => (
+                                    <tr key={row.month} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                        <th scope="row" className="border border-gray-300 px-4 py-2 text-left font-normal whitespace-nowrap">
+                                            {formatMonth(row.month)}{index === data.monthly!.length - 1 ? " (to date)" : ""}
+                                        </th>
+                                        {[row.sessions, row.activeUsers, row.unitsServed, row.scanRuns, row.htmlScans, row.pdfScans, row.newUsers, row.newAudits].map((value, i) => (
+                                            <td key={i} className={`border border-gray-300 px-4 py-2 ${style.numeric}`}>{formatNumber(value)}</td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className={style.note}>
+                        Sessions, Active Users, and Units Served are recorded from the release that added session tracking onward; earlier months show 0. Units Served counts distinct departments for SSO logins only.
+                    </p>
+                </section>
+            )}
 
         </div>
     );

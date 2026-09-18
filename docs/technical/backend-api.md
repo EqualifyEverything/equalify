@@ -31,6 +31,10 @@ Endpoints that don't require authentication:
 | `exportAuditTable` | Export blocker table for a shared/public audit |
 | `getAuditSummary` | Get summary stats for a shared/public audit |
 | `getAuditSummaryFast` | Get cached/fast summary stats for a shared/public audit |
+| `getMostCommonUrls` | Paginated "URLs with most blockers" list for a shared/public audit |
+| `getMostCommonBlockers` | Paginated "most common blockers" list for a shared/public audit |
+| `getAuditRecommendations` | Blockers grouped by content hash, ranked by occurrences, for a shared/public audit |
+| `getBlockerUrls` | Paginated list of every occurrence (URL) of one grouped blocker for a shared/public audit |
 | `putMetrics` | Record frontend telemetry metrics |
 | `getBlockerSummary` | Get AI-generated blocker summary |
 | `flagBlockerSummary` | Flag an AI-generated blocker summary |
@@ -56,18 +60,23 @@ Endpoints requiring a valid JWT token:
 | `getAuditProgress` | GET | Get current scan progress |
 | `getAuditSummary` | GET | Get summary stats for an audit |
 | `getAuditSummaryFast` | GET | Get cached/fast summary stats for an audit |
+| `getMostCommonUrls` | GET | Paginated "URLs with most blockers" list (backs the Summary View card) |
+| `getMostCommonBlockers` | GET | Paginated "most common blockers" list (backs the Summary View card) |
+| `getAuditRecommendations` | GET | Recommendations view: one row per unique blocker (`content_hash_id`) in the latest scan, ranked by occurrences; `status` (active / ignored / all), `repeat` (all / repeated / single), `page`, `pageSize` |
+| `getBlockerUrls` | GET | Every occurrence of one grouped blocker in the latest scan, one row per occurrence; `content_hash_id`, `page`, `pageSize` (backs the "View all occurrences" drawer and its CSV copy) |
 | `exportAuditTable` | GET | Export blocker table as CSV |
 | `exportAuditTablePdfSourceLinks` | GET | Export PDF source links for blockers |
 | `getLogs` | GET | Get activity logs |
 | `inviteUser` | POST | Invite a new user |
 | `trackUser` | POST | Track user analytics events |
+| `trackSession` | POST | Record an authenticated app load or login (optionally with SSO org fields from Microsoft Graph) for monthly KPIs |
 | `saveQuickScan` | POST | Run and save a one-off quick scan |
 | `getQuickScans` | GET | List quick scans |
 | `fetchRemoteCsv` | POST | Fetch a remote CSV of URLs |
 | `syncFromRemoteCsv` | POST | Sync audit URLs from a remote CSV |
 | `crawlUrl` | POST | Crawl a URL to discover pages |
 | `getBedrockModels` | GET | List available Bedrock models for AI features |
-| `getSystemStats` | GET | Get system-wide usage stats (admin) |
+| `getSystemStats` | GET | Get system-wide usage stats plus a month-over-month KPI series (admin) |
 | `getAccessRequests` | GET | List pending SSO access requests (admin) |
 | `reviewAccessRequest` | POST | Approve or deny an SSO access request (admin) |
 

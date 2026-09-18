@@ -177,6 +177,19 @@ Paginated table of accessibility blockers with:
 - WCAG tag filtering
 - URL filtering
 
+### BlockersRecommendations
+The Recommendations tab of the Audit Report. Calls `getAuditRecommendations` and renders one row per unique blocker (grouped by `content_hash_id`), ranked by occurrences:
+- Two stat cards (Repeated / One-off) that act as the `repeat` filter, plus a Status select
+- Collapsible syntax-highlighted code block, message, rule link into the Detailed View, standards tags
+- Occurrence count with a `BlockerUrlsDrawer` for repeated blockers
+- Hash-wide ignore toggle via the shared `useToggleIgnore` hook
+
+### BlockerUrlsDrawer
+Side drawer listing every occurrence (URL) of a grouped blocker, paginated from `getBlockerUrls`, with a "Copy as CSV" action that pages through the full list. Replaces a hover-only tooltip so the list is reachable by keyboard and screen readers.
+
+### useToggleIgnore (hook)
+Shared by `BlockersTable` and `BlockersRecommendations`. Ignoring inserts an `ignored_blockers` row for every blocker in the latest scan that shares the clicked blocker's `content_hash_id`; un-ignoring deletes all rows for that hash. Invalidates the ignored-blockers and recommendations queries on completion.
+
 ### AuditPagesInput
 URL entry component supporting:
 - Manual URL input

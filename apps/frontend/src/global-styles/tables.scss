@@ -1,6 +1,19 @@
 @use "./variables.module.scss";
 @use "./fonts.scss";
 
+// mask-image itself is a "discrete" animatable property — browsers just
+// flip it at the transition's halfway point rather than interpolating, so
+// transitioning between two mask-image values (even structurally-identical
+// gradients) snaps instead of fading. Registering this custom property with
+// a numeric syntax makes it a genuinely interpolatable value that a
+// transition CAN animate smoothly frame-by-frame, which then carries
+// through into the gradient that references it.
+@property --scroll-fade-alpha {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
 .table-container {
   border: 1px solid variables.$gray;
   border-radius: variables.$spacing;
@@ -10,6 +23,97 @@
 
   .table-scroll-wrapper {
     overflow-x: auto;
+
+    // Thin, low-key scrollbar rather than the browser's chunky default —
+    // but never scrollbar-width:none / a webkit display:none thumb. Hiding
+    // it entirely would remove a visible, draggable affordance that mouse
+    // and trackpad users rely on to discover and control horizontal
+    // scrolling, which is a real accessibility regression, not a cleanup.
+    // The thumb color (#6b6b6b) is chosen for ≥3:1 contrast (WCAG 1.4.11)
+    // against both the white and paper track backgrounds it appears on.
+    scrollbar-width: thin;
+    scrollbar-color: #6b6b6b transparent;
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #6b6b6b;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: variables.$black;
+    }
+
+    // Makes the region keyboard-scrollable (tabIndex/role/aria-label are
+    // set where this class is used) — needs its own visible focus ring
+    // since it's not a native interactive element and outline-offset:-2px
+    // keeps it from being clipped by .table-container's overflow:hidden.
+    &:focus-visible {
+      outline: 2px solid variables.$red;
+      outline-offset: -2px;
+    }
+
+    // Fades the last ~15px of actual content — a mask rather than a
+    // painted-on overlay, so it matches whatever's really there (theme,
+    // striped rows) with no colors to keep in sync, and adds no new
+    // DOM/accessibility surface since nothing is actually hidden from the
+    // accessibility tree, keyboard nav, or scrolling. Applied here rather
+    // than on the scrolling <table> itself: mask percentages resolve
+    // against the masked element's own box, and the table's box is its
+    // full (often huge) content width, not the visible viewport — this
+    // wrapper's box is the one that actually stays put at viewport size
+    // while its content scrolls inside it.
+    //
+    // --scroll-fade-alpha (registered above) drives the fade layer's final
+    // stop: 1 = opaque = no visible fade, 0.4 = softened-but-still-legible
+    // fade (not a hard cut to fully invisible).
+    //
+    // Two mask layers: the fade (full height) and a flat opaque rectangle
+    // sized to --table-header-height (set by useScrollFade, since header
+    // height isn't a constant). mask-composite: add unions them, so the
+    // header's row stays fully opaque regardless of what the fade layer
+    // says underneath, while everything below it keeps the fade untouched.
+    // Tradeoff: this combination stops the browser from smoothly
+    // interpolating --scroll-fade-alpha on toggle — it falls back to a
+    // discrete on/off snap despite the transition below, even though the
+    // custom property itself is still animating numerically. A single-layer
+    // mask (no header exclusion) doesn't have that problem; getting both
+    // smooth animation AND header exclusion needs the header to not be a
+    // descendant of the masked element at all (a bigger structural change).
+    --scroll-fade-alpha: 1;
+    --table-header-height: 0px;
+    mask-image:
+      linear-gradient(to right, black calc(100% - 15px), rgba(0, 0, 0, var(--scroll-fade-alpha)) 100%),
+      linear-gradient(black, black);
+    -webkit-mask-image:
+      linear-gradient(to right, black calc(100% - 15px), rgba(0, 0, 0, var(--scroll-fade-alpha)) 100%),
+      linear-gradient(black, black);
+    mask-repeat: no-repeat, no-repeat;
+    mask-position: 0 0, 0 0;
+    mask-size: 100% 100%, 100% var(--table-header-height);
+    mask-composite: add, add;
+    // -webkit-mask-composite's keyword set (source-over etc.) is WebKit's
+    // older, differently-modeled equivalent — intentionally left
+    // unspecified rather than guessed at. Without it, very old Safari just
+    // falls back to a single fade layer covering the header too.
+    -webkit-mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-position: 0 0, 0 0;
+    -webkit-mask-size: 100% 100%, 100% var(--table-header-height);
+    transition: --scroll-fade-alpha 200ms ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+
+    &.scroll-fade-active {
+      --scroll-fade-alpha: 0.4;
+    }
   }
   table {
     width: max-content;
@@ -177,6 +281,17 @@
   align-content: flex-end;
   align-items: flex-end;
   width: 100%;
+  padding-top:1rem;
+
+  .filter-group-right {
+    display: inline-flex;
+    justify-content: space-between;
+    align-content: flex-end;
+  }
+
+  .filter-group-right .labeled-input:last-child {
+      margin-right:0;
+  } 
   
   @media screen and (max-width: variables.$breakpoint-small) {
     display: block;
@@ -215,6 +330,41 @@
         }
       }
     }
+  }
+  .react-select,
+  select {
+    margin-bottom: calc(variables.$spacing);
+    min-width: 180px;
+  }
+  .clear-button {
+    margin-bottom: calc(variables.$spacing);
+    border: 0;
+    background: transparent;
+    opacity: 0.2;
+    cursor: pointer;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// The rest of the filters (status/duplicates/content type/tags/rules), kept
+// in their own row below .filter-group's search box. A left-aligned wrapping
+// row reads better here than .filter-group's space-between stretch, which
+// was designed to spread several varied-width controls across the full row
+// — now that .filter-group holds just the lone search box, that stretch no
+// longer does anything there, but this new row still has several controls
+// to lay out sensibly.
+.filter-group-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: variables.$spacing;
+  width: 100%;
+  margin-top: variables.$spacing;
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    display: block;
   }
   .react-select,
   select {

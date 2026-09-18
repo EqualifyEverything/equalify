@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { useGlobalStore } from "../utils";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
+import { useScrollFade } from "#src/utils/useScrollFade.ts";
 
 interface AccessRequest {
   id: string;
@@ -22,6 +23,7 @@ interface AccessRequest {
 
 export const RequestsTable = () => {
   const queryClient = useQueryClient();
+  const [scrollFadeRef, showScrollFade] = useScrollFade();
   const { setAnnounceMessage } = useGlobalStore();
 
   const { data, isLoading, error } = useQuery({
@@ -152,7 +154,7 @@ export const RequestsTable = () => {
         <SkeletonTable columns={4} rows={3} headers={["Name", "Email", "Requested At", "Actions"]} />
       ) : (
         <div className="table-container">
-          <div className="table-scroll-wrapper">
+          <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Access requests table, scrollable horizontally">
             <table
               className="w-full border-collapse border border-gray-300"
               aria-label="Access requests table"

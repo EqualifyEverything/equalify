@@ -93,6 +93,14 @@
       background-color: variables.$paper;
     }
   }
+  // Optional trailing badge (see the `badge` prop). Always renders after the
+  // label; margin is on this wrapper so the badge itself stays a plain pill.
+  .badge {
+    order: 1;
+    display: inline-flex;
+    align-items: center;
+    margin-left: calc(variables.$spacing / 2);
+  }
   &.naked {
     background: transparent;
     box-shadow: none;
@@ -110,8 +118,17 @@
     }
     &[aria-selected="true"] {
       font-weight: bold;
-      text-decoration: underline;
-      text-underline-offset: 3px;
+      // Underline the label only. A decoration on the button itself would
+      // propagate to every flex item, including a trailing badge.
+      > span:not(.badge) {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+    // row-reverse lays items out from the right, so the lowest order lands
+    // at the trailing edge — keeps the badge after the label here too.
+    .badge {
+      order: -1;
     }
     &:focus-visible {
       outline: 2px solid variables.$red;

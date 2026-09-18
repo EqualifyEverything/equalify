@@ -3,7 +3,7 @@ import { formatDate, useGlobalStore, unformatId } from "../utils";
 import * as API from "aws-amplify/api";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 const apiClient = API.generateClient();
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useRef, useState, ChangeEvent } from "react";
 import {
   LineChart,
   Line,
@@ -17,6 +17,8 @@ import {
   //Dot,
 } from "recharts";
 import { BlockersTable } from "../components/BlockersTable";
+import { BlockersRecommendations } from "../components/BlockersRecommendations";
+import { SkeletonChart } from "../components/Skeleton";
 import { AuditPagesInput } from "#src/components/AuditPagesInput.tsx";
 
 import { TbHistory, TbMail, TbAlertTriangle, TbReload } from "react-icons/tb";
@@ -100,11 +102,18 @@ export const Audit = () => {
   const isQuickScan = location.pathname.startsWith("/quick-scans/");
   const { setAnnounceMessage } = useGlobalStore();
   const [searchParams, setSearchParams] = useSearchParams();
-  const blockersTableView = searchParams.get("view") === "detailed" ? "detailed" : "summary";
+  const viewParam = searchParams.get("view");
+  const blockersTableView =
+    viewParam === "detailed" || viewParam === "recommendations" ? viewParam : "summary";
+  const blockersTableViewLabels: Record<string, string> = {
+    summary: "Summary View",
+    detailed: "Detailed View",
+    recommendations: "Recommendations",
+  };
   const setBlockersTableView = (value: string) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (value === "detailed") next.set("view", "detailed");
+      if (value === "detailed" || value === "recommendations") next.set("view", value);
       else next.delete("view"); // "summary" is the default, keep the URL clean
       return next;
     });
@@ -132,7 +141,7 @@ export const Audit = () => {
     queryFn: async () =>
       ((
         await apiClient.graphql({
-          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage status errors}}`,
+          query: `query($audit_id: uuid){scans(where:{audit_id:{_eq:$audit_id}},order_by: {created_at: asc}) {id created_at percentage status errors blocker_count}}`,
           variables: { audit_id: auditId },
         })
       ) as any)?.data?.scans,
@@ -144,6 +153,33 @@ export const Audit = () => {
       return hasActiveScan ? 2000 : false;
     },
   });
+
+  // The scans poll above is the only query that auto-refreshes while a scan runs.
+  // Everything derived from the scan's results (chart, summary cards, most-common
+  // lists, the blockers table) only fetches once on mount, so once the scan flips
+  // to complete/failed we need to explicitly invalidate them - otherwise the page
+  // keeps showing pre-scan data until a manual refresh.
+  const previousScanStatusRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const lastScan = scans?.[scans.length - 1];
+    const currentStatus = lastScan?.status;
+    const previousStatus = previousScanStatusRef.current;
+    const wasActive =
+      previousStatus !== undefined &&
+      previousStatus !== "complete" &&
+      previousStatus !== "failed";
+    const isNowTerminal = currentStatus === "complete" || currentStatus === "failed";
+
+    if (wasActive && isNowTerminal) {
+      queryClient.invalidateQueries({ queryKey: ["auditChart", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditSummary", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["mostCommonUrls", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["mostCommonBlockers", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditBlockers", auditId] });
+    }
+
+    previousScanStatusRef.current = currentStatus;
+  }, [scans, auditId, queryClient]);
 
   useEffect(() => {
     setPages(urls);
@@ -161,8 +197,13 @@ export const Audit = () => {
       ) as any)?.data?.audits_by_pk,
   });
 
-  const { data: chartData } = useQuery({
+  const { data: chartData, isLoading: isChartLoading, isFetching: isChartFetching } = useQuery({
     queryKey: ["auditChart", auditId, chartRange],
+    // Keep showing the previous range's data while a new range loads instead of
+    // unmounting the card - avoids the layout collapsing/popping back on every
+    // date-range change. The (isChartFetching && !isChartLoading) spinner below
+    // signals that a refresh is in flight.
+    placeholderData: (previousData: any) => previousData,
     queryFn: async () => {
       const results = await (
         await API.get({
@@ -455,7 +496,7 @@ export const Audit = () => {
           ).length ?? 0;
           return (
             <Card variant="dark">
-              <div style={{ padding: "20px 0" }}>
+              <div style={{ padding: "20px 20px" }}>
                 <h2 id="scan-progress-heading" style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
                   Scanning...
@@ -529,7 +570,8 @@ export const Audit = () => {
               </Card>
             )}
             <Card variant="dark" className="blockers-chart">
-              {chartData && (chartData as any)?.data && (chartData as any).data.length > 0 && (
+              {isChartLoading && <SkeletonChart />}
+              {!isChartLoading && chartData && (chartData as any)?.data && (chartData as any).data.length > 0 && (
                 <div>
                   <div className="blockers-chart-heading-wrapper">
                     <div>
@@ -542,6 +584,15 @@ export const Audit = () => {
                       </h2>
                       <span className="font-small">
                         Last {chartData.period_days} Days:
+                        {isChartFetching && (
+                          <span
+                            role="status"
+                            aria-label="Refreshing chart data"
+                            style={{ marginLeft: 8, display: "inline-flex", verticalAlign: "middle" }}
+                          >
+                            <GrPowerCycle className="icon-small" style={{ animation: "spin 1s linear infinite" }} />
+                          </span>
+                        )}
                       </span>
                     </div>
                     <div className="chart-ranger-select">
@@ -662,37 +713,48 @@ export const Audit = () => {
                             <thead>
                               <tr>
                                 <th scope="col">Scan Date</th>
+                                <th scope="col">Time</th>
                                 <th scope="col">URLS</th>
                                 {/* <th scope="col">Successful Scans</th> */}
                                 <th scope="col">Blockers</th>
+                                <th scope="col">Errors</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {chartData.data.map((row: any, index: number) => {
-                                if (row.timestamp) {
-                                  //console.log(row);
-                                  return (
-                                    <tr key={row.date}>
-                                      <td>
-                                        {new Date(row.timestamp).toLocaleDateString(
-                                          "en-US",
-                                          {
-                                            weekday: "short",
-                                            year: "numeric",
-                                            month: "short",
-                                            day: "numeric",
-                                          }
-                                        )}
-                                      </td>
-                                      <td>{row.pagesCount}</td>{/* 
-                                      <td>{row.processedPagesCount}</td> */}
-                                      <td>{row.blockers}</td>
-                                    </tr>
-                                  );
-                                } else {
-                                  return false;
-                                }
-                              })}
+                              {((chartData as any).individualScans ?? []).map((row: any) => (
+                                <tr key={row.timestamp}>
+                                  <td>
+                                    {new Date(row.timestamp).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        weekday: "short",
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      }
+                                    )}
+                                  </td>
+                                  <td>
+                                    {new Date(row.timestamp).toLocaleTimeString(
+                                      "en-US",
+                                      { hour: "numeric", minute: "2-digit" }
+                                    )}
+                                  </td>
+                                  <td>{row.pagesCount}</td>{/*
+                                  <td>{row.processedPagesCount}</td> */}
+                                  <td>{row.blockers}</td>
+                                  <td
+                                    style={
+                                      row.errorsCount > 0
+                                        ? { color: themeVariables.red, fontWeight: "bold" }
+                                        : undefined
+                                    }
+                                  >
+                                    {row.errorsCount}
+                                    {row.hasTimeoutError ? " (timeout)" : ""}
+                                  </td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>
@@ -751,6 +813,7 @@ export const Audit = () => {
                       <label htmlFor="remote-csv-input">Remote CSV URL</label>
                       <input
                         value={audit?.remote_csv_url}
+                        id="remote-csv-input"
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
                           event.preventDefault();
                           updateAuditRemoteCsv(event.target.value);
@@ -1018,7 +1081,7 @@ export const Audit = () => {
           activationMode="manual"
         >
           <div className={style["blockers-table-header"]} /* style={{ flexDirection: blockersTableView === "summary" ? "row" : "row-reverse" }} */>
-            <h2>Audit Report <span className="font-normal">{blockersTableView === "summary" ? "Summary View" : "Detailed View"}</span></h2>
+            <h2>Audit Report <span className="font-normal">{blockersTableViewLabels[blockersTableView]}</span></h2>
 
             <Tabs.List aria-label="Audit Report View" className={style["blockers-view-selector"]}>
                 <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
@@ -1026,6 +1089,9 @@ export const Audit = () => {
                 </Tabs.Trigger>
                 <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
                   <StyledButton variant="naked" label="Detailed View" onClick={undefined}>Detailed View</StyledButton>
+                </Tabs.Trigger>
+                <Tabs.Trigger value="recommendations" className={style["blockers-view-trigger"]} asChild>
+                  <StyledButton variant="naked" label="Recommendations" badge={<span className={style["new-badge"]}>New</span>} onClick={undefined}>Recommendations</StyledButton>
                 </Tabs.Trigger>
               </Tabs.List>
           </div>
@@ -1042,6 +1108,9 @@ export const Audit = () => {
           <Tabs.Content value="detailed">
             {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
 
+          </Tabs.Content>
+          <Tabs.Content value="recommendations">
+            {auditId && <BlockersRecommendations auditId={auditId} isShared={isShared} />}
           </Tabs.Content>
         </Tabs.Root>
       }

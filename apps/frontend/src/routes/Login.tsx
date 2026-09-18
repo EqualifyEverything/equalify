@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import * as Auth from 'aws-amplify/auth';
 import {  Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { trackSession } from '#src/utils/trackSession';
 import { useGlobalStore } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
@@ -43,6 +44,7 @@ export const Login = () => {
             });
             const attributes = (await Auth.fetchAuthSession()).tokens?.idToken?.payload;
             setAuthenticated(attributes?.sub);
+            trackSession();
             setLoading(false);
 
             if (code) {
@@ -120,6 +122,7 @@ export const Login = () => {
             // Only set authenticated if backend validation succeeds
             setAuthenticated(claims?.oid || claims?.sub);
             setSsoAuthenticated(true);
+            trackSession(instance);
 
             setLoading(false);
             setAnnounceMessage("Login Success!", "success");
