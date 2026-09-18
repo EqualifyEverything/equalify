@@ -286,7 +286,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
               The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> blockers across{" "}
               <strong>{stats.pagesWithBlockers.toLocaleString()}</strong> {stats.pagesWithBlockers === 1 ? "page" : "pages"}. <br/><br/>
               Some of those are the same piece of code showing up in more than one place, so we grouped them as <strong>repeated blockers</strong>.<br/>
-              That leaves <strong>{stats.uniqueBlockers.toLocaleString()}</strong> unique <strong>one-off blockers</strong> to fix.
+              That leaves <strong>{stats.uniqueBlockers.toLocaleString()}</strong> unique blockers to fix.
               Fix those and all <strong>{stats.totalBlockers.toLocaleString()}</strong> go away.<br/><br/>
               The list below puts the fixes that clear the most blockers first.
               Ignoring a blocker here ignores every copy of it.

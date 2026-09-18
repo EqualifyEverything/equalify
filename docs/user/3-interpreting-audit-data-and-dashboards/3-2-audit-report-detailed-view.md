@@ -37,7 +37,7 @@ Important Details for Developers: To move from identifying a problem to fixing i
     - **Issue Element:** This identifies the specific HTML element affected by the issue.
 - **Rule:** What rule does this blocker fall under.
 - **Accessibility Standards:** What accessibility standards this blocker relates to, if any.
-- **Ignore:** Toggle an issue on/off for the report.<br>
+- **Ignore:** Toggle an issue on/off for the report. Ignoring a blocker also ignores every identical copy of it on other pages in the audit (the same flagged code in a shared header, for example), and the ignore carries forward to future scans. Reactivating it restores all copies.<br>
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/46ed941ba70a82efbf5bddc737451c34a90fff83/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Detailed%20View.png" alt="Detailed audit results table listing Type, URL, Issue, and Code columns with View Code buttons for each issue." width="500"/>
 
 ## AI-Generated Blocker Summary
@@ -57,4 +57,32 @@ The summary includes:
 
 ```tip
 💡Tip: If no summary appears, click "Reload summary" to generate one. Summaries are cached after the first load, so subsequent visits to the same issue will be faster.
+```
+
+## Recommendations View
+This view is intended for **Developers and Project Leads** deciding what to fix first. Many blockers are the same piece of code showing up on many pages: a header, footer, navigation menu, or another template component. Equalify groups identical blockers together so that each row in this view is one fix. Fixing that one spot in your template clears every copy across the site. Switch to it using the **Recommendations** toggle at the top of the Audit Report, next to Summary View and Detailed View.
+
+### Repeated vs. One-off Blockers
+Two cards at the top of the view double as filters. Click one to change which blockers appear in the list below it:
+- **Repeated Blockers:** Blockers that appear in more than one place. This is the default, because these are the highest-value fixes. The card also tells you how much of your total blocker count would clear if you fixed only these (for example, "Fixing these clears 14% of your blockers").
+- **One-off Blockers:** Blockers that appear in a single place. Each one is its own fix.
+
+A short summary beside the cards restates the numbers in plain language: how many blockers the latest scan found, across how many pages, and how many unique fixes they come down to.
+<img src="https://github.com/EqualifyEverything/equalify-docs/blob/main/user/user-guide-images/sec-3-dashboard-audit-report-recommendations.png" alt="Audit Report Recommendations view. Two filter cards read 44 Repeated Blockers, Fixing these clears 77% of your blockers, and 41 One-off Blockers, beside a summary stating the latest scan found 179 blockers across 30 pages. Below, a Status filter set to Active, a count of 44 recommendations, and a table with Code, Description, Appears on, and Ignore columns whose first row shows a highlighted select element, a color-contrast description with EN 301 549 and +5 standards tags, 17 occurrences across 16 URLs with a View all 17 occurrences link, and an Active toggle." width="500"/><br>
+
+### Filtering
+- **Status:** Choose between **Active**, **Ignored**, and **All**, the same as in the Detailed View. The counts on the two cards update to match, and the number of matching recommendations is shown to the right of the filter.
+
+### Recommendation List
+Each row is one unique blocker. Rows are ranked so the fixes that clear the most blockers come first.
+- **Code:** The exact HTML block that was flagged, with syntax highlighting. Long snippets are collapsed; click **Show more** to expand one.
+- **Description:** A plain-language explanation of the problem, the **Rule** it falls under (click it to open the Detailed View filtered to that rule), and the accessibility standards it relates to. If more standards apply than fit on the row, a "+N" indicator reveals the rest.
+- **Appears on…:** How many times the blocker occurs and across how many URLs. For a blocker found in one place, the page URL is linked directly. For a repeated blocker, click **View all N occurrences** to open a panel listing every URL, with pagination and a **Copy as CSV** button so you can paste the list into a ticket or spreadsheet.
+```important
+⚠️Important: Occurrences and URLs can differ. If the same blocker appears twice on one page, that counts as two occurrences on one URL.
+```
+- **Ignore:** Works the same as in the Detailed View. Ignoring a recommendation ignores every copy of it across all pages, and reactivating it restores all of them.
+
+```tip
+💡Tip: Recommendations and the Detailed View are two ways of looking at the same scan. Use Recommendations to decide what to fix, and the Detailed View to find each specific page that needs it.
 ```

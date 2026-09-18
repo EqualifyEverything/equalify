@@ -27,3 +27,9 @@ This page is intended for **all users** as a quick reference for common technica
 
 **Q:** How do I look at only WCAG 2.1 AA failures for Web tests?<br>
 **A:** Use the “wcag2aa” AND  “wcag21aa” tags to view all WCAG 2.1 AA issues found.
+
+**Q:** What is the difference between the Summary, Detailed, and Recommendations views?<br>
+**A:** They are three ways of looking at the same scan. The Summary View gives you the overall numbers and trends. The Detailed View lists every individual blocker on every page, with filters and a CSV export. The Recommendations view groups identical blockers together, so each row is one fix, ranked by how many blockers it would clear. Use Recommendations to decide what to fix first, and the Detailed View to find each specific page that needs it.
+
+**Q:** If I ignore a blocker, does it stay ignored on other pages too?<br>
+**A:** Yes. Ignoring a blocker ignores every identical copy of it across the audit, and future scans keep it ignored. Reactivating it restores all copies. This applies whether you ignore it from the Detailed View or from Recommendations.

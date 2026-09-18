@@ -8,6 +8,10 @@
 
 - **Open Source:** Open source software is software that is publicly available for anyone to review and improve. Equalify is an Open Source tool and uses trusted open source tools as part of its accessibility scanning process.
 
+- **Recommendations:** The Audit Report view that groups identical blockers into unique fixes and ranks them by how many blockers each fix clears. Because a single template component can produce the same blocker on every page, one recommendation often resolves many blockers at once.
+
+- **Repeated Blocker:** A blocker whose exact flagged code appears in more than one place in an audit. Fixing it at its source clears every copy. Blockers that appear only once are called one-off blockers.
+
 - **Scans:** Scans are automated accessibility checks. Equalify scans your web pages and PDFs to find issues and organize them by type and severity so you know what to fix first.
 
 - **WCAG:** WCAG stands for Web Content Accessibility Guidelines. These are international guidelines that explain how to make websites and digital content accessible to people with disabilities. Equalify uses WCAG standards to check your content and identify accessibility issues.

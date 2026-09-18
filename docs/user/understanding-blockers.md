@@ -25,5 +25,6 @@ Sometimes, a scan might flag something that is a false positive or an issue you 
 - You can click the **Ignore** button on any blocker.
 - **Effect**:
     - The blocker is immediately removed from your total count.
+    - Every identical copy of that blocker on other pages in the audit is ignored too, so a template-level issue only needs to be ignored once.
     - The "Ignore" status is **persistent**. Future scans will continue to ignore this item so it doesn't clutter your report.
 - You can always View Ignored items and reactivate them if needed.

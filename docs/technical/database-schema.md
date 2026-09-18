@@ -225,7 +225,7 @@ users
 
 ## Content Hashing
 
-Blockers, messages, and tags all use content hashing for deduplication, via a shared `hashStringToUuid` helper (double SHA-256, truncated to a UUID-shaped hex string):
+Blockers, messages, and tags all use content hashing for deduplication, via a shared `hashStringToUuid` helper (double SHA-256, truncated to a UUID-shaped hex string). The blocker hash is what the Recommendations view groups by (`getAuditRecommendations`), and what makes ignoring hash-wide: `ignored_blockers.content_hash_id` lets both the UI and `scanWebhook` treat every identical node, on any page or in any future scan, as one ignored blocker:
 
 ```typescript
 const contentNormalized = normalizeHtmlWithVdom(blocker.node);

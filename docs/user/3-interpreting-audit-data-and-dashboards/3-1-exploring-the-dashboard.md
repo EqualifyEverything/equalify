@@ -34,6 +34,7 @@ The bottom of the dashboard breaks down the "where" and "what" of your accessibi
 - **Blockers per URL:** The average number of blockers per page scanned, along with how that average has changed since your last scan.
 - **URLs with Most Blockers:** Ranks your pages by the number of issues found. Each URL links to the Detailed View filtered to that page, and includes a separate icon to open the live page itself in a new tab. The list is paginated, so you can browse beyond just the top few.
 - **Most Common Blockers:** Identifies the specific types of errors found and their frequency. Also paginated.
-- **Detailed view:** Toggle to the Detailed View to access the granular data behind the summary. We will cover the specifics of this view in the following page.<br>
+- **Detailed view:** Toggle to the Detailed View to access the granular data behind the summary. We will cover the specifics of this view in the following page.
+- **Recommendations:** Toggle to the Recommendations view to see your blockers grouped into unique fixes, ranked by how many blockers each fix clears. Many blockers are the same piece of code repeated across a site (a header, footer, or template component), so this view is the fastest way to decide what to fix first. It is also covered on the following page.<br>
 
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/1c69050655a9a9c15fdc750c5474e9b701645f7b/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Summary.png" alt="Audit Report Summary View displaying 138 Blockers Found, a chart showing 12 of 14 URLs (85.7%) have blockers, 1 days since last scanned, and lists of URLs with Most Blockers and Most Common Blockers." width="500"/>

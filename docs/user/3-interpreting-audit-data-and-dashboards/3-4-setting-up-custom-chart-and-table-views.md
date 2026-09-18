@@ -2,7 +2,9 @@ This page is intended for **Project Leads, Accessibility Specialists, and Develo
 ## Ignoring Blockers
 Sometimes, a scan might flag something that is a false positive or an issue you cannot fix immediately (e.g., a template issue). You can click the Ignore button on any blocker. The blocker is removed from your total count immediately.
 
-Furthermore, the ignore status is persistent. Meaning, future scans will continue to ignore this blocker, so it doesn't clutter your report. You can always View Ignored items and reactivate them if needed.<br>
+Ignoring a blocker also ignores every identical copy of it on other pages in the audit, so a template-level issue only needs to be ignored once. The Recommendations view groups these copies for you, which makes it the quickest place to ignore a repeated issue.
+
+Furthermore, the ignore status is persistent. Meaning, future scans will continue to ignore this blocker, so it doesn't clutter your report. You can always View Ignored items and reactivate them if needed. Reactivating restores every copy.<br>
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/e8904525428482d7a38868aab32695998eb3eeaf/user/User%20Guide%20Images/Sec%203_Ignoring%20Blockers.png" alt="Issue status controls showing Ignored labels with crossed-eye icons and a green Active button for toggling issue visibility." width="200"/><br>
 When an issue has been ignored, the chart immediately updates with an updated blocker count.
 ```important
