@@ -16,6 +16,8 @@ export const Footer = () => {
            Star or contribute on GitHub
            <FaGithub className="icon-small"/>
            </Link>
+          <Separator.Root orientation="vertical"/>
+          <span>v{import.meta.env.VITE_APP_VERSION}</span>
       </div>
   );
 };
