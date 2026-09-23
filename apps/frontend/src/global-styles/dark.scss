@@ -10,6 +10,10 @@ body.dark {
     color: variables.$yellow;
   }
 
+  a:active {
+    color: variables.$gray;
+  }
+
   // Form controls
   input,
   textarea {

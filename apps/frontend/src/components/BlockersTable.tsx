@@ -30,6 +30,7 @@ import {
 } from "react-icons/fa";
 import { PiFileHtml } from "react-icons/pi";
 import { AiFillFileUnknown, AiOutlineFileUnknown } from "react-icons/ai";
+import { FiExternalLink } from "react-icons/fi";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
 //import * as Switch from "@radix-ui/react-switch";
@@ -148,6 +149,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
   const [selectedContentType, setSelectedContentType] = useState<string>("all");
 
   const [searchString, setSearchString] = useState<string>(() => searchParams.get("search") ?? "");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Tracks whether the (uncontrolled) search input currently has text, purely
+  // to show/hide the clear button — updated on every keystroke, unlike
+  // searchString itself which only catches up once the debounce settles.
+  const [searchHasText, setSearchHasText] = useState<boolean>(() => searchString.length > 0);
 
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -446,14 +452,28 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         cell: ({ getValue }) => {
           const url = getValue() as string;
           return (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline break-all block max-w-xs"
-            >
-              {url}
-            </a>
+            <div className={style["url-cell"]}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleFilterByUrl(url);
+                }}
+                className={style["url-filter-link"]}
+                aria-label={`Filter table to blockers for ${url}`}
+              >
+                {url}
+              </a>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${url} in a new tab`}
+                className={style["external-link"]}
+              >
+                <FiExternalLink aria-hidden="true" focusable="false" />
+              </a>
+            </div>
           );
         },
       },
@@ -774,6 +794,29 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
+  // Drill down into a single URL's blockers: matches the exact-URL search
+  // (quoted, per buildUrlSearchClause on the backend) that
+  // BlockersTableSummary's URL links use, but applied in-place since this
+  // table is already mounted rather than navigated to.
+  const handleFilterByUrl = (url: string) => {
+    const quotedUrl = `"${url}"`;
+    setSearchString(quotedUrl);
+    // The search input is uncontrolled (defaultValue) so its debounce isn't
+    // disrupted by re-renders while typing; set it imperatively here since
+    // this update doesn't come from typing.
+    if (searchInputRef.current) {
+      searchInputRef.current.value = quotedUrl;
+    }
+    setSearchHasText(true);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("search", quotedUrl);
+      next.delete("page");
+      return next;
+    });
+    setAnnounceMessage(`Filtering blockers to ${url}`);
+  };
+
   const handleSearch = useDebouncedCallback(
     // function
     (value) => {
@@ -782,6 +825,18 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     },
     750
   );
+
+  const handleClearSearch = () => {
+    handleSearch.cancel();
+    setSearchString("");
+    setSearchHasText(false);
+    if (searchInputRef.current) {
+      searchInputRef.current.value = "";
+      searchInputRef.current.focus();
+    }
+    setPage(0);
+    setAnnounceMessage("Search cleared");
+  };
 
   const clearAllFilters = () => {
     setSelectedTags([]);
@@ -955,7 +1010,26 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           {/* Search Filter */}
           <StyledLabeledInput className={style["search-input"]}>
             <label>Search by URL</label>
-            <input defaultValue={searchString} onChange={(e) => handleSearch(e.target.value)} />
+            <div className={style["search-input-wrapper"]}>
+              <input
+                ref={searchInputRef}
+                defaultValue={searchString}
+                onChange={(e) => {
+                  setSearchHasText(e.target.value.length > 0);
+                  handleSearch(e.target.value);
+                }}
+              />
+              {searchHasText && (
+                <StyledButton
+                  onClick={handleClearSearch}
+                  icon={<FaTimes className="icon-small" />}
+                  label="Clear search"
+                  variant="naked"
+                  showLabel={false}
+                  className={style["search-clear-button"]}
+                />
+              )}
+            </div>
           </StyledLabeledInput>
 
           <div className="filter-group-right">
