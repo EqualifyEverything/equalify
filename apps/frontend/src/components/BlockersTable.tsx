@@ -22,6 +22,7 @@ import {
   FaArrowDown,
   FaArrowUp,
   FaCaretDown,
+  FaCheck,
   FaClipboard,
   FaCode,
   FaDownload,
@@ -43,7 +44,7 @@ import { a11yDark as prism } from "react-syntax-highlighter/dist/esm/styles/pris
 import { StyledButton } from "./StyledButton";
 import { BlockerUrlsDrawer } from "./BlockerUrlsDrawer";
 import { Card } from "./Card";
-import { TbEye, TbEyeX } from "react-icons/tb";
+import { TbEye, TbEyeX, TbHistory } from "react-icons/tb";
 import style from "./BlockersTable.module.scss";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import { SkeletonBlockersTable } from "./Skeleton";
@@ -96,10 +97,35 @@ export interface Blocker {
   duplicateCount: number;
 }
 
+export interface ScanOption {
+  id: string;
+  created_at: string;
+  status?: string;
+  blocker_count?: number;
+}
+
 interface BlockersTableProps {
   auditId: string;
   isShared: boolean;
+  /** Finished scans, newest first — feeds the scan history picker. */
+  scans?: ScanOption[];
+  /** Set when viewing a past scan: the table goes read-only. */
+  historicalScan?: ScanOption;
+  onScanChange?: (scanId: string | null) => void;
 }
+
+// MM/DD/YYYY, as used in the historical scan banner
+const formatScanDate = (date: string) =>
+  new Date(date).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
+
+const formatScanDateTime = (date: string) =>
+  new Date(date).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
 interface Option {
   value: string;
@@ -117,9 +143,21 @@ declare module '@tanstack/table-core' {
   }
 }
 
-export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
+export const BlockersTable = ({
+  auditId,
+  isShared,
+  scans = [],
+  historicalScan,
+  onScanChange,
+}: BlockersTableProps) => {
   const [scrollFadeRef, showScrollFade] = useScrollFade();
   const [searchParams, setSearchParams] = useSearchParams();
+  const historicalScanId = historicalScan?.id ?? null;
+  const isHistorical = !!historicalScan;
+  // Link target for "Return to most recent scan" — same URL minus the scan
+  const recentScanParams = new URLSearchParams(searchParams);
+  recentScanParams.delete("scan");
+  recentScanParams.delete("page");
   const page = parseInt(searchParams.get("page") ?? "0", 10);
   const pageSize = parseInt(searchParams.get("pageSize") ?? "10", 10);
 
@@ -258,6 +296,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     queryKey: [
       "auditBlockers",
       auditId,
+      historicalScanId,
       page,
       pageSize,
       selectedTags,
@@ -279,6 +318,9 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         sortOrder: sortOrder,
         //searchString: searchString
       };
+      if (historicalScanId) {
+        params.scanId = historicalScanId;
+      }
       if (selectedTags.length > 0) {
         //params.tags = selectedTags.join(',');
         params.tags = selectedTags.map((tag) => tag.value).join(",");
@@ -338,7 +380,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       return resp;
     },
     refetchInterval: Infinity,
-    placeholderData: (previousData) => previousData,
+    // Keep the previous page on screen while filters/pages change, but not
+    // across a scan switch — that would show one scan's rows under another's
+    // banner until the fetch lands.
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[2] === historicalScanId ? previousData : undefined,
   });
 
   // Announce pagination changes to screen readers once the newly requested
@@ -412,6 +458,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         cell: ({ getValue }) => {
           const shortId = getValue() as string;
           const auditIdNoDash = auditId.replace(/-/g, "");
+          // Past-scan rows come from stale_blockers, which the blocker detail
+          // page can't load — show the ID without a link.
+          if (isHistorical) {
+            return <span className={style["id-unavailable"]}>{shortId}</span>;
+          }
           return (
             <div style={{ display: "inline-flex" }}>
               <Link to={"/shared/" + auditIdNoDash + "/" + shortId}>{shortId}</Link>
@@ -489,7 +540,13 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
           return (
             <div className="text-sm max-w-sm">
               {messages[0] || "No message"}
-              {duplicateCount > 1 && (
+              {/* The occurrences drawer reads the latest scan, so past scans just show the count */}
+              {duplicateCount > 1 && isHistorical && (
+                <div className="font-small" style={{ marginTop: "4px" }}>
+                  {duplicateCount} occurrences in this scan
+                </div>
+              )}
+              {duplicateCount > 1 && !isHistorical && (
                 <div style={{ marginTop: "4px" }}>
                   <BlockerUrlsDrawer
                     auditId={auditId}
@@ -684,6 +741,25 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
         cell: ({ getValue, row }) => {
           const blockerId = getValue() as string;
           const contentHashId = row.original.content_hash_id;
+          // Past scans are read-only: the server resolves ignore status
+          // against the audit's current (hash-wide) ignore list.
+          if (isHistorical) {
+            return (
+              <StyledButton
+                onClick={undefined}
+                disabled
+                label={row.original.ignored ? "Ignored" : "Active"}
+                icon={
+                  row.original.ignored ? (
+                    <TbEyeX className="icon-small" />
+                  ) : (
+                    <TbEye className="icon-small" />
+                  )
+                }
+                variant={row.original.ignored ? "toggle-ignored" : "toggle"}
+              />
+            );
+          }
           const isIgnored = ignoredBlockers?.has(blockerId) || false;
           return (
             <StyledButton
@@ -722,7 +798,7 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, auditId, isShared]
+    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, auditId, isShared, isHistorical]
   );
 
   const table = useReactTable({
@@ -845,6 +921,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
     setPage(0);
   };
 
+  // Past-scan exports are named for the scan's date, not today's
+  const exportDatePart = () =>
+    new Date(historicalScan?.created_at ?? Date.now()).toISOString().split("T")[0] +
+    (historicalScan ? "-scan" : "");
+
   const exportFilteredMutation = useMutation({
     mutationFn: async () => {
       const params: Record<string, string> = {
@@ -865,13 +946,16 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       if (searchString.length >= 3 || searchString === "") {
         params.searchString = searchString;
       }
+      if (historicalScanId) {
+        params.scanId = historicalScanId;
+      }
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/exportAuditTable",
         options: { queryParams: params },
       }).response;
       const csv = await response.body.text();
-      triggerCsvDownload(csv, `blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
+      triggerCsvDownload(csv, `blockers-${auditId}-${exportDatePart()}.csv`);
     },
     onSuccess: () => {
       setAnnounceMessage("Exported filtered blockers to CSV", "success");
@@ -887,10 +971,14 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
         path: "/exportAuditTable",
-        options: { queryParams: { id: auditId } },
+        options: {
+          queryParams: historicalScanId
+            ? { id: auditId, scanId: historicalScanId }
+            : { id: auditId },
+        },
       }).response;
       const csv = await response.body.text();
-      triggerCsvDownload(csv, `blockers-all-${auditId}-${new Date().toISOString().split("T")[0]}.csv`);
+      triggerCsvDownload(csv, `blockers-all-${auditId}-${exportDatePart()}.csv`);
     },
     onSuccess: () => {
       setAnnounceMessage("Exported all blockers to CSV", "success");
@@ -924,6 +1012,21 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
 
   return (
     <div className={style.BlockersTable}>
+      {historicalScan && (
+        <div className={style["historical-banner"]}>
+          <TbHistory className="icon-small" aria-hidden="true" />
+          <p>
+            <strong>Viewing data as of {formatScanDate(historicalScan.created_at)}.</strong>{" "}
+            Summary, Recommendations, and blocker detail pages are only available for the most recent scan.
+          </p>
+          <Link
+            to={{ search: recentScanParams.toString() }}
+            onClick={() => setAnnounceMessage("Showing the most recent scan", "normal")}
+          >
+            Return to most recent scan
+          </Link>
+        </div>
+      )}
       {/* Filter Controls */}
       <div>
 
@@ -935,22 +1038,84 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
             {data?.pagination?.totalCount === 1 ? "Blocker" : "Blockers"}
           </div>
           <div className={style["table-top-actions"]}>
+            {/* Scan History Dropdown — only once there's a past scan to pick */}
+            {onScanChange && scans.length > 1 && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger className={style["table-action-trigger"]}>
+                  <TbHistory aria-hidden="true" />
+                  <span>Scan History</span>
+                  <FaCaretDown className={style["export-trigger-caret"]} aria-hidden="true" />
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className={style["export-dropdown-content"] + " " + style["scan-history-content"]}
+                    align="end"
+                    sideOffset={4}
+                  >
+                    <DropdownMenu.Label className={style["scan-history-label"]}>
+                      View blockers from
+                    </DropdownMenu.Label>
+                    <DropdownMenu.RadioGroup
+                      value={historicalScanId ?? scans[0].id}
+                      onValueChange={(scanId) => {
+                        const isLatest = scanId === scans[0].id;
+                        const scan = scans.find((s) => s.id === scanId);
+                        onScanChange(isLatest ? null : scanId);
+                        setAnnounceMessage(
+                          isLatest || !scan
+                            ? "Showing the most recent scan"
+                            : `Showing blockers as of ${formatScanDate(scan.created_at)}`,
+                          "normal"
+                        );
+                      }}
+                    >
+                      {scans.map((scan, index) => (
+                        <DropdownMenu.RadioItem
+                          key={scan.id}
+                          value={scan.id}
+                          className={style["export-dropdown-item"] + " " + style["scan-history-item"]}
+                        >
+                          <span className={style["scan-history-check"]} aria-hidden="true">
+                            <DropdownMenu.ItemIndicator>
+                              <FaCheck />
+                            </DropdownMenu.ItemIndicator>
+                          </span>
+                          <div>
+                            <div className={style["export-dropdown-item-label"]}>
+                              {formatScanDateTime(scan.created_at)}
+                              {index === 0 && " (most recent)"}
+                            </div>
+                            <div className={style["export-dropdown-item-desc"]}>
+                              {scan.blocker_count !== undefined &&
+                                `${scan.blocker_count.toLocaleString()} ${scan.blocker_count === 1 ? "blocker" : "blockers"}`}
+                              {scan.status === "failed" && " · scan failed"}
+                            </div>
+                          </div>
+                        </DropdownMenu.RadioItem>
+                      ))}
+                    </DropdownMenu.RadioGroup>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            )}
             {/* ColumnToggle */}
             <BlockersTableColumnToggle
               table={table}
+              triggerClassName={style["table-action-trigger"]}
             />
             {/* Export CSV Dropdown */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger
-                className={style["export-trigger"]}
+                className={style["table-action-trigger"]}
                 disabled={anyExportPending}
-                aria-label="Export CSV options"
+                aria-label="Download CSV options"
               >
                 {anyExportPending ? (
                   <span className={style["export-trigger-spinner"]} aria-hidden="true" />
                 ) : (
                   <FaDownload aria-hidden="true" />
                 )}
+                <span>Download</span>
                 <FaCaretDown className={style["export-trigger-caret"]} aria-hidden="true" />
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
@@ -982,7 +1147,11 @@ export const BlockersTable = ({ auditId, isShared }: BlockersTableProps) => {
                     <FaDownload className="icon-small" aria-hidden="true" />
                     <div>
                       <div className={style["export-dropdown-item-label"]}>Export all blockers</div>
-                      <div className={style["export-dropdown-item-desc"]}>All blockers in this audit, ignoring current filters</div>
+                      <div className={style["export-dropdown-item-desc"]}>
+                        {isHistorical
+                          ? "All blockers from this scan, ignoring current filters"
+                          : "All blockers in this audit, ignoring current filters"}
+                      </div>
                     </div>
                   </DropdownMenu.Item>
                   {!isShared && (

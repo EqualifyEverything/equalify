@@ -4,10 +4,11 @@ import * as Popover from "@radix-ui/react-popover";
 import { Blocker } from "./BlockersTable";
 import { MdOutlineClose } from "react-icons/md";
 import { LuSettings2 } from "react-icons/lu";
-import { StyledButton } from "./StyledButton";
 
 interface BlockersTableColumnToggleProps {
   table: Table<Blocker>
+  /** Matches the trigger to its neighbouring table actions (Scan History, Download) */
+  triggerClassName?: string
 }
 interface StringMap {
   [key: string]: string;
@@ -23,20 +24,14 @@ const labelMap: StringMap = {
   'id': "Ignore"
 }
 
-export const BlockersTableColumnToggle = ({ table }: BlockersTableColumnToggleProps) => {
+export const BlockersTableColumnToggle = ({ table, triggerClassName }: BlockersTableColumnToggleProps) => {
 
   return (
     <div className={style["BlockersTableColumnToggle"]}>
       <Popover.Root>
-        <Popover.Trigger asChild className={style["blockersTableToggleButton"]}>
-          <StyledButton
-            variant="naked"
-            className="large"
-            icon={<LuSettings2 />}
-            label={"Show/Hide Table Columns"}
-            showLabel={false}
-            onClick={() => { }}
-          />
+        <Popover.Trigger className={triggerClassName}>
+          <LuSettings2 aria-hidden="true" />
+          <span>Columns</span>
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content sideOffset={5} className={style["popoverContent"]}>

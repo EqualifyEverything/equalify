@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId, buildUrlSearchClause } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, validateUuid, buildUrlSearchClause, getHistoricalBlockers } from "#src/utils";
 
 const BATCH_SIZE = 1000;
 
@@ -28,6 +28,76 @@ export const exportAuditTable = async () => {
   // Mirrors getAuditTable: "all" | "group" (one row per unique hash) | "hide"
   // (only blockers appearing once in the latest scan).
   const duplicatesMode = (event.queryStringParameters as any).duplicates || "all";
+
+  // Scan-history picker: export a specific past scan (see getAuditTable).
+  const scanId = (event.queryStringParameters as any).scanId || null;
+  if (scanId) {
+    if (!validateUuid(scanId)) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Invalid scanId" }) };
+    }
+    await db.connect();
+    try {
+      const audit = (
+        await db.query({
+          text: `SELECT "name" FROM "audits" WHERE "id" = $1`,
+          values: [auditId],
+        })
+      ).rows?.[0];
+      const scan = (
+        await db.query({
+          text: `SELECT "created_at" FROM "scans" WHERE "id" = $1 AND "audit_id" = $2`,
+          values: [scanId, auditId],
+        })
+      ).rows?.[0];
+      if (!scan) {
+        return { statusCode: 404, body: JSON.stringify({ error: "Scan not found" }) };
+      }
+      const { blockers } = await getHistoricalBlockers({
+        auditId,
+        scanId,
+        filters: {
+          contentType,
+          tags: tagFilters,
+          categories: typeFilters,
+          status: statusParam,
+          searchString,
+          sortBy,
+          sortOrder,
+        },
+      });
+      const rows = blockers.map((b) =>
+        [
+          b.type,
+          b.url,
+          b.messages?.[0] || "",
+          b.content || "",
+          b.tags.map((t) => t.content).join("; "),
+          b.categories.join("; "),
+          b.ignored ? "Ignored" : "Active",
+          b.short_id || "",
+          b.occurrences,
+        ]
+          .map(csvEscape)
+          .join(",")
+      );
+      const csv = [
+        "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences",
+        ...rows,
+      ].join("\n");
+      const scanDatePart = new Date(scan.created_at).toISOString().split("T")[0];
+      const filename = `blockers-${audit?.name ? audit.name.replace(/[^a-z0-9-_]/gi, "_") + "-" : ""}${auditId}-scan-${scanDatePart}.csv`;
+      return {
+        statusCode: 200,
+        headers: {
+          "content-type": "text/csv; charset=utf-8",
+          "content-disposition": `attachment; filename="${filename}"`,
+        },
+        body: csv,
+      };
+    } finally {
+      await db.clean();
+    }
+  }
 
   await db.connect();
   const audit = (

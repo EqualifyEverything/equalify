@@ -11,8 +11,8 @@ The **Search by URL** field stays visible at the top of the page. The rest of th
 Only standards that actually apply to your data appear in the list.
 ```
 - **Content Type filter:** Quickly switch between issues found in HTML (web) versus those found within PDF documents, or view all. Each option shows a live count of matching blockers.<br>
-- **Show/hide columns:** Tailor the view to show or hide audit details.<br>
-- **Download the report** as a CSV file, which is helpful for teams that want to manage issues in issue-tracking software (e.g., JIRA, Rally). Click the download icon to choose from:
+- **Show/hide columns:** Click **Columns** to tailor the view to show or hide audit details.<br>
+- **Download the report** as a CSV file, which is helpful for teams that want to manage issues in issue-tracking software (e.g., JIRA, Rally). Click **Download** to choose from:
     - **Export filtered blockers:** Only the blockers matching your current filters and search.
     - **Export all blockers:** Every blocker in the audit, ignoring any filters currently applied.
     - **Export PDF Source Page URLs:** A separate export listing the HTML pages that link out to PDF documents, alongside those PDF URLs — useful for tracking down where a flagged PDF is referenced from. Only available when viewing your own audits, not on shared report links.<br>
@@ -39,6 +39,20 @@ Important Details for Developers: To move from identifying a problem to fixing i
 - **Accessibility Standards:** What accessibility standards this blocker relates to, if any.
 - **Ignore:** Toggle an issue on/off for the report. Ignoring a blocker also ignores every identical copy of it on other pages in the audit (the same flagged code in a shared header, for example), and the ignore carries forward to future scans. Reactivating it restores all copies.<br>
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/46ed941ba70a82efbf5bddc737451c34a90fff83/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Detailed%20View.png" alt="Detailed audit results table listing Type, URL, Issue, and Code columns with View Code buttons for each issue." width="500"/>
+
+## Viewing Past Scans
+Click **Scan History** (next to Columns and Download) to see the blockers a previous scan found. The list shows each finished scan's date, time, and blocker count, with the most recent scan at the top.
+
+While you're viewing a past scan:
+- A yellow banner at the top of the table reads **"Viewing data as of MM/DD/YYYY"**. Click **Return to most recent scan** in the banner to go back.
+- Search, filters, and **Download** all work on that scan's blockers. A CSV download only includes blockers from that scan.
+- The **Summary View** and **Recommendations** tabs are greyed out, because they only cover the most recent scan.
+- The **ID** column is greyed out and doesn't link to Issue Detail pages. Those pages are only available for blockers in the most recent scan.
+- The **Ignore** column is read-only. It shows whether each blocker is ignored under your audit's current ignore settings.
+
+```tip
+💡Tip: The page address includes the scan you're viewing, so you can bookmark or share a link to a specific past scan.
+```
 
 ## AI-Generated Blocker Summary
 When you open an Issue Detail page, Equalify displays an **AI-generated Blocker Summary** below the issue details. This summary is intended to help you understand and fix the issue without needing to look up the WCAG rule yourself.
