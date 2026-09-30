@@ -2,6 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .button {
+  @include fonts.raleway;
   font-weight: bold;
   color: variables.$white;
   padding: variables.$spacing variables.$spacing * 2;

@@ -18,6 +18,16 @@ The Co-Branding panel lets Admins display a custom logo in the Equalify interfac
 ⚠️Important: Equalify cannot host your logo image. The Logo URL must point to an image already published on a publicly accessible server. If the URL becomes unavailable, the logo will stop displaying.
 ```
 
+## Login
+The Login panel appears only when Equalify is set up to sign in with Single Sign-On (SSO). It sets the organization name shown on the sign-in screen, so users know which account to sign in with.
+
+### Setting the organization name
+1. Navigate to **Account > System**.
+2. In the **Login** panel, enter a short **Organization Name** (e.g., "UIC"). A preview below the field shows how the sign-in button will read, such as "Sign in with your UIC account".
+3. Settings are saved automatically as you type — there is no Save button.
+
+If the field is left blank, Equalify uses "your organization account" instead. The same name is used in the email sent when an access request is approved.
+
 ## LLM Blocker Summaries
 The LLM Blocker Summaries panel controls whether Equalify generates AI-powered explanations and fix instructions on Issue Detail pages (see [3-2: Audit Report Detailed View](../3-interpreting-audit-data-and-dashboards/3-2-audit-report-detailed-view.md)). These summaries are generated using AWS Bedrock and are cached in the database after the first request.
 

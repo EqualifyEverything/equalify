@@ -1,6 +1,12 @@
 $font-small : .833rem;
 $font-normal : 16px;
 
+@mixin raleway {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 @mixin raleway-medium {
   font-family: "Raleway", sans-serif;
   font-optical-sizing: auto;

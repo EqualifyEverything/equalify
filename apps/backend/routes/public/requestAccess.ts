@@ -1,4 +1,4 @@
-import { db, event, isSsoEnabled } from "#src/utils";
+import { db, event, getSsoAccountLabel, isSsoEnabled } from "#src/utils";
 
 //
 // Public endpoint: lets someone with an SSO account but no Equalify access
@@ -36,8 +36,9 @@ export const requestAccess = async () => {
         values: [email],
     })).rows?.[0]?.id;
     if (inviteExists) {
+        const accountLabel = await getSsoAccountLabel();
         await db.clean();
-        return { status: 'success', message: 'You already have an invite — sign in with SSO to activate your account.' };
+        return { status: 'success', message: `You already have an invite — sign in with ${accountLabel} to activate your account.` };
     }
 
     const pendingExists = (await db.query({
