@@ -5,7 +5,8 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 interface ButtonProps
   extends React.PropsWithChildren,
-    Pick<React.AriaAttributes, "aria-expanded" | "aria-controls" | "aria-haspopup" | "aria-describedby"> {
+    Pick<React.AriaAttributes, "aria-expanded" | "aria-controls" | "aria-haspopup" | "aria-describedby" | "aria-hidden">,
+    Pick<React.ButtonHTMLAttributes<HTMLButtonElement>, "tabIndex"> {
   variant?: string;
   icon?: ReactNode;
   onClick: undefined | ((e?:any) => Promise<void> | void) ;

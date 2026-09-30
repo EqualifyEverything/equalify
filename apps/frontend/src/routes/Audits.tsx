@@ -17,6 +17,7 @@ import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { ChangeEvent, useState } from "react";
 import { useUser } from "../queries";
 import { TbHelpCircleFilled } from "react-icons/tb";
+import { WhatsNew } from "#src/components/WhatsNew.tsx";
 
 export interface Scan {
   blockers_aggregate: {
@@ -129,6 +130,7 @@ export const Audits = () => {
           </div>
         </div>
       </div>
+      <WhatsNew />
       <>
 
         <Tabs.Root
