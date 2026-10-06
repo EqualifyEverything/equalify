@@ -1,4 +1,4 @@
-import { db, event, isStaging, sendEmail } from "#src/utils";
+import { db, event, getSsoAccountLabel, isStaging, sendEmail } from "#src/utils";
 
 //
 // Admin-only: approve or deny an access request. Approving creates an invite,
@@ -58,6 +58,7 @@ export const reviewAccessRequest = async () => {
         text: `UPDATE "access_requests" SET "status"='approved', "reviewed_by"=$2, "reviewed_at"=now(), "updated_at"=now() WHERE "id"=$1`,
         values: [id, event.claims.sub],
     });
+    const accountLabel = await getSsoAccountLabel();
     await db.clean();
 
     // notify the requester; the approval already succeeded, so an email failure
@@ -73,7 +74,7 @@ export const reviewAccessRequest = async () => {
           </tr>
           <tr>
             <td style="padding:0 24px 24px 24px; font-size:16px; line-height:1.5; color:#334155;">
-              Your request to access Equalify has been approved. Sign in with your SSO account below to get started:
+              Your request to access Equalify has been approved. Sign in with ${escapeHtml(accountLabel)} below to get started:
             </td>
           </tr>
 
@@ -99,3 +100,10 @@ export const reviewAccessRequest = async () => {
 
     return { status: 'success', message: 'Request approved — invite created.' };
 };
+
+// the organization name is admin-entered text going into an HTML email
+const escapeHtml = (text: string) => text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');

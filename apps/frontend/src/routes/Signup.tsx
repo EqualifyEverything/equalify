@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import * as Auth from 'aws-amplify/auth';
 import * as API from 'aws-amplify/api';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { sleep, useGlobalStore, trackSession } from '#src/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import styles from "./Signup.module.scss";
 import { Logo } from "#src/components/Logo";
 import { StyledButton } from "#src/components/StyledButton";
+import { ssoAccountLabel, useOrganizationName } from "#src/queries";
 
 export const Signup = () => {
     const queryClient = useQueryClient();
@@ -15,6 +16,9 @@ export const Signup = () => {
     const [requestSubmitted, setRequestSubmitted] = useState('');
     const navigate = useNavigate();
     const isSso = !!import.meta.env.VITE_SSO_ENABLED;
+    const { data: organizationName } = useOrganizationName();
+    // pre-filled from the SSO account when arriving from a refused sign-in on the login screen
+    const ssoIdentity = useLocation().state as { name?: string; email?: string } | null;
 
     const requestAccess = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -101,11 +105,16 @@ export const Signup = () => {
         {isSso ? (requestSubmitted ? <div className={`${styles.signUpForm}`} role="status">
             <p>{requestSubmitted}</p>
         </div> : <div className={`${styles.signUpForm}`}>
-            <p>Enter your institutional email address and an administrator will review your request.</p>
+            <h2 className={styles.howItWorksHeading}>How this works</h2>
+            <ol className={styles.howItWorks}>
+                <li>Enter your name and institutional email address below.</li>
+                <li>An administrator reviews your request.</li>
+                <li>Once you're approved, you'll get an email. Then sign in with {ssoAccountLabel(organizationName)}.</li>
+            </ol>
             <label htmlFor='name'>Name</label>
-            <input id='name' name='name' required type='text' placeholder='John Doe' />
+            <input id='name' name='name' required type='text' placeholder='John Doe' defaultValue={ssoIdentity?.name ?? ''} />
             <label htmlFor='email'>Email address</label>
-            <input id='email' name='email' required type='email' placeholder='johndoe@uic.edu' />
+            <input id='email' name='email' required type='email' placeholder='johndoe@uic.edu' defaultValue={ssoIdentity?.email ?? ''} />
             {error && <div className={`${styles.error}`} role="alert">{error}</div>}
             <StyledButton
                 variant='green'

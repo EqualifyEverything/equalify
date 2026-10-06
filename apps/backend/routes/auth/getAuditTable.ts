@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId, buildUrlSearchClause } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, validateUuid, buildUrlSearchClause, getHistoricalBlockers } from "#src/utils";
 
 export const getAuditTable = async () => {
   const auditId = (event.queryStringParameters as any).id;
@@ -30,6 +30,89 @@ export const getAuditTable = async () => {
   const duplicatesMode =
     (event.queryStringParameters as any).duplicates || "all";
   const dedupe = duplicatesMode === "group";
+
+  // Scan-history picker: a specific past scan, read-only. Its rows may already
+  // live in stale_blockers, which Hasura doesn't track, so it's plain SQL.
+  const scanId = (event.queryStringParameters as any).scanId || null;
+  if (scanId) {
+    if (!validateUuid(scanId)) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Invalid scanId" }) };
+    }
+    await db.connect();
+    try {
+      const audit = (
+        await db.query({
+          text: `SELECT "name" FROM "audits" WHERE "id" = $1`,
+          values: [auditId],
+        })
+      ).rows?.[0];
+      const scan = (
+        await db.query({
+          text: `SELECT "id", "created_at" FROM "scans" WHERE "id" = $1 AND "audit_id" = $2`,
+          values: [scanId, auditId],
+        })
+      ).rows?.[0];
+      if (!scan) {
+        return { statusCode: 404, body: JSON.stringify({ error: "Scan not found" }) };
+      }
+
+      const { blockers, totalCount, statusCounts, typeCounts } =
+        await getHistoricalBlockers({
+          auditId,
+          scanId,
+          filters: {
+            contentType,
+            tags: tagFilters,
+            categories: typeFilters,
+            status: statusParam,
+            searchString,
+            sortBy,
+            sortOrder,
+          },
+          limit: pageSize,
+          offset: page * pageSize,
+        });
+      const availableTags = (
+        await db.query({ text: `SELECT "id", "content" FROM "tags" ORDER BY "content" ASC` })
+      ).rows;
+      const availableCategories = (
+        await db.query({ text: `SELECT DISTINCT "category" FROM "messages" ORDER BY "category" ASC` })
+      ).rows.map((row: any) => row.category).filter(Boolean);
+
+      return {
+        statusCode: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          audit_id: auditId,
+          audit_name: audit?.name,
+          scan_id: scan.id,
+          scan_date: scan.created_at,
+          historical: true,
+          blockers: blockers.map(({ occurrences, ...blocker }) => ({
+            ...blocker,
+            duplicateCount: occurrences,
+          })),
+          pagination: {
+            page,
+            pageSize,
+            totalCount,
+            totalPages: Math.ceil(totalCount / pageSize),
+          },
+          statusCounts,
+          typeCounts,
+          availableTags,
+          availableCategories,
+          filters: {
+            tags: tagFilters,
+            types: typeFilters,
+            status: statusParam,
+          },
+        }),
+      };
+    } finally {
+      await db.clean();
+    }
+  }
 
   await db.connect();
   const audit = (

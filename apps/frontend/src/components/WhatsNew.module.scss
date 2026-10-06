@@ -1,0 +1,124 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+
+.WhatsNew {
+  background: variables.$white;
+  border: 1px solid variables.$gray;
+  border-left: 4px solid variables.$green;
+  border-radius: variables.$spacing;
+  padding: calc(variables.$spacing * 2);
+  margin-bottom: calc(variables.$spacing * 3);
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(variables.$spacing * 1.5);
+  }
+
+  .icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    color: variables.$green;
+  }
+
+  .titles {
+    flex: 1;
+    min-width: 0;
+
+    h2 {
+      margin: 0;
+      @include fonts.font-size-normal;
+      line-height: 1.3em;
+    }
+
+    .title-trigger {
+      all: unset;
+      cursor: pointer;
+      text-align: left;
+      border-radius: calc(variables.$spacing / 2);
+
+      &:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
+    }
+
+    time {
+      display: block;
+      margin-top: calc(variables.$spacing / 2);
+      @include fonts.font-size-small;
+      opacity: 0.8;
+    }
+  }
+
+  .eyebrow {
+    color: variables.$green-darker;
+  }
+
+  .actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: variables.$spacing;
+  }
+
+  .chevron {
+    transition: transform 0.12s ease-out;
+  }
+
+  button[data-state="open"] .chevron {
+    transform: rotate(180deg);
+  }
+
+  .body {
+    @include fonts.font-size-normal;
+    margin-top: calc(variables.$spacing * 1.5);
+    padding-left: calc(20px + variables.$spacing * 1.5);
+    padding-right: calc(20px + variables.$spacing * 1.5);
+    
+    p {
+      margin: 0 0 variables.$spacing;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    .body {
+      padding-left: 0;
+    }
+  }
+}
+
+:global(body.dark) {
+  .WhatsNew {
+    background: variables.$dark-surface;
+    border-color: variables.$dark-border;
+    border-left-color: variables.$green;
+    color: variables.$paper;
+
+    .icon,
+    .eyebrow {
+      color: variables.$green-light;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .WhatsNew .chevron {
+    transition: none;
+  }
+}

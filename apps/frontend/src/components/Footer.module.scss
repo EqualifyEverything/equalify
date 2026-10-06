@@ -15,6 +15,11 @@
   justify-content: center;
   padding-top:variables.$spacing;
   padding-bottom:variables.$spacing;
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    flex-direction: column;
+  }
+
   a, a:visited {
     display: inline-block;
     padding:variables.$spacing;

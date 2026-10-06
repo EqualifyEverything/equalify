@@ -39,3 +39,115 @@
         padding: variables.$spacing*2;
     }
 }
+// SSO: side-by-side "I have access" / "I need access" cards
+.login.sso {
+    max-width: 760px;
+    .header {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+.ssoOptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(variables.$spacing * 3);
+
+    @media screen and (max-width: variables.$breakpoint-small) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.option, .ssoDenied {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing;
+    background: variables.$white;
+    border: 1px solid variables.$gray;
+    border-radius: variables.$spacing;
+    padding: calc(variables.$spacing * 3);
+
+    h2 {
+        margin: 0;
+        @include fonts.font-size-normal;
+    }
+    p {
+        margin: 0;
+    }
+}
+
+.option {
+    // keep both cards' buttons aligned along the bottom edge
+    > button, > .linkButton {
+        margin-top: auto;
+    }
+}
+
+.ssoDenied {
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+    border-left: 4px solid variables.$red;
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: variables.$spacing;
+        margin-top: variables.$spacing;
+        > * {
+            flex: 1 1 180px;
+            width: auto;
+            margin-top: 0;
+        }
+    }
+}
+
+// Navigation styled to match StyledButton: outlined by default, green when primary
+.linkButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: variables.$spacing * 2;
+    @include fonts.font-size-normal;
+    // buttons use the browser's default font, not Raleway; match them
+    font-family: system-ui, sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    color: variables.$black;
+    border: 1px solid variables.$black;
+    border-radius: calc(variables.$spacing / 2);
+    box-shadow: variables.$shadow-small;
+    transition: opacity 0.12s ease-out;
+    &:visited {
+        color: variables.$black;
+    }
+    &:hover {
+        opacity: 0.85;
+    }
+    &:active {
+        opacity: 0.7;
+    }
+
+    &.primary, &.primary:visited {
+        background: variables.$green;
+        border-color: variables.$green-dark;
+        color: variables.$white;
+    }
+}
+
+:global(body.dark) {
+    .option, .ssoDenied {
+        background: variables.$dark-surface;
+        border-color: variables.$dark-border;
+        color: variables.$paper;
+    }
+    .ssoDenied {
+        border-left-color: variables.$red;
+    }
+    .linkButton:not(.primary) {
+        &, &:visited {
+            color: variables.$paper;
+            border-color: variables.$paper;
+        }
+    }
+}

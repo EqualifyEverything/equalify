@@ -36,6 +36,17 @@
     input[type="text"], input[type="password"], input[type="email"]{
         width: 100%
     }
+    .howItWorksHeading{
+        margin: 0;
+        @include fonts.font-size-normal;
+    }
+    .howItWorks{
+        margin: variables.$spacing 0 0;
+        padding-left: calc(variables.$spacing * 3);
+        li + li{
+            margin-top: calc(variables.$spacing / 2);
+        }
+    }
     .error{
         color: variables.$red;
         border-radius: calc(variables.$spacing / 2);

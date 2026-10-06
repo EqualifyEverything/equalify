@@ -13,9 +13,13 @@ From the email invite, select "Accept Invite" to be redirected to the Equalify s
 ### Logging in
 Depending on how your organization manages Equalify you can sign in using Single Sign-On (SSO) or Create a New Account, via the Sign Up for Equalify form.
 #### Using SSO to Log In
-If your organization has set up SSO for Equalify, select "Sign in with SSO", and log in using your existing credentials.
+If your organization has set up SSO for Equalify, the sign-in screen shows two options:
+
+- **I have access:** If an administrator has already approved your access, select "Sign in with your organization account" (the button may name your organization) and log in using your existing credentials.
+- **I need access:** If you haven't been approved yet, select "Request access", enter your name and institutional email address, and submit the form. An administrator reviews requests from **Account > Requests**, and you'll get an email once you're approved.
+
 ```important
-⚠️Important: You must have previously received an invitation to join Equalify for SSO to work.
+⚠️Important: Having an account with your organization doesn't give you access to Equalify on its own — an administrator must approve your access first. If you sign in before being approved, Equalify shows the account you signed in with and offers a "Request access" button with your details already filled in, or lets you switch to a different account.
 ```
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/b724b4148ae2cc4c3f664114cffe3159130a881a/user/User%20Guide%20Images/Sec%201_Sign%20In.png" alt="Equalify sign-in page displaying the heading Sign in to Equalify, Sign in with SSO button, and a Create an account link for new users." width="400"/>
 

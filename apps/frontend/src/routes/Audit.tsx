@@ -115,6 +115,18 @@ export const Audit = () => {
       const next = new URLSearchParams(prev);
       if (value === "detailed" || value === "recommendations") next.set("view", value);
       else next.delete("view"); // "summary" is the default, keep the URL clean
+      if (value !== "detailed") next.delete("scan"); // scan history is Detailed-only
+      return next;
+    });
+  };
+  // Detailed view scan history (?scan=<id>). Only a past scan counts — a
+  // missing/unknown id or the latest scan's id just shows the latest scan.
+  const setHistoricalScanId = (scanId: string | null) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (scanId) next.set("scan", scanId);
+      else next.delete("scan");
+      next.delete("page"); // page numbers don't carry across scans
       return next;
     });
   };
@@ -184,6 +196,16 @@ export const Audit = () => {
   useEffect(() => {
     setPages(urls);
   }, [urls]);
+
+  // Finished scans, newest first; [0] is the one the report shows by default.
+  const finishedScans = (scans ?? [])
+    .filter((s: any) => s.status === "complete" || s.status === "failed")
+    .reverse();
+  const scanParam = searchParams.get("scan");
+  const historicalScan =
+    blockersTableView === "detailed" && scanParam
+      ? finishedScans.slice(1).find((s: any) => s.id === scanParam)
+      : undefined;
 
   //console.log(auditId);
   const { data: audit, refetch: refetchAudit } = useQuery({
@@ -1084,13 +1106,14 @@ export const Audit = () => {
             <h2>Audit Report <span className="font-normal">{blockersTableViewLabels[blockersTableView]}</span></h2>
 
             <Tabs.List aria-label="Audit Report View" className={style["blockers-view-selector"]}>
-                <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} asChild>
+                {/* Summary and Recommendations only cover the latest scan */}
+                <Tabs.Trigger value="summary" className={style["blockers-view-trigger"]} disabled={!!historicalScan} asChild>
                   <StyledButton variant="naked" label="Summary View" onClick={undefined}>Summary View</StyledButton>
                 </Tabs.Trigger>
                 <Tabs.Trigger value="detailed" className={style["blockers-view-trigger"]} asChild>
                   <StyledButton variant="naked" label="Detailed View" onClick={undefined}>Detailed View</StyledButton>
                 </Tabs.Trigger>
-                <Tabs.Trigger value="recommendations" className={style["blockers-view-trigger"]} asChild>
+                <Tabs.Trigger value="recommendations" className={style["blockers-view-trigger"]} disabled={!!historicalScan} asChild>
                   <StyledButton variant="naked" label="Recommendations" badge={<span className={style["new-badge"]}>New</span>} onClick={undefined}>Recommendations</StyledButton>
                 </Tabs.Trigger>
               </Tabs.List>
@@ -1106,7 +1129,15 @@ export const Audit = () => {
             />
           </Tabs.Content>
           <Tabs.Content value="detailed">
-            {auditId && <BlockersTable auditId={auditId} isShared={isShared} />}
+            {auditId && (
+              <BlockersTable
+                auditId={auditId}
+                isShared={isShared}
+                scans={finishedScans}
+                historicalScan={historicalScan}
+                onScanChange={setHistoricalScanId}
+              />
+            )}
 
           </Tabs.Content>
           <Tabs.Content value="recommendations">

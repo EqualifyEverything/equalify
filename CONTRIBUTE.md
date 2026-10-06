@@ -173,6 +173,26 @@ equalify/
 4. Add queue routing in `aws-lambda-scan-sqs-router`
 5. Update type definitions in `shared/types/`
 
+## Publishing a What's New Update
+
+The "What's New" panel at the top of the Audits screen shows the contents of [`WHATS_NEW.md`](WHATS_NEW.md) in the repository root. It holds a single entry — the latest update — with a short header followed by Markdown:
+
+```markdown
+---
+title: URL drilldown and a new Recommendations view
+date: 2026-09-29
+---
+The detailed view now lets you **drill down into any URL**...
+
+A second paragraph, with a [supporting link](https://example.com).
+```
+
+- `title` and `date` (`YYYY-MM-DD`) are required, as is some body text. If any are missing, the panel keeps showing the previous copy.
+- The body supports standard Markdown: paragraphs, **bold**, *italics*, links and lists. Keep it to a few short paragraphs, and avoid headings (the title is already the panel's heading).
+- To publish, edit the file (GitHub's web editor is fine) and commit it to `staging` or `main`. The deployed app fetches the file from its own branch on GitHub, so no redeploy is needed; changes appear within about five minutes as GitHub's cache expires. Each build also bundles a copy, which is shown if GitHub can't be reached.
+- The panel starts collapsed, showing just the title and date; users expand it by clicking the title or the chevron, or dismiss it with the close button. Both choices are stored per browser and are tied to the entry's `title` and `date`, so changing either one brings the panel back (collapsed) for everyone. Editing only the body (for example, fixing a typo) won't re-show it to users who already dismissed it.
+- Self-hosted deployments can point the panel at a different file with `VITE_WHATS_NEW_URL`, or set it to an empty string to use only the bundled copy.
+
 ## Accessibility Requirements
 
 As an accessibility tool, Equalify must meet high accessibility standards:

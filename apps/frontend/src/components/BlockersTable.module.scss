@@ -1,33 +1,61 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
-// Export dropdown trigger — sits inside .BlockersTable DOM, scoped normally
-.export-trigger {
+// Table action triggers (Scan History, Columns, Download) — icon + text.
+// Sit inside .BlockersTable DOM, scoped normally (also passed to
+// BlockersTableColumnToggle as triggerClassName).
+.table-action-trigger {
   background: transparent;
   border: 0;
-  color: variables.$red;
-  opacity: 0.6;
+  color: variables.$black;
+  @include fonts.font-size-small;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 0;
+  gap: 4px;
+  padding: calc(variables.$spacing / 2) 0;
 
   svg {
     min-width: 14px;
     min-height: 14px;
+    color: variables.$red;
   }
 
-  &:hover:not(:disabled) {
-    opacity: 1;
-  }
+  &:hover:not(:disabled),
   &[data-state="open"] {
-    opacity: 1;
+    span {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
   &:disabled {
     cursor: default;
     opacity: 0.35;
   }
+}
+
+// Scan history menu — renders in a portal alongside .export-dropdown-content
+.scan-history-content {
+  max-height: min(420px, var(--radix-dropdown-menu-content-available-height));
+  overflow-y: auto;
+}
+
+.scan-history-label {
+  @include fonts.font-size-small;
+  font-weight: bold;
+  padding: calc(variables.$spacing / 2) calc(variables.$spacing * 1.5);
+  color: variables.$black;
+}
+
+.scan-history-item[data-state="checked"] .export-dropdown-item-label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.scan-history-check {
+  width: 14px;
+  flex-shrink: 0;
 }
 
 .export-trigger-caret {
@@ -110,6 +138,35 @@
 }
 
 .BlockersTable {
+  // Shown while the Detailed view displays a past scan (?scan=)
+  .historical-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: variables.$spacing;
+    background-color: variables.$yellow;
+    color: variables.$black;
+    padding: variables.$spacing calc(variables.$spacing * 1.5);
+    border-radius: calc(variables.$spacing / 2);
+    margin-bottom: calc(variables.$spacing * 2);
+    @include fonts.font-size-small;
+
+    p {
+      flex: 1;
+      margin: 0;
+      min-width: 200px;
+    }
+    a {
+      color: variables.$black;
+      font-weight: bold;
+      text-underline-offset: 2px;
+    }
+  }
+  // ID column while viewing a past scan — no detail page to link to
+  .id-unavailable {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   .table-top-buttons {
     display: flex;
     gap: 8px;
@@ -125,7 +182,8 @@
   }
   .table-top-actions {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 16px;
     align-items: center;
   }
   .blocker-code {
@@ -182,6 +240,21 @@
     margin-right: 0;
     margin-bottom: calc(variables.$spacing);
   }
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    input {
+      width: 100%;
+      padding-right: calc(variables.$spacing * 3);
+    }
+  }
+  .search-clear-button {
+    position: absolute;
+    right: calc(variables.$spacing / 2);
+    top: 50%;
+    transform: translateY(-50%);
+  }
   .advanced-filters-card {
     margin-top: variables.$spacing;
     margin-bottom: calc(variables.$spacing * 2);
@@ -205,8 +278,21 @@
     width:430px;
     word-break: break-all;
     line-height: 1.4em;
-    a {
+    .url-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: calc(variables.$spacing / 4);
+    }
+    .url-filter-link {
       overflow-wrap: anywhere;
+    }
+    .external-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: calc(variables.$spacing / 4);
+      color: inherit;
     }
   }
   td.issue {
@@ -244,8 +330,15 @@
     background: variables.$dark-border;
   }
 
-  .export-trigger {
-    color: variables.$yellow;
+  .table-action-trigger {
+    color: variables.$paper;
+    svg {
+      color: variables.$yellow;
+    }
+  }
+
+  .scan-history-label {
+    color: variables.$paper;
   }
 
   .export-dropdown-content {

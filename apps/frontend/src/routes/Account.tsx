@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs";
 import { useUser } from "../queries"
-import { InvitesTable, RequestsTable, UsersTable, CoBrandingInput, LlmSettingsInput, SystemStats } from "../components"
+import { InvitesTable, RequestsTable, UsersTable, CoBrandingInput, LlmSettingsInput, LoginSettingsInput, SystemStats } from "../components"
 import { SkeletonAccount } from "#src/components/Skeleton.tsx"
 import style from "./Account.module.scss";
 import { Card } from "#src/components/Card.tsx";
@@ -52,6 +52,7 @@ export const Account = () => {
                             <div className="cards-50">
                                 <Card variant="light"><CoBrandingInput /></Card>
                                 <Card variant="light"><LlmSettingsInput /></Card>
+                                {import.meta.env.VITE_SSO_ENABLED && <Card variant="light"><LoginSettingsInput /></Card>}
                             </div>
                         </Tabs.Content>
                         <Tabs.Content value="statistics">
