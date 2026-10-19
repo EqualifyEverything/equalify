@@ -69,6 +69,22 @@ export const scanWebhook = async () => {
             return { percentage: 0, isComplete: false, scannedCount: 0, totalPages: 0 };
         }
         
+        // A result arriving after the stuck-scan sweep (runEveryMinute.ts) closed this
+        // URL out as `url_timeout` supersedes that entry. Guarded by containment, so in
+        // the normal case this matches no row and costs one primary-key lookup.
+        await db.query({
+            text: `
+                UPDATE "scans"
+                SET "errors" = (
+                    SELECT COALESCE(jsonb_agg(t.e ORDER BY t.i), '[]'::jsonb)
+                    FROM jsonb_array_elements("errors") WITH ORDINALITY AS t(e, i)
+                    WHERE NOT (t.e->>'type' = 'url_timeout' AND t.e->>'urlId' = $1)
+                )
+                WHERE "id" = $2 AND "errors" @> $3::jsonb
+            `,
+            values: [urlId, effectiveScanId, JSON.stringify([{ type: 'url_timeout', urlId }])],
+        });
+
         // Use a single atomic UPDATE with RETURNING to avoid race conditions
         // This atomically adds urlId to processed_pages if not present, then calculates progress
         const result = (await db.query({
@@ -99,9 +115,14 @@ export const scanWebhook = async () => {
         const percentage = totalPages > 0 ? Math.min(Math.round((scannedCount / totalPages) * 100), 100) : 0;
         const isComplete = scannedCount >= totalPages;
 
-        // Second atomic update for percentage and status
+        // Second atomic update for percentage and status. A scan the stuck-scan
+        // sweep already closed out stays 'complete': a late result is still recorded
+        // above, but must not flip the audit page back to "Scanning".
         await db.query({
-            text: `UPDATE "scans" SET "percentage"=$1, "status"=$2 WHERE "id"=$3`,
+            text: `UPDATE "scans"
+                   SET "percentage" = $1,
+                       "status" = CASE WHEN "status" = 'complete' THEN 'complete' ELSE $2 END
+                   WHERE "id" = $3`,
             values: [percentage, isComplete ? 'complete' : 'processing', effectiveScanId],
         });
 

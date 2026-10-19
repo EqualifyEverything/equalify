@@ -4,7 +4,8 @@ import themeVariables from "../global-styles/variables.module.scss"
 export const CustomizedDot = (props: any) => {
     const { cx, cy, dataKey, payload } = props;
     if (payload.timestamp) {
-      // scan_timeout is the audit-level 15-minute stuck-scan error — flag it in red
+      // scan_timeout is the stuck-scan error from the backend sweep (no webhook
+      // activity for STUCK_SCAN_INACTIVITY_MINUTES, default 60) — flag it in red
       // so the user can spot a significant problem at a glance on the chart.
       const dotColor = payload.hasTimeoutError ? themeVariables.red : themeVariables.white;
       return (

@@ -156,7 +156,11 @@
       margin: 0;
       min-width: 200px;
     }
-    a {
+    // `a:visited` is needed too: body.dark's `a:visited` rule
+    // (global-styles/dark.scss) outranks a plain `a` here and turned the
+    // (almost always visited) return link yellow on the yellow banner.
+    a,
+    a:visited {
       color: variables.$black;
       font-weight: bold;
       text-underline-offset: 2px;

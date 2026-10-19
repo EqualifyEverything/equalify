@@ -70,6 +70,8 @@ const scansSchema = z.object({
 3. Batch URLs into groups of 10 (SQS limit)
 4. Send batches to appropriate FIFO queues
 
+**How it is invoked**: the backend never calls this Lambda with a whole audit in one request. Asynchronous (`Event`) Lambda invokes reject payloads over 1 MB, which is roughly 3,500 URLs, and before this was handled a large audit's scan silently never reached the queue (#660). `apps/backend/utils/queueScanJobs.ts` splits a scan's URL list into invokes of at most 512 KB each (a 6,000-URL audit arrives as 3-4 invocations). The router executions may run concurrently, so pages from different chunks can interleave on the queue; nothing depends on URL order. If an invoke fails, the error is raised to the caller and the scan is left for the stuck-scan sweep (below), which closes out the pages that never reported.
+
 **Queue Configuration**:
 - HTML Queue: `scanHtml.fifo` (Terraform-provisioned deployments use a project/environment-prefixed name)
 - PDF Queue: `scanPdf.fifo` (same prefixing applies)
@@ -216,6 +218,26 @@ Results are sent to the backend API webhook:
   "blockers": [...]
 }
 ```
+
+## Stuck Scans and Timeouts
+
+A scan only finishes when `scanWebhook` has heard back about every URL. Two layers make sure a scan can't hang forever, and that the user can see which pages are missing when it doesn't finish cleanly:
+
+| Layer | Where | What it does |
+|-------|-------|--------------|
+| Per-page timeout | `aws-lambda-scan-html` (`SCAN_TIMEOUT`, 2 min) and `BROWSER_LOAD_TIMEOUT` (30 s) | A slow page is reported to the webhook as a `page_timeout` failure and the scan moves on. |
+| Stuck-scan sweep | `runEveryMinute` (backend, EventBridge) | Closes out scans with no webhook activity for `STUCK_SCAN_INACTIVITY_MINUTES` (default **60**). |
+
+**How the sweep decides a scan is stuck.** Every webhook call updates the `scans` row, so `updated_at` is the time of the last page result, and the threshold measures *inactivity*, not total runtime. Pages are scanned one at a time per audit (the FIFO message group is the audit id), so a 1,250-page audit takes around 90 minutes and a 6,000-page audit several hours. Because scans of the same audit share that message group, a scan started while an older one is still running waits in the queue with no activity of its own and only starts receiving results once the older one finishes; the sweep therefore skips a scan while an older sibling scan of the same audit has had activity within the threshold, whatever that sibling's status. This is what produced false "Scan Timed Out" notices on large audits before the rule was added.
+
+**What the sweep does to a stuck scan.**
+1. Appends a `scan_timeout` error whose `details` carry `totalPages`, `scannedPages`, `unscannedPages`, `listedPages`, `capped` and `inactivityMinutes`, and flips `status` to `complete` (guarded so a webhook landing at the same moment isn't clobbered).
+2. Works out which pages never reported (the scan's `pages` snapshot, which now records each url's id, minus `processed_pages`; scans older than that fall back to matching the audit's `urls` rows by URL) and appends a `url_timeout` error per page (`"Not Scanned (Timeout)"` in the UI), capped at 500 entries so the `scans` row stays small enough for the audit page's polling; the summary entry always carries the full count.
+3. Counts those pages as processed (so `percentage` reads 100 and the scan is genuinely closed), freezes `blocker_count`/`equalified_count` from the `blockers` table, and sets the audit to `complete` or `failed` depending on whether anything was found - but only if this is still the audit's newest scan.
+
+All three steps run in one transaction, so a failure part-way leaves the scan `processing` for the next sweep to retry.
+
+If a result for a closed-out page still arrives later (the scan was draining slowly rather than dead), `scanWebhook` removes that page's `url_timeout` entry, so the error list corrects itself; the scan itself stays `complete`.
 
 ## Metrics & Monitoring
 

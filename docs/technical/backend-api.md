@@ -83,7 +83,7 @@ Endpoints requiring a valid JWT token:
 ### Scheduled Routes (`/scheduled`)
 Endpoints triggered by AWS EventBridge:
 
-- **`runEveryMinute`** - Processes scheduled audits and triggers scans
+- **`runEveryMinute`** - Processes scheduled audits and triggers scans; also closes out stuck scans (no webhook activity for `STUCK_SCAN_INACTIVITY_MINUTES`, default 60) - see *Scanning Services → Stuck Scans and Timeouts*
 - **`runEveryDay`** - Daily scheduled tasks (e.g. processing scheduled audit emails)
 
 ### Hasura Routes (`/hasura`)
@@ -167,20 +167,15 @@ When a user creates an audit (`saveAudit`):
 2. Insert all URLs associated with the audit
 3. If `saveAndRun` is true:
    - Create a new scan record
-   - Invoke the scan router Lambda asynchronously
+   - Hand the URLs to the scan router Lambda via `queueScanJobs`
 
 ```typescript
-await lambda.send(new InvokeCommand({
-  FunctionName: "aws-lambda-scan-sqs-router",
-  InvocationType: "Event",
-  Payload: JSON.stringify({
-    urls: urls.map(url => ({
-      auditId, scanId, urlId: url.id,
-      url: url.url, type: url.type, isStaging
-    }))
-  })
-}));
+// apps/backend/utils/queueScanJobs.ts - shared by saveAudit, saveQuickScan,
+// rescanAudit and the scheduled runEveryMinute job
+await queueScanJobs({ auditId, scanId, urls });
 ```
+
+`queueScanJobs` builds `{ auditId, scanId, urlId, url, type, isStaging }` jobs and invokes `aws-lambda-scan-sqs-router` asynchronously, splitting the list into invokes of at most 512 KB because async Lambda invokes reject payloads over 1 MB (about 3,500 URLs). If an invoke fails the error propagates to the caller, and pages that never reached the queue are closed out later by the stuck-scan sweep.
 
 ## Webhook Processing
 
@@ -210,7 +205,8 @@ The `scanWebhook` endpoint processes results from scanners:
 | `SSO_JWKS` | Azure AD JWKS endpoint for SSO token verification |
 | `WEBHOOKSECRET` | Secret for Hasura webhooks |
 | `GRAPHQL_URL` | Hasura GraphQL endpoint used by `graphqlQuery` |
-| `SQS_ROUTER_FUNCTION_NAME` | Function name of the SQS Router Lambda invoked from `saveAudit`/`rescanAudit` |
+| `SQS_ROUTER_FUNCTION_NAME` | Function name of the SQS Router Lambda invoked by `queueScanJobs` (from `saveAudit`, `saveQuickScan`, `rescanAudit`, `runEveryMinute`) |
+| `STUCK_SCAN_INACTIVITY_MINUTES` | Minutes without a webhook result before `runEveryMinute` closes a scan out as timed out (default `60`) |
 | `CRAWLER_FUNCTION_NAME` | Function name of the crawler Lambda invoked from `crawlUrl` |
 
 ---
