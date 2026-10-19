@@ -12,9 +12,18 @@ import { StyledButton } from "#src/components/StyledButton.tsx";
 import { marked } from "marked";
 import { GrPowerCycle } from "react-icons/gr";
 import { MdOutlineFlag, MdSmartToy } from "react-icons/md";
+import { FaClipboard } from "react-icons/fa";
+import {
+  BlockerOccurrencesTable,
+  BlockerOccurrencesFilter,
+  blockerOccurrencesQueryOptions,
+  useCopyBlockerUrlsCsv,
+} from "#src/components/BlockerUrlsDrawer.tsx";
 import { getAccessibilityStandardLabel } from "#src/utils/accessibilityStandardTags.ts";
 
 const apiClient = API.generateClient();
+
+const OCCURRENCES_PAGE_SIZE = 10;
 
 interface BlockerTag {
   tag: {
@@ -38,6 +47,8 @@ interface theBlocker {
   blocker_messages: BlockerMessage[];
   short_id: string;
   audit_id: string;
+  scan_id: string;
+  content_hash_id: string | null;
   ignored_blocker: null | Object;
   content: string;
   audits: {
@@ -88,6 +99,8 @@ export const Blocker = () => {
             }
             short_id
             audit_id
+            scan_id
+            content_hash_id
             content
             ignored_blocker {
                 blocker_id
@@ -106,6 +119,21 @@ export const Blocker = () => {
       return data.data.blockers[0] as theBlocker;
     },
   });
+
+  // Every other copy of this same code in the blocker's own scan
+  const occurrencesFilter: BlockerOccurrencesFilter = {
+    auditId: blocker?.audit_id ?? "",
+    isShared: true,
+    contentHashId: blocker?.content_hash_id ?? "",
+    scanId: blocker?.scan_id,
+    excludeBlockerId: blocker?.id,
+  };
+  const { data: otherOccurrences } = useQuery({
+    ...blockerOccurrencesQueryOptions(occurrencesFilter, 0, OCCURRENCES_PAGE_SIZE),
+    enabled: !!blocker?.id && !!blocker?.content_hash_id,
+  });
+  const otherOccurrencesCount = otherOccurrences?.pagination.totalCount ?? 0;
+  const { copy: copyOccurrencesCsv, copying: copyingOccurrencesCsv } = useCopyBlockerUrlsCsv(occurrencesFilter);
 
   const summaryQueryKey = ["blocker-summary", blocker?.id];
 
@@ -233,6 +261,33 @@ export const Blocker = () => {
         ):(null)}
       </Card>
 
+      {blocker && otherOccurrencesCount > 0 && (
+        <Card variant="light" className={styles["OccurrencesCard"]}>
+          <div className={styles["occurrencesHeader"]}>
+            <div>
+              <h2>Also Appears On</h2>
+              <p>
+                {`This same code appears ${otherOccurrencesCount.toLocaleString()} more ${otherOccurrencesCount === 1 ? "time" : "times"} in this scan. Fixing it at the source clears every copy.`}
+              </p>
+            </div>
+            <StyledButton
+              onClick={copyOccurrencesCsv}
+              label="Copy as CSV"
+              icon={<FaClipboard className="icon-small" />}
+              variant="light"
+              loading={copyingOccurrencesCsv}
+              loadingText="Copying..."
+            />
+          </div>
+          <BlockerOccurrencesTable
+            {...occurrencesFilter}
+            expectedCount={otherOccurrencesCount}
+            pageSize={OCCURRENCES_PAGE_SIZE}
+            tableLabel="Other occurrences of this blocker"
+          />
+        </Card>
+      )}
+
       {blocker && !summary?.disabled && (
         <Card variant="light" className={styles["SummaryCard"]}>
           <div className={styles["summaryHeader"]}>
@@ -281,6 +336,7 @@ export const Blocker = () => {
           )}
         </Card>
       )}
+
     </div>
   );
 };

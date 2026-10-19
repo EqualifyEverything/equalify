@@ -411,15 +411,26 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                         </div>
                         <div className={style["where"]}>
                           {item.occurrences === 1 ? (
-                            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${item.url} in a new tab`}>{item.url}</a>
                           ) : (
-                            <BlockerUrlsDrawer
-                              auditId={auditId}
-                              isShared={isShared}
-                              contentHashId={item.content_hash_id}
-                              occurrences={item.occurrences}
-                              triggerLabel={`View all ${item.occurrences} occurrences`}
-                            />
+                            <>
+                              {item.short_id && (
+                                <Link
+                                  to={"/shared/" + auditIdNoDash + "/" + item.short_id}
+                                  className={style["example-link"]}
+                                  aria-label={`View an example: blocker ${item.short_id}`}
+                                >
+                                  View an example
+                                </Link>
+                              )}
+                              <BlockerUrlsDrawer
+                                auditId={auditId}
+                                isShared={isShared}
+                                contentHashId={item.content_hash_id}
+                                occurrences={item.occurrences}
+                                triggerLabel={`View all ${item.occurrences} occurrences`}
+                              />
+                            </>
                           )}
                         </div>
                       </td>
