@@ -98,6 +98,7 @@ const scansSchema = z.object({
 - Processes SQS records with partial batch failure handling
 - 2-minute timeout per scan to prevent Lambda hangs
 - Runs axe-core with two custom rules in addition to the default ruleset: an empty-alt-tag check and a PDF-link check (flags links to PDF documents for review)
+- Reports axe **violations** and **incomplete** (needs review) results as blockers, except incomplete results from the contrast rules (`color-contrast`, `color-contrast-enhanced`, `link-in-text-block`). axe reports an inconclusive contrast check most often when it can't determine the background (text over an image, gradient or overlapping element), and treating those as failures inflated contrast counts by thousands on image-heavy sites. Other incomplete results are kept because the two custom rules are declared `reviewOnFail` and only ever report through that channel
 - Converts axe-core results to EqualifyV2 format
 
 **Scan Flow**:
