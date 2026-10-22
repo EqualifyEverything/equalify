@@ -8,14 +8,27 @@
 import { Blocker, StreamResults } from "../types/streamResults.equalifyV2_format";
 import { AxeResults } from 'axe-core'
 
+// Rules whose "incomplete" (needs review) results are NOT reported as blockers.
+// axe reports an inconclusive contrast check most often when it can't determine
+// the background (text over an image, gradient or overlapping element), and
+// treating those as failures produced thousands of false contrast blockers on
+// image-heavy sites. Every other incomplete result is still reported on purpose:
+// the custom pdf-link and empty-alt-tag rules are declared reviewOnFail and only
+// ever report through that channel.
+const DROP_INCOMPLETE_FOR = new Set(["color-contrast", "color-contrast-enhanced", "link-in-text-block"]);
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function convertToEqualifyV2(axeResult: AxeResults, job: any):StreamResults {
     const blockers: Blocker[] = [];
 
     if (axeResult) {
 
-        // convert the axe results
-        const axeResults = [axeResult.incomplete, axeResult.violations]
+        // convert the axe results: violations plus incomplete (needs review)
+        // results, minus the inconclusive contrast checks (see DROP_INCOMPLETE_FOR)
+        const axeResults = [
+            axeResult.incomplete?.filter((el) => !DROP_INCOMPLETE_FOR.has(el.id)),
+            axeResult.violations,
+        ]
         axeResults?.forEach(path => {
             if (path)
                 path.forEach((el) => {

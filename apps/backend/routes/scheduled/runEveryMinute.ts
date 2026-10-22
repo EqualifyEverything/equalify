@@ -1,10 +1,16 @@
-import { db } from "#src/utils";
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { db, queueScanJobs, closeOutScanUrls, finalizeScan, MAX_URL_ERROR_ENTRIES } from "#src/utils";
 import {
   processScheduledAuditEmails,
   syncAuditUrlsFromRemoteCsv,
 } from "../internal";
-const lambda = new LambdaClient();
+
+// A 'processing' scan whose row hasn't changed in this long is treated as stuck.
+// Every scanWebhook call touches the row (processed_pages/percentage/errors), so
+// this measures inactivity rather than total runtime: a 6,000-URL audit
+// legitimately runs for hours at roughly 4 seconds per page. Raised from 15
+// minutes after large audits were being flagged while still draining (#660).
+const STUCK_SCAN_INACTIVITY_MINUTES =
+  Math.max(1, Math.round(Number(process.env.STUCK_SCAN_INACTIVITY_MINUTES)) || 60);
 
 export const runEveryMinute = async () => {
   // Determine whether we should run scheduled audits
@@ -63,86 +69,149 @@ export const runEveryMinute = async () => {
           values: [
             scheduledAuditId,
             "processing",
-            JSON.stringify(urls.map((obj: { url: string; type: string; }) => ({ url: obj.url, type: obj.type }))),
+            // `pages` snapshots the url ids too, so the stuck-scan sweep can tell
+            // exactly which queued pages never reported
+            JSON.stringify(urls.map((obj: { id: string; url: string; type: string; }) => ({ id: obj.id, url: obj.url, type: obj.type }))),
           ],
         })
       ).rows[0].id;
-      await lambda.send(
-        new InvokeCommand({
-          FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
-          InvocationType: "Event",
-          Payload: JSON.stringify({
-            urls: urls?.map((url: { id: string; url: string; type: string; }) => ({
-              auditId: scheduledAuditId,
-              scanId: scanId,
-              urlId: url.id,
-              url: url.url,
-              type: url.type,
-            })),
-          }),
-        }),
-      );
+      await queueScanJobs({ auditId: scheduledAuditId, scanId, urls });
       console.log("Scan jobs queued for audit:", scheduledAuditId);
     } catch (error) {
       console.error("Scheduled scan failed for audit:", scheduledAuditId, error);
     }
   }
 
-  // See if there are any "stuck" scans that we should error out!
-  const stuckScans = (
-    await db.query({
-      text: `SELECT s."id", s."errors", s."audit_id" FROM "scans" s
-               WHERE s."status" = 'processing' 
-               AND (NOW() - s."updated_at") > INTERVAL '15 minutes'`,
-    })
-  ).rows;
+  // See if there are any "stuck" scans that we should close out.
+  // Scans of one audit share a FIFO message group, so a scan started while an
+  // older one is still running just waits in the queue (no activity of its own)
+  // until the older one drains, and only then starts receiving results. An older
+  // sibling with activity inside the window - whatever its status, since the
+  // moment it completes is exactly when the newer scan is about to get its first
+  // result - therefore means "queued", not "stuck". That wait is what produced
+  // the false timeouts in #660. A sibling whose only recent "activity" was its
+  // own close-out by this sweep doesn't count, so a pile of dead scans closes
+  // out in one pass instead of one window apart.
+  let stuckScans: { id: string; audit_id: string; pages: { id?: string; url: string }[] | null; processed_pages: string[] | null }[] = [];
+  try {
+    stuckScans = (
+      await db.query({
+        text: `SELECT s."id", s."audit_id", s."pages", s."processed_pages"
+                 FROM "scans" s
+                 WHERE s."status" = 'processing'
+                 AND s."updated_at" < NOW() - make_interval(mins => $1::int)
+                 AND NOT EXISTS (
+                   SELECT 1 FROM "scans" o
+                   WHERE o."audit_id" = s."audit_id"
+                   AND o."created_at" < s."created_at"
+                   AND o."updated_at" >= NOW() - make_interval(mins => $1::int)
+                   AND NOT (COALESCE(o."errors", '[]'::jsonb) @> '[{"type":"scan_timeout"}]'::jsonb)
+                 )`,
+        values: [STUCK_SCAN_INACTIVITY_MINUTES],
+      })
+    ).rows;
+  } catch (error) {
+    // don't let a lookup failure skip db.clean() and the email pass below
+    console.error("Failed to look up stuck scans:", error);
+  }
 
   for (const scan of stuckScans) {
     // isolate each scan so one failure (e.g. a deadlock) can't abort the whole run,
     // which would skip db.clean() and the email pass below
     try {
+      // Work out which pages never reported back. Scans started since url ids were
+      // added to the `pages` snapshot can be diffed exactly; older scans fall back
+      // to mapping url strings through the audit's urls table (best effort, since
+      // remote-CSV syncs may have changed those rows mid-scan).
+      const pageList: { id?: string; url: string }[] = scan.pages ?? [];
+      const totalPages = pageList.length;
+      const processedIds = new Set<string>((scan.processed_pages ?? []).map(String));
+      let unscanned: { id: string; url: string }[];
+      if (totalPages > 0 && pageList.every((p) => typeof p.id === "string")) {
+        unscanned = pageList
+          .filter((p) => !processedIds.has(p.id as string))
+          .map((p) => ({ id: p.id as string, url: p.url }));
+      } else {
+        const pageUrls = new Set<string>(pageList.map((p) => p.url));
+        const urlRows: { id: string; url: string }[] = (
+          await db.query({
+            text: `SELECT "id", "url" FROM "urls" WHERE "audit_id" = $1 ORDER BY "created_at"`,
+            values: [scan.audit_id],
+          })
+        ).rows;
+        unscanned = urlRows.filter((u) => pageUrls.has(u.url) && !processedIds.has(u.id));
+      }
+      const unscannedCount = Math.max(unscanned.length, totalPages - processedIds.size);
+      // `capped` tells the UI the per-URL list doesn't cover the full count: either it
+      // was cut at MAX_URL_ERROR_ENTRIES, or (legacy scans) some pages couldn't be
+      // matched to the audit's current url rows at all.
+      const listedPages = Math.min(unscanned.length, MAX_URL_ERROR_ENTRIES);
+      const capped = listedPages < unscannedCount;
+
       const timeoutError = {
         type: "scan_timeout",
-        message: "Scan timed out after 15 minutes of inactivity",
+        message:
+          `Scan timed out after ${STUCK_SCAN_INACTIVITY_MINUTES} minutes with no progress. ` +
+          `${unscannedCount.toLocaleString()} of ${totalPages.toLocaleString()} pages were never scanned.` +
+          (capped ? ` ${listedPages.toLocaleString()} of them are listed below.` : ""),
         timestamp: new Date().toISOString(),
+        details: {
+          inactivityMinutes: STUCK_SCAN_INACTIVITY_MINUTES,
+          totalPages,
+          scannedPages: Math.max(0, totalPages - unscannedCount),
+          unscannedPages: unscannedCount,
+          listedPages,
+          capped,
+        },
       };
-      // Atomic jsonb append + status guard so a concurrent scanWebhook write (still
-      // trickling in results right up to the 15-minute mark) can't be clobbered by
-      // this read-modify-write racing against it.
-      const updateResult = await db.query({
-        text: `UPDATE "scans"
-                     SET "status" = 'complete', "errors" = COALESCE("errors", '[]'::jsonb) || $1::jsonb
-                     WHERE "id" = $2 AND "status" = 'processing'`,
-        values: [JSON.stringify([timeoutError]), scan.id],
-      });
 
-      if (updateResult.rowCount === 0) {
-        // Scan already completed/failed on its own between the SELECT and here - nothing to do
-        continue;
-      }
-
-      // Also update the parent audit so the frontend stops showing the spinner
-      if (scan.audit_id) {
-        const hasSuccessfulPages =
-          (
-            await db.query({
-              text: `SELECT COUNT(*) FROM "blockers" WHERE "scan_id"=$1`,
-              values: [scan.id],
-            })
-          ).rows[0].count > 0;
-
-        await db.query({
-          text: `UPDATE "audits" SET "status" = $1 WHERE "id" = $2 AND "status" NOT IN ('complete', 'failed')`,
-          values: [hasSuccessfulPages ? "complete" : "failed", scan.audit_id],
+      // Claim + close-out + finalize in one transaction: if any step fails the scan
+      // stays 'processing' and the next sweep retries it, instead of being left
+      // 'complete' with no counts. The status guard on the claim means a concurrent
+      // scanWebhook write (results still trickling in right up to the cutoff) can't
+      // be clobbered, and an overlapping sweep run can't close the same scan twice.
+      await db.query({ text: "BEGIN" });
+      try {
+        const updateResult = await db.query({
+          text: `UPDATE "scans"
+                       SET "status" = 'complete', "errors" = COALESCE("errors", '[]'::jsonb) || $1::jsonb
+                       WHERE "id" = $2 AND "status" = 'processing'`,
+          values: [JSON.stringify([timeoutError]), scan.id],
         });
-      }
 
-      console.log(
-        "Marked stuck scan as complete:",
-        scan.id,
-        "audit:",
-        scan.audit_id,
-      );
+        if (updateResult.rowCount === 0) {
+          // Scan already completed/failed on its own between the SELECT and here - nothing to do
+          await db.query({ text: "ROLLBACK" });
+          continue;
+        }
+
+        // Close out the pages that never reported: a url_timeout entry each (so the
+        // Errors drawer lists them) and counted as processed so progress reads 100%.
+        // A result that still arrives later clears its own url_timeout entry (see
+        // scanWebhook), so a late-draining scan self-corrects.
+        await closeOutScanUrls({
+          scanId: scan.id,
+          urls: unscanned,
+          type: "url_timeout",
+          message: "Not scanned before the scan timed out",
+        });
+
+        // Freeze blocker_count/equalified_count and settle the audit status so the
+        // chart and the frontend reflect what was actually scanned.
+        const { blockerCount } = await finalizeScan({ scanId: scan.id, auditId: scan.audit_id });
+        await db.query({ text: "COMMIT" });
+
+        console.log(
+          "Closed out stuck scan:",
+          scan.id,
+          "audit:",
+          scan.audit_id,
+          { totalPages, unscannedCount, blockerCount },
+        );
+      } catch (error) {
+        await db.query({ text: "ROLLBACK" }).catch(() => undefined);
+        throw error;
+      }
     } catch (error) {
       console.error("Failed to process stuck scan:", scan.id, error);
     }

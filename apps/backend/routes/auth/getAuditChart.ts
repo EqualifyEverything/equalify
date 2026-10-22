@@ -39,6 +39,19 @@ export const getAuditChart = async () => {
 
   const scans = response.audits_by_pk?.scans || [];
 
+  // Page-level errors only. The stuck-scan sweep also appends a summary entry
+  // (no urlId) that must not count as a page, and the per-URL
+  // url_timeout entries are capped - when they were, the scan_timeout summary
+  // carries the real number of pages that never reported.
+  const countPageErrors = (errors: any): number => {
+    const list: any[] = Array.isArray(errors) ? errors : [];
+    const perPage = list.filter((e) => e?.urlId || e?.url).length;
+    const details = list.find((e) => e?.type === "scan_timeout")?.details;
+    if (details?.capped !== true || typeof details.unscannedPages !== "number") return perPage;
+    const listedTimeouts = list.filter((e) => e?.type === "url_timeout").length;
+    return perPage - listedTimeouts + details.unscannedPages;
+  };
+
   // Process scans to get the last scan per day
   const scansByDate = new Map<
     string,
@@ -55,9 +68,10 @@ export const getAuditChart = async () => {
 
     const pagesCount = scan.pages.length;
     //const processedPagesCount = scan.processed_pages.length;
-    const errorsCount = scan.errors.length;
-    // scan_timeout is set only by the audit-level 15-minute stuck-scan sweep
-    // (runEveryMinute.ts) — distinct from ordinary per-page scan errors.
+    const errorsCount = countPageErrors(scan.errors);
+    // scan_timeout is set only by the stuck-scan sweep in runEveryMinute.ts (no
+    // webhook activity for STUCK_SCAN_INACTIVITY_MINUTES, default 60) — distinct
+    // from ordinary per-page scan errors.
     const hasTimeoutError = scan.errors.some((e: any) => e.type === "scan_timeout");
 
     // Only keep the last scan for each day (scans are ordered by created_at asc)
@@ -85,7 +99,7 @@ export const getAuditChart = async () => {
     .filter((scan: any) => new Date(scan.created_at) >= windowStart)
     .map((scan: any) => {
       const pagesCount = scan.pages.length;
-      const errorsCount = scan.errors.length;
+      const errorsCount = countPageErrors(scan.errors);
       return {
         timestamp: scan.created_at,
         blockers: scan.blocker_count ?? 0,

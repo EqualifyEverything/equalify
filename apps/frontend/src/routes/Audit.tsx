@@ -75,6 +75,7 @@ const formatErrorType = (type: string): string => {
     scan_failed: "Scan Failed",
     blocker_processing_error: "Processing Error",
     scan_timeout: "Scan Timeout",
+    url_timeout: "Not Scanned (Timeout)",
     no_urls: "No URLs Configured",
   };
   return errorLabels[type] || type;
@@ -566,26 +567,68 @@ export const Audit = () => {
           );
         }
 
-        // Check if the last scan timed out
-        const lastScanTimedOut = currentScan?.errors?.some(
-          (e: ScanError) => e.type === 'scan_timeout'
+        // Check if the last scan timed out (set by the stuck-scan sweep in
+        // backend runEveryMinute.ts; `details` carries the page counts)
+        const scanTimeout = (currentScan?.errors as ScanError[] | undefined)?.find(
+          (e) => e.type === 'scan_timeout'
         );
+        const timeoutDetails = (scanTimeout?.details ?? {}) as {
+          totalPages?: number;
+          unscannedPages?: number;
+          listedPages?: number;
+          capped?: boolean;
+          inactivityMinutes?: number;
+        };
+        // Results that still arrive after the close-out clear their url_timeout
+        // entries (scanWebhook), so count what's still listed - unless the list
+        // was capped, in which case only the summary knows the real number.
+        const remainingUrlTimeouts = ((currentScan?.errors as ScanError[] | undefined) ?? []).filter(
+          (e) => e.type === 'url_timeout'
+        ).length;
+        const listCapped = timeoutDetails.capped === true;
+        const unscannedPages =
+          timeoutDetails.unscannedPages == null
+            ? undefined
+            : listCapped
+              ? timeoutDetails.unscannedPages
+              : remainingUrlTimeouts;
+        const totalPages = timeoutDetails.totalPages;
 
         // Completed scan - show timeout notice if applicable, then chart
         return (
           <>
-            {lastScanTimedOut && (
+            {scanTimeout && (
               <Card variant="dark">
                 <div style={{ padding: "20px 0", display: "flex", alignItems: "center", gap: "12px" }}>
                   <TbAlertTriangle style={{ fontSize: "1.5em", color: themeVariables.yellow || "#f0ad4e", flexShrink: 0 }} />
                   <div>
                     <h3 style={{ margin: 0 }}>Scan Timed Out</h3>
                     <p style={{ margin: "4px 0 0", color: themeVariables.white, fontSize: "0.9em" }}>
-                      The last scan did not complete within the expected time. Some results may be missing.
-                      {currentScan.percentage != null && currentScan.percentage > 0 && currentScan.percentage < 100
-                        ? ` Only ${currentScan.percentage}% of pages were scanned.`
-                        : ''}
-                      {' '}Try rescanning — if the issue persists, some pages may be unreachable.
+                      {timeoutDetails.inactivityMinutes
+                        ? `The last scan stopped after ${timeoutDetails.inactivityMinutes} minutes without progress.`
+                        : 'The last scan did not complete within the expected time.'}
+                      {unscannedPages != null && totalPages != null && totalPages > 0 ? (
+                        unscannedPages === 0 ? (
+                          <>
+                            {' '}Every page has since reported back, so the report below is complete apart from any pages listed under{' '}
+                            <strong>Errors During Scan</strong>.
+                          </>
+                        ) : (
+                          <>
+                            {' '}<strong>{unscannedPages.toLocaleString()}</strong> of {totalPages.toLocaleString()} pages
+                            {unscannedPages === 1 ? ' was' : ' were'} never scanned.
+                            {listCapped
+                              ? ` ${(timeoutDetails.listedPages ?? 0).toLocaleString()} of them are listed under `
+                              : unscannedPages === 1 ? " It's listed under " : " They're listed under "}
+                            <strong>Errors During Scan</strong> below; results for every other page are shown as usual.
+                          </>
+                        )
+                      ) : currentScan.percentage != null && currentScan.percentage > 0 && currentScan.percentage < 100 ? (
+                        ` Only ${currentScan.percentage}% of pages were scanned.`
+                      ) : (
+                        ' Some results may be missing.'
+                      )}
+                      {' '}This usually means the scanning queue stalled, not that your site has a problem. Try rescanning — if the same pages keep failing, they may be unreachable from Equalify's scanners.
                     </p>
                   </div>
                 </div>
