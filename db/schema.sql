@@ -532,6 +532,54 @@ CREATE INDEX sessions_user_id_created_at_idx ON public.sessions USING btree (use
 
 
 --
+-- Name: audit_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.audit_tags (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    name text NOT NULL,
+    created_by uuid,
+    PRIMARY KEY (id)
+);
+
+
+--
+-- Name: audit_tags_name_lower_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX audit_tags_name_lower_key ON public.audit_tags USING btree (lower(name));
+
+
+--
+-- Name: audit_tags set_public_audit_tags_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_public_audit_tags_updated_at BEFORE UPDATE ON public.audit_tags FOR EACH ROW EXECUTE FUNCTION public.set_current_timestamp_updated_at();
+
+
+--
+-- Name: audit_tag_assignments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.audit_tag_assignments (
+    audit_id uuid NOT NULL,
+    tag_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    created_by uuid,
+    PRIMARY KEY (audit_id, tag_id)
+);
+
+
+--
+-- Name: audit_tag_assignments_tag_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX audit_tag_assignments_tag_id_idx ON public.audit_tag_assignments USING btree (tag_id);
+
+
+--
 -- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 

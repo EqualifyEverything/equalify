@@ -213,7 +213,7 @@ export const Audit = () => {
     queryFn: async () =>
       ((
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error tag_assignments(order_by: {tag: {name: asc}}) {tag {id name}}}}`,
           variables: { audit_id: auditId },
         })
       ) as any)?.data?.audits_by_pk,

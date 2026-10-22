@@ -1,0 +1,30 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.AuditTagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(variables.$spacing / 2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    @include fonts.font-size-small;
+    background: variables.$paper;
+    border: 1px solid variables.$gray;
+    border-radius: 999px;
+    color: variables.$black;
+    line-height: 1.4;
+    padding: 0 variables.$spacing;
+    white-space: nowrap;
+  }
+}
+
+:global(body.dark) {
+  .AuditTagList li {
+    background: variables.$dark-border;
+    border-color: variables.$dark-border;
+    color: variables.$paper;
+  }
+}

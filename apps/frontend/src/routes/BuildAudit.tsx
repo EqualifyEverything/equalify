@@ -1,7 +1,7 @@
 import React, { useState, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useUser } from "../queries";
+import { AuditTag, useUser } from "../queries";
 import * as API from "aws-amplify/api";
 import {
   AuditEmailSubscriptionInput,
@@ -23,6 +23,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { FaCloudArrowDown, FaFileCirclePlus, FaListUl, FaSpider } from "react-icons/fa6";
 import { AuditRemoteCsvInput } from "#src/components/AuditRemoteCsvInput.tsx";
 import { AuditCrawlInput } from "#src/components/AuditCrawlInput.tsx";
+import { AuditTagInput } from "#src/components/AuditTagInput.tsx";
 
 interface Page {
   url: string;
@@ -47,6 +48,7 @@ export const BuildAudit = () => {
   const [isSavingAndRunning, setIsSavingAndRunning] = useState(false);
   const submittingRef = useRef(false);
   const [scanFrequency, setScanFrequency] = useState("Manually");
+  const [tags, setTags] = useState<AuditTag[]>([]);
 
   const [validRemoteCsv, setValidRemoteCsv] = useState(false);
 
@@ -93,6 +95,7 @@ export const BuildAudit = () => {
       scanFrequency: formData.get("scanFrequency") as string,
       emailNotifications: JSON.stringify(notifications),
       remoteCsvUrl: remoteCsvUrl,
+      tagIds: tags.map((tag) => tag.id),
       pages: pages.map((page) => ({
         url: page.url,
         type: page.type,
@@ -227,6 +230,9 @@ export const BuildAudit = () => {
                 <TbAlertTriangle /> Daily scans for audits with {pages.length.toLocaleString()} URLs will use significant resources.
               </p>
             )}
+            <StyledLabeledInput>
+              <AuditTagInput inputId="auditTags" value={tags} onChange={setTags} />
+            </StyledLabeledInput>
           </Card>
           <Card variant="light">
             <h2>

@@ -1,10 +1,10 @@
-import { db, event, formatId, isStaging } from '#src/utils'
+import { db, event, formatId, isStaging, validateUuid } from '#src/utils'
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 const lambda = new LambdaClient();
 
 export const saveAudit = async () => {
     try {
-        const { auditName, scanFrequency, pages, saveAndRun, emailNotifications, remoteCsvUrl } = event.body;
+        const { auditName, scanFrequency, pages, saveAndRun, emailNotifications, remoteCsvUrl, tagIds } = event.body;
         const scheduledAt = new Date();
         await db.connect();
         const id = (await db.query({
@@ -28,6 +28,16 @@ export const saveAudit = async () => {
                 values: [userIds, auditIds, urls, types],
             });
             console.log('Successfully inserted URLs');
+        }
+
+        const validTagIds = Array.isArray(tagIds) ? tagIds.filter(validateUuid) : [];
+        if (validTagIds.length) {
+            await db.query({
+                text: `INSERT INTO "audit_tag_assignments" ("audit_id", "tag_id", "created_by")
+                       SELECT $1, "id", $3 FROM "audit_tags" WHERE "id" = ANY($2::uuid[])
+                       ON CONFLICT DO NOTHING`,
+                values: [id, validTagIds, event.claims.sub],
+            });
         }
 
         if (saveAndRun) {

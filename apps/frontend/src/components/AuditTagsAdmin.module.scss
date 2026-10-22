@@ -1,0 +1,59 @@
+@use "../global-styles/variables.module.scss";
+
+.AuditTagsAdmin {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: variables.$spacing;
+    flex-wrap: wrap;
+    margin-bottom: variables.$spacing;
+  }
+
+  table {
+    display: table !important;
+    min-height: unset;
+  }
+
+  th:last-child,
+  td:last-child {
+    text-align: right;
+  }
+
+  .actions {
+    display: inline-flex;
+    gap: calc(variables.$spacing / 2);
+  }
+
+  .expand-button {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(variables.$spacing / 2);
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    padding: 0;
+    text-align: left;
+  }
+
+  .audits-row {
+    td {
+      text-align: left;
+    }
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 calc(variables.$spacing * 2);
+    }
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      gap: variables.$spacing;
+      align-items: baseline;
+      padding: calc(variables.$spacing / 4) 0;
+    }
+  }
+}

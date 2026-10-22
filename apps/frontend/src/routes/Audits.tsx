@@ -15,7 +15,10 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { FaTable, FaTableList } from "react-icons/fa6";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
 import { ChangeEvent, useState } from "react";
-import { useUser } from "../queries";
+import { tagsFromAssignments, useAuditTags, useUser } from "../queries";
+import Select, { MultiValue } from "react-select";
+import { useSelectStyles } from "../utils/useSelectStyles";
+import { AuditTagList } from "#src/components/AuditTagList.tsx";
 import { TbHelpCircleFilled } from "react-icons/tb";
 import { WhatsNew } from "#src/components/WhatsNew.tsx";
 
@@ -50,9 +53,18 @@ export const Audits = () => {
     auditsTableView,
     setAuditsTableView,
     auditsTableCreatedByView,
-    setAuditsTableCreatedByView
+    setAuditsTableCreatedByView,
+    auditsTableTagFilter,
+    setAuditsTableTagFilter,
   } = useGlobalStore();
   const [searchString, setSearchString] = useState("");
+  const selectStyles = useSelectStyles();
+  const { data: allTags } = useAuditTags();
+  const tagOptions = (allTags ?? []).map((tag) => ({ value: tag.id, label: tag.name }));
+  // Ignore remembered tags that have since been deleted or merged away
+  const activeTagFilter = allTags
+    ? auditsTableTagFilter.filter((id) => allTags.some((tag) => tag.id === id))
+    : [];
   const { data: audits, isLoading } = useQuery({
     queryKey: ["audits"],
     queryFn: async () =>
@@ -85,6 +97,12 @@ export const Audits = () => {
                         count
                     }
                   }
+                  tag_assignments(order_by: {tag: {name: asc}}) {
+                    tag {
+                      id
+                      name
+                    }
+                  }
                 }
               }
             `,
@@ -97,6 +115,11 @@ export const Audits = () => {
       }
       if (searchString.length >= 3) {
         filtered = filtered.filter((audit: any) => audit.name.toLowerCase().includes(searchString.toLowerCase()))
+      }
+      if (activeTagFilter.length) {
+        filtered = filtered.filter((audit: any) =>
+          audit.tag_assignments.some((assignment: any) => activeTagFilter.includes(assignment.tag.id))
+        );
       }
       return filtered;
     }
@@ -153,6 +176,23 @@ export const Audits = () => {
                   <option value="all">All Audits</option>
                 </select>
               </StyledLabeledInput>
+              {tagOptions.length > 0 && (
+                <StyledLabeledInput className={styles["tag-filter"]}>
+                  <label htmlFor="auditsTagFilter">Filter by Tags:</label>
+                  <Select
+                    inputId="auditsTagFilter"
+                    className="react-select"
+                    isMulti
+                    options={tagOptions}
+                    value={tagOptions.filter((option) => activeTagFilter.includes(option.value))}
+                    onChange={(selected: MultiValue<{ value: string; label: string }>) =>
+                      setAuditsTableTagFilter(selected.map((option) => option.value))
+                    }
+                    placeholder="Any tag..."
+                    styles={selectStyles}
+                  />
+                </StyledLabeledInput>
+              )}
             </div>
 
             <Tabs.List aria-label="Select a View" className={styles["audits-view-selector"]}>
@@ -194,6 +234,7 @@ export const Audits = () => {
                         )}
                       </h2>
                     </Link>
+                    <AuditTagList tags={tagsFromAssignments(row.tag_assignments)} className={styles["card-tags"]} />
                     <div className={styles["dataRow-list"]}>
                       <DataRow
                         variant="highlight"
@@ -233,7 +274,16 @@ export const Audits = () => {
                   </Card>
                 ))
               )}
-              {audits && audits.length == 0 && !isLoading && searchString == "" && <>
+              {audits && audits.length == 0 && !isLoading && searchString == "" && activeTagFilter.length > 0 && (
+                <Card variant="empty-state-card">
+                  <TbHelpCircleFilled />
+                  <div className="text">
+                    <h2>No audits match the selected tags.</h2>
+                    <StyledButton variant="light" label="Clear Tag Filter" onClick={() => setAuditsTableTagFilter([])} />
+                  </div>
+                </Card>
+              )}
+              {audits && audits.length == 0 && !isLoading && searchString == "" && activeTagFilter.length == 0 && <>
                 <Card variant="empty-state-card">
                   <TbHelpCircleFilled />
                   <div className="text">

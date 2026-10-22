@@ -21,6 +21,8 @@ import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
+import { AuditTag, tagsFromAssignments } from "#src/queries/useAuditTags.ts";
+import { AuditTagList } from "./AuditTagList";
 
 interface Audit {
   created_at: string;
@@ -37,6 +39,7 @@ interface Audit {
       count: number;
     };
   };
+  tag_assignments: { tag: AuditTag }[];
 }
 
 interface auditsTableProps {
@@ -102,6 +105,13 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
           const valB = rowB.original.user.name;
           return valA.localeCompare(valB);
         }
+      },
+      {
+        accessorFn: (row) => tagsFromAssignments(row.tag_assignments).map((tag) => tag.name).join(", ") || undefined,
+        id: "tags",
+        header: "Tags",
+        sortUndefined: 'last',
+        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} />,
       },
       {
         accessorKey: "interval",
