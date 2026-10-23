@@ -268,8 +268,9 @@ aws sso login --profile equalifyuic
 - Check environment variables are set
 
 **Scan Timeouts**
-- Increase Lambda timeout
-- Check if pages are very large/slow
+- A single slow page: increase the scanner Lambda timeout / `SCAN_TIMEOUT`, check if the page is very large or slow
+- A scan stuck at 0% that ends in "Scan Timed Out" listing every page: the router invoke probably failed - look for the invoke error (e.g. `Scheduled scan failed for audit`) in the API logs
+- A large audit flagged as timed out while still running: the stuck-scan sweep threshold (`STUCK_SCAN_INACTIVITY_MINUTES`, default 60) may be too low for the site's response times
 - Review CloudWatch logs for errors
 
 ### Logs

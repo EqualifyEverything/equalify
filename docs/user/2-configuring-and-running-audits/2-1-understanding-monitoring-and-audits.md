@@ -28,6 +28,8 @@ Because these tools cannot always interpret context, they may label some blocker
 - Or flagged due to structural patterns in code
 So a blocker does not always mean “users are stuck.” It means “this needs attention.”
 
+Equalify does not list color contrast checks the scanner could not complete, such as text over an image or overlay where the background color cannot be determined automatically. Those are left out rather than reported as failures. If you want to be sure about such text, test it manually.
+
 ## How one fix can solve hundreds of issues 
 Some blockers come from repeated components, such as:
 - Buttons

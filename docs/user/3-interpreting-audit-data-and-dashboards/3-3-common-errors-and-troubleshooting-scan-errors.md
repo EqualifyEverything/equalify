@@ -12,3 +12,16 @@ To investigate why specific pages failed:
 💡Tip: Some scan errors are temporary. If you see a high number of failures, try re-running the scan during off-peak hours to ensure server stability. If the error persists over an extended period, please file a bug report or reach out to your administrator.
 ```
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/f06744bf2795951ea4cfe4894213a68fa8f6e494/user/User%20Guide%20Images/Sec%203_Scan%20Errors%20Detail.png" alt="Scan Errors modal with list of failed URLs. One entry shows a Scan Failed badge for a UIC dentistry intranet URL with a technical error message: Execution context was destroyed, most likely because of a navigation." width="500"/>
+
+## Scan Timeouts
+Very large audits can take several hours, because Equalify scans the pages in an audit one after another. A scan is only given up on when **no page has reported back for a full hour**. When that happens:
+- A **Scan Timed Out** notice appears above the blockers chart. It says how many of the audit's pages were never scanned.
+- Each page that was never scanned appears in the **Errors During Scan** list with a **Not Scanned (Timeout)** label, so you can see exactly which URLs are missing from the report. (If more than 500 pages are affected, the first 500 are listed and the notice gives the full count.)
+- Results for every page that *was* scanned are kept and shown as usual.
+
+A timeout usually means the scanning queue stalled, not that your pages are broken. Re-run the scan. If the same pages keep failing, check whether they can be reached from outside your network.
+
+```tip
+💡Tip: If you start a new scan while an earlier scan of the same audit is still running, the new one waits its turn and its progress bar will not move until the earlier scan finishes. That is expected and does not count as a timeout.
+```
+

@@ -1,6 +1,4 @@
-import { db, event, formatId, isStaging } from '#src/utils'
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-const lambda = new LambdaClient();
+import { db, event, formatId, queueScanJobs } from '#src/utils'
 
 export const saveQuickScan = async () => {
     try {
@@ -35,15 +33,9 @@ export const saveQuickScan = async () => {
 
         const scanId = (await db.query({
             text: `INSERT INTO "scans" ("audit_id", "status", "pages") VALUES ($1, $2, $3) RETURNING "id"`,
-            values: [id, 'processing', JSON.stringify([{ url, type }])],
+            values: [id, 'processing', JSON.stringify([{ id: urlRow.id, url, type }])],
         })).rows[0].id;
-        await lambda.send(new InvokeCommand({
-            FunctionName: process.env.SQS_ROUTER_FUNCTION_NAME ?? "aws-lambda-scan-sqs-router",
-            InvocationType: "Event",
-            Payload: JSON.stringify({
-                urls: [{ auditId: id, scanId, urlId: urlRow.id, url, type, isStaging }]
-            })
-        }));
+        await queueScanJobs({ auditId: id, scanId, urls: [{ id: urlRow.id, url, type }] });
 
         console.log('Quick scan queued:', { auditId: id, scanId, url, type });
 

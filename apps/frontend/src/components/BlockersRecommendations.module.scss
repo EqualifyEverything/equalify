@@ -196,6 +196,28 @@
     a {
       overflow-wrap: anywhere;
     }
+    // Matches the "View all X occurrences" StyledButton (variant="naked")
+    // beneath it. line-height: normal mirrors the button's UA reset, so the
+    // two stack with the same spacing instead of the link inheriting the
+    // cell's taller 1.4em line box.
+    a.example-link,
+    a.example-link:visited {
+      @include fonts.raleway-bold;
+      color: variables.$red;
+      text-decoration: none;
+      line-height: normal;
+      transition: opacity 0.12s ease-out;
+      &:hover {
+        opacity: 0.85;
+      }
+      &:active {
+        opacity: 0.7;
+      }
+      &:focus-visible {
+        outline: 2px solid variables.$red;
+        outline-offset: 2px;
+      }
+    }
   }
 
   .id-cell {
@@ -263,6 +285,10 @@
     }
     .impact-text {
       color: variables.$paper;
+    }
+    .where a.example-link,
+    .where a.example-link:visited {
+      color: variables.$yellow;
     }
     .code-content {
       border: 1px solid variables.$dark-border;

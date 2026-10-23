@@ -1,9 +1,7 @@
 ---
-title: URL drilldown and a new Recommendations view
-date: 2026-09-29
+title: Fewer false color contrast blockers
+date: 2026-10-19
 ---
-The detailed view now lets you **drill down into any URL** in an audit to see just the blockers found on that page, so it's easier to hand a focused list of fixes to the person who owns it.
+Color contrast checks that the scanner could not complete are no longer reported as failures. That usually meant text over an image or overlay, where the background color cannot be determined automatically, and those showed up as **color contrast** blockers even when the contrast was fine.
 
-The new **Recommendations** view groups blockers by the fix they need, and lets you ignore an issue across every page where it appears at once. [Learn more about the detailed view and Recommendations](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-2-audit-report-detailed-view).
-
-You'll also find the current Equalify version number in the footer, which is useful when [reporting an issue](https://github.com/EqualifyEverything/equalify/issues).
+Expect your contrast counts to drop at your next scan. Nothing has been deleted: earlier scans keep their results, and the [Scan History picker in the Detailed View](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-2-audit-report-detailed-view) still shows them.

@@ -1,0 +1,18 @@
+// The global table styles size a table to its content (display: block;
+// width: max-content) and give it a 300px min-height, so a narrow one-column
+// table left its rows short of the container's edge and padded short lists
+// with empty space. Lay it out as a real full-width table instead, and let
+// long URLs wrap rather than push the table wider than its container.
+//
+// Chained with the global .table-container so this outranks the global
+// `.table-container table` rule regardless of stylesheet load order.
+:global(.table-container).occurrences-table {
+  table {
+    display: table;
+    width: 100%;
+    min-height: 0;
+  }
+  td a {
+    overflow-wrap: anywhere;
+  }
+}
