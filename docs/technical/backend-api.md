@@ -84,11 +84,15 @@ Endpoints requiring a valid JWT token:
 
 `getAuditTable` and `exportAuditTable` accept an optional `scanId`. Without it they read the live `blockers` table, i.e. the audit's latest scan. With it they return that past scan's blockers through `getHistoricalBlockers`, which unions `blockers` and `stale_blockers` for the scan (plain SQL, since the stale tables aren't in Hasura) and resolves ignore status against the audit's current `ignored_blockers`. Past scans are read-only: no detail pages and no ignore toggling. The frontend only offers scans created from June 2026 onward (see *Database Schema → stale_blockers*).
 
+#### Platform statistics
+
+`GET /public/getPublicStats` (no auth) and `GET /auth/getSystemStats` (admins) both read `utils/kpis.ts`, so the public hubs, the admin Statistics panel and the monthly reports always agree. The public endpoint returns totals only, cached for five minutes per container: `live` (current figures), `monthly` (one row per UTC month, last row partial), `snapshot` (the daily Title II figures, null until the first daily run) and `redSitesTotal`. Definitions: *Platform KPIs* (kpis.md).
+
 ### Scheduled Routes (`/scheduled`)
 Endpoints triggered by AWS EventBridge:
 
 - **`runEveryMinute`** - Processes scheduled audits and triggers scans; also closes out stuck scans (no webhook activity for `STUCK_SCAN_INACTIVITY_MINUTES`, default 60) - see *Scanning Services → Stuck Scans and Timeouts*
-- **`runEveryDay`** - Daily maintenance: moves blockers (and their `blocker_messages`) from every scan that is no longer its audit's latest into `stale_blockers` / `stale_blocker_messages`, in batches under a soft deadline, so the live tables stay small - see *Database Schema → stale_blockers*
+- **`runEveryDay`** - Daily maintenance: moves blockers (and their `blocker_messages`) from every scan that is no longer its audit's latest into `stale_blockers` / `stale_blocker_messages`, in batches under a soft deadline, so the live tables stay small - see *Database Schema → stale_blockers*. Then, with whatever time is left in the Lambda's budget, recomputes the daily KPI snapshot (Red adoption, conformance, remediation) - see *Platform KPIs*
 
 ### Hasura Routes (`/hasura`)
 Webhook endpoints for Hasura event triggers (protected by webhook secret).

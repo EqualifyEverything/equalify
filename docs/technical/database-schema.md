@@ -183,6 +183,9 @@ Key/value configuration store.
 | `key` | TEXT | Option name |
 | `value` | JSONB | Option value |
 
+### options
+Key/value settings (`key` TEXT primary key, `value` TEXT). Besides workspace settings, three keys carry platform KPI data (see *Platform KPIs*): `kpi_red_sites_total` (maintained by hand: the Red adoption denominator and its date), `kpi_snapshot` and `kpi_red_hosts` (written daily by `runEveryDay`; never edit). `db/migrations/add_kpi_options.sql` seeds the denominator.
+
 ### logs
 Activity audit trail.
 

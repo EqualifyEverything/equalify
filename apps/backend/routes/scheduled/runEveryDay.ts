@@ -1,4 +1,4 @@
-import { db } from "#src/utils";
+import { db, computeKpiSnapshot } from "#src/utils";
 
 //
 // Daily maintenance: move blockers from non-latest scans into the
@@ -91,7 +91,20 @@ export const runEveryDay = async () => {
         throw err;
     }
 
+    // Daily KPI snapshot (Red adoption, conformance, remediation) - see utils/kpis.ts.
+    // Runs after the archive so a "previous scan" is in stale_blockers, and only with
+    // the time the archive left over: this Lambda has a 120 s timeout, and a piece
+    // that doesn't fit keeps yesterday's value.
+    const LAMBDA_BUDGET_MS = 110_000;
+    let kpi: Record<string, boolean> = {};
+    try {
+        const snapshot = await computeKpiSnapshot((ms) => Date.now() - t0 + ms < LAMBDA_BUDGET_MS);
+        kpi = { adoption: !!snapshot.adoption, conformance: !!snapshot.conformance, remediation: !!snapshot.remediation };
+    } catch (err) {
+        console.error("runEveryDay: kpi snapshot failed (archive unaffected):", err);
+    }
+
     await db.clean();
-    console.log(`runEveryDay: moved ${totalMoved} stale blockers in ${batches} batch(es), ${bmMoved} orphan blocker_messages in ${bmBatches} batch(es) (${Date.now() - t0}ms)`);
-    return { totalMoved, batches, bmMoved, bmBatches, ms: Date.now() - t0 };
+    console.log(`runEveryDay: moved ${totalMoved} stale blockers in ${batches} batch(es), ${bmMoved} orphan blocker_messages in ${bmBatches} batch(es), kpi snapshot ${JSON.stringify(kpi)} (${Date.now() - t0}ms)`);
+    return { totalMoved, batches, bmMoved, bmBatches, kpi, ms: Date.now() - t0 };
 };
