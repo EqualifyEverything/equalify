@@ -74,6 +74,9 @@ Individual accessibility issues found during scans.
 | `created_at` | TIMESTAMP | Discovery timestamp |
 | `updated_at` | TIMESTAMP | Last update timestamp |
 
+### stale_blockers / stale_blocker_messages
+Archive of blockers from scans that are no longer their audit's latest. `runEveryDay` moves each such scan's rows out of `blockers` / `blocker_messages` into these tables in batches (same columns as the live tables, minus `url_text`), so the live tables only hold the most recent scan per audit. A row lives in exactly one of the two tables at any time, so a past scan is read by unioning both for its `scan_id` (see `getHistoricalBlockers`, which powers the Detailed View's Scan History picker and its CSV export). These tables are not tracked in Hasura and are read with plain SQL; their indexes are in `db/migrations/add_stale_blockers_indexes.sql`. Scans archived before the tables existed (June 2026) kept only part of their rows, which is why the picker only offers scans from then on.
+
 ### messages
 Accessibility rule definitions.
 
@@ -179,6 +182,9 @@ Key/value configuration store.
 | `id` | UUID | Primary key |
 | `key` | TEXT | Option name |
 | `value` | JSONB | Option value |
+
+### options
+Key/value settings (`key` TEXT primary key, `value` TEXT). Besides workspace settings, three keys carry platform KPI data (see *Platform KPIs*): `kpi_red_sites_total` (maintained by hand: the Red adoption denominator and its date), `kpi_snapshot` and `kpi_red_hosts` (written daily by `runEveryDay`; never edit). `db/migrations/add_kpi_options.sql` seeds the denominator.
 
 ### logs
 Activity audit trail.

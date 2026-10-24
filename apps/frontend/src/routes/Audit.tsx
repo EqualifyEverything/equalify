@@ -199,9 +199,14 @@ export const Audit = () => {
   }, [urls]);
 
   // Finished scans, newest first; [0] is the one the report shows by default.
+  // Scans archived before the stale_blockers table existed (June 2026) kept only
+  // part of their blockers, so the history picker doesn't offer them. The latest
+  // scan is always kept: it reads live data and is what the report shows anyway.
+  const SCAN_HISTORY_SINCE = Date.parse("2026-06-01T00:00:00Z");
   const finishedScans = (scans ?? [])
     .filter((s: any) => s.status === "complete" || s.status === "failed")
-    .reverse();
+    .reverse()
+    .filter((s: any, i: number) => i === 0 || Date.parse(s.created_at) >= SCAN_HISTORY_SINCE);
   const scanParam = searchParams.get("scan");
   const historicalScan =
     blockersTableView === "detailed" && scanParam

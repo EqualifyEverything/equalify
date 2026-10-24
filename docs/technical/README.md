@@ -12,6 +12,7 @@ This folder contains technical documentation for developers working on or deploy
 | [Frontend Guide](frontend-guide.md) | React application structure and development |
 | [Database Schema](database-schema.md) | PostgreSQL tables and relationships |
 | [Deployment Guide](deployment-guide.md) | AWS deployment and configuration |
+| [Platform KPIs](kpis.md) | Definitions and sources of every usage, adoption and conformance figure |
 | [Contributing](contributing.md) | Development workflow and contribution guidelines |
 
 ## Quick Start
