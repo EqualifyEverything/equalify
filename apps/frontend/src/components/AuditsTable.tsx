@@ -47,6 +47,10 @@ interface auditsTableProps {
   isLoading: boolean;
 }
 
+// Stable reference: a fresh `[]` each render makes react-table see new data
+// every time, auto-reset its page index, and re-render in an endless loop
+const NO_AUDITS: Audit[] = [];
+
 export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
   const [scrollFadeRef, showScrollFade] = useScrollFade();
   //console.log(audits);
@@ -167,7 +171,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
-    data: audits || [],
+    data: audits ?? NO_AUDITS,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

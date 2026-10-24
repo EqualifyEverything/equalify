@@ -65,7 +65,7 @@ export const Audits = () => {
   const activeTagFilter = allTags
     ? auditsTableTagFilter.filter((id) => allTags.some((tag) => tag.id === id))
     : [];
-  const { data: audits, isLoading } = useQuery({
+  const { data: audits, isLoading, isError } = useQuery({
     queryKey: ["audits"],
     queryFn: async () =>
       (
@@ -214,6 +214,14 @@ export const Audits = () => {
               </Tabs.Trigger>
             </Tabs.List>
           </div>
+          {isError && (
+            <Card variant="short-error">
+              <TbHelpCircleFilled className="icon-small" />
+              <div className="font-small">
+                <b>Unable to load audits.</b> Please refresh the page, or contact your administrator if this keeps happening.
+              </div>
+            </Card>
+          )}
           <Tabs.Content value="cards">
             <div className="cards-33">
               {isLoading ? (
