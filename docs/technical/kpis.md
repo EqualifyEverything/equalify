@@ -8,7 +8,7 @@ Equalify reports platform usage and accessibility figures in four places: the ad
 |------|----------|--------|
 | **Live** | On request (routes cache for 5 minutes) | SQL over `users`, `audits`, `urls`, `scans`, `blockers`, `sessions`; CloudWatch `scansStarted` / `ScanDuration` metrics for page scans |
 | **Monthly** | On request, one row per UTC calendar month | Same sources, bucketed by month. The last row is the current, partial month (`partial: true`); hubs showing a snapshot should use the last row with `partial: false` |
-| **Snapshot** | Once a day by `runEveryDay`, stored in `options.kpi_snapshot` | SQL over the live and archived blocker tables plus a homepage probe for Red sites. Each piece keeps its previous value if it fails or runs out of time |
+| **Snapshot** | Once a day by `runEveryDay`, stored in `options.kpi_snapshot` | SQL over the live and archived blocker tables plus a homepage probe for Red sites. Saved after each piece, so a piece that fails or runs out of time keeps its previous value without affecting the others. The job logs `kpi snapshot: updated [...] skipped [...] failed [...]` |
 
 ## Usage
 
@@ -30,7 +30,7 @@ Equalify reports platform usage and accessibility figures in four places: the ad
 | Figure | Definition |
 |--------|------------|
 | uic.edu hosts tracked | Distinct `*.uic.edu` hostnames with at least one tracked page, excluding the Red team's own platform hosts (`red.uic.edu` and subdomains) |
-| UIC Red sites using Equalify | Of those hosts, the ones whose homepage references the `uic-red` WordPress theme. Each host is probed at most weekly, up to 40 hosts per daily run, so a newly added host shows up within a day or two |
+| UIC Red sites using Equalify | Of those hosts, the ones whose homepage references the `uic-red` WordPress theme. Each host is probed at most weekly, up to 300 hosts per daily run (the probes also stop when the daily job's time budget runs short), so a newly added host usually shows up the next day (later if the daily job ran short of time). The Equalify Hub only shows the Red share once no more than a tenth of tracked hosts are still waiting for their first check |
 | Red sites scanned (30 days) | Red hosts in an audit with a completed scan in the last 30 days |
 | Red site owners | Distinct accounts owning an audit that tracks a Red host |
 | Red site total | The denominator: live, public Red sites per the Red team. Maintained by hand in `options.kpi_red_sites_total` (see below); 690 as of Oct 22, 2026 |
@@ -47,9 +47,11 @@ Equalify reports platform usage and accessibility figures in four places: the ad
 
 | Figure | Definition |
 |--------|------------|
-| Audits rescanned | Audits whose latest completed scan happened in the month and that had an earlier completed scan to compare with (a brand-new audit's first scan is not counted) |
-| Issues resolved | For those audits, distinct issues (by content hash) that were in the previous completed scan and are absent from the latest |
-| New issues | The reverse: in the latest scan but not the previous one |
+| Audits rescanned | Audits with a completed scan in the month that also had one before the month began. Audits created during the month are left out, so a first scan isn't counted as all-new issues |
+| Issues resolved | For each of those audits, distinct issues (by content hash) in its last scan before the month that are absent from its last scan of the month |
+| New issues | The reverse: in the month's last scan but not in the last scan before the month |
+
+Scans closed out by the stuck-scan sweep (`scan_timeout`) are ignored on both sides, because their results are partial and an unscanned page would otherwise look resolved. So are scans from before June 2026, which were archived before the archive kept every row (the same cutoff as Scan History). Both scans are read from the live and archived tables. A finished month's figure depends only on scans up to its end, so it doesn't change no matter when the report is generated. Pages added to or removed from an audit during the month also move these numbers, so treat them as an indicator, not an exact count of fixes.
 
 The snapshot carries this for the current month to date (`remediation`) and for the last full month (`remediationPreviousMonth`); the monthly report prints the latter.
 

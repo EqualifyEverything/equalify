@@ -28,12 +28,19 @@ const RED_THEME_MARKER = 'wp-content/themes/uic-red';
 const RED_PLATFORM_HOSTS = /(^|\.)red\.uic\.edu$/i;
 const UIC_HOST = /^([a-z0-9-]+\.)*uic\.edu$/i;
 const RED_PROBE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // re-check a host weekly
-const RED_PROBE_MAX_PER_RUN = 40;                   // keeps a daily run bounded (~40 x 6 s / 8 parallel)
+// Enough to check every tracked host in one run (~190 on prod), so the first
+// snapshot after a deploy is complete instead of filling in over several days.
+// The probe loop also stops on its own when the caller's time budget runs short.
+const RED_PROBE_MAX_PER_RUN = 300;
 const RED_PROBE_CONCURRENCY = 8;
 const RED_PROBE_TIMEOUT_MS = 6000;
 // Each snapshot query gets its own statement timeout so one slow piece can't
 // eat the whole daily run; a timed-out piece keeps its previous value.
 const SNAPSHOT_QUERY_TIMEOUT = '25s';
+// Scans archived before the stale_blockers table existed (June 2026) kept only part
+// of their blockers, so they can't serve as a remediation baseline. Same cutoff as
+// the Detailed View's Scan History picker (apps/frontend/src/routes/Audit.tsx).
+const ARCHIVE_COMPLETE_SINCE = '2026-06-01T00:00:00Z';
 
 export interface LiveKpis {
     totalUsers: number;
@@ -104,9 +111,9 @@ export interface KpiSnapshot {
 
 export interface RemediationKpi {
     month: string;                // the month this row describes (UTC)
-    auditsRescanned: number;      // audits whose latest completed scan happened that month and that had an earlier completed scan to compare with
-    resolvedIssues: number;       // distinct issues in those audits' previous scan that are gone from the latest
-    newIssues: number;            // distinct issues in the latest scan that weren't in the previous one
+    auditsRescanned: number;      // audits scanned in the month that also had a scan before it (see computeRemediation)
+    resolvedIssues: number;       // distinct issues present before the month that are gone by its last scan
+    newIssues: number;            // distinct issues in the month's last scan that weren't there before it
     computedAt: string;
 }
 
@@ -262,7 +269,11 @@ export async function getMonthlyKpis(months: number): Promise<MonthlyKpi[]> {
     });
 }
 
-export const getRedSitesTotal = () => getOption<RedSitesTotal>(OPTION_RED_SITES_TOTAL);
+// Only a positive total is a usable denominator; anything else reads as "not set"
+export const getRedSitesTotal = async (): Promise<RedSitesTotal | null> => {
+    const v = await getOption<RedSitesTotal>(OPTION_RED_SITES_TOTAL);
+    return v && typeof v.total === 'number' && v.total > 0 ? v : null;
+};
 export const getKpiSnapshot   = () => getOption<KpiSnapshot>(OPTION_KPI_SNAPSHOT);
 
 // ─── Daily snapshot (expensive) ──────────────────────────────────────────────
@@ -295,8 +306,9 @@ async function probeRedTheme(host: string): Promise<boolean | null> {
     }
 }
 
-async function computeAdoption(): Promise<KpiSnapshot['adoption']> {
-    // Every tracked uic.edu host, with the accounts that own an audit tracking it
+async function computeAdoption(hasTimeFor: (ms: number) => boolean): Promise<KpiSnapshot['adoption']> {
+    // Every tracked uic.edu host, with the accounts that own an audit tracking it,
+    // and the hosts with a completed scan in the last 30 days
     const rows: { host: string; user_id: string }[] = (await db.query({
         text: `SELECT DISTINCT lower(substring(u.url FROM '^https?://([^/:?#]+)')) AS host, a.user_id
                FROM urls u JOIN audits a ON a.id = u.audit_id
@@ -328,6 +340,8 @@ async function computeAdoption(): Promise<KpiSnapshot['adoption']> {
         .sort((a, b) => (cache[a] ? Date.parse(cache[a].checkedAt) : 0) - (cache[b] ? Date.parse(cache[b].checkedAt) : 0))
         .slice(0, RED_PROBE_MAX_PER_RUN);
     for (let i = 0; i < due.length; i += RED_PROBE_CONCURRENCY) {
+        // one batch (bounded by the probe timeout, which also covers reading the body) plus the writes and cleanup after the loop
+        if (!hasTimeFor(RED_PROBE_TIMEOUT_MS + 15_000)) { console.log('kpi snapshot: stopping Red probes early (out of time)'); break; }
         const batch = due.slice(i, i + RED_PROBE_CONCURRENCY);
         const results = await Promise.all(batch.map(probeRedTheme));
         batch.forEach((host, j) => {
@@ -354,9 +368,11 @@ async function computeAdoption(): Promise<KpiSnapshot['adoption']> {
 }
 
 async function computeConformance(): Promise<KpiSnapshot['conformance']> {
-    // Levels are derived per message (rule), which is tiny, before touching the
-    // large blockers table. A blocker's level is the strictest one it is tagged
-    // with: A if any Level A tag, else AA, else AAA; best-practice rules have none.
+    // One statement, so every figure comes from the same snapshot of the live
+    // table. Levels are derived per message (rule), which is tiny; blockers are
+    // then grouped (a blocker can carry more than one message) and a blocker's
+    // level is the strictest one it is tagged with: A if any Level A tag, else
+    // AA, else AAA. Rules with no WCAG level tag are best-practice checks.
     const r = (await db.query({
         text: `
             WITH message_levels AS (
@@ -369,22 +385,21 @@ async function computeConformance(): Promise<KpiSnapshot['conformance']> {
                 LEFT JOIN tags t ON t.id = mt.tag_id
                 GROUP BY m.id
             ),
-            live AS (
-                SELECT b.id, b.url_id
-                FROM blockers b
-                WHERE NOT EXISTS (SELECT 1 FROM ignored_blockers ib WHERE ib.blocker_id = b.id)
-            ),
             leveled AS (
-                SELECT l.id, bool_or(ml.level_a) AS level_a, bool_or(ml.level_aa) AS level_aa, bool_or(ml.level_aaa) AS level_aaa
-                FROM live l
-                JOIN blocker_messages bm ON bm.blocker_id = l.id
-                JOIN message_levels ml ON ml.id = bm.message_id
-                GROUP BY l.id
+                SELECT b.id, b.url_id,
+                       COALESCE(bool_or(ml.level_a), false)   AS level_a,
+                       COALESCE(bool_or(ml.level_aa), false)  AS level_aa,
+                       COALESCE(bool_or(ml.level_aaa), false) AS level_aaa
+                FROM blockers b
+                LEFT JOIN blocker_messages bm ON bm.blocker_id = b.id
+                LEFT JOIN message_levels ml ON ml.id = bm.message_id
+                WHERE NOT EXISTS (SELECT 1 FROM ignored_blockers ib WHERE ib.blocker_id = b.id)
+                GROUP BY b.id, b.url_id
             )
             SELECT
                 (SELECT COUNT(*) FROM urls)                                        AS monitored_pages,
-                (SELECT COUNT(DISTINCT url_id) FROM live WHERE url_id IS NOT NULL) AS pages_with_blockers,
-                (SELECT COUNT(*) FROM live)                                        AS open_blockers,
+                COUNT(*)                                                           AS open_blockers,
+                COUNT(DISTINCT url_id)                                             AS pages_with_blockers,
                 COUNT(*) FILTER (WHERE level_a)                                    AS level_a,
                 COUNT(*) FILTER (WHERE level_aa AND NOT level_a)                   AS level_aa,
                 COUNT(*) FILTER (WHERE level_aaa AND NOT level_a AND NOT level_aa) AS level_aaa
@@ -407,48 +422,57 @@ async function computeConformance(): Promise<KpiSnapshot['conformance']> {
     };
 }
 
-// Issues are compared by content hash per audit: an issue counts as resolved when
-// it was in the previous completed scan and is absent from the latest one. Only
-// audits that have a previous completed scan take part, so a brand-new audit's
-// first scan doesn't show up as hundreds of "new" issues.
+// Remediation for one UTC month, per audit: the audit's last completed scan in the
+// month (E) is compared with its last completed scan before the month began (B),
+// by content hash. Resolved = in B but not in E; new = in E but not in B. Audits
+// with no B (created during the month) are left out, so a new audit's first scan
+// doesn't count as hundreds of new issues. Scans the stuck-scan sweep closed out
+// (scan_timeout) are skipped: their results are partial, and a page that was never
+// scanned would otherwise count as resolved. So are scans before ARCHIVE_COMPLETE_SINCE. Either scan may already have been
+// archived, so both tables are read. Because E and B only depend on scans before
+// the month's end, a finished month's figure is stable no matter when it's read.
 // `monthsBack` 0 = the current (partial) month, 1 = the last full month.
 async function computeRemediation(monthsBack: number): Promise<RemediationKpi> {
     const win = monthWindows(monthsBack + 1)[0];
     const r = (await db.query({
         text: `
-            WITH latest AS (
-                SELECT DISTINCT ON (audit_id) id, audit_id, created_at
-                FROM scans WHERE status = 'complete'
+            WITH usable AS (
+                SELECT id, audit_id, created_at FROM scans
+                WHERE status = 'complete'
+                  AND created_at >= $3
+                  AND NOT (COALESCE(errors, '[]'::jsonb) @> '[{"type":"scan_timeout"}]'::jsonb)
+            ),
+            e AS (
+                SELECT DISTINCT ON (audit_id) id, audit_id FROM usable
+                WHERE created_at >= $1 AND created_at < $2
                 ORDER BY audit_id, created_at DESC
             ),
-            in_month AS (
-                SELECT * FROM latest WHERE created_at >= $1 AND created_at < $2
+            b AS (
+                SELECT DISTINCT ON (u.audit_id) u.id, u.audit_id FROM usable u JOIN e ON e.audit_id = u.audit_id
+                WHERE u.created_at < $1
+                ORDER BY u.audit_id, u.created_at DESC
             ),
-            prev AS (
-                SELECT DISTINCT ON (s.audit_id) s.id, s.audit_id
-                FROM scans s JOIN in_month m ON m.audit_id = s.audit_id AND s.created_at < m.created_at
-                WHERE s.status = 'complete'
-                ORDER BY s.audit_id, s.created_at DESC
+            pairs AS (
+                SELECT e.audit_id, e.id AS e_id, b.id AS b_id FROM e JOIN b USING (audit_id)
             ),
-            rescanned AS (
-                SELECT m.* FROM in_month m JOIN prev p ON p.audit_id = m.audit_id
-            ),
-            prev_hashes AS (
-                SELECT DISTINCT p.audit_id, sb.content_hash_id FROM prev p JOIN stale_blockers sb ON sb.scan_id = p.id
+            b_hashes AS (
+                SELECT p.audit_id, x.content_hash_id FROM pairs p JOIN blockers x       ON x.scan_id = p.b_id
                 UNION
-                SELECT DISTINCT p.audit_id, b.content_hash_id  FROM prev p JOIN blockers b ON b.scan_id = p.id
+                SELECT p.audit_id, x.content_hash_id FROM pairs p JOIN stale_blockers x ON x.scan_id = p.b_id
             ),
-            latest_hashes AS (
-                SELECT DISTINCT b.audit_id, b.content_hash_id FROM rescanned m JOIN blockers b ON b.scan_id = m.id
+            e_hashes AS (
+                SELECT p.audit_id, x.content_hash_id FROM pairs p JOIN blockers x       ON x.scan_id = p.e_id
+                UNION
+                SELECT p.audit_id, x.content_hash_id FROM pairs p JOIN stale_blockers x ON x.scan_id = p.e_id
             )
             SELECT
-                (SELECT COUNT(*) FROM rescanned) AS audits_rescanned,
-                (SELECT COUNT(*) FROM prev_hashes ph
-                   WHERE NOT EXISTS (SELECT 1 FROM latest_hashes lh WHERE lh.audit_id = ph.audit_id AND lh.content_hash_id = ph.content_hash_id)) AS resolved,
-                (SELECT COUNT(*) FROM latest_hashes lh
-                   WHERE NOT EXISTS (SELECT 1 FROM prev_hashes ph WHERE ph.audit_id = lh.audit_id AND ph.content_hash_id = lh.content_hash_id)) AS new_issues
+                (SELECT COUNT(*) FROM pairs) AS audits_rescanned,
+                (SELECT COUNT(*) FROM b_hashes bh
+                   WHERE NOT EXISTS (SELECT 1 FROM e_hashes eh WHERE eh.audit_id = bh.audit_id AND eh.content_hash_id = bh.content_hash_id)) AS resolved,
+                (SELECT COUNT(*) FROM e_hashes eh
+                   WHERE NOT EXISTS (SELECT 1 FROM b_hashes bh WHERE bh.audit_id = eh.audit_id AND bh.content_hash_id = eh.content_hash_id)) AS new_issues
         `,
-        values: [win.start.toISOString(), win.end.toISOString()],
+        values: [win.start.toISOString(), win.end.toISOString(), ARCHIVE_COMPLETE_SINCE],
     })).rows[0];
     return {
         month: win.month,
@@ -459,35 +483,57 @@ async function computeRemediation(monthsBack: number): Promise<RemediationKpi> {
     };
 }
 
+export interface KpiSnapshotRun {
+    snapshot: KpiSnapshot;
+    updated: string[];  // pieces recomputed this run
+    skipped: string[];  // not started: the caller's time budget couldn't cover them
+    failed: string[];   // started but threw (timeout, error); previous value kept
+}
+
 /**
- * Recomputes the daily KPI snapshot and stores it under OPTION_KPI_SNAPSHOT.
- * Each piece runs under its own statement timeout and keeps its previous value
- * if it fails or if `hasTimeFor(ms)` says the caller's budget is spent, so the
- * snapshot degrades gracefully instead of blocking the job that runs it.
- * Expects db.connect() to have been called.
+ * Recomputes the daily KPI snapshot under OPTION_KPI_SNAPSHOT, one piece at a
+ * time. The snapshot is saved after every piece that succeeds, so if the run is
+ * cut short (out of budget, or the Lambda is killed) only the piece in flight is
+ * lost and every other piece keeps its newest value. Each statement runs under
+ * a session statement timeout. Expects db.connect() to have been called.
  */
-export async function computeKpiSnapshot(hasTimeFor: (ms: number) => boolean = () => true): Promise<KpiSnapshot> {
+export async function computeKpiSnapshot(hasTimeFor: (ms: number) => boolean = () => true): Promise<KpiSnapshotRun> {
     const previous: KpiSnapshot = { computedAt: '', adoption: null, conformance: null, remediation: null, remediationPreviousMonth: null, ...((await getKpiSnapshot()) ?? {}) };
-    const snapshot: KpiSnapshot = { ...previous, computedAt: new Date().toISOString() };
+    let snapshot: KpiSnapshot = { ...previous };
+    const run: Omit<KpiSnapshotRun, 'snapshot'> = { updated: [], skipped: [], failed: [] };
+    // A piece starts only if the caller's budget covers its statements at the full
+    // statement timeout plus headroom (adoption runs two small queries; its homepage
+    // probes then stop on their own when time runs short, so it goes last). Measured
+    // at prod scale the pieces take 2-5 s each, so these gates only bite on days the
+    // archive ran long. The last full month's remediation goes before the current
+    // month's because the monthly report needs it.
     const pieces: [keyof Omit<KpiSnapshot, 'computedAt'>, number, () => Promise<any>][] = [
-        ['adoption',     35_000, computeAdoption],
-        ['conformance',  30_000, computeConformance],
-        ['remediation',              30_000, () => computeRemediation(0)],
+        ['conformance',              30_000, computeConformance],
         ['remediationPreviousMonth', 30_000, () => computeRemediation(1)],
+        ['remediation',              30_000, () => computeRemediation(0)],
+        ['adoption',                 55_000, () => computeAdoption(hasTimeFor)],
     ];
-    await db.query({ text: `SET statement_timeout = '${SNAPSHOT_QUERY_TIMEOUT}'` });
     try {
         for (const [name, needsMs, compute] of pieces) {
-            if (!hasTimeFor(needsMs)) { console.log(`kpi snapshot: skipped ${name} (out of time)`); continue; }
+            if (!hasTimeFor(needsMs)) { run.skipped.push(name); continue; }
             try {
-                (snapshot as any)[name] = await compute();
+                // A session setting rather than a transaction on purpose: no transaction
+                // state can be left open on the shared connection, and Lambda re-initializes
+                // the container after a timeout. Re-applied per piece in case the client
+                // reconnected in between (a new connection starts without it).
+                await db.query({ text: `SET statement_timeout = '${SNAPSHOT_QUERY_TIMEOUT}'` });
+                const next: KpiSnapshot = { ...snapshot, [name]: await compute(), computedAt: new Date().toISOString() };
+                await setOption(OPTION_KPI_SNAPSHOT, next);
+                snapshot = next; // only once it's saved, so the log and the stored value agree
+                run.updated.push(name);
             } catch (error) {
+                run.failed.push(name);
                 console.error(`kpi snapshot: ${name} failed, keeping previous value`, error);
             }
         }
     } finally {
-        await db.query({ text: `SET statement_timeout = DEFAULT` }).catch(() => undefined);
+        await db.query({ text: 'RESET statement_timeout' }).catch(() => undefined);
     }
-    await setOption(OPTION_KPI_SNAPSHOT, snapshot);
-    return snapshot;
+    console.log(`kpi snapshot: updated [${run.updated.join(', ')}] skipped [${run.skipped.join(', ')}] failed [${run.failed.join(', ')}]`);
+    return { snapshot, ...run };
 }

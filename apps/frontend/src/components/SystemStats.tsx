@@ -158,7 +158,8 @@ export const SystemStats = () => {
     const conformance = data.snapshot?.conformance ?? null;
     const remediation = data.snapshot?.remediation ?? null;
     const remediationPrev = data.snapshot?.remediationPreviousMonth ?? null;
-    const redTotal = data.redSitesTotal ?? null;
+    // The API returns null unless the total is positive; the check here is belt-and-braces
+    const redTotal = data.redSitesTotal && data.redSitesTotal.total > 0 ? data.redSitesTotal : null;
     const chartRows = (data.monthly ?? []).map((row) => ({
         ...row,
         label: formatMonth(row.month) + (row.partial ? "*" : ""),
@@ -189,11 +190,11 @@ export const SystemStats = () => {
                                 subValue={redTotal ? formatPercent(adoption.redSitesTracked / redTotal.total) : undefined}
                             />
                             <StatCard label="Red Sites Scanned (30 days)" value={adoption.redSitesScanned30d} />
-                            <StatCard label="Red Site Owners" value={adoption.redSiteOwners} subLabel="distinct Equalify accounts" subValue="" />
+                            <StatCard label="Red Site Owners (Equalify accounts)" value={adoption.redSiteOwners} />
                             <StatCard label="uic.edu Hosts Tracked" value={adoption.uicHostsTracked} subLabel="hosts awaiting a theme check" subValue={adoption.redHostsPending} />
                         </div>
                         <p className={style.note}>
-                            A site counts as Red when its homepage uses the uic-red WordPress theme; hosts are rechecked weekly, a few per day. Computed {formatDate(adoption.computedAt)}.
+                            A site counts as Red when its homepage uses the uic-red WordPress theme; each host is rechecked weekly. Computed {formatDate(adoption.computedAt)}.
                             {redTotal && <> Red site total of {formatNumber(redTotal.total)} is as of {redTotal.asOf}{redTotal.source ? ` (${redTotal.source})` : ""}.</>}
                         </p>
                     </>
@@ -216,7 +217,7 @@ export const SystemStats = () => {
                             />
                             <StatCard label="Open Blockers, WCAG Level A" value={conformance.openBlockersLevelA} />
                             <StatCard label="Open Blockers, WCAG Level AA" value={conformance.openBlockersLevelAA} />
-                            <StatCard label="Open Blockers, Other Rules" value={conformance.openBlockersLevelAAA + conformance.openBlockersUntagged} subLabel="Level AAA or best practice" subValue="" />
+                            <StatCard label="Open Blockers, AAA / Best Practice" value={conformance.openBlockersLevelAAA + conformance.openBlockersUntagged} />
                         </>
                     )}
                 </div>
@@ -244,7 +245,7 @@ export const SystemStats = () => {
                             <StatCard label={`New Issues (${formatMonth(remediation.month)} to date)`} value={remediation.newIssues} />
                         </div>
                         <p className={style.note}>
-                            For audits whose latest scan ran in the month and that had an earlier scan to compare with: an issue is resolved when it was in the previous scan and is gone from the latest, and new when the reverse is true. Computed {formatDate(remediation.computedAt)}.
+                            For each audit scanned in the month, its last scan of the month is compared with its last scan before the month began: an issue is resolved when it was there before and is gone now, and new when the reverse is true. Audits created during the month and scans that timed out are left out. Computed {formatDate(remediation.computedAt)}.
                         </p>
                     </>
                 ) : (

@@ -19,8 +19,8 @@ These figures are recomputed once a day.
 |---|---|
 | UIC Red Sites Using Equalify | How many live UIC Red sites have at least one page tracked in Equalify, shown against the Red team's total and as a percentage. A site counts as Red when its homepage uses the uic-red WordPress theme. |
 | Red Sites Scanned (30 days) | Red sites that completed a scan in the last 30 days. |
-| Red Site Owners | Distinct accounts that own an audit tracking a Red site. |
-| uic.edu Hosts Tracked | All uic.edu hostnames with a tracked page, Red or not. Newly added hosts are checked for the Red theme within a day or two. |
+| Red Site Owners (Equalify accounts) | Distinct accounts that own an audit tracking a Red site. |
+| uic.edu Hosts Tracked | All uic.edu hostnames with a tracked page, Red or not. Newly added hosts are usually checked for the Red theme in the next daily run. |
 
 The Red site total comes from the Red team and is updated by hand; the date it was last refreshed is shown under the cards.
 
@@ -30,13 +30,13 @@ The Red site total comes from the Red team and is updated by hand; the date it w
 | Total Blockers Found | The cumulative number of accessibility issues detected across all scans. Includes a count of new blockers discovered in the last 30 days. |
 | Pages With No Open Blockers | The share of tracked pages with no open (non-ignored) blocker in their audit's latest scan. Pages that have never been scanned count as clear, so read this as an upper bound. |
 | Open Blockers, WCAG Level A / AA | Open blockers whose rule is tagged with that WCAG level. Level A is counted first, so a blocker appears in one row only. |
-| Open Blockers, Other Rules | Open blockers for Level AAA criteria or best-practice rules without a WCAG level. |
+| Open Blockers, AAA / Best Practice | Open blockers for Level AAA criteria or best-practice rules without a WCAG level. |
 
 ## Remediation
 | Metric | Description |
 |---|---|
-| Issues Resolved | For audits rescanned in the month (ones that had an earlier scan to compare with): distinct issues that were in the previous scan and are gone from the latest. Shown for the last full month and for the current month to date. |
-| New Issues | The reverse: issues in the latest scan that were not in the previous one. |
+| Issues Resolved | For each audit scanned in the month, distinct issues that were present before the month began and are gone by the month's last scan. Shown for the last full month and for the current month to date. Audits created during the month and scans that timed out are left out. |
+| New Issues | The reverse: issues in the month's last scan that weren't there before the month began. |
 
 ## Scans (Last 30 Days)
 This section reflects scan activity over the rolling 30-day window.

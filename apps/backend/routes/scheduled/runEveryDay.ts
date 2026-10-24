@@ -1,4 +1,5 @@
 import { db, computeKpiSnapshot } from "#src/utils";
+import type { KpiSnapshotRun } from "#src/utils";
 
 //
 // Daily maintenance: move blockers from non-latest scans into the
@@ -92,14 +93,14 @@ export const runEveryDay = async () => {
     }
 
     // Daily KPI snapshot (Red adoption, conformance, remediation) - see utils/kpis.ts.
-    // Runs after the archive so a "previous scan" is in stale_blockers, and only with
-    // the time the archive left over: this Lambda has a 120 s timeout, and a piece
-    // that doesn't fit keeps yesterday's value.
+    // Runs after the archive (which is already committed by now) with the time the
+    // archive left over: this Lambda has a 120 s timeout, the archive normally takes
+    // 20-30 s, and a piece that doesn't fit keeps yesterday's value.
     const LAMBDA_BUDGET_MS = 110_000;
-    let kpi: Record<string, boolean> = {};
+    let kpi: Omit<KpiSnapshotRun, 'snapshot'> | null = null;
     try {
-        const snapshot = await computeKpiSnapshot((ms) => Date.now() - t0 + ms < LAMBDA_BUDGET_MS);
-        kpi = { adoption: !!snapshot.adoption, conformance: !!snapshot.conformance, remediation: !!snapshot.remediation };
+        const { snapshot: _snapshot, ...summary } = await computeKpiSnapshot((ms) => Date.now() - t0 + ms < LAMBDA_BUDGET_MS);
+        kpi = summary;
     } catch (err) {
         console.error("runEveryDay: kpi snapshot failed (archive unaffected):", err);
     }
