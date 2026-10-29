@@ -242,7 +242,7 @@ export const Audits = () => {
                         )}
                       </h2>
                     </Link>
-                    <AuditTagList tags={tagsFromAssignments(row.tag_assignments)} className={styles["card-tags"]} />
+                    <AuditTagList tags={tagsFromAssignments(row.tag_assignments)} maxVisible={3} className={styles["card-tags"]} />
                     <div className={styles["dataRow-list"]}>
                       <DataRow
                         variant="highlight"

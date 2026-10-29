@@ -14,4 +14,6 @@
 
 - **Scans:** Scans are automated accessibility checks. Equalify scans your web pages and PDFs to find issues and organize them by type and severity so you know what to fix first.
 
+- **Tags:** Short labels, such as a department or website name, that you attach to audits so you can group them and filter the Audits page. Tags are shared across your workspace. Not to be confused with the accessibility standard tags (such as "wcag2aa") used to filter blockers. Review the [🔗 "Organizing audits with tags"](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags) page for more details.
+
 - **WCAG:** WCAG stands for Web Content Accessibility Guidelines. These are international guidelines that explain how to make websites and digital content accessible to people with disabilities. Equalify uses WCAG standards to check your content and identify accessibility issues.

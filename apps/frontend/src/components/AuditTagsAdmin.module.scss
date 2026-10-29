@@ -10,9 +10,13 @@
     margin-bottom: variables.$spacing;
   }
 
-  table {
-    display: table !important;
-    min-height: unset;
+  // Scoped under .table-container to outrank the global
+  // `.table-container table { min-height: 300px }` (which loads later). With
+  // only a few tags, that min-height got shared out across the rows and
+  // stretched them.
+  :global(.table-container) table {
+    display: table;
+    min-height: 0;
   }
 
   th:last-child,

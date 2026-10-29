@@ -1,4 +1,4 @@
-import { db, event, formatId, isStaging, queueScanJobs, validateUuid } from '#src/utils'
+import { db, event, formatId, isStaging, logAuditTagAssignmentChanges, queueScanJobs, validateUuid } from '#src/utils'
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 const lambda = new LambdaClient();
 
@@ -32,12 +32,14 @@ export const saveAudit = async () => {
 
         const validTagIds = Array.isArray(tagIds) ? tagIds.filter(validateUuid) : [];
         if (validTagIds.length) {
-            await db.query({
+            const addedIds = (await db.query({
                 text: `INSERT INTO "audit_tag_assignments" ("audit_id", "tag_id", "created_by")
                        SELECT $1, "id", $3 FROM "audit_tags" WHERE "id" = ANY($2::uuid[])
-                       ON CONFLICT DO NOTHING`,
+                       ON CONFLICT DO NOTHING
+                       RETURNING "tag_id"`,
                 values: [id, validTagIds, event.claims.sub],
-            });
+            })).rows.map((row) => row.tag_id);
+            await logAuditTagAssignmentChanges(id, addedIds, []);
         }
 
         if (saveAndRun) {

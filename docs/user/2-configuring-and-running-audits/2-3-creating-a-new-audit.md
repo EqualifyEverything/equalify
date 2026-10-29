@@ -9,6 +9,9 @@ When naming your audit, use clear, descriptive names that identify the scan's pu
 **For example:** “UIC - School of Public Health - Web” or “UIC - College of Dentistry - PDFs” or “Athletics - Facilities - All”. Avoid including complete URLs or dates in the title, as the system automatically logs creation dates and URLs.<br>
 
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/b800acaa513a3938d1d90578a6af223b39231480/user/User%20Guide%20Images/Sec%202_Audit%20Builder%20Name.png" alt="General Info configuration panel displaying Audit Name (required) input field and Scan Frequency dropdown selector." width="400"/>
+
+### Adding tags (optional)
+Use the **Tags** field in General Info to label your audit, for example with its department or website, so it's easy to find and filter later. Start typing to choose an existing tag, or create a new one. You can also add or change tags later from the audit's page. Learn more in [🔗 "Organizing audits with tags"](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags).
 ## Step 2: Scan frequency/ Scheduling audits
 You can scan manually (default setting), Daily, Weekly, or Monthly. 
 

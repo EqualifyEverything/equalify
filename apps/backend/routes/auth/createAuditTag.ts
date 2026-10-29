@@ -1,4 +1,4 @@
-import { db, event, normalizeAuditTagName, validateAuditTagName } from "#src/utils";
+import { db, event, logAuditTagEvent, normalizeAuditTagName, validateAuditTagName } from "#src/utils";
 
 //
 // Create a shared audit tag. If a tag with the same name (case-insensitive)
@@ -21,7 +21,10 @@ export const createAuditTag = async () => {
         values: [name, event.claims.sub],
     })).rows?.[0];
     const created = !!tag;
-    if (!tag) {
+    if (created) {
+        await logAuditTagEvent(`Tag "${tag.name}" created`, { tagId: tag.id, tagName: tag.name });
+    }
+    else {
         tag = (await db.query({
             text: `SELECT "id", "name" FROM "audit_tags" WHERE lower("name")=lower($1)`,
             values: [name],

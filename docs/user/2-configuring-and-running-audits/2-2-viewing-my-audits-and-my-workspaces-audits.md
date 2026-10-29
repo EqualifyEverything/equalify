@@ -5,6 +5,7 @@ This page is intended for **Project Leads and workspace members** who need to mo
 - **URLs:** The volume of pages or PDFs included in the scan.
 - **Runs:** The automated frequency of the scan (e.g., Daily, Weekly, or Monthly).
 - **Last Scan:** The timestamp of the most recent data collection.
+- **Tags:** Labels your workspace has added to the audit, such as a department or website name. Cards show up to three tags; select the **+** chip to see the rest.
 - **My Audits:** Hide your workspace’s audits and only show the projects you created.<br>
 
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/a78d3146fcb72dedd8413ee8cdcff703ad36e43e/user/User%20Guide%20Images/Sec%202_My%20Audits.png" alt="The Audits dashboard with the Filter View set to My Audits. Only one audit card, titled Athletics - Facilities - All, is visible, showing 144 blockers across 14 URLs." width="500"/><br>
@@ -14,3 +15,5 @@ This page is intended for **Project Leads and workspace members** who need to mo
 ```tip
 💡Tip: Quick scans you or your workspace members created do not show up in either view
 ```
+
+**Filter by Tags:** Show only audits with any of the tags you choose. This filter works together with Search and Filter View, and appears once your workspace has created at least one tag. Learn more in [🔗 "Organizing audits with tags"](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags).

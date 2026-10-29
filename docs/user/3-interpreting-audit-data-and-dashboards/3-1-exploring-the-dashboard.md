@@ -8,6 +8,7 @@ We designed it to help you identify and track blockers across your experiences. 
 - **Delete:** The trash can icon lets you delete your entire audit.
 - **“Scan Now”:** for a Manual Scan. If you’ve just made fixes, you can click Scan Now to refresh the data immediately.
 - **Share:** Copy a link to this report to share.<br>
+- **Tags:** Below the audit name, add or remove tags to help your workspace group and filter audits. Changes save immediately. Learn more in [🔗 "Organizing audits with tags"](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags).<br>
 <br>
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/1c69050655a9a9c15fdc750c5474e9b701645f7b/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Title.png" alt="Audit header showing Audit – Athletics – Facilities – All with edit and delete icons and buttons Scan Now and Share." width="500"/><br>
 

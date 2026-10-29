@@ -1,4 +1,4 @@
-import { db, event, isAdminUser, normalizeAuditTagName, validateAuditTagName, validateUuid } from "#src/utils";
+import { db, event, isAdminUser, logAuditTagEvent, normalizeAuditTagName, validateAuditTagName, validateUuid } from "#src/utils";
 
 //
 // Admin-only: rename an audit tag (Account > Tags).
@@ -19,15 +19,26 @@ export const renameAuditTag = async () => {
     }
 
     try {
+        // The FROM subquery reads the row as it was before the update
         const updated = (await db.query({
-            text: `UPDATE "audit_tags" SET "name"=$1 WHERE "id"=$2 RETURNING "id", "name"`,
+            text: `UPDATE "audit_tags" SET "name"=$1
+                   FROM (SELECT "id", "name" AS "old_name" FROM "audit_tags" WHERE "id"=$2) AS "previous"
+                   WHERE "audit_tags"."id"="previous"."id"
+                   RETURNING "audit_tags"."id", "audit_tags"."name", "previous"."old_name"`,
             values: [name, id],
         })).rows?.[0];
-        await db.clean();
         if (!updated) {
+            await db.clean();
             return { status: 'error', message: 'Tag not found.' };
         }
-        return { status: 'success', tag: updated };
+        if (updated.old_name !== updated.name) {
+            await logAuditTagEvent(
+                `Tag "${updated.old_name}" renamed to "${updated.name}"`,
+                { tagId: updated.id, oldName: updated.old_name, newName: updated.name },
+            );
+        }
+        await db.clean();
+        return { status: 'success', tag: { id: updated.id, name: updated.name } };
     }
     catch (err) {
         await db.clean();

@@ -1,30 +1,84 @@
 @use "../global-styles/variables.module.scss";
 @use "../global-styles/fonts.scss";
 
+@mixin chip {
+  @include fonts.font-size-small;
+  background: variables.$paper;
+  border: 1px solid variables.$gray;
+  border-radius: 999px;
+  color: variables.$black;
+  line-height: 1.4;
+  padding: 0 variables.$spacing;
+}
+
 .AuditTagList {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: calc(variables.$spacing / 2);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(variables.$spacing / 2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
 
   li {
-    @include fonts.font-size-small;
-    background: variables.$paper;
-    border: 1px solid variables.$gray;
-    border-radius: 999px;
-    color: variables.$black;
-    line-height: 1.4;
-    padding: 0 variables.$spacing;
-    white-space: nowrap;
+    @include chip;
+    max-width: 100%;
+    // long tag names wrap inside their chip instead of widening the layout
+    overflow-wrap: anywhere;
+  }
+}
+
+.more {
+  @include chip;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background: variables.$paper-dark;
+  }
+
+  &:focus-visible {
+    outline: 2px solid variables.$red;
+    outline-offset: 2px;
+  }
+}
+
+.tooltip {
+  max-width: min(20rem, calc(100vw - 16px));
+  z-index: 50;
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(variables.$spacing / 2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    @include chip;
+    overflow-wrap: anywhere;
   }
 }
 
 :global(body.dark) {
-  .AuditTagList li {
+  .AuditTagList li,
+  .more,
+  .tooltip li {
     background: variables.$dark-border;
     border-color: variables.$dark-border;
     color: variables.$paper;
+  }
+
+  .more:hover {
+    background: variables.$black;
   }
 }

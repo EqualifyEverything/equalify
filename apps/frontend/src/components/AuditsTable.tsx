@@ -115,7 +115,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
         id: "tags",
         header: "Tags",
         sortUndefined: 'last',
-        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} />,
+        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} maxVisible={2} className={styles["tags-cell"]} />,
       },
       {
         accessorKey: "interval",

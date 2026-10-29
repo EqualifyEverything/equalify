@@ -1,4 +1,4 @@
-import { db, event, isAdminUser, validateUuid } from "#src/utils";
+import { db, event, isAdminUser, logAuditTagEvent, validateUuid } from "#src/utils";
 
 //
 // Admin-only: delete an audit tag (Account > Tags). Removing it from audits
@@ -17,10 +17,20 @@ export const deleteAuditTag = async () => {
         return { status: 'error', message: 'Admin access required.' };
     }
 
-    await db.query({
-        text: `DELETE FROM "audit_tags" WHERE "id"=$1`,
+    // Every part of a statement sees the same snapshot, so the count is taken
+    // before the delete (and its cascade) removes the assignments
+    const deleted = (await db.query({
+        text: `WITH "deleted" AS (DELETE FROM "audit_tags" WHERE "id"=$1 RETURNING "id", "name")
+               SELECT "name", (SELECT count(*)::int FROM "audit_tag_assignments" WHERE "tag_id"=$1) AS "audit_count"
+               FROM "deleted"`,
         values: [id],
-    });
+    })).rows?.[0];
+    if (deleted) {
+        await logAuditTagEvent(
+            `Tag "${deleted.name}" deleted (removed from ${deleted.audit_count} audit${deleted.audit_count === 1 ? '' : 's'})`,
+            { tagId: id, tagName: deleted.name, auditCount: deleted.audit_count },
+        );
+    }
     await db.clean();
 
     return { status: 'success' };
