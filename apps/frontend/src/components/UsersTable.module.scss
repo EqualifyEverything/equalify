@@ -2,9 +2,12 @@
 @use "../global-styles/fonts.scss";
 
 .UsersTable {
-  table {
-    display:table !important;
-    min-height: unset;
+  // Scoped under .table-container to outrank the global
+  // `.table-container table { min-height: 300px }` (which loads later), so a
+  // short list of users doesn't get its rows stretched to fill it
+  :global(.table-container) table {
+    display: table;
+    min-height: 0;
   }
   
   th:last-child,

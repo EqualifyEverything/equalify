@@ -199,9 +199,14 @@ export const Audit = () => {
   }, [urls]);
 
   // Finished scans, newest first; [0] is the one the report shows by default.
+  // Scans archived before the stale_blockers table existed (June 2026) kept only
+  // part of their blockers, so the history picker doesn't offer them. The latest
+  // scan is always kept: it reads live data and is what the report shows anyway.
+  const SCAN_HISTORY_SINCE = Date.parse("2026-06-01T00:00:00Z");
   const finishedScans = (scans ?? [])
     .filter((s: any) => s.status === "complete" || s.status === "failed")
-    .reverse();
+    .reverse()
+    .filter((s: any, i: number) => i === 0 || Date.parse(s.created_at) >= SCAN_HISTORY_SINCE);
   const scanParam = searchParams.get("scan");
   const historicalScan =
     blockersTableView === "detailed" && scanParam
@@ -214,7 +219,7 @@ export const Audit = () => {
     queryFn: async () =>
       ((
         await apiClient.graphql({
-          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error}}`,
+          query: `query($audit_id: uuid!){audits_by_pk(id:$audit_id) {id name email_notifications interval remote_csv_url remote_csv_error tag_assignments(order_by: {tag: {name: asc}}) {tag {id name}}}}`,
           variables: { audit_id: auditId },
         })
       ) as any)?.data?.audits_by_pk,

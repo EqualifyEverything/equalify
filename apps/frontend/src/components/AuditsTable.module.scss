@@ -17,6 +17,11 @@
   table {
     display:table !important;
   }
+  // caps the Tags column; long names wrap inside their chips
+  .tags-cell {
+    max-width: 14rem;
+    min-width: 8rem;
+  }
   .audit-name {
     font-weight: bold;
   }

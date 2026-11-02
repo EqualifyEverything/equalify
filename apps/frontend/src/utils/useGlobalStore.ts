@@ -19,6 +19,8 @@ interface EqualifyState {
   setAuditsTableView: (val: string) => void;
   auditsTableCreatedByView: string;
   setAuditsTableCreatedByView: (val:string) => void;
+  auditsTableTagFilter: string[]; // audit tag ids; matches audits with any of them
+  setAuditsTableTagFilter: (val: string[]) => void;
   // What's New panel, keyed by entry id so a new entry reappears collapsed
   whatsNewDismissedId: string | null;
   setWhatsNewDismissedId: (val: string | null) => void;
@@ -49,6 +51,8 @@ export const useGlobalStore = create<EqualifyState>()(
       setAuditsTableView: (val) => set(() => ({ auditsTableView: val })),
       auditsTableCreatedByView: "user",
       setAuditsTableCreatedByView: (val) => set(() => ({auditsTableCreatedByView : val})),
+      auditsTableTagFilter: [],
+      setAuditsTableTagFilter: (val) => set(() => ({ auditsTableTagFilter: val })),
       whatsNewDismissedId: null,
       setWhatsNewDismissedId: (val) => set(() => ({ whatsNewDismissedId: val })),
       whatsNewExpandedId: null,
@@ -109,6 +113,7 @@ export const useGlobalStore = create<EqualifyState>()(
         ssoAuthenticated: state.ssoAuthenticated,
         auditsTableView: state.auditsTableView,
         auditsTableCreatedByView: state.auditsTableCreatedByView,
+        auditsTableTagFilter: state.auditsTableTagFilter,
         whatsNewDismissedId: state.whatsNewDismissedId,
         whatsNewExpandedId: state.whatsNewExpandedId,
         blockerTableAdvancedFiltersOpen: state.blockerTableAdvancedFiltersOpen,

@@ -267,6 +267,10 @@ aws sso login --profile equalifyuic
 - Clear `node_modules` and reinstall
 - Check environment variables are set
 
+**Platform KPIs show "appear after the first daily KPI run"**
+- The daily job (`runEveryDay`) hasn't completed since the deploy, or ran out of time after a large archive batch; check its CloudWatch log for `kpi snapshot`
+- Seed the Red denominator once per environment with `db/migrations/add_kpi_options.sql`
+
 **Scan Timeouts**
 - A single slow page: increase the scanner Lambda timeout / `SCAN_TIMEOUT`, check if the page is very large or slow
 - A scan stuck at 0% that ends in "Scan Timed Out" listing every page: the router invoke probably failed - look for the invoke error (e.g. `Scheduled scan failed for audit`) in the API logs

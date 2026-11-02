@@ -41,7 +41,7 @@ Important Details for Developers: To move from identifying a problem to fixing i
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/46ed941ba70a82efbf5bddc737451c34a90fff83/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Detailed%20View.png" alt="Detailed audit results table listing Type, URL, Issue, and Code columns with View Code buttons for each issue." width="500"/>
 
 ## Viewing Past Scans
-Click **Scan History** (next to Columns and Download) to see the blockers a previous scan found. The list shows each finished scan's date, time, and blocker count, with the most recent scan at the top.
+Click **Scan History** (next to Columns and Download) to see the blockers a previous scan found. The list shows each finished scan's date, time, and blocker count, with the most recent scan at the top. Scans from June 2026 onward are available; earlier scans were archived before scan history existed and kept only part of their results, so they're not listed.
 
 While you're viewing a past scan:
 - A yellow banner at the top of the table reads **"Viewing data as of MM/DD/YYYY"**. Click **Return to most recent scan** in the banner to go back.

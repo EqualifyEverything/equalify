@@ -47,5 +47,22 @@
       padding-left: variables.$spacing;
     }
   }
+  .tags {
+    margin-top: variables.$spacing;
+  }
+  .tags-edit {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing;
+    max-width: 640px;
+    label {
+      @include fonts.font-size-small;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    :global(.react-select) {
+      flex: 1;
+    }
+  }
 }
 

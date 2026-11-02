@@ -43,6 +43,7 @@ The main dashboard displaying all user audits with status indicators.
 Displays scan results for a specific audit including:
 - Blockers over time chart
 - Blocker details table
+- Scan History picker in the Detailed View for past scans (`?view=detailed&scan=<id>`)
 - Scan progress indicator
 - Re-scan functionality
 
@@ -176,6 +177,7 @@ Paginated table of accessibility blockers with:
 - HTML snippet preview
 - WCAG tag filtering
 - URL filtering
+- Scan History picker: lists finished scans from June 2026 onward (older ones were archived before scan history existed and are incomplete). Viewing a past scan shows a "Viewing data as of" banner with a return link; the ID column is greyed out, the Ignore column is read-only, and the Summary and Recommendations tabs are disabled, since those only cover the latest scan. Data comes from `getAuditTable`/`exportAuditTable` with `scanId`.
 
 ### BlockersRecommendations
 The Recommendations tab of the Audit Report. Calls `getAuditRecommendations` and renders one row per unique blocker (grouped by `content_hash_id`), ranked by occurrences:
@@ -217,7 +219,7 @@ const useGlobalStore = create((set) => ({
 ```
 
 ### URL State
-Route parameters for shareable views:
+Route parameters for shareable views. On the audit page: `view` (`summary`, `detailed` or `recommendations`), `scan` (a past scan's id, Detailed View only; dropped when the view changes) and `page`.
 
 ```typescript
 import { useParams, useSearchParams } from 'react-router-dom';

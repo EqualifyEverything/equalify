@@ -74,6 +74,21 @@
                     }
                   }
                 }
+              },
+              {
+                "name": "tag_assignments",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id": "audit_id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "audit_tag_assignments",
+                      "schema": "public"
+                    }
+                  }
+                }
               }
             ],
             "select_permissions": [
@@ -138,6 +153,129 @@
                   ],
                   "filter": {},
                   "check": null
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "audit_tag_assignments",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "audit",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "audit_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "audits",
+                      "schema": "public"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "tag",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "tag_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "audit_tags",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "created_at",
+                    "created_by",
+                    "audit_id",
+                    "tag_id"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "created_at",
+                    "created_by",
+                    "audit_id",
+                    "tag_id"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "audit_tags",
+              "schema": "public"
+            },
+            "array_relationships": [
+              {
+                "name": "assignments",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id": "tag_id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "audit_tag_assignments",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "anonymous",
+                "permission": {
+                  "columns": [
+                    "created_at",
+                    "updated_at",
+                    "created_by",
+                    "id",
+                    "name"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "created_at",
+                    "updated_at",
+                    "created_by",
+                    "id",
+                    "name"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
                 },
                 "comment": ""
               }

@@ -1,0 +1,8 @@
+@use "../global-styles/variables.module.scss";
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: variables.$spacing;
+  margin-top: calc(variables.$spacing * 2);
+}

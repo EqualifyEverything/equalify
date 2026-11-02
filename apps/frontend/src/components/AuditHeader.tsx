@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import styles from "./AuditHeader.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { StyledButton } from "./StyledButton";
@@ -10,6 +10,9 @@ import * as API from "aws-amplify/api";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { SkeletonAuditHeader } from "./Skeleton";
 import { ShareModal } from "./ShareModal";
+import { AuditTagInput } from "./AuditTagInput";
+import { AuditTagList } from "./AuditTagList";
+import { AuditTag, tagsFromAssignments } from "../queries";
 
 interface AuditHeaderProps extends React.PropsWithChildren {
   isShared: boolean;
@@ -34,6 +37,11 @@ export const AuditHeader = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  // Local copy so chips update immediately while setAuditTags is in flight
+  const [tags, setTags] = useState<AuditTag[]>([]);
+  useEffect(() => {
+    setTags(tagsFromAssignments(audit?.tag_assignments));
+  }, [audit]);
 
   const sharedPath = location.pathname
     .replace("/audits/", "/shared/")
@@ -117,6 +125,30 @@ export const AuditHeader = ({
     }
   };
 
+  const updateTags = async (newTags: AuditTag[]) => {
+    const previousTags = tags;
+    setTags(newTags);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/setAuditTags",
+          options: { body: { auditId: auditId!, tagIds: newTags.map((tag) => tag.id) } },
+        }).response
+      ).body.json()) as { status: string; message?: string };
+      if (response?.status !== "success") {
+        throw new Error(response?.message);
+      }
+      await queryClient.refetchQueries({ queryKey: ["audit", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["audits"] });
+      queryClient.invalidateQueries({ queryKey: ["auditTags"] });
+    } catch (err) {
+      console.error("Failed to update tags:", err);
+      setTags(previousTags);
+      setAnnounceMessage(`Unable to update tags for ${audit.name}.`, "error");
+    }
+  };
+
   // Show skeleton while audit is loading
   if (!audit) {
     return <SkeletonAuditHeader />;
@@ -180,6 +212,13 @@ export const AuditHeader = ({
           />
         </div>
       </div>
+      {!isQuickScan && (isShared ? (
+        <AuditTagList tags={tags} className={styles["tags"]} />
+      ) : (
+        <div className={styles["tags"] + " " + styles["tags-edit"]}>
+          <AuditTagInput inputId="auditTags" value={tags} onChange={updateTags} />
+        </div>
+      ))}
     </div>
     </>
   );

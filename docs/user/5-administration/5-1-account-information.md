@@ -22,6 +22,7 @@ The Member role is the default role for all invited users. Users have access to 
 - Invite new users to the workspace.
 - Access activity logs.
 - Configure audit schedules and notifications.
+- Create tags and add or remove them on audits.
 
 ### Available Actions for Members:
 - Verification: Use this page to confirm you are logged into the correct Account, and confirm permission level.
@@ -37,6 +38,7 @@ The first user to log in to a new Equalify instance automatically becomes an Adm
 - Manage workspace membership.
 - Access activity logs.
 - Configure audit schedules and notifications.
+- Rename, merge, and delete the workspace's tags from **Account > Tags**. See [🔗 "Managing tags"](https://equalify.uic.edu/dashboard/user-guide/5-administration/5-5-managing-tags).
 
 ### Available Actions for Admins:
 As an Admin, you have extra tools to manage who can access the system and what they are allowed to do.

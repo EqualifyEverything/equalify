@@ -1,24 +1,29 @@
-import { db } from '#src/utils';
+import { db, getLiveKpis, getMonthlyKpis, getKpiSnapshot, getRedSitesTotal } from '#src/utils';
+import type { LiveKpis, MonthlyKpi, KpiSnapshot, RedSitesTotal } from '#src/utils';
 
-// Public, unauthenticated usage totals for external dashboards (DASE Hub's
-// Key Results page). Totals only — no names, emails, departments, or any
+// Public, unauthenticated platform statistics for external dashboards (the
+// Equalify Hub's About page, DASE Hub's Key Results page) and the monthly
+// development report. Totals only — no names, emails, departments, or any
 // per-user data.
 //
 //   GET /public/getPublicStats
 //
-// Definitions match Account > Statistics (getSystemStats.ts) so the two
-// surfaces always agree:
-//   totalUsers     — accounts in Equalify
-//   newUsers30d    — accounts created in the last 30 days
-//   activeUsers30d — distinct accounts with a session (sign-in / app load) in the last 30 days
-//   unitsServed30d — distinct SSO departments with a session in the last 30 days
-//   auditOwners    — distinct accounts that have created at least one audit
-//   totalAudits    — audits created
+// Every figure comes from utils/kpis.ts, the module Account > Statistics
+// (getSystemStats) also reads, so the surfaces always agree. The flat top-level
+// fields are kept for existing consumers; new consumers should read:
+//   live      current figures (totals and rolling 30-day windows)
+//   monthly   one row per UTC calendar month, oldest first; the last row is the
+//             current, partial month (`partial: true`) - hubs that show a
+//             monthly snapshot should use the last row with partial === false
+//   snapshot  the daily Title II figures (Red adoption, conformance,
+//             remediation), or null until the first daily run has happened
+//   redSitesTotal  the Red adoption denominator and the date it was given
 //
-// Cached in memory for 5 minutes per container so an open route can't be
-// used to hammer the database.
-
+// Cached in memory for 5 minutes per container so an open route can't be used
+// to hammer the database or CloudWatch.
 const CACHE_TTL_MS = 5 * 60 * 1000;
+// A year of full months plus the current one; CloudWatch retains 15 months
+const MONTHS_OF_HISTORY = 13;
 
 interface PublicStats {
     totalUsers: number;
@@ -28,6 +33,10 @@ interface PublicStats {
     auditOwners: number;
     totalAudits: number;
     generatedAt: string;
+    live: LiveKpis;
+    monthly: MonthlyKpi[];
+    snapshot: KpiSnapshot | null;
+    redSitesTotal: RedSitesTotal | null;
 }
 
 let cache: { at: number; body: PublicStats } | null = null;
@@ -37,27 +46,24 @@ export const getPublicStats = async (): Promise<PublicStats> => {
 
     await db.connect();
     try {
-        const row = (await db.query({
-            text: `
-                SELECT
-                    (SELECT COUNT(*) FROM users)                                                              AS total_users,
-                    (SELECT COUNT(*) FROM users    WHERE created_at >= NOW() - INTERVAL '30 days')           AS new_users_30d,
-                    (SELECT COUNT(DISTINCT user_id)    FROM sessions WHERE created_at >= NOW() - INTERVAL '30 days') AS active_users_30d,
-                    (SELECT COUNT(DISTINCT department) FROM sessions WHERE created_at >= NOW() - INTERVAL '30 days'
-                                                                      AND department IS NOT NULL)            AS units_served_30d,
-                    (SELECT COUNT(DISTINCT user_id) FROM audits)                                              AS audit_owners,
-                    (SELECT COUNT(*) FROM audits)                                                             AS total_audits
-            `,
-        })).rows[0];
-
+        const [live, monthly, snapshot, redSitesTotal] = await Promise.all([
+            getLiveKpis(),
+            getMonthlyKpis(MONTHS_OF_HISTORY),
+            getKpiSnapshot(),
+            getRedSitesTotal(),
+        ]);
         const body: PublicStats = {
-            totalUsers:     parseInt(row.total_users),
-            newUsers30d:    parseInt(row.new_users_30d),
-            activeUsers30d: parseInt(row.active_users_30d),
-            unitsServed30d: parseInt(row.units_served_30d),
-            auditOwners:    parseInt(row.audit_owners),
-            totalAudits:    parseInt(row.total_audits),
+            totalUsers:     live.totalUsers,
+            newUsers30d:    live.newUsers30d,
+            activeUsers30d: live.activeUsers30d,
+            unitsServed30d: live.unitsServed30d,
+            auditOwners:    live.auditOwners,
+            totalAudits:    live.totalAudits,
             generatedAt:    new Date().toISOString(),
+            live,
+            monthly,
+            snapshot,
+            redSitesTotal,
         };
         cache = { at: Date.now(), body };
         return body;

@@ -21,6 +21,8 @@ import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
+import { AuditTag, tagsFromAssignments } from "#src/queries/useAuditTags.ts";
+import { AuditTagList } from "./AuditTagList";
 
 interface Audit {
   created_at: string;
@@ -37,12 +39,17 @@ interface Audit {
       count: number;
     };
   };
+  tag_assignments: { tag: AuditTag }[];
 }
 
 interface auditsTableProps {
   audits: Audit[];
   isLoading: boolean;
 }
+
+// Stable reference: a fresh `[]` each render makes react-table see new data
+// every time, auto-reset its page index, and re-render in an endless loop
+const NO_AUDITS: Audit[] = [];
 
 export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
   const [scrollFadeRef, showScrollFade] = useScrollFade();
@@ -104,6 +111,13 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
         }
       },
       {
+        accessorFn: (row) => tagsFromAssignments(row.tag_assignments).map((tag) => tag.name).join(", ") || undefined,
+        id: "tags",
+        header: "Tags",
+        sortUndefined: 'last',
+        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} maxVisible={2} className={styles["tags-cell"]} />,
+      },
+      {
         accessorKey: "interval",
         header: "Runs",
         cell: ({ getValue }) => {
@@ -157,7 +171,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
-    data: audits || [],
+    data: audits ?? NO_AUDITS,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

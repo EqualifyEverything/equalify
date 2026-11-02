@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs";
 import { useUser } from "../queries"
-import { InvitesTable, RequestsTable, UsersTable, CoBrandingInput, LlmSettingsInput, LoginSettingsInput, SystemStats } from "../components"
+import { InvitesTable, RequestsTable, UsersTable, CoBrandingInput, LlmSettingsInput, LoginSettingsInput, SystemStats, AuditTagsAdmin } from "../components"
 import { SkeletonAccount } from "#src/components/Skeleton.tsx"
 import style from "./Account.module.scss";
 import { Card } from "#src/components/Card.tsx";
@@ -23,6 +23,7 @@ export const Account = () => {
                     {isAdmin && <Tabs.Trigger value="users" className={style.tabTrigger}>Users</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="invites" className={style.tabTrigger}>Invites</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="requests" className={style.tabTrigger}>Requests</Tabs.Trigger>}
+                    {isAdmin && <Tabs.Trigger value="tags" className={style.tabTrigger}>Tags</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="system" className={style.tabTrigger}>System</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="statistics" className={style.tabTrigger}>Statistics</Tabs.Trigger>}
                 </Tabs.List>
@@ -47,6 +48,9 @@ export const Account = () => {
                         </Tabs.Content>
                         <Tabs.Content value="requests">
                             <Card variant="light"><RequestsTable /></Card>
+                        </Tabs.Content>
+                        <Tabs.Content value="tags">
+                            <Card variant="light"><AuditTagsAdmin /></Card>
                         </Tabs.Content>
                         <Tabs.Content value="system">
                             <div className="cards-50">

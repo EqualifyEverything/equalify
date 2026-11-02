@@ -60,6 +60,12 @@
       flex-direction: column;
     }
   }
+  .tag-filter {
+    min-width: 240px;
+  }
+  .card-tags {
+    margin-bottom: variables.$spacing;
+  }
   .audits-view-selector {
     display: inline-flex;
     align-content: flex-end;

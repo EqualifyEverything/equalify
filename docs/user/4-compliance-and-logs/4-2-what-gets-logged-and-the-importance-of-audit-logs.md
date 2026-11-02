@@ -5,6 +5,9 @@ Equalify logs user actions across a workspace, including:
 - When a user runs a scan
 - Adding pages
 - Deleting pages
+- Creating a new tag
+- Adding or removing tags on an audit
+- Renaming, merging, or deleting a tag (Admins only). Merge and delete entries also note how many audits were affected.
 ```important
 ⚠️ Important: Logs do not show when you ignore or reactivate blockers. To view these changes, check the audit report's Detailed View.
 ```
