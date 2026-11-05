@@ -1,0 +1,41 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.TagReport {
+  display: flex;
+  flex-direction: column;
+  gap: calc(variables.$spacing * 2);
+
+  .header {
+    h1 {
+      margin: 0 0 calc(variables.$spacing / 2) 0;
+      line-height: 1em;
+    }
+    p {
+      margin: 0;
+      max-width: 70ch;
+    }
+  }
+
+  .label {
+    display: block;
+    @include fonts.font-size-small;
+  }
+
+  .notice p {
+    margin: 0;
+  }
+
+  .scan-note {
+    display: block;
+    @include fonts.font-size-small;
+    font-style: italic;
+  }
+
+  // Scoped under .table-container to outrank the global
+  // `.table-container table { display: block; min-height: 300px }`
+  :global(.table-container) table {
+    display: table;
+    min-height: 0;
+  }
+}

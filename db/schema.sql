@@ -763,6 +763,13 @@ CREATE INDEX idx_scans_status_updated ON public.scans USING btree (status, updat
 
 
 --
+-- Name: scans_audit_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX scans_audit_id_created_at_idx ON public.scans USING btree (audit_id, created_at DESC);
+
+
+--
 -- Name: idx_urls_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 

@@ -49,7 +49,7 @@ The tag filter works together with **Search** and **Filter View** (My Audits or 
 ```
 
 ## Where tags appear
-- **Audit cards and table:** Tags are shown on each audit card and in the **Tags** column of the table view. To save space, cards show up to three tags and the table shows up to two. When an audit has more, a chip such as **+3** appears. Hover over it, focus it with the keyboard, or select it to see the rest. Screen readers announce it as, for example, "+3 more tags", followed by the names of the hidden tags.
+- **Audit cards and table:** Tags are shown on each audit card and in the **Tags** column of the table view. To save space, cards show up to three tags and the table shows up to two. When an audit has more, select **View all tags** (for example, "View all 5 tags") to show the rest, and **Show fewer tags** to collapse the list again. Selecting a tag opens its Tag Report.
 - **Audit page:** All of an audit's tags are shown in the Tags field below the audit name.
 - **Shared reports:** People viewing a [🔗 shared report](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-5-notifications-reporting-and-sharing) can see the audit's tags, but can't change them.
 - **Logs:** Creating tags, and adding or removing tags on an audit, are recorded on the Logs page. See [🔗 "What gets logged"](https://equalify.uic.edu/dashboard/user-guide/4-compliance-and-logs/4-2-what-gets-logged-and-the-importance-of-audit-logs).
