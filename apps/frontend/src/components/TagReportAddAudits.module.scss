@@ -1,0 +1,27 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+.TagReportAddAudits {
+  display: flex;
+  align-items: flex-end;
+  gap: variables.$spacing;
+  margin-bottom: variables.$spacing;
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field {
+    flex: 1;
+    max-width: 640px;
+    min-width: 0;
+
+    label {
+      display: block;
+      @include fonts.font-size-small;
+      font-weight: bold;
+      margin-bottom: calc(variables.$spacing / 2);
+    }
+  }
+}

@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: calc(variables.$spacing * 2);
+  // Space before the footer, matching the Audit page
+  margin-bottom: calc(variables.$spacing * 2);
 
   .header {
     h1 {
@@ -14,6 +16,7 @@
     p {
       margin: 0;
       max-width: 70ch;
+      line-height: 1.4;
     }
   }
 

@@ -10,15 +10,14 @@ import { CardSpinner, PaginationControls } from "./BlockersTableSummary";
 import { formatId, useGlobalStore } from "../utils";
 import themeVariables from "../global-styles/variables.module.scss";
 // Same cards and lists as the Audit page's summary
-import style from "./BlockersTableSummary.module.scss";
+import style from "./BlockersTableSummary.module.scss";
+import ownStyle from "./TagReportSummary.module.scss";
 
 const PAGE_SIZE = 5;
 
 export interface TagReportSummaryData {
   totalBlockersCount: number;
   latestScanBlockersCount: number;
-  uniqueBlockersCount: number;
-  sharedBlockersCount: number;
   urlsWithBlockersCount: number;
   scannedUrlsCount: number;
   pdfBlockersCount: number;
@@ -39,13 +38,6 @@ interface UrlItem {
   auditName: string;
 }
 
-interface BlockerItem {
-  key: string;
-  count: number;
-  auditCount: number;
-  category: string | null;
-}
-
 interface TagReportSummaryProps {
   tagId: string;
   summary: TagReportSummaryData;
@@ -58,7 +50,7 @@ interface TagReportSummaryProps {
 
 const plural = (count: number, word: string) => `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
 
-// Paginated list fetcher shared by the two tables below
+// Paginated list fetcher for the URLs table below
 const useTagReportList = <T,>(path: string, tagId: string, page: number) =>
   useQuery({
     queryKey: ["auditTags", path, tagId, page],
@@ -73,8 +65,8 @@ const useTagReportList = <T,>(path: string, tagId: string, page: number) =>
     placeholderData: (previousData) => previousData,
   });
 
-// Stat cards plus "URLs with Most Blockers" / "Most Common Blockers" for a
-// Tag Report, combined across each tagged audit's latest scan
+// Stat cards plus "URLs with Most Blockers" for a Tag Report, combined across
+// each tagged audit's latest scan
 export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, periodDays, isFetching }: TagReportSummaryProps) => {
   const { darkMode, setAnnounceMessage } = useGlobalStore();
   const accentColor = darkMode ? themeVariables.yellow : themeVariables.red;
@@ -85,19 +77,14 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
 
   const baseId = useId();
   const urlsHeadingId = `${baseId}-urls-heading`;
-  const blockersHeadingId = `${baseId}-blockers-heading`;
 
   const [urlsPage, setUrlsPage] = useState(0);
-  const [blockersPage, setBlockersPage] = useState(0);
   useEffect(() => {
     setUrlsPage(0);
-    setBlockersPage(0);
   }, [tagId]);
 
   const urls = useTagReportList<UrlItem>("/getTagReportUrls", tagId, urlsPage);
-  const blockers = useTagReportList<BlockerItem>("/getTagReportBlockers", tagId, blockersPage);
   const urlsTotalPages = urls.data ? Math.max(1, Math.ceil(urls.data.totalCount / urls.data.pageSize)) : 1;
-  const blockersTotalPages = blockers.data ? Math.max(1, Math.ceil(blockers.data.totalCount / blockers.data.pageSize)) : 1;
 
   // Announce page changes once the requested page has loaded, as on the Audit page
   const announcedUrlsPageRef = useRef(urlsPage);
@@ -108,14 +95,6 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
     }
     announcedUrlsPageRef.current = urlsPage;
   }, [urls.data]);
-  const announcedBlockersPageRef = useRef(blockersPage);
-  useEffect(() => {
-    if (!blockers.data) return;
-    if (announcedBlockersPageRef.current !== blockersPage) {
-      setAnnounceMessage(`Showing ${blockers.data.items.length} of ${blockers.data.totalCount} blockers, page ${blockersPage + 1} of ${blockersTotalPages}`, "normal", true);
-    }
-    announcedBlockersPageRef.current = blockersPage;
-  }, [blockers.data]);
 
   const delta = blockersAtStart === null ? null : summary.totalBlockersCount - blockersAtStart;
   const deltaText = delta === null
@@ -144,7 +123,7 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
       <div className="cards-50">
         <Card className="short">
           {isFetching && <CardSpinner />}
-          <div className={style["blockers-count"]}>
+          <div className={style["blockers-count"] + " " + ownStyle.stat}>
             <h3><span className="font-extra-large">{summary.totalBlockersCount.toLocaleString()}</span> Blockers Found</h3>
             <div className={style["blockers-meta-group"]}>
               {deltaText && (
@@ -161,7 +140,7 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
         </Card>
         <Card className="short" variant="light">
           {isFetching && <CardSpinner />}
-          <div className={style["graph-card"]}>
+          <div className={style["graph-card"] + " " + ownStyle.stat}>
             <div className={style["graph-card-text"]}>
               <h3>
                 <span style={{ color: accentColor }}>{summary.urlsWithBlockersCount.toLocaleString()}</span> of {summary.scannedUrlsCount.toLocaleString()} URLs
@@ -169,7 +148,7 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
               </h3>
               {typeBreakdownText && <p className={style["blocker-type-breakdown"]}>{typeBreakdownText}</p>}
             </div>
-            <ResponsiveContainer className={style["donut-chart"]}>
+            <ResponsiveContainer className={style["donut-chart"] + " " + ownStyle.donut}>
               <PieChart {...{ "aria-hidden": "true" }}>
                 <Pie
                   data={[
@@ -188,20 +167,9 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
             </ResponsiveContainer>
           </div>
         </Card>
-        <Card variant="light" className="short">
-          {isFetching && <CardSpinner />}
-          <div className={style["blockers-count"]}>
-            <h3><span className="font-extra-large">{summary.uniqueBlockersCount.toLocaleString()}</span> Unique Blockers</h3>
-            <div className={style["blockers-meta-group"]}>
-              <p className={style["blockers-meta"]}>
-                <strong>{summary.sharedBlockersCount.toLocaleString()}</strong> found in more than one audit, where one fix can clear them everywhere.
-              </p>
-            </div>
-          </div>
-        </Card>
       </div>
 
-      <div className="cards-50">
+      <div>
         <Card variant="light">
           {urls.isFetching && !urls.isLoading && <CardSpinner />}
           <h3 id={urlsHeadingId}>URLs with Most Blockers</h3>
@@ -252,46 +220,6 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
                 onPrevious={() => setUrlsPage((p) => Math.max(0, p - 1))}
                 onNext={() => setUrlsPage((p) => Math.min(urlsTotalPages - 1, p + 1))}
                 label="URLs with Most Blockers"
-              />
-            </>
-          )}
-        </Card>
-        <Card variant="light">
-          {blockers.isFetching && !blockers.isLoading && <CardSpinner />}
-          <h3 id={blockersHeadingId}>Most Common Blockers</h3>
-          {blockers.error ? (
-            <p>Couldn&apos;t load this list.</p>
-          ) : !blockers.data ? (
-            <p>Loading…</p>
-          ) : blockers.data.totalCount === 0 ? (
-            <p>No blockers found.</p>
-          ) : (
-            <>
-              <div role="table" aria-labelledby={blockersHeadingId}>
-                <DataRow asTableRow variant="highlight" the_value="Count" the_key="Blocker" />
-                {blockers.data.items.map((item) => (
-                  <DataRow
-                    asTableRow
-                    key={item.key}
-                    variant="tight"
-                    the_key={
-                      <>
-                        {item.key}
-                        <span className="font-small" style={{ display: "block" }}>
-                          In {plural(item.auditCount, "audit")}
-                        </span>
-                      </>
-                    }
-                    the_value={item.count.toLocaleString()}
-                  />
-                ))}
-              </div>
-              <PaginationControls
-                page={blockersPage}
-                totalPages={blockersTotalPages}
-                onPrevious={() => setBlockersPage((p) => Math.max(0, p - 1))}
-                onNext={() => setBlockersPage((p) => Math.min(blockersTotalPages - 1, p + 1))}
-                label="Most Common Blockers"
               />
             </>
           )}

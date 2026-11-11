@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as API from "aws-amplify/api";
 import { TbAlertTriangle, TbHelpCircleFilled } from "react-icons/tb";
+import { FaTrash } from "react-icons/fa";
 import { Card } from "#src/components/Card.tsx";
+import { ConfirmDialog } from "#src/components/ConfirmDialog.tsx";
+import { StyledButton } from "#src/components/StyledButton.tsx";
+import { TagReportAddAudits } from "#src/components/TagReportAddAudits.tsx";
 import { SkeletonAuditHeader } from "#src/components/Skeleton.tsx";
 import { TagReportChart, TagReportChartData } from "#src/components/TagReportChart.tsx";
 import { TagReportSummary, TagReportSummaryData } from "#src/components/TagReportSummary.tsx";
-import { formatId } from "../utils";
+import { formatId, useGlobalStore } from "../utils";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import styles from "./TagReport.module.scss";
 
@@ -57,18 +61,29 @@ const ChangeCell = ({ audit, periodDays }: { audit: TagReportAudit; periodDays: 
   return <>{delta > 0 ? `${delta.toLocaleString()} more` : `${Math.abs(delta).toLocaleString()} fewer`}</>;
 };
 
+// Highest contributors first; audits without a completed scan last
+const sortAudits = (audits: TagReportAudit[]) =>
+  [...audits].sort((a, b) => (b.blockerCount ?? -1) - (a.blockerCount ?? -1));
+
 const scanStatusNote = (audit: TagReportAudit) => {
   if (audit.latestScanStatus === "processing") return "Scanning now";
   if (audit.latestScanStatus === "failed") return "Last scan failed";
   return null;
 };
 
-// Read-only roll-up of every audit with a tag: combined blockers over time,
-// combined stats, and the audits themselves
+// Roll-up of every audit with a tag: the audits themselves (which can be
+// added and removed here), combined blockers over time, and combined stats
 export const TagReport = () => {
   const { tagId } = useParams();
+  const queryClient = useQueryClient();
+  const { setAnnounceMessage } = useGlobalStore();
   const [days, setDays] = useState(90);
   const [scrollFadeRef, showScrollFade] = useScrollFade();
+  const [pendingRemove, setPendingRemove] = useState<TagReportAudit | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+  // After a removal the clicked button is gone, so focus moves to the next
+  // row's Remove button (or onward) once the refreshed table renders
+  const focusAfterRemoveRef = useRef<string | null>(null);
 
   const report = useQuery({
     queryKey: ["auditTags", "report", tagId, days],
@@ -80,6 +95,53 @@ export const TagReport = () => {
     queryFn: () => fetchTagReport<TagReportChartData>("/getTagReportChart", tagId!, days),
     placeholderData: (previousData) => previousData,
   });
+
+  useEffect(() => {
+    const nextAuditId = focusAfterRemoveRef.current;
+    if (nextAuditId === null) return;
+    focusAfterRemoveRef.current = null;
+    requestAnimationFrame(() => {
+      const target =
+        (nextAuditId && document.querySelector<HTMLElement>(`[data-remove-audit="${nextAuditId}"]`)) ||
+        document.getElementById("tag-report-audits-heading") ||
+        document.getElementById("tagReportAddAudits");
+      target?.focus();
+    });
+  }, [report.data]);
+
+  const removeAudit = async () => {
+    if (!pendingRemove || !report.data) return;
+    const audit = pendingRemove;
+    const rows = sortAudits(report.data.audits);
+    const index = rows.findIndex((row) => row.id === audit.id);
+    const nextRow = rows[index + 1] ?? rows[index - 1];
+    setIsRemoving(true);
+    try {
+      const response = (await (
+        await API.post({
+          apiName: "auth",
+          path: "/updateTagAudits",
+          options: { body: { tagId: tagId!, remove: [audit.id] } },
+        }).response
+      ).body.json()) as unknown as { status: string; message?: string };
+      if (response?.status !== "success") {
+        setAnnounceMessage(response?.message ?? "Unable to remove audit.", "error");
+        return;
+      }
+      // "" = no rows left; the effect above falls back to the heading or picker
+      focusAfterRemoveRef.current = nextRow?.id ?? "";
+      setPendingRemove(null);
+      await queryClient.invalidateQueries({ queryKey: ["auditTags"] });
+      queryClient.invalidateQueries({ queryKey: ["audits"] });
+      queryClient.invalidateQueries({ queryKey: ["audit"] });
+      setAnnounceMessage(`Removed ${audit.name} from ${report.data.tag.name}.`, "success");
+    } catch (err) {
+      console.error("Failed to remove audit from tag:", err);
+      setAnnounceMessage("Unable to remove audit.", "error");
+    } finally {
+      setIsRemoving(false);
+    }
+  };
 
   if (report.isError) {
     return (
@@ -100,8 +162,7 @@ export const TagReport = () => {
   }
 
   const { tag, audits, summary, periodDays } = report.data;
-  // Highest contributors first
-  const sortedAudits = [...audits].sort((a, b) => (b.blockerCount ?? -1) - (a.blockerCount ?? -1));
+  const sortedAudits = sortAudits(audits);
   const scanning = audits.filter((audit) => audit.latestScanStatus === "processing").length;
   const failed = audits.filter((audit) => audit.latestScanStatus === "failed").length;
   const neverScanned = audits.filter((audit) => audit.lastCompleteScanAt === null).length;
@@ -124,7 +185,8 @@ export const TagReport = () => {
           <TbHelpCircleFilled />
           <div className="text">
             <h2>No audits have this tag yet.</h2>
-            <p>Add the "{tag.name}" tag to an audit from the audit's page or the Audit Builder, and its results will appear here.</p>
+            <p>Add audits below, or add the "{tag.name}" tag from an audit's page or the Audit Builder, and their results will appear here.</p>
+            <TagReportAddAudits tagId={tag.id} tagName={tag.name} taggedAuditIds={[]} />
           </div>
         </Card>
       ) : (
@@ -142,25 +204,9 @@ export const TagReport = () => {
             </Card>
           )}
 
-          <TagReportChart
-            chartData={chart.data}
-            isLoading={chart.isLoading}
-            isFetching={chart.isFetching && !chart.isLoading}
-            days={days}
-            onDaysChange={setDays}
-          />
-
-          <TagReportSummary
-            tagId={tagId!}
-            summary={summary}
-            auditCount={audits.length}
-            blockersAtStart={blockersAtStart}
-            periodDays={periodDays}
-            isFetching={report.isFetching}
-          />
-
           <Card variant="light">
-            <h2 id="tag-report-audits-heading">Audits</h2>
+            <h2 id="tag-report-audits-heading" tabIndex={-1}>Audits</h2>
+            <TagReportAddAudits tagId={tag.id} tagName={tag.name} taggedAuditIds={audits.map((audit) => audit.id)} />
             <div className="table-container">
               <div
                 className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")}
@@ -179,6 +225,7 @@ export const TagReport = () => {
                       <th scope="col">URLs</th>
                       <th scope="col">Runs</th>
                       <th scope="col">Created By</th>
+                      <th scope="col">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -196,6 +243,15 @@ export const TagReport = () => {
                           <td>{audit.urlCount.toLocaleString()}</td>
                           <td>{audit.interval}</td>
                           <td>{audit.user?.name ?? audit.user?.email ?? "—"}</td>
+                          <td>
+                            <StyledButton
+                              label={`Remove ${audit.name} from ${tag.name}`}
+                              icon={<FaTrash />}
+                              showLabel={false}
+                              onClick={() => setPendingRemove(audit)}
+                              data-remove-audit={audit.id}
+                            />
+                          </td>
                         </tr>
                       );
                     })}
@@ -204,9 +260,42 @@ export const TagReport = () => {
               </div>
             </div>
           </Card>
+
+          <TagReportChart
+            chartData={chart.data}
+            isLoading={chart.isLoading}
+            isFetching={chart.isFetching && !chart.isLoading}
+            days={days}
+            onDaysChange={setDays}
+          />
+
+          <TagReportSummary
+            tagId={tagId!}
+            summary={summary}
+            auditCount={audits.length}
+            blockersAtStart={blockersAtStart}
+            periodDays={periodDays}
+            isFetching={report.isFetching}
+          />
+
         </>
       )}
       {report.isFetching && !report.isLoading && <span className="sr-only" role="status">Updating report</span>}
+      <ConfirmDialog
+        open={pendingRemove !== null}
+        onOpenChange={(open) => { if (!open) setPendingRemove(null); }}
+        title="Remove audit from tag"
+        description={<>Remove <strong>"{pendingRemove?.name}"</strong> from <strong>"{tag.name}"</strong>? Its scans will no longer be counted in this report, including past totals. The audit itself isn't affected.</>}
+        confirmLabel="Remove"
+        confirmVariant="red"
+        loading={isRemoving}
+        onConfirm={removeAudit}
+        onCloseAutoFocus={(e) => {
+          // After a removal, the effect above moves focus; on cancel, Radix
+          // returns it to the row's Remove button as usual
+          if (focusAfterRemoveRef.current !== null) e.preventDefault();
+        }}
+      />
     </div>
   );
 };
