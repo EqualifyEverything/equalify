@@ -125,6 +125,7 @@ Blockers marked as ignored/resolved.
 | `audit_id` | UUID | Audit reference (FK) |
 | `blocker_id` | UUID | Blocker reference (FK) |
 | `content_hash_id` | UUID | Hash reference, used to match ignored blockers across scans |
+| `status` | TEXT | Optional reason the blocker is ignored: `false_positive`, `wont_fix`, `third_party`, `needs_review` or `fixed_pending` (CHECK constraint); NULL when none is set. Set hash-wide and carried forward by the scan webhook. A row's existence is what makes a blocker ignored, so the status never affects counts. Labels live in `utils/ignoreStatuses.ts` in both apps. Added by `db/migrations/add_ignored_blockers_status.sql` |
 | `created_at` | TIMESTAMP | When ignored |
 | `updated_at` | TIMESTAMP | Last update timestamp |
 

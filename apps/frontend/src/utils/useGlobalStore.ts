@@ -85,7 +85,7 @@ export const useGlobalStore = create<EqualifyState>()(
         // defaults for column visibility
         categories: false,
         tags: false,
-        id: false, // this is the "ignored" column
+        id: true, // this is the "ignored" column: shown by default so the ignore toggle and its status are in reach
         content: true,
         messages: true,
         url: true,

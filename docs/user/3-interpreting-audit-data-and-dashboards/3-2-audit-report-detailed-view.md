@@ -1,6 +1,6 @@
 This page is intended for **Developers and Accessibility Specialists** tasked with fixing specific code-level issues. Switch to the Audit Report detailed view for the "under-the-hood" companion to your summary view. While the summary tells you how many problems you have, this view tells a developer exactly where they are and how to fix them.
 ## Filtering & Search: 
-The **Search by URL** field stays visible at the top of the page. The rest of the filters are tucked behind a **Show Advanced Filter Options** toggle to keep the page uncluttered — click it to reveal them.
+**Search by URL**, **Filter by Status**, **Filter by Content Type** and **Filter by Accessibility Standard** stay visible at the top of the page. **Filter by Rules** is tucked behind a **Show Advanced Filter Options** toggle to keep the page uncluttered — click it to reveal it.
 - **Filter by Status:** Choose between **Active** issues (currently live on the site), **Ignored** issues (manually hidden), and **All** recorded issues. Each option shows a live count of matching blockers.
 - Use the **Filter by Accessibility Standard** or **Filter by Rules** dropdowns to narrow the list by type (e.g., a specific WCAG success criterion, or a rule category like contrast or ARIA roles).
 ```tip
@@ -38,6 +38,7 @@ Important Details for Developers: To move from identifying a problem to fixing i
 - **Rule:** What rule does this blocker fall under.
 - **Accessibility Standards:** What accessibility standards this blocker relates to, if any.
 - **Ignore:** Toggle an issue on/off for the report. Ignoring a blocker also ignores every identical copy of it on other pages in the audit (the same flagged code in a shared header, for example), and the ignore carries forward to future scans. Reactivating it restores all copies.<br>
+- **Ignore status:** Once a blocker is ignored, a dropdown appears under the toggle so you can say why: **False positive**, **Won't fix**, **Third-party content**, **Needs review**, or **Fixed, awaiting rescan**. Choosing one is optional. Like the ignore itself, the status applies to every identical copy of the blocker and carries forward to future scans. It does not change any counts: an ignored blocker is left out of the active totals whatever its status. The status is included in the CSV export as the last column, **Ignore Status**.
 <img src="https://github.com/EqualifyEverything/equalify-docs/blob/46ed941ba70a82efbf5bddc737451c34a90fff83/user/User%20Guide%20Images/Sec%203_Dashboard%20Audit%20Report%20Detailed%20View.png" alt="Detailed audit results table listing Type, URL, Issue, and Code columns with View Code buttons for each issue." width="500"/>
 
 ## Viewing Past Scans
@@ -49,6 +50,7 @@ While you're viewing a past scan:
 - The **Summary View** and **Recommendations** tabs are greyed out, because they only cover the most recent scan.
 - The **ID** column is greyed out and doesn't link to Issue Detail pages. Those pages are only available for blockers in the most recent scan.
 - The **Ignore** column is read-only. It shows whether each blocker is ignored under your audit's current ignore settings.
+- If an ignored blocker has an ignore status, it is shown under the toggle as plain text.
 
 ```tip
 💡Tip: The page address includes the scan you're viewing, so you can bookmark or share a link to a specific past scan.
@@ -98,6 +100,7 @@ Each row is one unique blocker. Rows are ranked so the fixes that clear the most
 ⚠️Important: Occurrences and URLs can differ. If the same blocker appears twice on one page, that counts as two occurrences on one URL.
 ```
 - **Ignore:** Works the same as in the Detailed View. Ignoring a recommendation ignores every copy of it across all pages, and reactivating it restores all of them.
+- **Ignore status:** The same optional dropdown as in the Detailed View, applied to every copy of the recommendation.
 
 ```tip
 💡Tip: Recommendations and the Detailed View are two ways of looking at the same scan. Use Recommendations to decide what to fix, and the Detailed View to find each specific page that needs it.

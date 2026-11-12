@@ -4,7 +4,12 @@ import { useGlobalStore } from "../utils";
 
 const apiClient = API.generateClient();
 
-/** Set of blocker ids currently ignored in this audit. */
+/**
+ * Blocker ids currently ignored in this audit, mapped to their optional
+ * status (why it's ignored; null when none is set). `.has(id)` = ignored.
+ * The status is a property of the hash (as in Recommendations and past
+ * scans), so a row without one takes it from a sibling row of the same hash.
+ */
 export const useIgnoredBlockers = (auditId: string) =>
   useQuery({
     queryKey: ["ignoredBlockers", auditId],
@@ -13,12 +18,19 @@ export const useIgnoredBlockers = (auditId: string) =>
         query: `query ($audit_id: uuid!) {
           ignored_blockers(where: {audit_id: {_eq: $audit_id}}) {
             blocker_id
+            content_hash_id
+            status
           }
         }`,
         variables: { audit_id: auditId },
       })) as any;
-      return new Set<string>(
-        response.data.ignored_blockers.map((ib: any) => ib.blocker_id)
+      const rows: any[] = response.data.ignored_blockers;
+      const statusByHash = new Map<string, string>();
+      for (const ib of rows) {
+        if (ib.status && ib.content_hash_id) statusByHash.set(ib.content_hash_id, ib.status);
+      }
+      return new Map<string, string | null>(
+        rows.map((ib) => [ib.blocker_id, ib.status ?? statusByHash.get(ib.content_hash_id) ?? null])
       );
     },
   });
@@ -105,6 +117,71 @@ export const useToggleIgnore = (auditId: string) => {
       console.error("Failed to toggle ignore status:", err);
       setAnnounceMessage("Failed to update blocker status", "error");
       // Resync in case a partial change landed
+      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditRecommendations", auditId] });
+    },
+  });
+};
+
+/**
+ * Set (or clear, with null) the status on an ignored blocker. Hash-wide like
+ * the ignore itself, so every copy of the node shows the same status and the
+ * scan webhook carries it forward to future scans.
+ */
+export const useSetIgnoreStatus = (auditId: string) => {
+  const queryClient = useQueryClient();
+  const { setAnnounceMessage } = useGlobalStore();
+
+  return useMutation({
+    mutationFn: async ({
+      blockerId,
+      contentHashId,
+      status,
+    }: {
+      blockerId: string;
+      contentHashId: string;
+      status: string | null;
+    }) => {
+      const response = (await apiClient.graphql({
+        query: `mutation ($audit_id: uuid!, $blocker_id: uuid!, $content_hash_id: uuid!, $status: String) {
+          update_ignored_blockers(
+            where: {
+              audit_id: {_eq: $audit_id},
+              _or: [
+                {content_hash_id: {_eq: $content_hash_id}},
+                {blocker_id: {_eq: $blocker_id}}
+              ]
+            },
+            _set: {status: $status}
+          ) {
+            affected_rows
+          }
+        }`,
+        variables: { audit_id: auditId, blocker_id: blockerId, content_hash_id: contentHashId, status },
+      })) as any;
+      // Nothing matched: the blocker isn't ignored (yet, or any more), so the
+      // status was not saved. Fail loudly instead of reporting success.
+      if (!response?.data?.update_ignored_blockers?.affected_rows) {
+        throw new Error("No ignored blocker found to set a status on");
+      }
+    },
+    // Show the choice straight away in the Detailed table; the refetch on
+    // settle brings in the copies on other rows (or the old value on failure).
+    onMutate: async ({ blockerId, status }) => {
+      // An ignore-list refetch already in flight would land after this and
+      // put the old value back
+      await queryClient.cancelQueries({ queryKey: ["ignoredBlockers", auditId] });
+      queryClient.setQueryData<Map<string, string | null>>(["ignoredBlockers", auditId], (current) =>
+        current?.has(blockerId) ? new Map(current).set(blockerId, status) : current
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
+      queryClient.invalidateQueries({ queryKey: ["auditRecommendations", auditId] });
+    },
+    onError: (err) => {
+      console.error("Failed to set ignore status:", err);
+      setAnnounceMessage("Failed to update blocker status", "error");
       queryClient.invalidateQueries({ queryKey: ["ignoredBlockers", auditId] });
       queryClient.invalidateQueries({ queryKey: ["auditRecommendations", auditId] });
     },

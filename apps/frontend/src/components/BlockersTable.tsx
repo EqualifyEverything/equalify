@@ -35,7 +35,7 @@ import { FiExternalLink } from "react-icons/fi";
 import { Drawer } from "vaul-base";
 import * as Tooltip from "@radix-ui/react-tooltip";
 //import * as Switch from "@radix-ui/react-switch";
-import { useDebounce, useGlobalStore } from "../utils";
+import { useDebounce, useGlobalStore, ignoreStatusLabel } from "../utils";
 import { useSelectStyles } from "../utils/useSelectStyles";
 //import { MdOutlineCancel } from "react-icons/md";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -57,7 +57,8 @@ import {
 import { useDebouncedCallback } from 'use-debounce';
 import { Link, useSearchParams } from "react-router-dom";
 import { BlockersTableColumnToggle } from "./BlockersTableColumnToggle";
-import { useIgnoredBlockers, useToggleIgnore } from "../hooks";
+import { useIgnoredBlockers, useToggleIgnore, useSetIgnoreStatus } from "../hooks";
+import { IgnoreCell, IgnoreStatusSelect } from "./IgnoreStatusSelect";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
@@ -89,6 +90,8 @@ export interface Blocker {
   url_id: string;
   content: string;
   ignored: boolean;
+  /** Past scans only: the status on an ignored blocker, resolved by the server */
+  ignoredStatus?: string | null;
   //equalified: boolean;
   messages: string[];
   tags: BlockerTag[];
@@ -142,6 +145,85 @@ declare module '@tanstack/table-core' {
     className?: string; // Add your custom property
   }
 }
+
+/**
+ * The Ignore column's cell: the toggle, plus the status picker once a blocker
+ * is ignored. It reads the ignore list itself instead of receiving it through
+ * the column definitions, so saving an ignore or a status re-renders this cell
+ * in place. Rebuilding the columns would remount every cell and drop keyboard
+ * focus from the control that was just used.
+ */
+const IgnoreColumnCell = ({ auditId, blocker, isHistorical }: { auditId: string; blocker: Blocker; isHistorical: boolean }) => {
+  // Selected individually so a cell only re-renders when these change, not on
+  // every store update (each toast is one)
+  const setAnnounceMessage = useGlobalStore((state) => state.setAnnounceMessage);
+  const authenticated = useGlobalStore((state) => state.authenticated);
+  const { data: ignoredBlockers } = useIgnoredBlockers(auditId);
+  const toggleIgnoreMutation = useToggleIgnore(auditId);
+  const setIgnoreStatusMutation = useSetIgnoreStatus(auditId);
+  const blockerId = blocker.id;
+  const contentHashId = blocker.content_hash_id;
+
+  // Past scans are read-only: the server resolves ignore status
+  // against the audit's current (hash-wide) ignore list.
+  if (isHistorical) {
+    return (
+      <IgnoreCell>
+        <StyledButton
+          onClick={undefined}
+          disabled
+          label={blocker.ignored ? "Ignored" : "Active"}
+          icon={blocker.ignored ? <TbEyeX className="icon-small" /> : <TbEye className="icon-small" />}
+          variant={blocker.ignored ? "toggle-ignored" : "toggle"}
+        />
+        {blocker.ignored && (
+          <IgnoreStatusSelect status={blocker.ignoredStatus} blockerLabel={blocker.short_id} readOnly />
+        )}
+      </IgnoreCell>
+    );
+  }
+
+  const isIgnored = ignoredBlockers?.has(blockerId) || false;
+  const ignoredStatus = ignoredBlockers?.get(blockerId) ?? null;
+  return (
+    <IgnoreCell>
+      <StyledButton
+        // Signed-out viewers (shared reports) can see the state but not change it
+        disabled={!authenticated}
+        onClick={() => {
+          if (!authenticated) return;
+          toggleIgnoreMutation.mutate({
+            blockerId,
+            contentHashId,
+            isCurrentlyIgnored: isIgnored,
+          });
+          setAnnounceMessage(
+            // isIgnored is the pre-toggle state, so the new status is its opposite
+            `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Active" : "Ignored"}`,
+            "success"
+          );
+        }}
+        label={isIgnored ? "Ignored" : "Active"}
+        icon={isIgnored ? <TbEyeX className="icon-small" /> : <TbEye className="icon-small" />}
+        variant={isIgnored ? "toggle-ignored" : "toggle"}
+      />
+      {isIgnored && (
+        <IgnoreStatusSelect
+          status={ignoredStatus}
+          blockerLabel={blocker.short_id}
+          readOnly={!authenticated}
+          onChange={(status) => {
+            setIgnoreStatusMutation.mutate({ blockerId, contentHashId, status });
+            setAnnounceMessage(
+              `Blocker ID ${blockerId} ignore status set to: ${ignoreStatusLabel(status) || "No status"}`,
+              "success"
+            );
+          }}
+        />
+      )}
+    </IgnoreCell>
+  );
+};
 
 export const BlockersTable = ({
   auditId,
@@ -198,7 +280,6 @@ export const BlockersTable = ({
 
   const {
     setAnnounceMessage,
-    authenticated,
     blockerTableColumnVisibility,
     setBlockerTableColumnVisibility,
     blockerTableAdvancedFiltersOpen,
@@ -207,8 +288,6 @@ export const BlockersTable = ({
 
   const selectStyles = useSelectStyles();
 
-  const { data: ignoredBlockers } = useIgnoredBlockers(auditId);
-  const toggleIgnoreMutation = useToggleIgnore(auditId);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -656,56 +735,9 @@ export const BlockersTable = ({
       {
         accessorKey: "id",
         header: "Ignore",
-        cell: ({ getValue, row }) => {
-          const blockerId = getValue() as string;
-          const contentHashId = row.original.content_hash_id;
-          // Past scans are read-only: the server resolves ignore status
-          // against the audit's current (hash-wide) ignore list.
-          if (isHistorical) {
-            return (
-              <StyledButton
-                onClick={undefined}
-                disabled
-                label={row.original.ignored ? "Ignored" : "Active"}
-                icon={
-                  row.original.ignored ? (
-                    <TbEyeX className="icon-small" />
-                  ) : (
-                    <TbEye className="icon-small" />
-                  )
-                }
-                variant={row.original.ignored ? "toggle-ignored" : "toggle"}
-              />
-            );
-          }
-          const isIgnored = ignoredBlockers?.has(blockerId) || false;
-          return (
-            <StyledButton
-              onClick={() => {
-                if (!authenticated) return;
-                toggleIgnoreMutation.mutate({
-                  blockerId,
-                  contentHashId,
-                  isCurrentlyIgnored: isIgnored,
-                });
-                setAnnounceMessage(
-                  // isIgnored is the pre-toggle state, so the new status is its opposite
-                  `Blocker ID ${blockerId} set to ignored status: ${isIgnored ? "Active" : "Ignored"}`,
-                  "success"
-                );
-              }}
-              label={isIgnored ? "Ignored" : "Active"}
-              icon={
-                isIgnored ? (
-                  <TbEyeX className="icon-small" />
-                ) : (
-                  <TbEye className="icon-small" />
-                )
-              }
-              variant={isIgnored ? "toggle-ignored" : "toggle"}
-            />
-          );
-        },
+        // A component of its own, so the column definitions don't change (and
+        // remount every cell) each time an ignore or a status is saved
+        cell: ({ row }) => <IgnoreColumnCell auditId={auditId} blocker={row.original} isHistorical={isHistorical} />,
       },
       /* {
             accessorKey: 'created_at',
@@ -716,7 +748,7 @@ export const BlockersTable = ({
             },
         }, */
     ],
-    [sortBy, sortOrder, ignoredBlockers, toggleIgnoreMutation, auditId, isShared, isHistorical]
+    [sortBy, sortOrder, auditId, isShared, isHistorical]
   );
 
   const table = useReactTable({
@@ -1120,6 +1152,28 @@ export const BlockersTable = ({
           </StyledLabeledInput>
 
           <div className="filter-group-right">
+          {/* Status Filter */}
+          <StyledLabeledInput>
+            <label>Filter by Status</label>
+            <select
+              id="statusToggleGroup"
+              defaultValue="all"
+              aria-label="Filter by status:"
+              value={selectedStatus}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleStatusChange(e.target.value)}
+            >
+              <option value="active">Active{" "}
+                {data?.statusCounts?.active !== undefined &&
+                  `(${data.statusCounts.active})`}</option>
+              <option value="ignored">Ignored{" "}
+                {data?.statusCounts?.ignored !== undefined &&
+                  `(${data.statusCounts.ignored})`}</option>
+              <option value="all">All{" "}
+                {data?.statusCounts?.all !== undefined &&
+                  `(${data.statusCounts.all})`}</option>
+            </select>
+          </StyledLabeledInput>
+
           {/* Content Type Filter */}
           <StyledLabeledInput>
             <label>Filter by Content Type</label>
@@ -1176,29 +1230,10 @@ export const BlockersTable = ({
             </Collapsible.Trigger>
             <Collapsible.Content>
         <div className="filter-group-secondary">
-          {/* Status Filter */}
-          <StyledLabeledInput>
-            <label>Filter by Status</label>
-            <select
-              id="statusToggleGroup"
-              defaultValue="all"
-              aria-label="Filter by status:"
-              value={selectedStatus}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleStatusChange(e.target.value)}
-            >
-              <option value="active">Active{" "}
-                {data?.statusCounts?.active !== undefined &&
-                  `(${data.statusCounts.active})`}</option>
-              <option value="ignored">Ignored{" "}
-                {data?.statusCounts?.ignored !== undefined &&
-                  `(${data.statusCounts.ignored})`}</option>
-              <option value="all">All{" "}
-                {data?.statusCounts?.all !== undefined &&
-                  `(${data.statusCounts.all})`}</option>
-            </select>
-          </StyledLabeledInput>
-
-
+          {/* Rules is the only filter in here now, and it needs rules to list */}
+          {!isLoading && data && !(availableCategories && availableCategories.length > 0) && (
+            <p className="font-small">No rules to filter by yet.</p>
+          )}
           {/* Rules Filter */}
           {availableCategories && availableCategories.length > 0 && (
             <StyledLabeledInput>

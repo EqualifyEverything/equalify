@@ -33,6 +33,8 @@ export interface HistoricalBlocker {
   url: string;
   type: string;
   ignored: boolean;
+  /** Optional label on an ignored blocker (utils/ignoreStatuses.ts); null when none */
+  ignoredStatus: string | null;
   occurrences: number;
   messages: string[];
   tags: { id: string; content: string }[];
@@ -207,6 +209,23 @@ export const getHistoricalBlockers = async ({
     }
   }
 
+  // Ignore statuses for the audit. Read once here instead of per row in
+  // scan_rows: only labelled ignores are fetched, so the set stays small.
+  // Keyed by hash, and by blocker id for legacy rows with a NULL hash,
+  // matching how "ignored" is resolved above.
+  const statusByKey = new Map<string, string>();
+  for (const row of (
+    await db.query({
+      text: `SELECT COALESCE("content_hash_id", "blocker_id") AS "key", MAX("status") AS "status"
+             FROM "ignored_blockers"
+             WHERE "audit_id" = $1 AND "status" IS NOT NULL
+             GROUP BY 1`,
+      values: [auditId],
+    })
+  ).rows) {
+    statusByKey.set(row.key, row.status);
+  }
+
   const blockers: HistoricalBlocker[] = rows.map((row) => {
     const details = detailsByBlocker.get(row.id);
     const messages = Array.from(details?.messages.values() ?? []);
@@ -220,6 +239,7 @@ export const getHistoricalBlockers = async ({
       url: row.url,
       type: row.type,
       ignored: row.ignored,
+      ignoredStatus: row.ignored ? statusByKey.get(row.content_hash_id) ?? statusByKey.get(row.id) ?? null : null,
       occurrences: row.occurrences,
       messages: messages.map((m) => m.content),
       tags: Array.from(details?.tags ?? []).map(([id, content]) => ({ id, content })),

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as API from "aws-amplify/api";
 import { useEffect, useId, useRef, useState, ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -11,10 +11,11 @@ import { StyledButton } from "./StyledButton";
 import { StyledLabeledInput } from "./StyledLabeledInput";
 import { SkeletonAuditHeader, SkeletonBlockersTable } from "./Skeleton";
 import { BlockerUrlsDrawer } from "./BlockerUrlsDrawer";
-import { useGlobalStore } from "../utils";
+import { useGlobalStore, ignoreStatusLabel, mergeKeptRows } from "../utils";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
 import { getAccessibilityStandardLabel } from "#src/utils/accessibilityStandardTags.ts";
-import { useToggleIgnore } from "../hooks";
+import { useToggleIgnore, useSetIgnoreStatus } from "../hooks";
+import { IgnoreCell, IgnoreStatusSelect } from "./IgnoreStatusSelect";
 import style from "./BlockersRecommendations.module.scss";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
@@ -34,6 +35,7 @@ interface Recommendation {
   occurrences: number;
   urlCount: number;
   ignored: boolean;
+  ignoredStatus?: string | null;
   url: string;
   type: string;
   content: string;
@@ -120,14 +122,35 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
   const [status, setStatus] = useState<string>("active");
   const [repeat, setRepeat] = useState<"all" | "repeated" | "single">("repeated");
 
+  // Rows ignored during this visit, keyed by content hash. Under the Active
+  // filter the refetch drops a row the moment it's ignored, before a status
+  // can be picked, so those rows are kept on screen (in place) until the
+  // page, filter or audit changes. A kept row only fills the gap: whenever
+  // the server's list includes the row, the server's version is shown.
+  const [justIgnored, setJustIgnored] = useState<Record<string, { item: Recommendation; index: number }>>({});
+  const forgetKept = (hash: string) =>
+    setJustIgnored((kept) => {
+      const { [hash]: _gone, ...rest } = kept;
+      return rest;
+    });
+  // Hashes whose ignore toggle is still saving, so only that row waits
+  const [savingIgnore, setSavingIgnore] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     setPage(0);
   }, [auditId]);
 
-  const toggleIgnoreMutation = useToggleIgnore(auditId);
+  useEffect(() => {
+    setJustIgnored({});
+  }, [auditId, page, status, repeat]);
 
+  const toggleIgnoreMutation = useToggleIgnore(auditId);
+  const setIgnoreStatusMutation = useSetIgnoreStatus(auditId);
+
+  const queryClient = useQueryClient();
+  const recommendationsKey = ["auditRecommendations", auditId, page, status, repeat];
   const { data, isLoading, error } = useQuery({
-    queryKey: ["auditRecommendations", auditId, page, status, repeat],
+    queryKey: recommendationsKey,
     queryFn: async () => {
       const response = await API.get({
         apiName: isShared ? "public" : "auth",
@@ -226,7 +249,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
   const repeatedNote = stats.filteredRepeated > 0 && stats.filteredTotalOccurrences > 0
     ? <>Fixing these clears <strong>{repeatedPercent}%</strong> of your blockers.</>
     : null;
-  const items = data.items ?? [];
+  const items = mergeKeptRows<Recommendation>(data.items ?? [], Object.values(justIgnored), (item) => item.content_hash_id);
   const pagination = data.pagination ?? { page: 0, pageSize: PAGE_SIZE, totalCount: 0, totalPages: 0 };
   const auditIdNoDash = auditId.replace(/-/g, "");
 
@@ -356,7 +379,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                   </td>
                 </tr>
               ) : (
-                items.map((item) => {
+                items.map((item, index) => {
                   const standards = item.tags
                     .map((tag) => {
                       const label = getAccessibilityStandardLabel(tag.content);
@@ -461,16 +484,47 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
 
                       {/* Ignore */}
                       <td className={style["ignore-cell"]}>
+                        <IgnoreCell>
                         <StyledButton
                           onClick={() => {
-                            if (!authenticated) return;
-                            toggleIgnoreMutation.mutate({
-                              blockerId: item.id,
-                              contentHashId: item.content_hash_id,
-                              isCurrentlyIgnored: item.ignored,
-                            });
+                            // One change at a time per row: a second click before the first
+                            // has saved would send the same change twice
+                            const hash = item.content_hash_id;
+                            if (!authenticated || savingIgnore[hash]) return;
+                            const willIgnore = !item.ignored;
+                            // Under the Active filter a newly ignored row would leave the list
+                            // before a status can be picked: keep it. A kept row that is
+                            // reactivated stays too, until the server's list includes it again.
+                            const keepOnScreen = willIgnore && status === "active";
+                            const keptBefore = justIgnored[hash];
+                            if (keepOnScreen || keptBefore) {
+                              setJustIgnored((kept) => ({
+                                ...kept,
+                                [hash]: { item: { ...item, ignored: willIgnore, ignoredStatus: null }, index: kept[hash]?.index ?? index },
+                              }));
+                            }
+                            setSavingIgnore((saving) => ({ ...saving, [hash]: true }));
+                            toggleIgnoreMutation
+                              .mutateAsync({
+                                blockerId: item.id,
+                                contentHashId: hash,
+                                isCurrentlyIgnored: item.ignored,
+                              })
+                              // Didn't save (the hook shows the error): put the row back as it was
+                              .catch(() => (keptBefore ? setJustIgnored((kept) => ({ ...kept, [hash]: keptBefore })) : forgetKept(hash)))
+                              // Wait for the list to catch up before taking another click on
+                              // this row, so it acts on the saved state, not the stale one
+                              // (joins the refetch the save already started rather than starting a second)
+                              .then(() => queryClient.invalidateQueries({ queryKey: ["auditRecommendations", auditId] }, { cancelRefetch: false }))
+                              .finally(() =>
+                                setSavingIgnore((saving) => {
+                                  const { [hash]: _done, ...rest } = saving;
+                                  return rest;
+                                })
+                              );
                             setAnnounceMessage(
-                              `Blocker ${item.short_id} and its ${item.occurrences - 1} ${item.occurrences - 1 === 1 ? "copy" : "copies"} set to ${item.ignored ? "Active" : "Ignored"}`,
+                              `Blocker ${item.short_id} and its ${item.occurrences - 1} ${item.occurrences - 1 === 1 ? "copy" : "copies"} set to ${item.ignored ? "Active" : "Ignored"}` +
+                                (keepOnScreen ? ". You can set a status now; it leaves this list when you change page or filter." : ""),
                               "success"
                             );
                           }}
@@ -478,6 +532,40 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
                           icon={item.ignored ? <TbEyeX className="icon-small" /> : <TbEye className="icon-small" />}
                           variant={item.ignored ? "toggle-ignored" : "toggle"}
                         />
+                        {/* Offered once the ignore has saved, so a status can't be set on a row that isn't there yet */}
+                        {item.ignored && !savingIgnore[item.content_hash_id] && (
+                          <IgnoreStatusSelect
+                            status={item.ignoredStatus}
+                            blockerLabel={item.short_id}
+                            readOnly={!authenticated}
+                            onChange={(newStatus) => {
+                              const hash = item.content_hash_id;
+                              const previous = item.ignoredStatus ?? null;
+                              // Show a value straight away: on the kept row if this is one,
+                              // and in the cached list (the refetch then confirms it)
+                              const show = (value: string | null) => {
+                                setJustIgnored((kept) =>
+                                  kept[hash] ? { ...kept, [hash]: { ...kept[hash], item: { ...kept[hash].item, ignoredStatus: value } } } : kept
+                                );
+                                queryClient.setQueryData<RecommendationsResp>(recommendationsKey, (current) =>
+                                  current
+                                    ? { ...current, items: current.items.map((row) => (row.content_hash_id === hash ? { ...row, ignoredStatus: value } : row)) }
+                                    : current
+                                );
+                              };
+                              show(newStatus);
+                              setIgnoreStatusMutation
+                                .mutateAsync({ blockerId: item.id, contentHashId: hash, status: newStatus })
+                                // Didn't save (the hook shows the error): put the old value back
+                                .catch(() => show(previous));
+                              setAnnounceMessage(
+                                `Blocker ${item.short_id} ignore status set to: ${ignoreStatusLabel(newStatus) || "No status"}`,
+                                "success"
+                              );
+                            }}
+                          />
+                        )}
+                      </IgnoreCell>
                       </td>
                     </tr>
                   );

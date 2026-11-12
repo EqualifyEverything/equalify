@@ -62,9 +62,9 @@ Endpoints requiring a valid JWT token:
 | `getAuditSummaryFast` | GET | Get cached/fast summary stats for an audit |
 | `getMostCommonUrls` | GET | Paginated "URLs with most blockers" list (backs the Summary View card) |
 | `getMostCommonBlockers` | GET | Paginated "most common blockers" list (backs the Summary View card) |
-| `getAuditRecommendations` | GET | Recommendations view: one row per unique blocker (`content_hash_id`) in the latest scan, ranked by occurrences; web pages only (blockers on PDF URLs are left out and counted in `stats.pdfBlockersExcluded`); `status` (active / ignored / all), `repeat` (all / repeated / single), `page`, `pageSize` |
+| `getAuditRecommendations` | GET | Recommendations view: one row per unique blocker (`content_hash_id`) in the latest scan, ranked by occurrences; web pages only (blockers on PDF URLs are left out and counted in `stats.pdfBlockersExcluded`); `status` (active / ignored / all), `repeat` (all / repeated / single), `page`, `pageSize`; each item carries `ignoredStatus` (the optional `ignored_blockers.status`, null when none) |
 | `getBlockerUrls` | GET | Every occurrence of one grouped blocker in the latest scan, one row per occurrence; `content_hash_id`, `page`, `pageSize` (backs the "View all occurrences" drawer and its CSV copy) |
-| `exportAuditTable` | GET | Export blocker table as CSV |
+| `exportAuditTable` | GET | Export blocker table as CSV; the last column, `Ignore Status`, is the label of the ignored blocker's status (empty when none) |
 | `exportAuditTablePdfSourceLinks` | GET | Export PDF source links for blockers |
 | `getLogs` | GET | Get activity logs |
 | `inviteUser` | POST | Invite a new user |

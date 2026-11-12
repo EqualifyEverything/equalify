@@ -15,6 +15,9 @@ import { db, event } from "#src/utils";
 //   pageSize  default 10
 //   status    active (default) | ignored | all   — ignore state is per hash
 //   repeat    all (default) | repeated | single  — appears on >1 row vs exactly once
+//
+// Each item also carries `ignoredStatus`: the optional label on an ignored
+// blocker (see utils/ignoreStatuses.ts), null when none is set.
 
 const STATUS_FILTERS: Record<string, string> = {
   active: `AND NOT "ignored"`,
@@ -47,8 +50,9 @@ export const getAuditRecommendations = async () => {
       WHERE "audit_id" = $1 ORDER BY "created_at" DESC LIMIT 1
     ),
     ignored_hashes AS (
-      SELECT DISTINCT "content_hash_id" FROM "ignored_blockers"
+      SELECT "content_hash_id", MAX("status") AS "status" FROM "ignored_blockers"
       WHERE "audit_id" = $1 AND "content_hash_id" IS NOT NULL
+      GROUP BY "content_hash_id"
     )`;
 
   await db.connect();
@@ -126,6 +130,7 @@ export const getAuditRecommendations = async () => {
         SELECT
           "p"."content_hash_id", "p"."occurrences", "p"."url_count",
           "p"."ignored", "p"."total_count",
+          (SELECT "ih"."status" FROM ignored_hashes "ih" WHERE "ih"."content_hash_id" = "p"."content_hash_id") AS "ignored_status",
           "rb"."id", "rb"."short_id", "rb"."content",
           COALESCE("ru"."url", "rb"."url_text", 'Unknown URL') AS "url",
           COALESCE("ru"."type", 'unknown') AS "type",
@@ -187,6 +192,7 @@ export const getAuditRecommendations = async () => {
         occurrences: row.occurrences,
         urlCount: row.url_count,
         ignored: row.ignored,
+        ignoredStatus: row.ignored_status ?? null,
         url: row.url,
         type: row.type,
         content: row.content,

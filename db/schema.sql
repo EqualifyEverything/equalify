@@ -386,7 +386,9 @@ CREATE TABLE public.ignored_blockers (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     audit_id uuid NOT NULL,
     blocker_id uuid NOT NULL,
-    content_hash_id uuid
+    content_hash_id uuid,
+    status text,
+    CONSTRAINT ignored_blockers_status_check CHECK (((status IS NULL) OR (status = ANY (ARRAY['false_positive'::text, 'wont_fix'::text, 'third_party'::text, 'needs_review'::text, 'fixed_pending'::text]))))
 );
 
 
