@@ -87,6 +87,8 @@ A short summary beside the cards restates the numbers in plain language: how man
 ### Filtering
 - **Status:** Choose between **Active**, **Ignored**, and **All**, the same as in the Detailed View. The counts on the two cards update to match, and the number of matching recommendations is shown to the right of the filter.
 
+Recommendations cover **web pages only**. A PDF's blockers belong to that one file, so grouping them would not point to a shared fix. When the latest scan also found PDF blockers, a note under the summary says how many; find them in the Detailed View by filtering on the PDF content type.
+
 ### Recommendation List
 Each row is one unique blocker. Rows are ranked so the fixes that clear the most blockers come first.
 - **Code:** The exact HTML block that was flagged, with syntax highlighting. Long snippets are collapsed; click **Show more** to expand one.

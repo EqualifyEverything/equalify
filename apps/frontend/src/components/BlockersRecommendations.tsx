@@ -50,6 +50,7 @@ interface RecommendationsResp {
     activeUniqueBlockers: number;
     repeatedBlockers: number;
     pagesWithBlockers: number;
+    pdfBlockersExcluded?: number;
     filteredUnique: number;
     filteredRepeated: number;
     filteredSingle: number;
@@ -212,6 +213,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
     repeatedBlockers: data.stats?.repeatedBlockers ?? 0,
     pagesWithBlockers: data.stats?.pagesWithBlockers ?? 0,
     filteredUnique: data.stats?.filteredUnique ?? 0,
+    pdfBlockersExcluded: data.stats?.pdfBlockersExcluded ?? 0,
     filteredRepeated: data.stats?.filteredRepeated ?? 0,
     filteredSingle: data.stats?.filteredSingle ?? 0,
     filteredTotalOccurrences: data.stats?.filteredTotalOccurrences ?? 0,
@@ -274,7 +276,7 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
 
         <p className={style["explainer"]}>
           {stats.totalBlockers === 0 ? (
-            <>The latest scan found no blockers, so there is nothing to recommend yet.</>
+            <>The latest scan found no blockers{stats.pdfBlockersExcluded > 0 ? " on web pages" : ""}, so there is nothing to recommend yet.</>
           ) : stats.repeatedBlockers === 0 ? (
             <>
               The latest scan found <strong>{stats.totalBlockers.toLocaleString()}</strong> {stats.totalBlockers === 1 ? "blocker" : "blockers"} across{" "}
@@ -290,6 +292,14 @@ export const BlockersRecommendations = ({ auditId, isShared }: BlockersRecommend
               Fix those and all <strong>{stats.totalBlockers.toLocaleString()}</strong> go away.<br/><br/>
               The list below puts the fixes that clear the most blockers first.
               Ignoring a blocker here ignores every copy of it.
+            </>
+          )}
+          {stats.pdfBlockersExcluded > 0 && (
+            <>
+              <br/><br/>
+              Recommendations cover web pages only. This scan also found{" "}
+              <strong>{stats.pdfBlockersExcluded.toLocaleString()}</strong> PDF {stats.pdfBlockersExcluded === 1 ? "blocker" : "blockers"},
+              which {stats.pdfBlockersExcluded === 1 ? "is" : "are"} listed in the Detailed view.
             </>
           )}
         </p>

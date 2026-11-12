@@ -5,6 +5,10 @@ import { db, event } from "#src/utils";
 // appears. Fixing the representative fixes every occurrence at once, so this
 // is the "what should I fix first" view.
 //
+// Web pages only: blockers on PDF URLs are left out. A PDF's blockers belong
+// to that one file, so grouping them doesn't surface a shared fix. They stay
+// in the Summary and Detailed views; `pdfBlockersExcluded` says how many.
+//
 // Query params:
 //   id        audit id (required)
 //   page      0-based page, default 0
@@ -23,6 +27,10 @@ const REPEAT_FILTERS: Record<string, string> = {
   repeated: `AND "occurrences" > 1`,
   single: `AND "occurrences" = 1`,
 };
+
+// Applied wherever blockers are joined to their URL as "u". Blockers whose URL
+// row is gone (url_text only) have no type and are kept.
+const NOT_PDF = `AND "u"."type" IS DISTINCT FROM 'pdf'`;
 
 export const getAuditRecommendations = async () => {
   const qs = (event.queryStringParameters as any) || {};
@@ -52,10 +60,11 @@ export const getAuditRecommendations = async () => {
     await db.query({
       text: `${withLatestAndIgnored},
         groups AS (
-          SELECT "content_hash_id", COUNT(*)::int AS "occurrences"
-          FROM "blockers"
-          WHERE "scan_id" = (SELECT "id" FROM latest)
-          GROUP BY "content_hash_id"
+          SELECT "b"."content_hash_id", COUNT(*)::int AS "occurrences"
+          FROM "blockers" "b"
+          LEFT JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+          WHERE "b"."scan_id" = (SELECT "id" FROM latest) ${NOT_PDF}
+          GROUP BY "b"."content_hash_id"
         ),
         groups_with_status AS (
           SELECT "g".*, ("g"."content_hash_id" IN (SELECT "content_hash_id" FROM ignored_hashes)) AS "ignored"
@@ -71,9 +80,15 @@ export const getAuditRecommendations = async () => {
           (SELECT COUNT(*) FROM groups_with_status WHERE NOT "ignored")::int AS "active_unique_blockers",
           (SELECT COUNT(*) FROM groups WHERE "occurrences" > 1)::int AS "repeated_blockers",
           (
-            SELECT COUNT(DISTINCT COALESCE("url_id"::text, "url_text")) FROM "blockers"
-            WHERE "scan_id" = (SELECT "id" FROM latest)
+            SELECT COUNT(DISTINCT COALESCE("b"."url_id"::text, "b"."url_text")) FROM "blockers" "b"
+            LEFT JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+            WHERE "b"."scan_id" = (SELECT "id" FROM latest) ${NOT_PDF}
           )::int AS "pages_with_blockers",
+          (
+            SELECT COUNT(*) FROM "blockers" "b"
+            JOIN "urls" "u" ON "b"."url_id" = "u"."id"
+            WHERE "b"."scan_id" = (SELECT "id" FROM latest) AND "u"."type" = 'pdf'
+          )::int AS "pdf_blockers_excluded",
           (SELECT COUNT(*) FROM status_filtered)::int AS "filtered_unique",
           (SELECT COUNT(*) FROM status_filtered WHERE "occurrences" > 1)::int AS "filtered_repeated",
           (SELECT COUNT(*) FROM status_filtered WHERE "occurrences" = 1)::int AS "filtered_single",
@@ -95,7 +110,7 @@ export const getAuditRecommendations = async () => {
             ("b"."content_hash_id" IN (SELECT "content_hash_id" FROM ignored_hashes)) AS "ignored"
           FROM "blockers" "b"
           LEFT JOIN "urls" "u" ON "b"."url_id" = "u"."id"
-          WHERE "b"."scan_id" = (SELECT "id" FROM latest)
+          WHERE "b"."scan_id" = (SELECT "id" FROM latest) ${NOT_PDF}
           GROUP BY "b"."content_hash_id"
         ),
         filtered AS (
@@ -154,6 +169,8 @@ export const getAuditRecommendations = async () => {
         activeUniqueBlockers: stats?.active_unique_blockers ?? 0,
         repeatedBlockers: stats?.repeated_blockers ?? 0,
         pagesWithBlockers: stats?.pages_with_blockers ?? 0,
+        // Blockers on PDF URLs in the latest scan, left out of everything above
+        pdfBlockersExcluded: stats?.pdf_blockers_excluded ?? 0,
         // Counts under the current status filter, one per stat block
         filteredUnique: stats?.filtered_unique ?? 0,
         filteredRepeated: stats?.filtered_repeated ?? 0,
