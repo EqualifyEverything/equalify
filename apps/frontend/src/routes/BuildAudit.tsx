@@ -17,6 +17,7 @@ import { CgOptions } from "react-icons/cg";
 import { TbAlertTriangle, TbMail } from "react-icons/tb";
 import { StyledButton } from "#src/components/StyledButton.tsx";
 import { LuClipboardCheck, LuClipboardPaste } from "react-icons/lu";
+import { FiExternalLink } from "react-icons/fi";
 import styles from "./BuildAudit.module.scss";
 //import * as Switch from "@radix-ui/react-switch";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -182,6 +183,27 @@ export const BuildAudit = () => {
       {/* <Link to="..">← Go Back</Link>
        */}
       <h1 className="initial-focus-element">Audit Builder</h1>
+      <p className={`font-small ${styles["helper-text"]}`}>
+        An audit is a saved list of web pages and PDFs that Equalify scans for
+        accessibility blockers, on demand or on a schedule. Give your audit a
+        name, choose how often it should run, add the URLs you want to monitor,
+        then save it or run your first scan. Everyone in your workspace can view
+        the audits you create.{" "}
+        <a
+          href="https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-3-creating-a-new-audit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read the guide to creating an audit
+          <span className="sr-only"> (opens in a new tab)</span>
+          <FiExternalLink
+            className={styles["external-link-icon"]}
+            aria-hidden="true"
+            focusable="false"
+          />
+        </a>
+        .
+      </p>
       {auditCount >= AUDIT_SOFT_LIMIT && (
         <Card variant="short-error">
           <TbAlertTriangle className="icon-small" />
@@ -192,7 +214,7 @@ export const BuildAudit = () => {
       )}
       <form onSubmit={saveAndRunAudit}>
         <div className="cards-38-62">
-          <Card variant="light">
+          <Card variant="light" className={styles["general-info-card"]}>
             <h2>
               <CgOptions className={"icon-small"} />
               General Info
@@ -201,9 +223,14 @@ export const BuildAudit = () => {
               <label htmlFor="auditName">
                 Audit Name <span>(required)</span>:
               </label>
+              <p id="auditNameHelp" className={`font-small ${styles["field-helper-text"]}`}>
+                Use a clear, descriptive name. No need to include dates or URLs; Equalify tracks those
+                for you.
+              </p>
               <input
                 id="auditName"
                 name="auditName"
+                aria-describedby="auditNameHelp"
                 onBlur={validateAuditName}
                 required
                 className={styles["input-element"]}
@@ -212,9 +239,14 @@ export const BuildAudit = () => {
 
             <StyledLabeledInput>
               <label htmlFor="scanFrequency">Scan Frequency:</label>
+              <p id="scanFrequencyHelp" className={`font-small ${styles["field-helper-text"]}`}>
+                Choose "Manually" to run scans yourself, or pick a schedule to
+                rescan automatically.
+              </p>
               <select
                 id="scanFrequency"
                 name="scanFrequency"
+                aria-describedby="scanFrequencyHelp"
                 className={styles["input-element"]}
                 value={scanFrequency}
                 onChange={(e) => setScanFrequency(e.target.value)}
@@ -231,7 +263,13 @@ export const BuildAudit = () => {
               </p>
             )}
             <StyledLabeledInput>
-              <AuditTagInput inputId="auditTags" value={tags} onChange={setTags} />
+              <AuditTagInput
+                inputId="auditTags"
+                value={tags}
+                onChange={setTags}
+                description="Optional. Tags are shared labels (like a department or website) that make audits easier to find and filter."
+                descriptionClassName={`font-small ${styles["field-helper-text"]}`}
+              />
             </StyledLabeledInput>
           </Card>
           <Card variant="light">
@@ -239,6 +277,11 @@ export const BuildAudit = () => {
               <TbMail className="icon-small" />
               Email Notifications:
             </h2>
+            <p className={`font-small ${styles["helper-text"]}`}>
+              Optional. Add email addresses to get regular summaries of this
+              audit's results, so you and your team don't need to check the
+              dashboard. You can change these later from the audit's page.
+            </p>
             <AuditEmailSubscriptionInput
               initialValue={emailList}
               onValueChange={setEmailList}
@@ -248,6 +291,16 @@ export const BuildAudit = () => {
 
         <Card variant="light" className={styles["pages-input-card"]}>
           <h2><FaListUl className="icon-small" /> Add URLs to Your Audit</h2>
+          <p className={`font-small ${styles["helper-text"]}`}>
+            Equalify scans only the pages and PDFs you list here. Choose one
+            method: <b>WordPress Integration</b> keeps the list in sync with
+            your WordPress site automatically, <b>Crawl Site</b> finds pages
+            once from a site's sitemap, and <b>Add Manually</b> lets you enter
+            exact URLs one at a time or upload a CSV (each URL is one page, so
+            adding a domain alone scans only its home page). Switching methods clears any
+            URLs you've already added. Only publicly available content can be
+            scanned.
+          </p>
           <Tabs.Root className="TabsRoot" defaultValue="remote-csv" onValueChange={() => { setRemoteCsvUrl(""); setPages([]); }}>
             <Tabs.List className={styles["pages-input-list"]} aria-label="Add URLs to Scan">
               <Tabs.Trigger value="remote-csv" asChild>

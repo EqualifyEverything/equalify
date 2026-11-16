@@ -24,3 +24,9 @@
   display: flex;
   flex-direction: column-reverse;
 }
+
+.field-helper-text {
+  margin-top: calc(variables.$spacing * 0.5);
+  margin-bottom: calc(variables.$spacing * 0.5);
+  line-height: 1.35;
+}

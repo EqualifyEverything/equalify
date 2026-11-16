@@ -89,6 +89,7 @@ export const AuditCrawlInput: React.FC<ChildProps> = ({
           <input
             id="crawl-url"
             type="url"
+            className={style["crawl-url-input"]}
             placeholder="example.com"
             value={crawlUrl}
             onChange={(e) => setCrawlUrl(e.target.value)}

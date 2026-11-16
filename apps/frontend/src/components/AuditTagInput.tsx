@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import type { MultiValue, SelectInstance } from "react-select";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,6 +23,9 @@ interface AuditTagInputProps {
   onChange: (tags: AuditTag[]) => void;
   label?: string;
   disabled?: boolean;
+  /** Optional helper text shown between the label and the input. */
+  description?: ReactNode;
+  descriptionClassName?: string;
 }
 
 const toOption = (tag: AuditTag): TagOption => ({ value: tag.id, label: tag.name });
@@ -35,6 +38,8 @@ export const AuditTagInput = ({
   onChange,
   label = "Tags",
   disabled = false,
+  description,
+  descriptionClassName,
 }: AuditTagInputProps) => {
   const queryClient = useQueryClient();
   const { setAnnounceMessage } = useGlobalStore();
@@ -95,9 +100,15 @@ export const AuditTagInput = ({
   return (
     <>
       <label htmlFor={inputId}>{label}:</label>
+      {description && (
+        <p id={`${inputId}-description`} className={descriptionClassName}>
+          {description}
+        </p>
+      )}
       <CreatableSelect<TagOption, true>
         ref={selectRef}
         inputId={inputId}
+        aria-describedby={description ? `${inputId}-description` : undefined}
         className="react-select audit-tag-select"
         isMulti
         isClearable={false}
