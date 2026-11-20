@@ -17,6 +17,8 @@
 }
 
 .tabTrigger {
+    position: relative; // anchors NotificationPip
+    --pip-ring-dark: #{variables.$black}; // tabs sit on the page background
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;

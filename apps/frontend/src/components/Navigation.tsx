@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Loader, GlobalErrorHandler } from ".";
 import * as Auth from "aws-amplify/auth";
-import { useUser } from "../queries";
+import { useUser, useAccessRequests } from "../queries";
 import * as Avatar from "@radix-ui/react-avatar";
 import generateAbbreviation from "#src/utils/generateAbbreviation.ts";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -15,6 +15,8 @@ import { Logo } from "./Logo";
 import * as AccessibleIcon from "@radix-ui/react-accessible-icon";
 import { MdDarkMode, MdOutlineDarkMode, MdLightMode } from "react-icons/md";
 import { Footer } from "./Footer";
+import { NotificationPip } from "./NotificationPip";
+import { pendingRequestsLabel } from "#src/utils/pendingRequestsLabel.ts";
 
 export const Navigation = () => {
   const location = useLocation();
@@ -22,6 +24,9 @@ export const Navigation = () => {
   const { loading, authenticated, setAuthenticated, darkMode, setDarkMode } =
     useGlobalStore();
   const { data: user } = useUser();
+  const isAdmin = !!authenticated && user?.type === "admin";
+  const { data: accessRequests } = useAccessRequests({ enabled: isAdmin });
+  const pendingRequestCount = isAdmin ? accessRequests?.length ?? 0 : 0;
 
   // Handle MSAL token refresh
   useMsalTokenRefresh();
@@ -178,6 +183,12 @@ export const Navigation = () => {
                     }
                   >
                     {obj.label}
+                    {obj.value === "/account" && (
+                      <NotificationPip
+                        count={pendingRequestCount}
+                        label={pendingRequestsLabel}
+                      />
+                    )}
                   </Link>
                 ))}
               </div>

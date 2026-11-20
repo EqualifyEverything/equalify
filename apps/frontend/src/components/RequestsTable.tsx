@@ -1,5 +1,5 @@
 import styles from "./InvitesTable.module.scss";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,35 +12,14 @@ import { useGlobalStore } from "../utils";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
-
-interface AccessRequest {
-  id: string;
-  name: string | null;
-  email: string;
-  status: string;
-  created_at: string;
-}
+import { useAccessRequests, AccessRequest } from "../queries";
 
 export const RequestsTable = () => {
   const queryClient = useQueryClient();
   const [scrollFadeRef, showScrollFade] = useScrollFade();
   const { setAnnounceMessage } = useGlobalStore();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["accessRequests"],
-    queryFn: async () => {
-      const response = (await (
-        await API.post({
-          apiName: "auth",
-          path: "/getAccessRequests",
-        }).response
-      ).body.json()) as any;
-      if (response?.status !== "success") {
-        throw new Error(response?.message ?? "Failed to load access requests");
-      }
-      return response.requests as AccessRequest[];
-    },
-  });
+  const { data, isLoading, error } = useAccessRequests();
 
   const reviewRequestMutation = useMutation({
     mutationFn: async ({ id, action }: { id: string; action: "approve" | "deny" }) => {
