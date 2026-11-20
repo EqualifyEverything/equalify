@@ -12,7 +12,7 @@ The top of the tab shows how many tags exist and how many audits are tagged. Use
 | Audits | The number of audits that have this tag. |
 | Blockers (latest scans) | The total number of blockers found in the most recent scan of each audit with this tag. |
 | Created | The date the tag was created. |
-| Actions | Buttons to rename, merge, or delete the tag. |
+| Actions | Buttons to open the tag's Tag Report (the **chart** icon), and to rename, merge, or delete the tag. |
 
 When you expand a tag, each audit is listed with a link to its page, the name of the person who created it, how often it runs, and its current number of blockers. Tags that aren't used by any audits show "No audits use this tag", which makes unused tags easy to spot and clean up.
 

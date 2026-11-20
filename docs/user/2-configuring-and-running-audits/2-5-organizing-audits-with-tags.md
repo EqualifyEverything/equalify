@@ -1,4 +1,4 @@
-This page is intended for **all users** who want to group and find audits more easily. Tags are short labels, such as a department, website, or project name, that you attach to audits. Once your audits are tagged, you can filter the Audits page to show only the audits you care about.
+This page is intended for **all users** who want to group and find audits more easily. Tags are short labels, such as a department, website, or project name, that you attach to audits. Once your audits are tagged, you can filter the Audits page to show only the audits you care about, and open a **Tag Report** that combines the results of every audit with the same tag.
 
 ## How tags work
 - **Tags are shared across your workspace.** Any tag you create can be used by everyone in your workspace, and everyone sees the same tags on an audit.
@@ -10,6 +10,7 @@ This page is intended for **all users** who want to group and find audits more e
 You can add tags when you create an audit, or at any time afterwards.
 - **In the Audit Builder:** Use the **Tags** field in the General Info section, below Scan Frequency. The tags are saved when you save the audit.
 - **On an audit's page:** Use the **Tags** field just below the audit name. Changes are saved as soon as you make them.
+- **On a Tag Report:** Add several audits to a tag at once with **Add audits to this tag**. See [🔗 "Tag Reports"](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-7-tag-reports).
 
 To add a tag:
 1. Click in the **Tags** field and start typing. A list of matching tags appears as you type.
@@ -34,7 +35,7 @@ The new tag is added to the audit and becomes available to everyone in your work
 ## Removing a tag from an audit
 On the audit's page (or in the Audit Builder), select the **×** next to the tag in the **Tags** field. You can also press Backspace in an empty Tags field to remove the last tag.
 
-Removing a tag from an audit does not delete the tag itself. It stays available for other audits.
+Removing a tag from an audit does not delete the tag itself. It stays available for other audits. You can also remove audits from a tag on its [🔗 Tag Report](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-7-tag-reports).
 
 ## Filtering the Audits page by tag
 Once at least one tag exists, a **Filter by Tags** control appears at the top of the Audits page, next to Search and Filter View.
@@ -47,6 +48,9 @@ The tag filter works together with **Search** and **Filter View** (My Audits or 
 ```tip
 💡Tip: If no audits match your selection, the page shows a "No audits match the selected tags" message with a **Clear Tag Filter** button.
 ```
+
+## Tag Reports
+Select any tag on the Audits page to open its **Tag Report**: a combined view of every audit with that tag, including a chart of their total blockers over time, summary statistics, and the pages with the most blockers. Learn more in [🔗 "Tag Reports"](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-7-tag-reports).
 
 ## Where tags appear
 - **Audit cards and table:** Tags are shown on each audit card and in the **Tags** column of the table view. To save space, cards show up to three tags and the table shows up to two. When an audit has more, select **View all tags** (for example, "View all 5 tags") to show the rest, and **Show fewer tags** to collapse the list again. Selecting a tag opens its Tag Report.
