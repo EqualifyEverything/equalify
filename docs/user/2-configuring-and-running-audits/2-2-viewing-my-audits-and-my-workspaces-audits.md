@@ -16,4 +16,6 @@ This page is intended for **Project Leads and workspace members** who need to mo
 💡Tip: Quick scans you or your workspace members created do not show up in either view
 ```
 
+**Paging:** Long lists are split into pages: the cards view shows 15 audits per page, and the table view shows 10. Use **First**, **Previous**, **Next**, and **Last** below the audits to move between pages, and **Audits per page** to show more at once. Searching or changing a filter returns you to the first page. Search and the filters always apply to every audit, not just the page showing.
+
 **Filter by Tags:** Show only audits with any of the tags you choose. This filter works together with Search and Filter View, and appears once your workspace has created at least one tag. Learn more in [🔗 "Organizing audits with tags"](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags).

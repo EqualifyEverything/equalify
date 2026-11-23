@@ -78,7 +78,29 @@
   }
 }
 
+// The cards pager borrows the table pager's look (.table-container
+// .pagination). Matched on both of the wrapper's classes so these outrank the
+// global .table-container rules whatever order the stylesheets load in.
+.cards-pagination:global(.table-container) {
+  // Line up with the cards above: three cards at (33.33% - 12px) plus two
+  // 16px gaps stop 4px short of the full width (.cards-33 in flex.scss)
+  width: calc(100% - 4px);
+  // The same gap the cards leave above the footer
+  margin-bottom: calc(variables.$spacing * 2);
+
+  @media screen and (max-width: variables.$breakpoint-small) {
+    // Cards are full width on small screens
+    width: 100%;
+  }
+}
+
 :global(body.dark) {
+  // With no table above the pager, the dark-mode divider line would double
+  // the container's border.
+  .cards-pagination:global(.table-container) :global(.pagination) {
+    border-top: 0;
+  }
+
   .Audits {
     h2 {
       svg {

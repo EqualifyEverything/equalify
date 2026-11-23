@@ -14,7 +14,7 @@ import { AuditsTable } from "#src/components/AuditsTable.tsx";
 import * as Tabs from "@radix-ui/react-tabs";
 import { FaTable, FaTableList } from "react-icons/fa6";
 import { StyledLabeledInput } from "#src/components/StyledLabeledInput.tsx";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { tagsFromAssignments, useAuditTags, useUser } from "../queries";
 import Select, { MultiValue } from "react-select";
 import { useSelectStyles } from "../utils/useSelectStyles";
@@ -46,6 +46,9 @@ export interface Audit {
   };
 } */
 
+// Cards sit three across, so every page size fills whole rows
+const CARD_PAGE_SIZES = [15, 30, 60, 90];
+
 export const Audits = () => {
   const navigate = useNavigate();
   const { data: user } = useUser();
@@ -56,8 +59,17 @@ export const Audits = () => {
     setAuditsTableCreatedByView,
     auditsTableTagFilter,
     setAuditsTableTagFilter,
+    setAnnounceMessage,
   } = useGlobalStore();
   const [searchString, setSearchString] = useState("");
+  // Cards view paging. The table view pages itself (AuditsTable).
+  const [cardPage, setCardPage] = useState(0);
+  const [cardPageSize, setCardPageSize] = useState(CARD_PAGE_SIZES[0]);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const cardsPagerRef = useRef<HTMLDivElement>(null);
+  // Set by the pager buttons so the effect below knows a person changed the
+  // page (and which way), as opposed to a filter or refetch moving it
+  const cardPageMove = useRef<{ forward: boolean; byPointer: boolean } | null>(null);
   const selectStyles = useSelectStyles();
   const { data: allTags } = useAuditTags();
   const tagOptions = (allTags ?? []).map((tag) => ({ value: tag.id, label: tag.name }));
@@ -126,6 +138,53 @@ export const Audits = () => {
 
   });
   //console.log(audits);
+
+  // The list is already filtered and fully loaded; paging only decides which
+  // cards are on screen. Clamp rather than trust cardPage, since a refetch or
+  // filter can leave it past the end.
+  const auditCount = audits?.length ?? 0;
+  const cardPageCount = Math.max(1, Math.ceil(auditCount / cardPageSize));
+  const currentCardPage = Math.min(cardPage, cardPageCount - 1);
+  const firstCardIndex = currentCardPage * cardPageSize;
+  const visibleCards = audits?.slice(firstCardIndex, firstCardIndex + cardPageSize);
+  const lastCardNumber = Math.min(firstCardIndex + cardPageSize, auditCount);
+
+  // A new search or filter starts again from the first page. Search only
+  // filters from three characters, so shorter input doesn't count as a change.
+  const tagFilterKey = activeTagFilter.join(",");
+  const effectiveSearch = searchString.length >= 3 ? searchString.toLowerCase() : "";
+  useEffect(() => {
+    setCardPage(0);
+  }, [effectiveSearch, auditsTableCreatedByView, tagFilterKey]);
+
+  const goToCardPage = (page: number, e?: { detail?: number }) => {
+    // detail is 0 when a button is activated from the keyboard
+    cardPageMove.current = { forward: page > currentCardPage, byPointer: (e?.detail ?? 0) > 0 };
+    setCardPage(page);
+  };
+
+  // After a person changes page: tell screen readers what is showing, bring
+  // the first cards into view for pointer users, and keep focus in the pager
+  // if the button that was pressed has just been disabled (first or last
+  // page), which would otherwise drop focus to the top of the document.
+  useEffect(() => {
+    const move = cardPageMove.current;
+    if (!move) return;
+    cardPageMove.current = null;
+    setAnnounceMessage(
+      `Showing audits ${firstCardIndex + 1} to ${lastCardNumber} of ${auditCount}, page ${currentCardPage + 1} of ${cardPageCount}`,
+      "normal",
+      true
+    );
+    if (move.byPointer) cardsRef.current?.scrollIntoView({ block: "start" });
+    const active = document.activeElement as HTMLButtonElement | null;
+    if (!active || active === document.body || active.disabled) {
+      cardsPagerRef.current
+        ?.querySelector<HTMLButtonElement>(move.forward ? ".cards-pager-previous" : ".cards-pager-next")
+        // After a click the view has just moved to the first cards: don't pull it back down
+        ?.focus({ preventScroll: move.byPointer });
+    }
+  }, [currentCardPage]);
 
   const handleCreatedByViewChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setAuditsTableCreatedByView(e.target.value);
@@ -223,12 +282,14 @@ export const Audits = () => {
             </Card>
           )}
           <Tabs.Content value="cards">
-            <div className="cards-33">
+            <div className="cards-33" ref={cardsRef}>
               {isLoading ? (
                 <SkeletonAuditGrid count={6} />
               ) : (
-                audits?.map((row: any, index: number) => (
-                  <Card variant="light" key={index}>
+                visibleCards?.map((row: any) => (
+                  // Keyed by audit, not position, so a card's own state (expanded
+                  // tags) doesn't carry over to a different audit on the next page
+                  <Card variant="light" key={row.id}>
                     <Link
                       to={`/audits/${formatId(row.id)}`}
                     >
@@ -301,6 +362,65 @@ export const Audits = () => {
                 </Card>
               </>}
             </div>
+            {/* Paging controls, shown once there are more audits than the smallest page holds */}
+            {!isLoading && auditCount > CARD_PAGE_SIZES[0] && (
+              <div className={"table-container " + styles["cards-pagination"]}>
+                <div className="pagination" role="navigation" aria-label="Audit cards pagination" ref={cardsPagerRef}>
+                  <div className="pagination-text">
+                    Showing {firstCardIndex + 1}–{lastCardNumber} of {auditCount} audits (Page {currentCardPage + 1} of {cardPageCount})
+                  </div>
+                  <div className="pagination-buttons">
+                    <div className="page-size-control">
+                      <label htmlFor="cardsPageSize">Audits per page:</label>
+                      <select
+                        id="cardsPageSize"
+                        value={cardPageSize}
+                        onChange={(e) => {
+                          const size = Number(e.target.value);
+                          // Stay on the page that holds the first card now showing
+                          setCardPage(Math.floor(firstCardIndex / size));
+                          setCardPageSize(size);
+                        }}
+                      >
+                        {CARD_PAGE_SIZES.map((size) => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="pagination-buttons-prev-next">
+                      <StyledButton
+                        onClick={(e) => goToCardPage(0, e)}
+                        disabled={currentCardPage === 0}
+                        label="First"
+                        variant="light"
+                        className="pagination-edge"
+                      />
+                      <StyledButton
+                        onClick={(e) => goToCardPage(currentCardPage - 1, e)}
+                        disabled={currentCardPage === 0}
+                        label="Previous"
+                        variant="light"
+                        className="cards-pager-previous"
+                      />
+                      <StyledButton
+                        onClick={(e) => goToCardPage(currentCardPage + 1, e)}
+                        disabled={currentCardPage >= cardPageCount - 1}
+                        label="Next"
+                        variant="light"
+                        className="cards-pager-next"
+                      />
+                      <StyledButton
+                        onClick={(e) => goToCardPage(cardPageCount - 1, e)}
+                        disabled={currentCardPage >= cardPageCount - 1}
+                        label="Last"
+                        variant="light"
+                        className="pagination-edge"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </Tabs.Content>
           <Tabs.Content value="table">
             <AuditsTable audits={audits} isLoading={isLoading} />
