@@ -26,7 +26,21 @@
 
   .actions {
     display: inline-flex;
+    align-items: center;
     gap: calc(variables.$spacing / 2);
+  }
+
+  .report-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: variables.$spacing;
+    color: inherit;
+
+    &:focus-visible {
+      outline: 2px solid variables.$red;
+      outline-offset: 2px;
+    }
   }
 
   .expand-button {

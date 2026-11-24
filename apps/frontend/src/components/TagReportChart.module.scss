@@ -1,0 +1,8 @@
+.data-table {
+  // Scoped under .table-container to outrank the global
+  // `.table-container table { display: block; min-height: 300px }`
+  :global(.table-container) table {
+    display: table;
+    min-height: 0;
+  }
+}

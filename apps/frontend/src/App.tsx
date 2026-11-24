@@ -15,6 +15,7 @@ import {
   QuickScans,
   Signup,
   SsoCallback,
+  TagReport,
 } from "#src/routes";
 import { Navigation } from "#src/components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -167,6 +168,7 @@ const router = createBrowserRouter([
       { path: "audits/build", element: <BuildAudit /> },
       { path: "quick-scans", element: <QuickScans /> },
       { path: "quick-scans/:auditId", element: <Audit /> },
+      { path: "tags/:tagId", element: <TagReport /> },
       { path: "logs", element: <Logs /> },
       { path: "log/:logId", element: <Log /> },
       { path: "account", element: <Account /> },

@@ -3,3 +3,5 @@ export * from './useWhatsNew'
 export * from './useOrganizationName'
 
 export * from './useAuditTags'
+export * from './useAccessRequests'
+export * from './useAuditsList'

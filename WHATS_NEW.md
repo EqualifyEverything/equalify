@@ -1,9 +1,13 @@
 ---
-title: Organize your audits with tags
-date: 2026-10-28
+title: Tag Reports, ignore statuses, and more
+date: 2026-11-23
 ---
-You can now **tag your audits** to group them by department, site, project, or whatever works for your team. Add tags in the **Audit Builder** when you create an audit, or at any time from the top of an audit's page. Start typing to find an existing tag, or enter a new name to create one. [Learn more about organizing audits with tags](https://equalify.uic.edu/dashboard/user-guide/2-configuring-and-running-audits/2-5-organizing-audits-with-tags).
+Select any tag to open its **Tag Report**: one view that combines every audit with that tag. Track their total blockers over time on a single chart, see which audits and pages need the most attention, and add or remove audits right from the report. [Learn more about Tag Reports](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-7-tag-reports).
 
-Tags are shared across your organization, so everyone can use the same set. On the Audits screen, use **Filter by Tags** to show only audits with any of the tags you choose. Tags also appear on each audit card, in the table view, and on shared reports.
+When you ignore a blocker, you can now say why. Choose an **ignore status** such as False positive, Won't fix, or Needs review under the Ignore toggle. The status applies to every copy of that blocker, carries forward to future scans, and is included in the CSV export. [Learn more about ignoring blockers](https://equalify.uic.edu/dashboard/user-guide/3-interpreting-audit-data-and-dashboards/3-2-audit-report-detailed-view).
 
-Admins can see every tag and the audits that use it under **Account > Tags**, and can rename, merge, or delete tags there to keep the list tidy.
+Also in this update:
+
+- **Recommendations** no longer list PDF blockers. They still appear in the Detailed view.
+- The **Audits** cards view is split into pages of 15, with an option to show more.
+- Admins see a marker on **Account** when access requests are waiting.

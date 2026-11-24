@@ -3,16 +3,14 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
+  Column,
   ColumnDef,
-  getPaginationRowModel,
   SortingState,
-  getSortedRowModel,
   SortDirection
 } from "@tanstack/react-table";
 import { SkeletonTable } from "./Skeleton";
 import { StyledButton } from "./StyledButton";
-import { useMemo, useState } from "react";
-import { Scan } from "#src/routes/Audits.tsx";
+import { useMemo } from "react";
 
 import { formatId } from "../utils";
 import { Link } from "react-router-dom";
@@ -21,43 +19,32 @@ import { GrPowerCycle } from "react-icons/gr";
 import React from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
-import { AuditTag, tagsFromAssignments } from "#src/queries/useAuditTags.ts";
+import { tagsFromAssignments } from "#src/queries/useAuditTags.ts";
+import { AuditListItem, AuditListScan, useAuditsList } from "#src/queries/useAuditsList.ts";
 import { AuditTagList } from "./AuditTagList";
+import { Card } from "./Card";
+import { TbHelpCircleFilled } from "react-icons/tb";
 
-interface Audit {
-  created_at: string;
-  id: string;
-  interval: string;
-  name: string;
-  scans: Scan[];
-  user: {
-    name: string;
-    email: string;
-  }
-  urls_aggregate: {
-    aggregate: {
-      count: number;
-    };
-  };
-  tag_assignments: { tag: AuditTag }[];
-}
+type Audit = AuditListItem;
+type Scan = AuditListScan;
 
+// The Search, Filter View and Filter by Tags controls live on the Audits
+// screen; the table loads, sorts and pages the matching audits itself.
 interface auditsTableProps {
-  audits: Audit[];
-  isLoading: boolean;
+  search: string;
+  createdBy: string;
+  tagIds: string[];
+  enabled?: boolean;
 }
+
+const PAGE_SIZES = [10, 50, 100];
 
 // Stable reference: a fresh `[]` each render makes react-table see new data
-// every time, auto-reset its page index, and re-render in an endless loop
+// every time and re-render in an endless loop
 const NO_AUDITS: Audit[] = [];
 
-export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
+export const AuditsTable = ({ search, createdBy, tagIds, enabled = true }: auditsTableProps) => {
   const [scrollFadeRef, showScrollFade] = useScrollFade();
-  //console.log(audits);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
 
   function renderSortingIcon(val: false | SortDirection) {
     switch (val) {
@@ -71,6 +58,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {
         accessorFn: (row) => (row.scans[0]?.status === "processing" ? 1 : 0),
         id: "status",
+        sortDescFirst: true,
         header: () => (
           <>
             <GrPowerCycle aria-hidden="true" />
@@ -91,6 +79,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       },
       {
         accessorKey: "name",
+        sortDescFirst: false,
         header: "Name",
         cell: ({ row }) => {
           return <Link to={`/audits/${formatId(row.original.id)}`} className={styles["audit-name"]}>{row.original.name}</Link>;
@@ -99,6 +88,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
 
       {
         accessorKey: "user",
+        sortDescFirst: false,
         header: "Created By",
         cell: ({ getValue }) => {
           const user = getValue() as any;;
@@ -113,12 +103,14 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {
         accessorFn: (row) => tagsFromAssignments(row.tag_assignments).map((tag) => tag.name).join(", ") || undefined,
         id: "tags",
+        sortDescFirst: false,
         header: "Tags",
         sortUndefined: 'last',
-        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} maxVisible={2} className={styles["tags-cell"]} />,
+        cell: ({ row }) => <AuditTagList tags={tagsFromAssignments(row.original.tag_assignments)} maxVisible={2} className={styles["tags-cell"]} linkToReport toggleAlign="start" />,
       },
       {
         accessorKey: "interval",
+        sortDescFirst: false,
         header: "Runs",
         cell: ({ getValue }) => {
           const interval = getValue() as any;
@@ -127,6 +119,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       },
       {
         accessorKey: "created_at",
+        sortDescFirst: false,
         header: "Created",
         cell: ({ getValue }) => {
           const created = getValue() as string;
@@ -136,6 +129,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       {
         accessorKey: "scans",
         id: "lastScan",
+        sortDescFirst: true,
         header: "Last Scan",
         cell: ({ getValue }) => {
           const scans = getValue() as Scan[];
@@ -145,6 +139,8 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       },
       {
         accessorFn: (row) => row.urls_aggregate.aggregate.count,
+        id: "urls",
+        sortDescFirst: true,
         sortUndefined: 'last',
         accessorKey: "urls_aggregate",
         header: "URLs",
@@ -156,6 +152,8 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
       },
       {
         accessorFn: (row) => row.scans[0]?.blockers_aggregate?.aggregate?.count,
+        id: "blockers",
+        sortDescFirst: true,
         sortUndefined: 'last',
         accessorKey: "scans",
         header: "Blockers",
@@ -169,25 +167,70 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
     []
   );
 
+  // Sorting and paging happen in the backend, across every matching audit:
+  // the table only ever holds the page it is showing. Each column's id is the
+  // name the backend sorts by (SORT_KEYS in getAudits.ts), one column at a
+  // time. No sort means newest first. Each column also states which way it
+  // sorts first (sortDescFirst): left to itself the table decides that from
+  // the first row on screen, which changes with every sort.
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const sort = sorting[0];
+  const list = useAuditsList({
+    search,
+    createdBy,
+    tagIds,
+    sortBy: sort?.id,
+    sortOrder: sort ? (sort.desc ? "desc" : "asc") : undefined,
+    defaultPageSize: PAGE_SIZES[0],
+    enabled,
+  });
+  // The pager describes the rows on screen; while the next page loads, that
+  // is still the previous one
+  const shownPage = list.shown?.page ?? 0;
+  const shownPageCount = list.shown?.totalPages ?? 1;
+
   const table = useReactTable({
-    data: audits ?? NO_AUDITS,
+    data: list.audits ?? NO_AUDITS,
     columns,
+    // Rows are known by their audit, not their position: each page holds
+    // different audits in the same positions, and a row's own state (its
+    // expanded tag list) must not carry over to whichever audit comes next
+    getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination
-    },
+    manualPagination: true,
+    manualSorting: true,
+    enableMultiSort: false,
     state: {
       sorting
     },
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
   });
+
+  // What a column's sort button will do when it is next activated, for screen
+  // readers: some columns sort descending first, and a third press clears the sort
+  const sortButtonLabel = (column: Column<Audit, unknown>) => {
+    const name = typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id;
+    const next = column.getNextSortingOrder();
+    return next
+      ? `Sort by "${name}" ${next === 'asc' ? 'ascending' : 'descending'}`
+      : `Remove sorting by "${name}"`;
+  };
+
+  const loadError = list.isError && (
+    <Card variant="short-error">
+      <TbHelpCircleFilled className="icon-small" />
+      <div className="font-small">
+        <b>Unable to load audits.</b> Please refresh the page, or contact your administrator if this keeps happening.
+      </div>
+    </Card>
+  );
+  // Nothing loaded to fall back on: the message is all there is to show
+  if (list.isError && !list.audits) return loadError;
 
   return (
     <div className={styles.AuditsTable}>
-      {isLoading ? (
+      {loadError}
+      {list.isPending ? (
         <SkeletonTable
           columns={3}
           rows={6}
@@ -197,7 +240,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
         <>
           <div className="table-container">
             <div className={"table-scroll-wrapper" + (showScrollFade ? " scroll-fade-active" : "")} ref={scrollFadeRef} tabIndex={0} role="region" aria-label="Audits table, scrollable horizontally">
-            <table aria-label="Audits table">
+            <table aria-label="Audits table" aria-busy={!list.settled && !list.isError}>
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id} className="bg-gray-100">
@@ -214,8 +257,7 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
                             onClick: header.column.getToggleSortingHandler()
                           }}
                         >
-                          <button className={styles["header-sort"]} aria-label={`Sort by "${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : header.column.id}" ${header.column.getIsSorted() === 'asc' ? 'descending' : 'ascending'
-                            }`}>
+                          <button className={styles["header-sort"]} aria-label={sortButtonLabel(header.column)}>
                             <div className={styles["header-label"]}>
                               {flexRender(
                                 header.column.columnDef.header,
@@ -270,50 +312,44 @@ export const AuditsTable = ({ audits, isLoading }: auditsTableProps) => {
               aria-label="Pagination"
             >
               <div className="pagination-text">
-                {audits &&
-                  `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
+                {list.shown && `Page ${shownPage + 1} of ${shownPageCount}`}
               </div>
               <div className="pagination-buttons">
                 <div className="page-size-control">
                   <label htmlFor="pageSize">Audits per page:</label>
                   <select
                     id="pageSize"
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => {
-                      table.setPageSize(Number(e.target.value));
-                    }}
+                    value={list.pageSize}
+                    onChange={(e) => list.changePageSize(Number(e.target.value))}
                   >
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                    {PAGE_SIZES.map((size) => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="pagination-buttons-prev-next">
                   <StyledButton
-                    onClick={() => table.firstPage()}
-                    disabled={table.getState().pagination.pageIndex === 0}
+                    onClick={() => { list.goToPage(0); }}
+                    disabled={shownPage === 0}
                     label="First"
                     variant="light"
                     className="pagination-edge"
                   />
                   <StyledButton
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
+                    onClick={() => { list.goToPage(list.page - 1); }}
+                    disabled={shownPage === 0}
                     label="Previous"
                     variant="light"
                   />
                   <StyledButton
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
+                    onClick={() => { list.goToPage(list.page + 1); }}
+                    disabled={shownPage >= shownPageCount - 1}
                     label="Next"
                     variant="light"
                   />
                   <StyledButton
-                    onClick={() => table.lastPage()}
-                    disabled={
-                      table.getState().pagination.pageIndex + 1 >=
-                      table.getPageCount()
-                    }
+                    onClick={() => { list.goToPage(list.pageCount - 1); }}
+                    disabled={shownPage >= shownPageCount - 1}
                     label="Last"
                     variant="light"
                     className="pagination-edge"

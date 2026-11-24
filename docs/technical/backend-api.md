@@ -53,6 +53,7 @@ Endpoints requiring a valid JWT token:
 | `updateAudit` | POST | Modify an existing audit |
 | `deleteAudit` | POST | Delete an audit |
 | `rescanAudit` | POST | Trigger a new scan for an audit |
+| `getAudits` | GET | The Audits screen's list, one page at a time (quick scans excluded): `page`, `pageSize` (up to 100), `search` (in the audit name, from three characters), `createdBy` (`user` for the caller's own, otherwise everyone's), `tagIds` (comma-separated; audits with any of them), `sortBy` (`name`, `user`, `tags`, `interval`, `created_at`, `lastScan`, `status`, `urls`, `blockers`; default newest first) and `sortOrder`. Returns `audits` plus `pagination` (`page`, `pageSize`, `totalCount`, `totalPages`); a `page` past the end returns the last page |
 | `getAuditDetails` | GET | Get audit configuration |
 | `getAuditResults` | GET | Get scan results with blockers |
 | `getAuditChart` | GET | Get chart data for blockers over time |
@@ -62,9 +63,9 @@ Endpoints requiring a valid JWT token:
 | `getAuditSummaryFast` | GET | Get cached/fast summary stats for an audit |
 | `getMostCommonUrls` | GET | Paginated "URLs with most blockers" list (backs the Summary View card) |
 | `getMostCommonBlockers` | GET | Paginated "most common blockers" list (backs the Summary View card) |
-| `getAuditRecommendations` | GET | Recommendations view: one row per unique blocker (`content_hash_id`) in the latest scan, ranked by occurrences; `status` (active / ignored / all), `repeat` (all / repeated / single), `page`, `pageSize` |
+| `getAuditRecommendations` | GET | Recommendations view: one row per unique blocker (`content_hash_id`) in the latest scan, ranked by occurrences; web pages only (blockers on PDF URLs are left out and counted in `stats.pdfBlockersExcluded`); `status` (active / ignored / all), `repeat` (all / repeated / single), `page`, `pageSize`; each item carries `ignoredStatus` (the optional `ignored_blockers.status`, null when none) |
 | `getBlockerUrls` | GET | Every occurrence of one grouped blocker in the latest scan, one row per occurrence; `content_hash_id`, `page`, `pageSize` (backs the "View all occurrences" drawer and its CSV copy) |
-| `exportAuditTable` | GET | Export blocker table as CSV |
+| `exportAuditTable` | GET | Export blocker table as CSV; the last column, `Ignore Status`, is the label of the ignored blocker's status (empty when none) |
 | `exportAuditTablePdfSourceLinks` | GET | Export PDF source links for blockers |
 | `getLogs` | GET | Get activity logs |
 | `inviteUser` | POST | Invite a new user |

@@ -1,0 +1,20 @@
+@use "../global-styles/variables.module.scss";
+
+// The shared BlockersTableSummary styles are sized for three cards across on
+// the Audit page. Two across, each card is much wider, so the content needs
+// to fill it explicitly or it hugs the left edge.
+.stat {
+  // Fill the card (a flex row), with the same inset on both cards
+  flex: 1;
+  min-width: 0;
+  padding-left: variables.$spacing;
+  padding-right: variables.$spacing;
+}
+
+.donut {
+  // Fixed size so it sits at the card's right edge instead of floating in
+  // whatever width is left over
+  flex: 0 0 100px;
+  width: 100px !important;
+  height: 100px !important;
+}

@@ -37,7 +37,7 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
 }) => {
   const { setAnnounceMessage } = useGlobalStore();
 
-  const [importBy, setImportBy] = useState("URLs");
+  const [importBy, setImportBy] = useState("URL");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [pages, setPages] = useState<Page[]>(initialPages);
   //const [pagesToDeleteCount, setPagesToDeleteCount] = useState(0);
@@ -433,21 +433,29 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                     <option>CSV</option>
                   </select>
                 </StyledLabeledInput>
-                {["URLs"].includes(importBy) && (
+                {importBy === "URL" && (
                   <div>
                     <StyledLabeledInput>
                       <label htmlFor="pageInput">URL:</label>
+                      
                       <input
                         id="pageInput"
                         name="pageInput"
+                        aria-describedby="pageInputHelp"
                         onKeyDown={handleUrlInputKeyDown}
                         placeholder="example.com"
                       />
+                      <p id="pageInputHelp" className={`font-small ${style["field-helper-text"]}`}>
+                        Each URL adds one page. Entering <code>example.com</code> scans
+                        only that site's home page, not other pages on the domain
+                        (like <code>example.com/about</code>). To scan more of a site,
+                        add each page's URL individually or upload a CSV list.
+                      </p>
                     </StyledLabeledInput>
                     {urlError && <p>{urlError}</p>}
                   </div>
                 )}
-                {["CSV"].includes(importBy) && (
+                {importBy === "CSV" && (
                   <div>
                     <StyledLabeledInput>
                       <label htmlFor="csvInput">CSV Upload:</label>
@@ -472,9 +480,11 @@ export const AuditPagesInput: React.FC<ChildProps> = ({
                   </div>
                 )}
               </div>
-              <div className={style["button-area"]}>
-              <StyledButton label="Add URL" onClick={addPage} />
-              </div>
+              {importBy === "URL" && (
+                <div className={style["button-area"]}>
+                  <StyledButton label="Add URL" onClick={addPage} />
+                </div>
+              )}
             </Card>
           )}
         </>

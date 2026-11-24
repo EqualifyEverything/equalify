@@ -17,6 +17,16 @@
   table {
     display:table !important;
   }
+  // While the next page or sort loads, the current rows stay up. If that
+  // takes more than a moment they fade, so a slow load doesn't look like a
+  // click that did nothing.
+  tbody {
+    transition: opacity 0.1s;
+  }
+  table[aria-busy="true"] tbody {
+    opacity: 0.6;
+    transition: opacity 0.2s ease 0.3s;
+  }
   // caps the Tags column; long names wrap inside their chips
   .tags-cell {
     max-width: 14rem;

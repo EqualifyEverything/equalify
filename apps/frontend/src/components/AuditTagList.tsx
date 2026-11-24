@@ -1,5 +1,7 @@
-import { useRef, useState } from "react";
-import * as Tooltip from "@radix-ui/react-tooltip";
+import { useId, useState } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { Link } from "react-router-dom";
+import { formatId } from "../utils";
 import { AuditTag } from "../queries";
 import styles from "./AuditTagList.module.scss";
 
@@ -7,69 +9,49 @@ interface AuditTagListProps {
   tags: AuditTag[];
   label?: string;
   className?: string;
-  /** Show at most this many chips; the rest go in a "+N" tooltip */
+  /** Show at most this many chips until "View all N tags" is selected */
   maxVisible?: number;
+  /** Make the chips links to each tag's report (signed-in views only) */
+  linkToReport?: boolean;
+  /** Horizontal alignment of the "View all N tags" toggle below the tags */
+  toggleAlign?: "start" | "center" | "end";
 }
 
 // Read-only tag chips (audit cards and table, shared reports)
-export const AuditTagList = ({ tags, label = "Tags", className = "", maxVisible }: AuditTagListProps) => {
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreTriggerRef = useRef<HTMLButtonElement>(null);
+export const AuditTagList = ({ tags, label = "Tags", className = "", maxVisible, linkToReport = false, toggleAlign = "start" }: AuditTagListProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const listId = useId();
   if (!tags.length) return null;
 
-  const visibleTags = maxVisible === undefined ? tags : tags.slice(0, maxVisible);
-  const hiddenTags = tags.slice(visibleTags.length);
-  const moreLabel = `+${hiddenTags.length} more tag${hiddenTags.length === 1 ? "" : "s"}`;
+  const isTruncated = maxVisible !== undefined && tags.length > maxVisible;
+  const shownTags = isTruncated && !expanded ? tags.slice(0, maxVisible) : tags;
 
   return (
     <div className={styles.AuditTagList + " " + className}>
-      <ul aria-label={label}>
-        {visibleTags.map((tag) => (
-          <li key={tag.id}>{tag.name}</li>
+      <ul id={listId} aria-label={label}>
+        {shownTags.map((tag) => (
+          <li key={tag.id} className={linkToReport ? styles.linked : undefined}>
+            {linkToReport ? (
+              <Link to={`/tags/${formatId(tag.id)}`}>
+                {tag.name}
+                <VisuallyHidden.Root> tag report</VisuallyHidden.Root>
+              </Link>
+            ) : tag.name}
+          </li>
         ))}
       </ul>
-      {hiddenTags.length > 0 && (
-        // Kept outside the list so screen readers' item count matches what's
-        // shown. The trigger is announced as e.g. "+3 more tags, button",
-        // followed by the hidden names as its description.
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root open={moreOpen} onOpenChange={setMoreOpen}>
-            <Tooltip.Trigger
-              ref={moreTriggerRef}
-              type="button"
-              className={styles.more}
-              aria-label={moreLabel}
-              onClick={(e) => {
-                // Radix tooltips only open on hover/focus; clicking (or
-                // tapping on touch screens) toggles it instead of closing it
-                e.preventDefault();
-                setMoreOpen((open) => !open);
-              }}
-            >
-              {`+${hiddenTags.length}`}
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content
-                side="bottom"
-                className={"tooltip " + styles.tooltip}
-                collisionPadding={8}
-                // Read as a comma-separated list rather than run-together chips
-                aria-label={hiddenTags.map((tag) => tag.name).join(", ")}
-                onPointerDownOutside={(e) => {
-                  // let the trigger's own click toggle it closed
-                  if (moreTriggerRef.current?.contains(e.target as Node)) e.preventDefault();
-                }}
-              >
-                <ul>
-                  {hiddenTags.map((tag) => (
-                    <li key={tag.id}>{tag.name}</li>
-                  ))}
-                </ul>
-                <Tooltip.Arrow className="tooltip-arrow" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+      {isTruncated && (
+        // A disclosure button rather than a tooltip, so the extra tags render
+        // in the same list (and can be links). Focus stays on the button.
+        <button
+          type="button"
+          className={styles.toggle + (toggleAlign === "start" ? "" : " " + styles[`align-${toggleAlign}`])}
+          aria-expanded={expanded}
+          aria-controls={listId}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          {expanded ? "Show fewer tags" : `View all ${tags.length} tags`}
+        </button>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { db, event, graphqlQuery, validateShortId, validateUuid, buildUrlSearchClause, getHistoricalBlockers } from "#src/utils";
+import { db, event, graphqlQuery, validateShortId, validateUuid, buildUrlSearchClause, getHistoricalBlockers, ignoreStatusLabel } from "#src/utils";
 
 const BATCH_SIZE = 1000;
 
@@ -76,12 +76,13 @@ export const exportAuditTable = async () => {
           b.ignored ? "Ignored" : "Active",
           b.short_id || "",
           b.occurrences,
+          ignoreStatusLabel(b.ignoredStatus),
         ]
           .map(csvEscape)
           .join(",")
       );
       const csv = [
-        "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences",
+        "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences,Ignore Status",
         ...rows,
       ].join("\n");
       const scanDatePart = new Date(scan.created_at).toISOString().split("T")[0];
@@ -215,7 +216,7 @@ export const exportAuditTable = async () => {
         "content-type": "text/csv; charset=utf-8",
         "content-disposition": `attachment; filename="blockers-${auditId}-${new Date().toISOString().split("T")[0]}.csv"`,
       },
-      body: "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences\n",
+      body: "Type,URL,Issue,Code,Tags,Rules,Status,ID,Occurrences,Ignore Status\n",
     };
   }
 
@@ -224,13 +225,23 @@ export const exportAuditTable = async () => {
     query: `query ($audit_id: uuid!) {
   ignored_blockers(where: {audit_id: {_eq: $audit_id}}) {
     blocker_id
+    content_hash_id
+    status
   }
 }`,
     variables: { audit_id: auditId },
   };
   const ignoredResp = await graphqlQuery(ignoredSetQuery);
-  const ignoredSet = new Set<string>(
-    (ignoredResp.ignored_blockers || []).map((ib: any) => ib.blocker_id)
+  // blocker id -> optional status; has(id) = ignored. The status is a
+  // property of the hash (as in Recommendations and past scans), so a row
+  // without one takes it from a sibling row of the same hash.
+  const ignoredRows: any[] = ignoredResp.ignored_blockers || [];
+  const ignoredStatusByHash = new Map<string, string>();
+  for (const ib of ignoredRows) {
+    if (ib.status && ib.content_hash_id) ignoredStatusByHash.set(ib.content_hash_id, ib.status);
+  }
+  const ignoredStatusById = new Map<string, string | null>(
+    ignoredRows.map((ib) => [ib.blocker_id, ib.status ?? ignoredStatusByHash.get(ib.content_hash_id) ?? null])
   );
 
   const scopedWhere = {
@@ -323,8 +334,8 @@ export const exportAuditTable = async () => {
     });
   }
 
-  // Occurrences is appended last so consumers addressing the export by
-  // column position keep the original eight columns unchanged.
+  // Occurrences, then Ignore Status, are appended last so consumers addressing
+  // the export by column position keep the original eight columns unchanged.
   const headers = [
     "Type",
     "URL",
@@ -335,6 +346,7 @@ export const exportAuditTable = async () => {
     "Status",
     "ID",
     "Occurrences",
+    "Ignore Status",
   ];
   const rows = formattedBlockers.map((b) =>
     [
@@ -344,9 +356,10 @@ export const exportAuditTable = async () => {
       b.content || "",
       b.tags.map((t: any) => t.content).join("; "),
       b.categories.join("; "),
-      ignoredSet.has(b.id) ? "Ignored" : "Active",
+      ignoredStatusById.has(b.id) ? "Ignored" : "Active",
       b.short_id || "",
       b.occurrences,
+      ignoreStatusLabel(ignoredStatusById.get(b.id)),
     ]
       .map(csvEscape)
       .join(",")

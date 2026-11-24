@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as API from "aws-amplify/api";
-import { FaAngleDown, FaAngleRight, FaPen, FaTrash } from "react-icons/fa";
+import { FaAngleDown, FaAngleRight, FaChartLine, FaPen, FaTrash } from "react-icons/fa";
 import { MdMergeType } from "react-icons/md";
 import { formatId, useGlobalStore } from "../utils";
 import { useScrollFade } from "#src/utils/useScrollFade.ts";
@@ -195,6 +195,14 @@ export const AuditTagsAdmin = () => {
                           <td>{new Date(tag.created_at).toLocaleDateString()}</td>
                           <td>
                             <div className={styles.actions}>
+                              <Link
+                                to={`/tags/${formatId(tag.id)}`}
+                                className={styles["report-link"]}
+                                aria-label={`View tag report for ${tag.name}`}
+                                title="View tag report"
+                              >
+                                <FaChartLine aria-hidden="true" />
+                              </Link>
                               <StyledButton
                                 label={`Rename tag ${tag.name}`}
                                 icon={<FaPen />}

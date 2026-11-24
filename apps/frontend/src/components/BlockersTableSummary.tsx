@@ -25,13 +25,13 @@ interface PaginatedListResp<T> {
   pageSize: number;
 }
 
-const CardSpinner = () => (
+export const CardSpinner = () => (
   <span className={style["card-spinner"]} role="img" aria-label="Refreshing">
     <GrPowerCycle className={style.spinning} />
   </span>
 );
 
-const PaginationControls = ({
+export const PaginationControls = ({
   page,
   totalPages,
   onPrevious,

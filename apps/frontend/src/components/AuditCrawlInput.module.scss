@@ -2,5 +2,7 @@
 @use "../global-styles/fonts.scss";
 
 .AuditCrawlInput {
-
+  .crawl-url-input {
+    margin-bottom: variables.$spacing;
+  }
 }

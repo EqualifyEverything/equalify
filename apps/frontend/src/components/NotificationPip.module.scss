@@ -1,0 +1,28 @@
+@use "../global-styles/variables.module.scss";
+
+.pip {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: variables.$red;
+  // Ring in the surrounding surface colour so the dot separates from text it
+  // overlaps. Parents on a different background can override --pip-ring.
+  box-shadow: 0 0 0 2px var(--pip-ring, #{variables.$paper});
+  pointer-events: none;
+
+  // Keep the dot visible in Windows High Contrast / forced colours
+  @media (forced-colors: active) {
+    forced-color-adjust: none;
+    background: Highlight;
+    box-shadow: 0 0 0 2px Canvas;
+  }
+}
+
+:global(body.dark) .pip {
+  // $red is under 3:1 against the dark surface; use a lighter red
+  background: #ff6b61;
+  box-shadow: 0 0 0 2px var(--pip-ring-dark, #{variables.$dark-surface});
+}

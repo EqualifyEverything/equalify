@@ -27,6 +27,7 @@
     align-items: center;
     .link {
       display: inline-block;
+      position: relative; // anchors NotificationPip
       color: variables.$black;
       padding: calc(variables.$spacing/2) variables.$spacing;
       margin-left: calc(variables.$spacing/2);

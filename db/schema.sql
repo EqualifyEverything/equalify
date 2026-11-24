@@ -386,7 +386,9 @@ CREATE TABLE public.ignored_blockers (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     audit_id uuid NOT NULL,
     blocker_id uuid NOT NULL,
-    content_hash_id uuid
+    content_hash_id uuid,
+    status text,
+    CONSTRAINT ignored_blockers_status_check CHECK (((status IS NULL) OR (status = ANY (ARRAY['false_positive'::text, 'wont_fix'::text, 'third_party'::text, 'needs_review'::text, 'fixed_pending'::text]))))
 );
 
 
@@ -760,6 +762,13 @@ CREATE INDEX idx_message_tags_tag_id ON public.message_tags USING btree (tag_id)
 --
 
 CREATE INDEX idx_scans_status_updated ON public.scans USING btree (status, updated_at);
+
+
+--
+-- Name: scans_audit_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX scans_audit_id_created_at_idx ON public.scans USING btree (audit_id, created_at DESC);
 
 
 --

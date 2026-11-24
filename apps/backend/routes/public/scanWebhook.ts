@@ -279,13 +279,27 @@ export const scanWebhook = async () => {
                 const params = [];
                 let p = 1;
                 for (const entry of ignoredEntries) {
-                    vals.push(`($${p}, $${p+1}, $${p+2})`);
+                    vals.push(`($${p}::uuid, $${p+1}::uuid, $${p+2}::uuid)`);
                     params.push(auditId, entry.blockerId, entry.contentHashId);
                     p += 3;
                 }
+                // The status (why it's ignored) carries forward with the ignore.
+                // It is read here, in the insert itself, rather than with the
+                // hash list above, so a status changed while this page was
+                // being processed isn't overwritten with a stale one. It is
+                // set hash-wide, so MAX just picks the one non-null value.
+                // Looked up once for this page's hashes, not per inserted row.
                 await db.query({
-                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id", "content_hash_id") VALUES ${vals.join(', ')} ON CONFLICT DO NOTHING`,
-                    values: params,
+                    text: `INSERT INTO "ignored_blockers" ("audit_id", "blocker_id", "content_hash_id", "status")
+                           SELECT v."audit_id", v."blocker_id", v."content_hash_id", s."status"
+                           FROM (VALUES ${vals.join(', ')}) AS v("audit_id", "blocker_id", "content_hash_id")
+                           LEFT JOIN (
+                               SELECT "content_hash_id", MAX("status") AS "status" FROM "ignored_blockers"
+                               WHERE "audit_id" = $${p}::uuid AND "content_hash_id" = ANY($${p+1}::uuid[]) AND "status" IS NOT NULL
+                               GROUP BY "content_hash_id"
+                           ) s ON s."content_hash_id" = v."content_hash_id"
+                           ON CONFLICT DO NOTHING`,
+                    values: [...params, auditId, [...new Set(ignoredEntries.map(e => e.contentHashId))]],
                 });
             }
 

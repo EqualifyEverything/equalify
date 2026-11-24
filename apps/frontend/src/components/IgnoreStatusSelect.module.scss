@@ -1,0 +1,40 @@
+@use "../global-styles/variables.module.scss";
+@use "../global-styles/fonts.scss";
+
+// Toggle button + status picker, stacked. Both stretch to the stack's width:
+// at least the minimum below (which fits "Active", "Ignored" and "No status"),
+// wider only when a longer status is selected.
+.ignore-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 7.5rem;
+
+  > button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+// Sits directly under the Ignore toggle button, in the same cell. The wrapper
+// carries the spacing: table styles reset a select's own margin, and changing
+// the select's display breaks its one-line label + arrow layout.
+.status-wrap {
+  display: block;
+  margin-top: calc(variables.$spacing / 2);
+
+  select {
+    width: 100%;
+    min-width: max-content;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+  }
+}
+
+.status-text {
+  display: block;
+  margin-top: calc(variables.$spacing / 2);
+  @include fonts.font-size-small;
+}

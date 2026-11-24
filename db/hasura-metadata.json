@@ -525,7 +525,8 @@
                     "audit_id",
                     "blocker_id",
                     "content_hash_id",
-                    "id"
+                    "id",
+                    "status"
                   ]
                 },
                 "comment": ""
@@ -541,7 +542,8 @@
                     "audit_id",
                     "blocker_id",
                     "content_hash_id",
-                    "id"
+                    "id",
+                    "status"
                   ],
                   "filter": {},
                   "allow_aggregations": true
@@ -557,10 +559,24 @@
                     "audit_id",
                     "blocker_id",
                     "content_hash_id",
-                    "id"
+                    "id",
+                    "status"
                   ],
                   "filter": {},
                   "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "status"
+                  ],
+                  "filter": {},
+                  "check": null
                 },
                 "comment": ""
               }

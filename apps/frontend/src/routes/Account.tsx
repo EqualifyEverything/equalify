@@ -1,15 +1,18 @@
 import { useNavigate } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs";
-import { useUser } from "../queries"
-import { InvitesTable, RequestsTable, UsersTable, CoBrandingInput, LlmSettingsInput, LoginSettingsInput, SystemStats, AuditTagsAdmin } from "../components"
+import { useUser, useAccessRequests } from "../queries"
+import { InvitesTable, RequestsTable, NotificationPip, UsersTable, CoBrandingInput, LlmSettingsInput, LoginSettingsInput, SystemStats, AuditTagsAdmin } from "../components"
 import { SkeletonAccount } from "#src/components/Skeleton.tsx"
 import style from "./Account.module.scss";
 import { Card } from "#src/components/Card.tsx";
 import { StyledButton } from "#src/components/StyledButton.tsx";
+import { pendingRequestsLabel } from "#src/utils/pendingRequestsLabel.ts";
 
 export const Account = () => {
     const { data: user, isLoading } = useUser();
     const isAdmin = user?.type === 'admin';
+    const { data: accessRequests } = useAccessRequests({ enabled: isAdmin });
+    const pendingRequestCount = accessRequests?.length ?? 0;
     const navigate = useNavigate();
 
     return <div className={style.Account}>
@@ -22,7 +25,7 @@ export const Account = () => {
                     <Tabs.Trigger value="account" className={style.tabTrigger}>Account</Tabs.Trigger>
                     {isAdmin && <Tabs.Trigger value="users" className={style.tabTrigger}>Users</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="invites" className={style.tabTrigger}>Invites</Tabs.Trigger>}
-                    {isAdmin && <Tabs.Trigger value="requests" className={style.tabTrigger}>Requests</Tabs.Trigger>}
+                    {isAdmin && <Tabs.Trigger value="requests" className={style.tabTrigger}>Requests<NotificationPip count={pendingRequestCount} label={pendingRequestsLabel} /></Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="tags" className={style.tabTrigger}>Tags</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="system" className={style.tabTrigger}>System</Tabs.Trigger>}
                     {isAdmin && <Tabs.Trigger value="statistics" className={style.tabTrigger}>Statistics</Tabs.Trigger>}
