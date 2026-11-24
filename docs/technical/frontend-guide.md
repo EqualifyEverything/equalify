@@ -169,7 +169,10 @@ const mutation = useMutation({
 Global navigation with authentication-aware links.
 
 ### AuditsTable
-Sortable, filterable table of all audits with status badges.
+Sortable table of audits with status badges: the table view of the Audits screen. The screen's Search, Filter View and Filter by Tags are passed in, and the table loads, sorts and pages the matching audits through `useAuditsList`.
+
+### useAuditsList (hook)
+The Audits screen's list, loaded one page at a time from `getAudits`, with its paging state. The cards view and `AuditsTable` each hold one. Filtering, sorting and counting happen in the backend, so the browser only holds the page on screen. The previous page stays visible while the next loads (`shown` describes it), a new search, filter or sort starts from the first page, and the query key begins with `audits`, so `invalidateQueries({ queryKey: ['audits'] })` refreshes the list.
 
 ### BlockersTable
 Paginated table of accessibility blockers with:

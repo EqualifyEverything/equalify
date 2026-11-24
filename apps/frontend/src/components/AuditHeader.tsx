@@ -59,7 +59,10 @@ export const AuditHeader = ({
           }).response
         ).body.json();
         //console.log(response);
-        await queryClient.refetchQueries({ queryKey: ["audits"] });
+        // The Audits screen keeps a copy of every page of its list it has
+        // shown lately. Drop them all, so the list loads fresh, without this
+        // audit, rather than refetching each one here.
+        queryClient.removeQueries({ queryKey: ["audits"] });
         // aria & logging
         setAnnounceMessage(`Deleted audit ${audit.name}.`, "success");
         await createLog(`Deleted audit ${audit.name}.`, auditId);
@@ -83,7 +86,9 @@ export const AuditHeader = ({
           }).response
         ).body.json();
         //console.log(response);
-        await queryClient.refetchQueries({ queryKey: ["audits"] });
+        // Marks the Audits screen's remembered pages out of date; it reloads
+        // the one it shows when it next opens
+        queryClient.invalidateQueries({ queryKey: ["audits"] });
         await queryClient.refetchQueries({ queryKey: ["scans", auditId] });
         // aria & logging
         setAnnounceMessage(`Scanning audit ${audit.name}...`);

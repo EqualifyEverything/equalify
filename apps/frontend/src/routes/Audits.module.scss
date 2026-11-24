@@ -35,6 +35,18 @@
     }
   }
 
+  // While the next page of cards loads, the current one stays up. If that
+  // takes more than a moment it fades, so a slow load doesn't look like a
+  // click that did nothing.
+  :global(.cards-33) {
+    transition: opacity 0.1s;
+
+    &[aria-busy="true"] {
+      opacity: 0.6;
+      transition: opacity 0.2s ease 0.3s;
+    }
+  }
+
   .audits-header {
     display: inline-flex;
     justify-content: space-between;
