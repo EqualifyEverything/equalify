@@ -143,7 +143,11 @@ export const TagReport = () => {
     }
   };
 
-  if (report.isError) {
+  // A report that has loaded stays on screen if a later refresh fails (a
+  // dropped connection, say). This message is for when there is nothing to
+  // show, or the backend says the tag itself is gone.
+  const tagGone = (report.error as any)?.response?.statusCode === 404;
+  if (report.isError && (!report.data || tagGone)) {
     return (
       <div className={styles.TagReport}>
         <h1 className="initial-focus-element">Tag Report</h1>

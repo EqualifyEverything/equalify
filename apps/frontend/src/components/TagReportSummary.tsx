@@ -86,6 +86,15 @@ export const TagReportSummary = ({ tagId, summary, auditCount, blockersAtStart, 
   const urls = useTagReportList<UrlItem>("/getTagReportUrls", tagId, urlsPage);
   const urlsTotalPages = urls.data ? Math.max(1, Math.ceil(urls.data.totalCount / urls.data.pageSize)) : 1;
 
+  // The list can shrink while a later page is showing (an audit is removed
+  // from the tag, or rescanned). The backend then answers with its last page:
+  // follow it, so the pager counts from the page that is on screen. Only a
+  // fresh answer counts, not one remembered from before a refetch.
+  const servedUrlsPage = urls.data && !urls.isPlaceholderData && !urls.isFetching ? urls.data.page : null;
+  useEffect(() => {
+    if (servedUrlsPage !== null && servedUrlsPage !== urlsPage) setUrlsPage(servedUrlsPage);
+  }, [servedUrlsPage, urlsPage]);
+
   // Announce page changes once the requested page has loaded, as on the Audit page
   const announcedUrlsPageRef = useRef(urlsPage);
   useEffect(() => {

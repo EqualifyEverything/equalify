@@ -14,7 +14,7 @@ export const getTagReportUrls = async () => {
     if (!validateUuid(tagId)) {
         return { statusCode: 400, body: JSON.stringify({ error: "Invalid tag" }) };
     }
-    const page = Math.max(0, parseInt(params.page ?? "0", 10) || 0);
+    let page = Math.max(0, parseInt(params.page ?? "0", 10) || 0);
     const pageSize = Math.min(100, Math.max(1, parseInt(params.pageSize ?? "5", 10) || 5));
 
     await db.connect();
@@ -23,18 +23,35 @@ export const getTagReportUrls = async () => {
         await db.clean();
         return { statusCode: 404, body: JSON.stringify({ error: "Tag not found" }) };
     }
-    const rows = (await db.query({
+    const listed = `FROM "blockers" "b"
+                    JOIN "urls" "u" ON "u"."id"="b"."url_id"
+                    JOIN "audits" "a" ON "a"."id"="b"."audit_id"
+                    WHERE "b"."scan_id" = ANY($1::uuid[])
+                    GROUP BY "u"."url", "a"."id", "a"."name"`;
+    // The audit id is the last tie-break: the same URL in two audits with the
+    // same count would otherwise have no fixed order, and could repeat on one
+    // page and be missing from the next
+    const fetchPage = async (pageIndex: number) => (await db.query({
         text: `SELECT "u"."url"::text AS "key", "a"."id" AS "audit_id", "a"."name" AS "audit_name",
                       COUNT(*)::int AS "count", COUNT(*) OVER ()::int AS "total_count"
-               FROM "blockers" "b"
-               JOIN "urls" "u" ON "u"."id"="b"."url_id"
-               JOIN "audits" "a" ON "a"."id"="b"."audit_id"
-               WHERE "b"."scan_id" = ANY($1::uuid[])
-               GROUP BY "u"."url", "a"."id", "a"."name"
-               ORDER BY 4 DESC, 1
+               ${listed}
+               ORDER BY 4 DESC, 1, "a"."id"
                LIMIT $2 OFFSET $3`,
-        values: [scope.latestScanIds, pageSize, page * pageSize],
+        values: [scope.latestScanIds, pageSize, pageIndex * pageSize],
     })).rows;
+    let rows = await fetchPage(page);
+    if (rows.length === 0 && page > 0) {
+        // Past the end: the list shrank since this page was asked for (an
+        // audit left the tag, or was rescanned). An empty page has no row to
+        // carry the total, so count it directly and answer with the last page
+        // there is; `page` in the response says which one that was.
+        const total: number = (await db.query({
+            text: `SELECT COUNT(*)::int AS "count" FROM (SELECT 1 ${listed}) "rows"`,
+            values: [scope.latestScanIds],
+        })).rows[0].count;
+        page = Math.max(0, Math.ceil(total / pageSize) - 1);
+        rows = await fetchPage(page);
+    }
     await db.clean();
 
     return {
